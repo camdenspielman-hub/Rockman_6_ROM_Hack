@@ -27,9 +27,16 @@ print(C.status(e))  # {'stage': 'SKULL', 'cp': 1, 'hp': 28, 'lives': 9, 'x': 524
 e = Emu(C.ROM); C.unlock_all(e)                  # inject an unlocked save, boot to the title menu
 C.to_extra_config(e)                             # title -> SPECIAL MODE -> EXTRA CONFIGURATION
 C.enter_stage(e, C.STAGE['WILY2'], cp=1, loadout='fortress', exwp=3)   # Wily 2, checkpoint 1, riding R.ARMOR
+
+# warp from anywhere in a stage, no menus (sets $22/$1F, kills Rockman via player state $30 = 7, respawns there):
+C.warp(e, C.STAGE['DIVE'], 2)
+
+# any boss or mid-boss (45 fight IDs, section 5b):
+e.load('build/research/r4mi/states/fight_1a_skull.state'); C.godmode(e)   # the red T-rex mech
+# or build one: e.load('build/research/r4mi/states/my_arena_menu.state'); C.arena_fight(e, [0x00, 0x20])
 ```
 
-`python3 -I tools/analysis/r4mi/cheats.py [outdir]` rebuilds the whole state set in about 6 seconds.
+`python3 -I tools/analysis/r4mi/cheats.py [outdir]` rebuilds 99 of the 105 states in about 7 seconds (all but the six SPECIAL MODE entry screens, which `build/research/r4mi/r4mi-scout/modes.py` makes). It is deterministic: the stage states come out with identical RAM.
 
 ---
 
@@ -176,6 +183,7 @@ The game-block check also rejects the block if `$30 & $40` is set (`$AAA3`). Pyt
 | Address | Meaning | Evidence |
 |---|---|---|
 | `$22` | **Stage ID** (0-15, see §5). `$10` = stage select, `$11` = DATA SAVED / Game Over screen | [seen] |
+| `$30` | **Player state** (vanilla RM4): 0 standing, 1 walking, …, **7 dying**. Poking 7 kills Rockman at once; after the death the stage loop restarts at `$22`/`$1F` and `DEC $A1` (fixed bank `$C82F`) | [seen + code] |
 | `$1F` | **Checkpoint** (0-2) | [seen] (EXTRA CONFIG C.P.) |
 | `$A0` | **Current weapon slot.** Energy of the current weapon = `$B0 + $A0` | [seen] firing drained the matching byte |
 | `$A1` | **Lives** | [seen] |
@@ -184,6 +192,8 @@ The game-block check also rejects the block if `$30 & $40` is set (`$AAA3`). Pyt
 | `$AA` | **Fortress clear bits**: thermometer `00 01 03 07 0F 1F 3F 7F` (Cossack 1 … Wily 3) | [text] |
 | `$B0` | **HP**: bit7 set, bits 0-4 = 0..28 (`$9C` = full) | [seen] |
 | `$B1-$BD` | **Weapon energy**, bit7 = owned (table below) | [seen] |
+| `$BF` | **Boss life bar** (bits 0-4 = 0..28; some fights keep bit7 set, `$9C`). It follows the boss's HP | [seen] |
+| `$0467` | **Boss HP** = HP of object slot 23 (`$0450 + slot`), where all 8 Robot Masters and the Cossack 1 boss live. Poke 1, hit once, and the fight is won [seen: Bright Man in MY ARENA → "CONGRATULATIONS! … NEW RECORD!!", `cheats_arena_clear.png`]. The other fortress bosses and the extra fights keep their HP elsewhere (multi-part objects; not traced) | [seen] |
 | `$3C` | **Player i-frame timer**: 30 after the ~9-frame knockback, counts down to 0. Freezing it at 2 blocks all enemy damage | [seen] (HP stayed 28 for 900 frames in Ring) |
 | `$0330` / `$0348` / `$0318` | Player X pixel / X screen (page) / X subpixel (object slot 0; slots are `$18` apart) | [seen] |
 | `$0378` / `$0360` / `$03F0`+`$03D8` | Player Y pixel / Y sub / Y speed (whole + sub, +4 at jump start) | [seen] |
@@ -200,12 +210,13 @@ The game-block check also rejects the block if `$30 & $40` is set (`$AAA3`). Pyt
 |---|---|
 | `$7839` | **Equipment bits** (table below) |
 | `$7890` | PROG. (game progress value). The readme says it changes after the Cossack 1 entrance scene, for example [doc] |
-| `$7898` | FLAG: bit7 EDDY, bit6 BEAT, bit5 KALINKA, bit4 TOADMAN, bit3 RUSH, bit2 RE-ENTER, bit1 SHADOWMAN, bit0 unused. These are the Hero Score "friends / bonus / revisit" flags. [text] gives the order; bit numbering follows the other fields [guess] |
+| `$7898` | FLAG: bit7 EDDY, bit6 BEAT, bit5 KALINKA, bit4 TOADMAN, bit3 RUSH, bit2 RE-ENTER, bit1 SHADOWMAN, bit0 unused. These are the Hero Score "friends / bonus / revisit" flags. [text] gives the order, and the set sites in the code agree [code]: `ORA #$04` in bank `$39` (stage select) right after testing the chosen stage's `$A9` clear bit = **RE-ENTER** (you revisited a cleared stage); `ORA #$40` in bank `$44` together with `$7839 \|= $40` = **BEAT** (the bird joins you and the equipment bit is set); `ORA #$80` bank `$41` (EDDY), `ORA #$10` bank `$41` (TOADMAN; bank `$1D` clears it again with `AND #$EF`), `ORA #$08` bank `$56` (RUSH), `ORA #$02` bank `$57` (SHADOWMAN), `ORA #$20` bank `$50` (KALINKA, in the same routine that fills `$B1-$B3`, the three Rush slots). `$7898` and `$7890` are zeroed together on NEW GAME (bank `$4C` `+166E`, bank `$7B`) |
 | `$7820-$782F` | S.VAL ×16 (per-stage scratch values, "MULTIPURPOSE") [text] |
 | `$78CA` / `$78CB` / `$78D3` | Cheats C.RFL (refill at pause) / EXWP (super-special weapon 0-11) / TML ("TOO MANY LIVES!", lives stay at 9) [text] |
 | `$78B0` | Language (0 JP, 1 EN) |
 | `$78CD` `$78CE` `$78C9` `$78C8` `$78CF` `$78CC` | CONFIG MAIN (0 NORM, 1 HARD), DAMAGE (0 ×1.0, 1 ×0.5, 2 ×1.5), CRITICAL (0 ON), ITEM DROP (0 NORM, 1 MORE, 2 NONE), FAIL-SAFE (0 NORM, 1 SAFE), E.GEN (0 ON) [seen: one RIGHT press each] |
-| `$78D0` / `$78D1` / `$78D2` | VITAL (max HP, 28) / ROCKMAN (starting lives, 4) / ETANK (guaranteed minimum) |
+| `$78D0` / `$78D1` / `$78D2` | VITAL = **max HP** (28; with 10, Rockman respawns with 10 HP [seen]) / ROCKMAN (starting lives, 4) / ETANK (guaranteed minimum) |
+| `$78ED-$78FF` | Arena setup (MY ARENA fields, §5b); `$7900+` = the arena's fight list |
 | `$7942` | CONFIG ROCKMAN as used on load (EXTRA CONFIG entries leave it 0) |
 | `$7836` / `$7837-$7838` | Frame counter / play-time accumulator added into the save at each save |
 | `$788D` | Unlock bits earned this session (ORed into `$7F78`) |
@@ -233,6 +244,9 @@ The game-block check also rejects the block if `$30 & $40` is set (`$AAA3`). Pyt
 
 Controller-2 A cycles weapons in the order 0, 12, 4, 9, 11, 8, 10, 7, 13, 1, 3, 2, 5, 6 [seen].
 
+![Weapon slots](img/cheats_weapon_slots.png)
+*The pause menu with only one energy byte `$B1`…`$BD` owned at a time: each slot's name and its place in the menu grid.*
+
 ### Equipment bits (`$7839`) [seen: one bit at a time, `cheats_equip_bits.png`]
 
 | Bit | Item | Help text (abridged) [text] |
@@ -248,6 +262,9 @@ Controller-2 A cycles weapons in the order 0, 12, 4, 9, 11, 8, 10, 7, 13, 1, 3, 
 
 The three starting items, ENERGY CHARGER (= CONFIG E.GEN), ENERGY BALANCER and EXCHANGER, are always shown and have
 no bit [seen].
+
+![Equipment bits](img/cheats_equip_bits.png)
+*The pause menu's bottom panels with `$7839` = bit0 … bit7 (left to right, top to bottom). The three starting items sit in the middle box every time; the extra icon is the bit's item (bit6 BEAT draws elsewhere, as a bird at the top right).*
 
 ---
 
@@ -314,7 +331,10 @@ TOAD      DRILL    DUST
 The cursor starts in the centre (`$10 = 1`, `$11 = 3`). NEW GAME skips the intro and goes straight to this screen.
 Beaten bosses' portraits go blank. With all 8 beaten, the centre panel shows Dr. Cossack, and START plays the Cossack
 castle scene: lightning, the castle in colour, then a night shot where **a Wire line shoots in from the left** to
-the castle. After that, Cossack 1 opens on **the roof of a moving train** [seen] (vanilla opens in snow).
+the castle. After that, Cossack 1 opens **beside a moving train** [seen] (vanilla opens in snow).
+
+![Cossack castle intro](img/cheats_cossack_intro.png)
+*The centre panel with all 8 cleared: lightning, the castle in colour, the Wire line at night, then Cossack 1 beside a train.*
 
 ![Menus](img/cheats_menus.png)
 *Title after unlock, SPECIAL MODE, EXTRA CONFIGURATION, stage select (new), stage select (all 8 cleared).*
@@ -333,7 +353,8 @@ How it works [code, bank `$4C`]:
 - START runs `$95CC`: `$78F7` = mode (0 MECHANICAL, 1-9 the LIMITED ARENA entries, `$0A` MY ARENA, `$0B` THE TRUE
   ARENA). Every mode except MY ARENA first loads a preset (`$955F`, 7 presets in column tables at `$94E1-$955E`).
 - `$9762` walks the fight table at `$97A3` and copies each ID whose bit is set (bit `id & 7` of `$78FA + (id >> 3)`)
-  into the run list at `$7900` (terminated by `$0F`). Bit 7 in the table marks the start of a shuffle block for
+  into the run list at `$7900` (count in `$78E8`, then a `$0F` filler byte). Fights always run in table order, not
+  in the order you pick them: `arena_fight(e, [0x20, 0x00, 0x13])` builds `13 00 20` [seen]. Bit 7 in the table marks the start of a shuffle block for
   RAND = 11.
 - Table order (= the order a full run plays): `[10-1D] [00-07] [1E-2A] [08-0E] [0F 2B 2C]`. So the full TRUE ARENA
   is 45 fights: 14 mid-bosses, the 8 Robot Masters, 13 more extra fights, the 7 fortress bosses, then the Wily
@@ -394,6 +415,9 @@ hall in Wily 4.
 ![All 45 fights](img/cheats_fights.png)
 *Every MY ARENA fight ID, about 4 s after its state loads (godmode on).*
 
+![Arena clear](img/cheats_arena_clear.png)
+*MY ARENA cleared (Bright Man alone, with `$0467 = 1`): the result screen compares your time with the 30:00.00 default record. Clearing it also sets `$788D = $78` (the post-LIMITED unlock bits).*
+
 ---
 
 ## 6. Cheat recipes
@@ -401,13 +425,15 @@ hall in Wily 4.
 | Want | Do |
 |---|---|
 | No damage | `e.freeze(0x3C, 2)` (i-frame timer) or `godmode(e)` |
+| Fight any boss / mid-boss | `fight_XX_<stage>.state`, or `arena_fight(e, ids)` from `my_arena_menu.state` (§5b) |
+| Kill Rockman (respawn at checkpoint) | `e.poke(0x30, 7)` |
 | No pit / spike deaths | Equipment `$7839 \|= $70` (SHOCK GUARD + TRAMPOLINE + BEAT). Frozen HP alone does **not** stop pits: Skull cp1 killed a frozen-HP Rockman by falling, and with `$70` he got through [seen] |
 | Infinite lives | `freeze(0xA1, 9)` or EXTRA CONFIG TML ≠ 0 |
 | All weapons | `$B0-$BD = $9C` (`give_all`) |
 | Refill at pause | `$78CA ≠ 0` (C.RFL) |
 | Pick a weapon | `$A0 = slot` (`set_weapon(e, 'DIVE')`) |
 | A super-special weapon | `$78CB = 1..11`, then enter a stage. It replaces the buster (§9) |
-| Warp | `enter_stage()` from `extra_config.state`. Or, faster, in any stage: poke `$22` (stage) / `$1F` (checkpoint), then die (`$B0 = $81` and wait for a hit, or fall). The respawn reads both, so you reappear at that stage's checkpoint with your current loadout [seen: Ring → Ring cp2, and Ring → Bright cp1, 240 frames each]. `cheats.warp(e, stage, cp)` does this |
+| Warp | `enter_stage()` from `extra_config.state`, or faster, in any stage, `cheats.warp(e, stage, cp)`: it pokes `$22`/`$1F`, kills Rockman with `$30 = 7`, keeps re-poking `$22`/`$1F` while he dies (the checkpoint logic can raise `$1F` during the death), and waits for control. You reappear at that checkpoint with your current loadout, about 520 frames in all. Tested on all 48 targets in a chain (each warp from the previous spot) [seen]: 44 land exactly on the EXTRA CONFIG spawn point. The others: `pharaoh_cp2` a few pixels off (the floor carries him), `cossack3_cp1` at screen 31 (x 128, y 84) instead of 37, `cossack3_cp2` at y 100 instead of 84, and `wily3_cp0`, which is the cutscene |
 | English | sys `$79` bit0 / `$78B0 = 1`. The opening story crawl stays Japanese even in EN [seen] |
 
 ---
@@ -421,7 +447,7 @@ hall in Wily 4.
 | Fixed `$7F` @ `$FEA8` | Vanilla RM4 task scheduler (4 slots at `$80`); `$FF1C` = yield one frame |
 | Bank `$40` @ `$A000` | Save system: load `$A9A3`, verify `$AA33`, checksums `$AAFD`/`$AC42`, system boot `$AB31`, per-stage death counters `$AC80`, save `$AF1F`, unlock/achievement merge `$AE51`, config pack `$AE8D` |
 | Bank `$30` @ `$8000` | Title-menu text (`$8B2E`: SPECIAL MODE when `$7F78 ≠ 0`). The title task runs with banks `$39`/`$33` |
-| Bank `$4C` @ `$8000` | SPECIAL MODE menu (`$8001`), achievement drawing (`$8120`), EXTRA CONFIGURATION (`$90A3`; field table `$93A1`/`$93BF`; actions `$923B`/`$9241`), arena-clear unlocks (`$9B03`) |
+| Bank `$4C` @ `$8000` | SPECIAL MODE menu (`$8001`), achievement drawing (`$8120`), EXTRA CONFIGURATION (`$90A3`; field table `$93A1`/`$93BF`; actions `$923B`/`$9241`), arena-clear unlocks (`$9B03`), arena start (`$95CC`; presets `$955F` with tables `$94E1-$955E`; fight-list builder `$9762` over the fight table `$97A3`; LIMITED-mode BOSS1 masks `$9866`) |
 | Bank `$1C` | Main ending: `$788D \|= 3`, `$7698 = 1` |
 | Bank `$4D` @ `$BAB0` | Friend count == 3 → `$788D \|= 4` |
 | ROM `0x17600-0x17A40` | Compressed menu strings (CONFIGURATION / EXTRA / SPECIAL MODE …), letters `A = $0B` |
@@ -494,7 +520,16 @@ hall in Wily 4.
    - Cossack 4 has a N/E/S/W compass HUD and runs from screen 30 back down to 2.
    - Bright's stage has a bottom status bar ("WPN P").
 7. **Records count deaths as "TIWNS"** (*tiun*, the death-sound onomatopoeia), per stage, for the main game [seen].
-8. **The RM4 engine is still underneath** [code]: the task scheduler, the stage order, the object table layout and the
+8. **Behind MY ARENA is a 45-fight boss and mid-boss select** [seen + code] (§5b). Beyond the 16 stage bosses, the
+   table holds 29 extra fights, and many of them are not in vanilla RM4: a **red T-rex mech** in Skull Man's stage, a
+   **giant frog mech with a rider** in Toad Man's, a **whale battleship over the sea** in Dive Man's, a purple hippo
+   in Drill Man's, four fights in a **city at dusk** with an onion-dome skyline in Cossack 1, a **shuriken ninja** that
+   turns up in Bright, Pharaoh and Toad Man's stages (riding a frog in Toad's), five humanoid robots that look like
+   the Game Boy Mega Man Killers / Stardroids [guess], and a teal hall of refights in Wily 4. THE TRUE ARENA runs all
+   45 in a row, which explains why the author cannot beat it.
+   ![All 45 fights](img/cheats_fights.png)
+   *Fight IDs `00`-`2C` (same image as §5b).*
+9. **The RM4 engine is still underneath** [code]: the task scheduler, the stage order, the object table layout and the
    `$B0` energy block are all vanilla RM4. 4MI adds a far-call trampoline and moves the save, menus and special modes
    into the new banks `$40+`.
 
@@ -502,6 +537,12 @@ hall in Wily 4.
 
 ## 10. Lessons for Rockman 6 GP
 
+- **Drive boss rushes and a boss select from one fight table.** 4MI's arenas are a 45-entry table of fight IDs
+  (each = stage + room), a 6-byte bitmask, and a list builder. Mechanical, Limited, True and the user-made MY ARENA
+  are just presets over the same data. RM6 GP can get a boss rush, a refight hall and a "fight any boss" debug
+  menu from one table like this.
+- **Give the player a one-byte "kill me" state.** `$30 = 7` restarts the stage at the checkpoint the RAM points to. It
+  makes warps, tests and fuzzing trivial. Keep the stage/checkpoint pair the respawn reads in two documented bytes.
 - **Ship a level select as a feature, not a debug hack.** 4MI's EXTRA CONFIGURATION is a live RAM editor with a
   one-line help string per field. It cost the author one pointer table and some text, and it makes the game testable,
   speedrun-practisable and cheat-friendly. RM6 GP should have the same thing (stage, checkpoint, flags, loadout) from

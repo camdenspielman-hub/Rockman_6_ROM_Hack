@@ -1,0 +1,197 @@
+# Rockman CX (JP) dialogue table, bank $26 scripts.  JP text bytes are tile numbers $20-$FF in the dialogue
+# pattern table; each script loads its own 16-glyph pages with op 04 [CHR hi,bank,dst] (dst $12 = codes $20-$2F, etc.).
+# Codes therefore change meaning per script.  This table lists the most common page for each code row;
+# rows marked "varies" are per-script kanji pages (decode with build/research/cx/cx-text2/turns.py, which follows
+# the CHR ops and maps glyph bitmaps to characters via jp_glyphs.tsv).  Control codes are as in the EN table,
+# except 07 [NUM] takes 5 argument bytes and 0D is unused.
+# codes 20-2F: page bank $29 $A000 (ROM 0x52000), loaded by 13 of 24 CHR ops for this row (varies)
+20=が
+21=な
+22=い
+23=の
+24=つ
+25=そ
+26=を
+27=た
+28=…
+29=！
+2A=、
+2B=。
+2C=ど
+2D=は
+2E=？
+2F=に
+# codes 30-3F: page bank $29 $A200 (ROM 0x52200), loaded by 12 of 27 CHR ops for this row (varies)
+30=き
+31=じ
+32=ゃ
+33=わ
+34=と
+35=こ
+36=ろ
+37=で
+38=っ
+39=よ
+3A=う
+3B=さ
+3C=る
+3D=し
+3E=て
+3F=す
+# codes 40-4F: page bank $29 $A500 (ROM 0x52500), loaded by 10 of 29 CHR ops for this row (varies)
+40=ま
+41=あ
+42=お
+43=ん
+44=く
+45=れ
+46=え
+47=や
+48=ら
+49=だ
+4A=か
+4B=み
+4C=り
+4D=け
+4E=ぶ
+4F=ず
+# codes 50-5F: page bank $29 $B200 (ROM 0x53200), loaded by 3 of 21 CHR ops for this row (varies)
+50=非
+51=常
+52=自
+53=然
+54=摂
+55=理
+56=草
+57=木
+58=生
+59=鳥
+5A=飛
+5B=日
+5C=差
+5D=前
+5E=カ
+5F=タ
+# codes 60-6F: page bank $29 $A000 (ROM 0x52000), loaded by 1 of 6 CHR ops for this row (varies)
+60=が
+61=な
+62=い
+63=の
+64=つ
+65=そ
+66=を
+67=た
+68=…
+69=！
+6A=、
+6B=。
+6C=ど
+6D=は
+6E=？
+6F=に
+# codes 70-7F: page bank $29 $A500 (ROM 0x52500), loaded by 2 of 16 CHR ops for this row (varies)
+70=ま
+71=あ
+72=お
+73=ん
+74=く
+75=れ
+76=え
+77=や
+78=ら
+79=だ
+7A=か
+7B=み
+7C=り
+7D=け
+7E=ぶ
+7F=ず
+# codes 80-8F: page bank $29 $AC00 (ROM 0x52c00), loaded by 4 of 19 CHR ops for this row (varies)
+80=ば
+81=み
+82=も
+83=だ
+84=取
+85=短
+86=時
+87=間
+88=研
+89=究
+8A=所
+8B=荒
+8C=回
+8D=実
+8E=手
+8F=合
+# codes 90-9F: page bank $29 $A500 (ROM 0x52500), loaded by 1 of 4 CHR ops for this row (varies)
+90=ま
+91=あ
+92=お
+93=ん
+94=く
+95=れ
+96=え
+97=や
+98=ら
+99=だ
+9A=か
+9B=み
+9C=り
+9D=け
+9E=ぶ
+9F=ず
+# codes A0-AF: page bank $29 $BD00 (ROM 0x53d00), loaded by 3 of 18 CHR ops for this row (varies)
+A0=ぞ
+A1=ふ
+A2=む
+A3=も
+A4=げ
+A5=ざ
+A6=遠
+A7=受
+A8=仮
+A9=面
+AA=へ
+AB=ン
+AC=ツ
+AD=ノ
+AE=ハ
+AF=リ
+# codes B0-BF: page bank $17 $BC00 (ROM 0x2fc00), loaded by 1 of 2 CHR ops for this row (varies)
+# codes C0-CF: page bank $17 $BD00 (ROM 0x2fd00), loaded by 1 of 2 CHR ops for this row (varies)
+# codes D0-DF: page bank $28 $BF00 (ROM 0x51f00), loaded by 1 of 8 CHR ops for this row (varies)
+D0=く
+D1=さ
+D2=ロ
+D3=ッ
+D4=ク
+D5=休
+D6=ん
+D7=で
+D8=お
+D9=れ
+DA=ウ
+DB=ル
+DC=ト
+DD=ラ
+DE=マ
+DF=ン
+# codes E0-EF: page bank $10 $B800 (ROM 0x21800), loaded by 1 of 4 CHR ops for this row (varies)
+E1=1
+# codes F0-FF: page bank $29 $AF00 (ROM 0x52f00), loaded by 1 of 3 CHR ops for this row (varies)
+F0=う
+F1=だ
+F2=！
+F3=モ
+F4=ノ
+F5=危
+F6=険
+F7=平
+F8=和
+F9=世
+FA=界
+FB=必
+FC=要
+FD=手
+FE=八
+FF=裂

@@ -150,10 +150,34 @@ def to_stage_select(e, slot=0, **save):
     return e
 
 
+def new_game(e, slot=0, wait=True):
+    """Title -> NEW GAME -> DATA <slot+1> -> intro -> opening stage (stage $0F).  Returns frames waited."""
+    e.load(state('title')); e.run(2)
+    e.tap('START'); e.run(1200)
+    for _ in range(slot): e.tap('DOWN'); e.run(12)
+    e.tap('START'); e.run(1400)
+    return wait_playable(e, step=5) if wait else None
+
+
+def fortress_route(e, quick_man=True):
+    """On the Dr. Light fortress map shown after Light stage 1 (progress 1), walk the fake Rockman:
+    quick_man=True climbs the ladder and walks into Quick Man -> stage $09 (Light 2);
+    False walks along the floor into Guts Man -> stage $0A (Light 3, skipping $09)."""
+    if quick_man:
+        for _ in range(400):
+            if e.peek(X) >= 0x78: break
+            e.step(['RIGHT'])
+        e.run(120, ['UP']); e.run(60, ['UP', 'RIGHT'])
+    e.run(600, ['RIGHT'])
+
+
 def warp(e, stage, slot=0, wait=True, **save):
     """Start a stage fresh from the stage select, via a crafted save.
     stage 0-7 = robot masters, 8-13 = Dr. Light fortress 1-6 (sets bosses=$FF and the fortress progress),
-    14 = ending.  Returns frames waited until playable (None if it never got control)."""
+    14 = final stage ($0E), 15 = opening stage (NEW GAME).  Stage 9 is reached through the fortress map
+    (progress 1, ladder -> Quick Man).  Returns frames waited until playable (None if it never got control)."""
+    if stage == 15:
+        return new_game(e, slot, wait)
     if stage >= 8:
         save.setdefault('bosses', 0xFF)
         save['flags'] = (save.get('flags', 0) & 0x8F) | ((stage - 8) << 4)
@@ -162,7 +186,59 @@ def warp(e, stage, slot=0, wait=True, **save):
         sel = SEL_OF[stage]
     to_stage_select(e, slot, **save)
     e.poke(STAGE, sel); e.run(10); e.tap('START')
+    if stage == 9:
+        wait_playable(e)              # the map walker becomes controllable
+        fortress_route(e, quick_man=True)
     return wait_playable(e) if wait else None
+
+
+# Restart rooms per stage, in the order you reach them (cp 0 = stage start).  Each 16 KB stage bank holds
+# one robot-master stage plus one fortress/opening stage, and both share the bank's 6-entry restart
+# table at $BB06 (rooms) / $BB30 (segment $38) / $BB37 / $BB3D (scroll limits $14/$15) [code $C4CD].
+# On death $C190 sets checkpoint index $B0 = (number of entries <= current room) - 1; stage 5 skips the -1
+# because Mega Man's stage runs right-to-left (start room $0E, then $08, then $01).
+CP_ROOMS = {0: [0x00, 0x08, 0x16, 0x18], 1: [0x00, 0x0A, 0x14, 0x17, 0x20], 2: [0x00, 0x0D, 0x16],
+            3: [0x00, 0x0C, 0x14], 4: [0x00, 0x07, 0x16], 5: [0x0E, 0x08, 0x01], 6: [0x00, 0x0A, 0x13],
+            7: [0x00, 0x08, 0x11], 8: [0x19, 0x21], 9: [0x2B], 10: [0x18, 0x21, 0x28], 11: [0x17, 0x21, 0x2A],
+            12: [0x18, 0x1D, 0x29], 13: [0x15, 0x16, 0x20], 14: [0x18, 0x1A, 0x28], 15: [0x17, 0x1D]}
+
+
+def cp_table(rom_bytes, stage):
+    """The raw 6-entry restart-room table of a stage's bank (rom_bytes = ROM without the iNES header)."""
+    o = (2 * (stage & 7) + 1) * 0x2000 + 0x1B06
+    return list(rom_bytes[o:o + 6])
+
+
+def kill(e, room=None, limit=400):
+    """Kill the player now (drop him below the screen).  If room is given, the room byte is held there
+    until the death registers, which picks the checkpoint the game restarts from.  Refunds the life."""
+    lives = e.peek(LIVES)
+    e.poke(Y, 0xF0)
+    if room is not None: e.freeze(ROOM, room)
+    for _ in range(limit):
+        e.step(None)
+        if e.peek(LIVES) != lives: break
+    if room is not None: e.unfreeze(ROOM)
+    e.poke(LIVES, lives)
+
+
+def warp_cp(e, stage, cp, wait=True, **save):
+    """Start `stage` at checkpoint `cp` (index into CP_ROOMS[stage]): warp to the stage start, then die
+    with the room byte held at the checkpoint room so the restart code picks it."""
+    t = warp(e, stage, **save)
+    if cp == 0: return t
+    rooms = CP_ROOMS[stage]
+    if stage == 5:
+        tab = [0x01, 0x08, 0x0E]           # B0 index k needs (entries <= room) == k
+        k = 2 - cp; room = tab[k] - 1
+    else:
+        room = rooms[cp]
+    kill(e, room)
+    if not wait: return None
+    t = wait_playable(e, limit=600)
+    if t is None:                          # beam-in hung (scroll-locked boss rooms): drop in from y=$80
+        e.poke(Y, 0x80); t = wait_playable(e, limit=600)
+    return t
 
 
 # ---- autoplay ----------------------------------------------------------------------------------

@@ -10,6 +10,9 @@
     C.godmode(e); C.give_all(e)        # freeze HP/lives/i-frames (+FAIL-SAFE items), own everything
     print(C.status(e))
     # or simply: e.load('build/research/r4mi/states/ring_cp0.state')   (see docs/research/r4mi/cheats.md)
+    C.warp(e, C.STAGE['DIVE'], 2)      # in-stage warp: set $22/$1F, kill via player state $30 = 7, respawn there
+    e.load('build/research/r4mi/states/my_arena_menu.state'); C.arena_fight(e, 0x1A)   # any of 45 boss fights
+    # (ready-made: build/research/r4mi/states/fight_XX_<stage>.state, labels in C.FIGHTS)
 
 Regenerate the whole savestate set:  python3 -I tools/analysis/r4mi/cheats.py [outdir]
 
@@ -24,6 +27,8 @@ docs/research/r4mi/cheats.md.
     $00-$EF, checksum $F0-$FA = sum16 lo, sum16 hi, xor, xor of even offsets, xor of odd offsets, the same five
     inverted, xor of the first five. Bad game block -> "SAVE DATA BROKEN" handler (special menu hangs black).
   * Unlocks: system byte $78 (= $7F for every SPECIAL MODE item), $7E (= $07 for the three achievements).
+  * MY ARENA setup $78ED-$78FF (BOSS0-5 bitmask = $78FA-$78FF over 45 fight IDs, table bank $4C:$97A3);
+    VITAL (max HP) $78D0.
 """
 import os, sys
 
@@ -36,7 +41,7 @@ STAGE = {'BRIGHT': 0, 'TOAD': 1, 'DRILL': 2, 'PHARAOH': 3, 'RING': 4, 'DUST': 5,
 STAGE_NAME = {v: k for k, v in STAGE.items()}
 
 RAM = dict(
-    stage=0x22, checkpoint=0x1F, pstate=0x30, weapon=0xA0, lives=0xA1, etanks=0xA2, clear=0xA9, fortress=0xAA,
+    stage=0x22, checkpoint=0x1F, pstate=0x30, weapon=0xA0, boss_bar=0xBF, boss_hp=0x0467, lives=0xA1, etanks=0xA2, clear=0xA9, fortress=0xAA,
     hp=0xB0, iframes=0x3C, px=0x0330, ppage=0x0348, pxsub=0x0318, py=0x0378, pysub=0x0360, pvy=0x03F0,
     scroll_x=0xFC, scroll_page=0xF9, ss_col=0x10, ss_row=0x11, joy_held=0x14, joy_new=0x16,
     equip=0x7839, prog=0x7890, flag=0x7898, sval=0x7820, tml=0x78D3, crfl=0x78CA, exwp=0x78CB,
@@ -297,7 +302,7 @@ def make_fight_states(outdir='build/research/r4mi/states'):
 
 # ----------------------------------------------------------------------------- regenerate the state set
 def make_states(outdir='build/research/r4mi/states'):
-    """Power-on -> unlocked title -> menus -> every stage x checkpoint 0-2. ~1 minute."""
+    """Power-on -> unlocked title -> menus -> every stage x checkpoint 0-2. ~6 s."""
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
     from emu import Emu
     os.makedirs(outdir, exist_ok=True); P = lambda n: os.path.join(outdir, n + '.state')

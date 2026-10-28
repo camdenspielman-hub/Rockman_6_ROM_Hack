@@ -273,21 +273,41 @@ def _press(act, j):
 
 
 def _cell(r, xshift=5, yshift=5):
-    return (r[STAGE], r[CAM_SCR], r[X] >> xshift, r[Y] >> yshift)
+    return (r[STAGE], r[XSCR], r[X] >> xshift, r[Y] >> yshift)
+
+
+def progress(r):
+    """Default explore score: the player's screen ($046F, which counts screens along the level path,
+    also through vertical shafts), then X in 32-pixel steps."""
+    return r[XSCR] * 8 + (r[X] >> 5)
+
+
+DEATH_AI = {(0x8F, 0x13): 'pit', (0x8E, 0x7F): 'hp'}   # player AI pointer ($0413/$042A, bank $38) while dying
+
+
+def dying(r):
+    """'pit' / 'hp' while the player's death sequence runs (60 / 240 frames, then $F0 = 2), else None."""
+    return DEATH_AI.get((r[O_AIHI], r[O_AILO]))
+
+
+def safe(r):
+    """Default explore keep(): drop rollouts that die or leave the stage loop.  (Y >= $F0 is not a death
+    test: falling into the next screen of a vertical shaft also passes there.)"""
+    return r[GAMEFLOW] == 0 and dying(r) is None
 
 
 def explore(e, budget=200000, seed=0, acts=ACTS, done=None, keep=None, log=print, xshift=5, yshift=5,
-            frontier=4.0, god=True, cell=None, checkpoint=None, idle_max=600, score=None):
+            frontier=4.0, god=True, cell=None, checkpoint=None, idle_max=600, score=progress):
     """Go-Explore autoplayer (same design as tools/analysis/cx/cheats.py).  Archive of cells
-    (stage, screen, x>>xshift, y>>yshift[, extra]) -> savestate; repeatedly restore a cell, biased to the
-    best score (default: number of distinct screens on the path, then the screen number) and play random
-    held-button macros.  done(e, r) -> True stops; keep(r) -> False drops the rollout; cell(r) adds an
+    (stage, player screen, x>>xshift, y>>yshift[, extra]) -> savestate; repeatedly restore a cell, biased
+    to the best score (default progress(): screen, then x) and play random held-button macros.  done(e, r) -> True stops; keep(r) -> False drops the rollout; cell(r) adds an
     extra key.  Returns (best_state_bytes, archive)."""
     rnd = random.Random(seed)
     if god: godmode(e)
     e.step(None)
     key = (lambda r: _cell(r, xshift, yshift) + ((cell(r),) if cell else ()))
-    sc = score or (lambda r: r[CAM_SCR])
+    sc = score or progress
+    keep = keep or safe
     r = ram(e); c0 = key(r)
     arch = {c0: [e.save(), 0, 0, sc(r)]}
     total, it, best, t0 = 0, 0, sc(r), time.time()
@@ -323,4 +343,4 @@ def explore(e, budget=200000, seed=0, acts=ACTS, done=None, keep=None, log=print
 
 def boss_score(r):
     """Frontier score for boss fights: screen first, then damage dealt to the boss ($03ED)."""
-    return r[CAM_SCR] * 64 + (0x1B - min(r[BOSSHP], 0x1B)) if r[BOSSBAR] else r[CAM_SCR] * 64
+    return progress(r) * 32 + ((0x1B - min(r[BOSSHP], 0x1B)) if r[BOSSBAR] else 0)
