@@ -1,12 +1,20 @@
 # Rockman CX: the Dr. Light fortress, final battle and ending (cx-fortress)
 
-Status: IN PROGRESS (rewritten as I go so an interruption loses little).
+Status: complete for this run (the open points are listed in §11).
 
 Scope: Dr. Light fortress stages 1-6 (stage IDs `$08`-`$0D`), the fortress map and its route choice, every fortress
 boss, the final stage `$0E` (giant Dr. Light) and the ending. Tags: **[seen]** observed in the emulator, **[code]**
 disassembly or ROM data, **[text]** in-game text, **[doc]** readme, **[guess]** speculation. ROM `roms/cx_en.nes`.
 RAM names follow `docs/research/cx/cheats.md`. Dialogue transcriptions (EN and JP) are in `docs/research/cx/text.md`
 §2.6-2.7; this doc cites the script numbers s00-s25 from there.
+
+**How crazy it gets, in short:** Light 1's boss is **Ultraman** in the Mecha Dragon arena; Light 2 is a clock tower
+where you free a brainwashed **Quick Man** and then *become* him for the walk out; Light 3's **Guts Tank** puts a
+helmet on for round two; Light 5 is a teleporter refight hall where Cheat Man's rematch is a **Dragon Quest
+battle against a floating rock band**; Light 6 opens with **Dr. Light himself**, who taunts you after every death,
+asks you to kill yourself (Yes/No), offers you an X-style capsule, and begs for mercy like Wily; the final boss is a
+**giant background-drawn Dr. Light that only the Print Cutter and Power Bomb can hurt**; and the **staff roll is a
+playable level** with 99 lives.
 
 ## 0. Structure
 
@@ -15,16 +23,17 @@ RAM names follow `docs/research/cx/cheats.md`. Dialogue transcriptions (EN and J
 | `$08` | Light 1, Light's lab under attack | Cheat Man (bank 0) | `$19`-`$2B` | `$19`, `$21` | **Ultraman** (room `$2B`) |
 | `$09` | Light 2, the clock tower (optional) | Air Man (bank 1) | `$2B` down to `$16` | `$17`, `$20`, `$2B` | **Quick Man**, brainwashed (room `$16`) |
 | `$0A` | Light 3, the electrified base | Whispy Woods (bank 2) | `$18`-`$2B` | `$18`, `$21`, `$28` | **Guts Tank**, two phases (room `$2B`) |
-| `$0B` | Light 4, water works | Fire Mario (bank 3) | `$17`-`$2B` | `$17`, `$21`, `$2A` | |
-| `$0C` | Light 5, the teleport-system lab | Yoshino Man (bank 4) | `$18`-`$29` | `$18`, `$1D`, `$29` | (mid-boss: green grasshopper robot) |
+| `$0B` | Light 4, water works | Fire Mario (bank 3) | `$17`-`$2B` | `$17`, `$21`, `$2A` | **the masked robot** (room `$2B`) |
+| `$0C` | Light 5, teleporter refights | Yoshino Man (bank 4) | `$18`-`$29` | `$18`, `$1D`, `$29` | five robot-master **refights** |
 | `$0D` | Light 6, Light's inner lab | Mega Man (bank 5) | `$15`-`$2B` | `$15`, `$16`, `$20` | **Dr. Light himself**, twice |
-| `$0E` | final stage | Kamen Rider (bank 6) | `$18`-`$28` | `$18`, `$1A`, `$28` | **giant Dr. Light** |
+| `$0E` | final stage + staff roll | Kamen Rider (bank 6) | `$18`-`$28` | `$18`, `$1A`, `$28` | **giant Dr. Light** (only Print Cutter / Power Bomb hurt him) |
 
 Segment layouts (first room, last room, exit) from the bank's segment table `$B400` [code, `stagemap.segments`]:
 
 - Light 1: `$19-$20` up, `$21` up, `$22-$26` up, `$27` up, `$28-$2B` end. A rightward walk with short climbs.
 - Light 2: starts at room `$2B` and the room numbers **count down** as you climb: `$2B` .. `$27` are one-screen
-  vertical rooms, then `$25-$26`, `$21-$24`, `$1D-$20`, `$1B-$1C`, `$18-$1A`, `$17`, `$16` [seen].
+  vertical rooms, then `$25-$26`, `$21-$24`, `$1D-$20`, `$1B-$1C`, `$18-$1A`, `$17`, `$16` [seen]. Its checkpoints
+  work in that reverse order: a death in room `$27` restarts at `$2B`, a death in `$1E` at `$20` [seen].
 - Light 3: `$18-$1A` down, `$1B-$1C` right, `$1D` down, ... a zig-zag of one- and two-screen segments to `$2B`.
 - Light 6: `$15` (one locked screen), `$16-$1D` right, `$1E`, `$1F`, `$20-$2B`.
 - Final: `$18-$1A` up, `$1B` up, `$1C` up, `$1D-$20` down, `$21-$23`, `$24` right, `$25`.
@@ -52,6 +61,16 @@ Light stages run with all eight robot-master bits set (`$9A = $FF`) and the fort
 - **Rock's own Mega Buster does nothing to Dr. Light** (and nothing to Ultraman); Rider Kick does nothing to Ultraman.
   The heroes' weapons will not hurt their own side [guess at intent; the zeros are seen].
 - Every fortress boss has 40 HP (`$28`) per bar.
+
+**Boss index `$B3`** [seen: read in every boss room]: the boss-scene code in bank `$16` dispatches on `$B3` through the
+table at `$16:803D` (15 entries) [code]. RM2 used it for its six Wily bosses; CX numbers all fifteen of its bosses:
+
+| `$B3` | Boss | `$B3` | Boss |
+|---|---|---|---|
+| 0-7 | the eight robot masters, in stage order (also their Light 5 refights) | `$0B` | Light 4's masked robot |
+| 8 | Ultraman (Light 1) | `$0C` | **not met in this run**: the routine that spawns s08, Light's "pet" (§11) |
+| 9 | Quick Man (Light 2) | `$0D` | Dr. Light (Light 6) |
+| `$0A` | Guts Tank (Light 3) | `$0E` | Guts Man (opening stage) |
 
 ---
 
@@ -85,6 +104,9 @@ puts a platform under you and a second jump lands on the roof (`floor_test.py`).
 items the player has had since the opening.
 
 ### Boss: Ultraman (object `$70`, room `$2B`) [seen]
+
+![Ultraman](img/fortress_light1_ultraman.png)
+*Ultraman over the floating blocks (the player hovers by cheat), flashing when hit, and his grey fade-out on death.*
 
 - The arena is RM2's **Mecha Dragon** arena: a black screen with single white blocks (object `$63`) floating over a
   bottomless pit. The blocks drift as you cross rooms `$2A`-`$2B`; script `$1D` (object `$41` at x `$FE`) starts the
@@ -154,12 +176,26 @@ Boomerangs that fly across the room in formation.*
   and fails. Then **you are Quick Man** (`$9B` bit 7 set, max HP 40) and have to walk back out of the tower: room
   `$16` → `$17` → `$18` → ... back down [seen: `light2_quickman.state`, `rec_qm_esc.png`]. This is the "only stage
   where `$9B` bit 7 survives death" from cheats.md.
+- The rescue also sets **`$9B` bit 3** (`$9B` = `$98` after the fight = Quick Man playing + progress 1 + bit 3)
+  [seen]. With bit 3 set, the pause menu shows a **Quick Man portrait** in its bottom panel (drawn at `$1F:A24F`
+  when bit 3 is set and `$0140` ≠ 0) [code][seen: `menu_qm.png`]. This is s04's "Let's split out. Call me in the
+  menu if you need help." and Quick Man's pre-rendered reply "Ok, I'm on my way!" (text.md §3). I could not make
+  the call happen by menu input (A, B or START on the bottom row did nothing) [seen]; `$1F:BBCA` spawns a script when
+  `$0141` = `$14` and bit 3 is set [code], which looks like the call itself [guess].
+- The escape back down the tower as Quick Man was played to room `$25` (explorer, rooms `$16` → `$25` in order)
+  [seen]; where it ends and where s04 plays was not reached.
 
 ---
 
 ## 4. Light 3 (stage `$0A`): the electrified base
 
-(stage tour to be filled)
+![Light 3 tour](img/fortress_light3_tour.png)
+*Light 3 rooms `$18`-`$24` from the explorer (s05 plays in room `$22`), then checkpoint 2 (room `$28`) and the Guts
+Tank room `$2B`.*
+
+**Route** [seen]: a zig-zag of short segments, down from `$18`, right, down, then up out of room `$23` into `$24`.
+The explorer reached the top of `$23` and crossed into `$24` but always fell back (no foothold where it entered); rooms `$25`-`$27` were not played (the scout's `light3_cp2` restarts at
+`$28`).
 
 **Look** [seen]: teal machinery walls with pink domed caps, dark corridors, and **yellow lightning-bolt circuits** that
 run through the walls with a white spark travelling along them (rooms `$1D`-`$27`, object `$99` at (`$80`,`$80`) plus
@@ -168,6 +204,10 @@ base's gonna ruin!!" Light: "Don't worry, Guts. ...We're now SERIOUS." (JP: he i
 A sign reading **"USE"** hangs in room `$22`.
 
 ### Boss: Guts Tank, two phases (room `$2B`) [seen][text]
+
+![Guts Tank](img/fortress_light3_gutstank.png)
+*Phase 1 (Guts Man's bare head, hit flash), phase 2 (white flash, the masked helmet), the striped beam, and Guts Man's
+head bouncing after the tank is destroyed.*
 
 - RM2's Wily-3 **Guts Tank**, with the face replaced by a huge **Guts Man** riding on top (s06: "I'm going to STOP
   you with... The Fierce Dr.Light's Guts Tank!!").
@@ -182,22 +222,73 @@ A sign reading **"USE"** hangs in room `$22`.
 
 ---
 
-## 5. Light 4 (stage `$0B`)
+## 5. Light 4 (stage `$0B`): the water works
 
-(to be filled) Red-brick lab with tall water tanks whose water level rises and falls, ring-studded platforms over pits
-[seen: `rec_light4.png`].
+![Light 4 tour](img/fortress_light4_tour.png)
+*Rooms `$17`-`$1A` (the water tanks), checkpoint 1 (room `$21`), checkpoint 2 (room `$2A`) and the boss room.*
+
+**Look** [seen: `rec_light4.png`, static map]: red-brick lab with tall glass **water tanks** whose water level rises and
+falls, ring-studded blue platforms over bottomless pits, purple pipes; then a flooded section (rooms `$22`-`$2B`) with a
+light-blue water background, dark-blue kelp shapes and walls of black spike mines. The autoplayer died in the pits of
+room `$18` over and over, and the explorer did not get past room `$1A` in 700,000 frames, so this stage is covered only
+from its checkpoints [seen].
+
+**Checkpoint warps** [seen]: falling below the screen does not kill in room `$17` (the scout's `light4_cp*` states are
+broken for that reason: room `$22` with limits `$17-$1B`, room `$2A` with limits `$16-$16`). Holding HP at 0 and the
+room byte at the target kills the player properly: `cpwarp.py light4 21` gives room `$21` with limits `$21-$21`, and
+`cpwarp.py light4 2A` gives room `$2A` with limits `$2A-$2A`.
+
+### Boss: the masked robot (room `$2B`) [seen][text]
+
+![Light 4 boss](img/fortress_light4_boss.png)
+*From checkpoint 2: the flooded corridor, the arena, s07 ("You finally got here. This is the fourth "Dr.Light's
+Sanctuary" location. It's ours now. Take it from us, if you dare..."), then the fight.*
+
+![Light 4 boss close-up](img/fortress_light4_boss_zoom.png)
+*The boss at 3x: an orange pointed-ear mask, red and black body; a bomb hit and a yellow streak shot.*
+
+- On entry he says **s07**, the variant addressed to the fake Rockman (above). His portrait is the masked face
+  (text.md portrait 09). The Quick Man variant of s07 ("You're, um...the robot master who inherits me? You look
+  weird..." / "Shut up, you are." / "You are.") would play if you arrive as Quick Man [text].
+- The arena is underwater (blue water background with kelp, spike mines along the ceiling, a white floor). He jumps
+  high and fast across the room, throws **yellow streak blades** horizontally and diagonally, and lobs a small grey
+  bomb that bursts into a white star [seen]. 40 HP, 1 per buster hit.
+- Who he is: the text only calls him the robot whose successor is Quick Man; JP "わたしを受けついだロボット" = "the
+  robot who inherited me" [text]. The orange mask and red-and-black suit are consistent with a tokusatsu/anime speed
+  hero [guess; not identified].
+- Death: no dialogue; the fortress map plays and Light 5 starts [seen: `a_l4.png`].
 
 ---
 
-## 6. Light 5 (stage `$0C`): the teleport-system lab
+## 6. Light 5 (stage `$0C`): the teleporter refights
 
-(to be filled) Green-grid walls with the "DR.LIGHT TELEPORT SYSTEM" monitors and orange girders. Room `$1A` is a
-vertical shaft lined with ledges on which sit **rows of small blue Mega-Man-like soldiers** that shoot pellets: Light
-mass-produces Rocks too [seen: `rec_light5.png`; identification is a guess].
+![Light 5 refights](img/fortress_light5_refights.png)
+*Top: the jam-session refight in room `$20` ("The Cheatous Bass and its cohorts used a jam session attack!!"), the
+teleporter hub, Air Man's refight. Bottom: Whispy Woods, Bomberman, Kamen Rider riding his bike.*
 
-**Mid-boss, room `$24`** (not scroll-locked, `$14-$15` = `$24-$26`) [seen]: a green grasshopper-like robot with big red
-compound eyes and antennae (object states `$53`/`$54`/`$55`), leaping in high arcs, curling into a ball in the air,
-crouching and firing a red shot. 40 HP, the buster takes 1 per hit. When it dies the stage simply continues.
+**Route** [seen]: room `$18` (start), then a down-shaft (`$1A`, lim `$1A-$1A`) lined with ledges on which sit **rows of
+small blue Mega-Man-like soldiers** shooting pellets [seen; that they are Light's own mass-produced Rocks is a guess], then the **teleporter hub** (room `$1D`, the second restart
+point). Every room from `$1D` on is its own one-room segment with no exit flag: the rest of the stage is joined only
+by teleporters [code: segment table].
+
+**The hub** [seen]: green girder walls, four "DR.LIGHT TELEPORT SYSTEM" monitors, and cyan teleporter pads on the side
+columns. A scan that dropped the player at every point of the screen (`l5_hubs.png`, brute force in this run) found
+these destinations:
+
+| Pad (player x, y) | Room | Refight |
+|---|---|---|
+| upper left (`$20`, `$40`) | `$20` | **"Cheatous Bass" jam session**: a flying-V guitar, a double bass and a drum kit float in a black room while a small purple X-like robot (Cheat Man's figure in a different palette) jumps about; music notes fly at you, and a *Dragon Quest*-style message box announces "The Cheatous Bass and its cohorts used a jam session attack!!". The banner (bank `$2A`, `0x54c00`) was never seen in Cheat Man's own stage by the other agents; this is where it plays |
+| upper right / middle left | `$1E` | **Air Man**, invisible as in his own stage (only his little tornadoes show), in a blue-grid room |
+| middle right (`$E0`, `$80`) | `$24`-`$26` | **Kamen Rider** on his white Cyclone bike; the room scrolls (`$24-$26`), as his own arena does |
+| lower left (`$20`, `$C0`) | `$28` | **Whispy Woods** in a purple-night forest |
+| lower right (`$E0`, `$C0`) | `$22` | **Bomberman**, climbing a pole and dropping bombs in a green-grid room |
+
+Five of the eight robot masters are refought here [seen]; Fire Mario, Yoshino Man and Mega Man had no pad in the scan.
+The second hub (room `$29`, the third restart point) has the same pad table [seen]. After the Whispy Woods refight the
+player is beamed back to hub 1 about 100 frames after the kill; `$BC` then holds Whispy's bit (`$04`, bit n = boss n)
+and `$B4` = 1, and a second scan found no working pad [seen: `a_l5w.log`, RAM diff]. (Killing Kamen Rider from the
+scout's `light5_boss` state left the player in room `$24` for 3,000 frames, probably because that state starts on the
+road part of the arena [guess].) How the stage continues after the refights is open (§11).
 
 ---
 
@@ -205,7 +296,7 @@ crouching and firing a red shot. 40 HP, the buster takes 1 per hit. When it dies
 
 **Round 1, room `$15`** [seen][text]: the stage **begins with the Dr. Light fight** (one locked screen, "DR.LIGHT
 TELEPORT SYSTEM" monitors on the wall, a teleporter capsule at the right). Light is a small white old man in a lab
-coat who runs, jumps and shoots blue energy balls; 40 HP, 1 per buster hit.
+coat who runs, jumps and shoots blue energy balls; 40 HP, 1 per buster hit, one hit from the Cheat Saber.
 
 - Each time you die, Light **beams back in through the capsule** and says a new line from the round table at
   `$30:8584` (s10-s24). Deaths in one run gave s17, s16, s19, s18, s11, s19, s11 in that order, so the line is not
@@ -220,28 +311,172 @@ coat who runs, jumps and shoots blue energy balls; 40 HP, 1 per buster hit.
   Light: "Phew, it was worth a shot." He steps into the capsule and teleports away. Hero: "We will capture you!"
   Light: "Remember, you are still in my lab." Then the screen unlocks to room `$16` [seen: `a_l6.png`].
 
-**Rooms `$16`-`$1D`** [seen]: green-grid corridors lined with **rows of grey spike mines** (the spikes Light ordered in
-s01), a low tunnel holding a row of five 1-up heads, Sniper Armors and Sniper Joes.
+![Dr. Light, round 1](img/fortress_light6_light.png)
+*Room `$15`: Light shooting energy balls; s21 (the dogeza); "Remember, you are still in my lab." as he beams out; and,
+from a death run, Light beaming back in for s12 with the Yes/No prompt.*
 
-**Round 2, room `$2B`** [seen: from cheats.md's `light6_boss` state]: after a drop down a shaft of spike mines (room
-`$20`) and a green Dr. L logo, you land in the teleporter hall. Light beams in and says **s24**: "Heh heh heh... You
-respawn repeatedly while I heal myself permanently. How amazing story!" His bar fills to 40 and then **drops to 0 in
-8 frames** [seen in that state]. **s25**: "Awww, it cannot be..." / "The war is now over." / "Ha! I have the last
-plan... It is... to become much bigger!" He steps into the capsule, a white flash, and stage `$0E` starts.
+![Light 6 tour](img/fortress_light6_tour.png)
+*Light 6 from the start (round 1), after round 1 (room `$16`), the spike-mine corridors `$17`-`$1D`, and the scout's
+`light6_boss` state in room `$20` above the spike shaft.*
+
+**Rooms `$16`-`$1D`** [seen]: green-grid corridors lined with **rows of grey spike mines** (the spikes Light ordered in
+s01), a low tunnel holding a row of five 1-up heads, Sniper Armors and Sniper Joes. Room `$1D` ends at a brick column
+with a cyan shutter at the right; neither the explorer nor a few placed jumps got through it in this run.
+
+**Round 2, room `$2B`** [seen: from cheats.md's `light6_boss` state, which starts in room `$20`]: a drop down a shaft
+lined with spike mines and a green Dr. L logo ends in the teleporter hall. Light beams in and says **s24**: "Heh heh
+heh... You respawn repeatedly while I heal myself permanently. How amazing story!" His bar fills to 40 and then
+**drops to 0 in 8 frames** in that state [seen]. **s25**: "Awww, it cannot be..." / "The war is now over." / "Ha! I
+have the last plan... It is... to become much bigger!" He steps into the capsule, a white flash, and stage `$0E`
+starts.
 
 ---
 
 ## 8. Final stage (`$0E`): giant Dr. Light
 
-(in progress) Room `$18`: a **giant Dr. Light drawn in the background** (black and white, beard, glowing orange eyes,
-fists) behind a strip of floor over a cyan machine. He is not an object: the boss bar stays empty and the only objects
-are falling rocks (`$A3`, up to eight), smoke puffs (`$A4`) and a fist hitbox (`$A5`) [seen]. Attacks in 3,000
-frames: rocks rain from above; he **punches holes in the floor**, leaving pillars over a pit; he **grows**, the face
-scaling up until it fills the screen, then shrinks back; a fist swing with white smoke; a stack of orange blocks
-thrown [seen: `b_final.png`].
+![Giant Dr. Light](img/fortress_final_giant_light.png)
+*Top: rocks rain down, the fist swing, the floor punched into pillars, the giant grown to full size. Bottom: the
+damage-counter phase hit with Print Cutter (counter `$88`), phase 2 in room `$19` (counter reset), the defeat
+explosions, and the normal-sized Light lying on a pillar afterwards.*
+
+**The giant is background art, and only two weapons hurt him** [code][seen]:
+
+- Room `$18`: a giant Dr. Light (black-and-white, beard, glowing orange eyes, fists) is drawn in the nametable behind
+  a strip of floor over a cyan machine. He is not an object; the objects are falling rocks (`$A3`, up to eight), smoke
+  puffs (`$A4`) and his fist (`$A5`) [seen].
+- The fight is a state machine in bank `$31` (`$B2` = state, jump table `$31:A360`) [code]. The hit test at
+  `$31:A948` returns at once unless the equipped weapon `$A9` is **5 (Print Cutter, Yoshino Man's, the hack author's
+  own robot) or 8 (Power Bomb)**. A Print Cutter hit adds 4 and a Power Bomb hit adds 7 to `$06C1`, which here is a
+  hidden **damage counter that counts up**; the boss bar stays empty [code `$31:A9A1`, `$31:AA0C`]. The buster,
+  the Cheat Saber and the rest do nothing [seen: 30,000 frames of buster fire left `$B2` cycling 5/6 forever].
+- The same counter paces him: every frame `$31:A900` derives two timers from it (`$8E` = `$30` minus the counter
+  scaled by `$F340`, `$8D` = `$60` minus a second scaling, floored at `$10`), which the attack states compare against,
+  so his cycle shortens as damage builds up [code; the speed-up itself was not measured]. His growing ("to become
+  much bigger") happens from the start, at counter 0 [seen].
+- **Phase 1** (states 2-6, room `$18`): rocks fall, he punches holes into the floor until only pillars over a pit are
+  left, swings a fist with white smoke, throws a stack of orange blocks, and scales his face up until it fills the
+  screen and back. At counter `$A0` (160, i.e. 40 Print Cutter hits) state 7 scrolls the arena one room right [seen:
+  frame 12,487 of `final_pc.png`].
+- **Phase 2** (states 8-9, room `$19`): the counter restarts from 0, more floor is gone; at `$60` (96) state `$0B`
+  plays the defeat [code `$31:AD93`][seen: frame 13,606].
+- Defeat [seen]: explosions over the giant, his picture breaks up into pixel noise, a white flash, and Dr. Light,
+  normal-sized again, lies on the next pillar beside you. Another white flash, and the ending starts.
 
 ---
 
+## 9. The ending and the playable staff roll [seen]
+
+![Ending](img/fortress_ending.png)
+*The seasons walk with the fake Rockman's colour changing (autumn, winter, spring, rain), summer with the helmet off,
+the meadow with the helmet in the grass and Wily's skull castle on the horizon, and the "THE 8 BOSSES" roll call.*
+
+1. **Seasons**: the fake Rockman stands beside a picture of a landscape while it changes season (autumn leaves,
+   winter snow, spring blossom, grey rain) and his colours change with it (pink-white, purple, orange, Mega Man blue).
+   In summer he is grey again and **takes his helmet off**. This follows RM2's own ending, redrawn for the fake
+   Rockman [guess: compared from memory of RM2, whose ending was not run here].
+2. **The meadow**: a wide view of green fields, red-roofed houses and mountains, the empty helmet lying in the grass,
+   and **Dr. Wily's skull castle** standing over the mountains [seen]. Whether RM2's version shows the castle was not
+   checked [guess: added by CX, Wily having won].
+3. **"THE 8 BOSSES"**: RM2's starfield roll call; each boss walks in and its line is typed: DLN.001 MEGAMAN / CAPCOM,
+   DLN.009 YOSHINOMAN / HIMAJIN JICHIKU, DLN.010 CHEATMAN / HIMAJIN JICHIKU, **DLN.011 AIRMAN / HIMAJIN JICHIKU with
+   no sprite at all** (Air Man stays invisible to the end), DLN.012 FIREMARIO / NINTENDO, DLN.013 KAMEN RIDER /
+   ISHINOMORI PROD., DLN.014 BOMBERMAN / HUDSON SOFT, DLN.015 WHISPYWOODS / HAL LABORATORY.
+
+![Staff roll](img/fortress_staff_roll.png)
+*The playable staff roll: Quick Man walks through the silhouette castle while the names are written into it.*
+
+4. **The staff roll is a level**: back in stage `$0E` (rooms `$1A` on, which is why the final stage has restart rooms
+   `$1A` and `$28`), you play **as Quick Man** (`$9B` = `$80`) with **99 lives and 99 E-tanks**, walking and climbing
+   through a pink-and-purple silhouette castle while the staff names are written into the scenery: "STAFF", "ORIGINAL
+   MEGAMAN2 STAFF", "CHARACTER DESIGNER YASUKICHI INAFKING TOM PON NAGINEKO 2M03CM MAN A.K", "SOUND PROGRAMMER
+   OGERETSU MANAMI YUUKICHAN'S PAPA", "PROGRAMMER H.M.D.", "PLANNER A.K", ... (full list in text.md §2.7). The
+   explorer reached room `$21` of it (`p_credits`).
+
+---
+
+## 10. Savestates, scripts and how to reproduce
+
+Shared states added to `build/research/cx/states/` (all load straight into play; apply `cx.godmode()` yourself):
+
+| State | What it is |
+|---|---|
+| `fortress_light1_ultraman` | Light 1 room `$2B`, Ultraman's bar full, player on the right-hand block |
+| `fortress_light2_quickman_boss` | Light 2 room `$16`, Quick Man fight (s02 just played) |
+| `fortress_light2_as_quickman` | Light 2 room `$16` after the rescue: you are Quick Man (40 HP), escape not yet started |
+| `fortress_light4_cp1`, `fortress_light4_cp2` | Light 4 checkpoints (rooms `$21`, `$2A`) with correct scroll limits (replace the scout's broken `light4_cp*`) |
+| `fortress_light4_boss` | Light 4 room `$2B`, masked robot, bar full |
+| `fortress_light5_hub1`, `fortress_light5_hub2` | Light 5 teleporter hubs (rooms `$1D`, `$29`) |
+| `fortress_light5_jam_session`, `_airman`, `_whispy`, `_bomberman` | Light 5 refight rooms `$20`, `$1E`, `$28`, `$22` (Kamen Rider: the scout's `light5_boss`) |
+| `fortress_light6_after_round1` | Light 6 room `$16`, right after Light's dogeza and escape |
+| `fortress_final_phase2` | Final stage at the switch to phase 2 (`$B2` = 7) |
+| `fortress_ending` | The first frame of the ending sequence (the stage byte reads 6 during the ending) |
+| `fortress_staff_roll` | The playable staff roll, room `$1A`, as Quick Man with 99 lives and 99 E-tanks |
+
+Corrections to `cheats.md` §1 [seen]: `light1_cp1` (room `$21`, limits `$11-$18`), `light4_cp1`, `light4_cp2`,
+`ending_cp1` and `ending_cp2` have inconsistent scroll limits (the kill-to-checkpoint trick failed where falling off the
+screen does not kill); `light6_boss` is not in a boss fight but in room `$20` above the drop to round 2; `light5_boss`
+is the Kamen Rider refight, not Light 5's boss. Killing with HP held at 0 (`cpwarp.py`) works where the pit drop does
+not.
+
+Scripts in `build/research/cx/cx-fortress/`:
+
+- `play.py <state> <outdir> <budget> [seed] [score]`: Go-Explore wrapper around `cheats.explore` that saves the first
+  state of every room and every boss bar it meets; score modes `room`, `rroom`, `rx`, `rxu`, `up`, `rdown`, `rup`;
+  `FLOOR=1` freezes the Instant Floor as the weapon and adds jump-and-drop-floor macros (needed in Light 1).
+- `rec.py` (autorun contact sheet), `bossrec.py` (boss pattern sheet + object log; `HOVER=yy` freezes the player's
+  height for pit arenas), `after.py` (kill the boss, following refilled bars as phases, and record the aftermath),
+  `dmgtest.py` (damage per weapon), `l6run.py` (play without cheats, log dialogue scripts and deaths; answers Yes/No
+  prompts), `cpwarp.py` (die in a held room to restart at that checkpoint), `tour.py` (one frame per state),
+  `shots.py`, `hunt_reset.py`, `enemies.py`, `segs.py`.
+- Recipe for the final boss: load `ending`, `cx.godmode(e)`, `e.poke(0x9A, 0xFF)`, `e.freeze(0xA9, 5)` (Print
+  Cutter), `e.freeze(0xA0, 0x28)`, then jump and fire; phase 2 at about frame 12,500, the defeat at about 13,600 more.
+
+## 11. Open questions
+
+- Light 5's boss `$0C` (the s08 "pet", "garbage-disposal duty") was never reached. The two teleporter hubs showed the
+  same five destinations; after one refight the pads stopped working (`$BC` gets the boss's bit, `$B4` counts up)
+  [seen], and setting `$BC`/`$B4` by hand did not open anything. Fire Mario, Yoshino Man and Mega Man had no pad.
+- s09 (the two-part robot, text.md) was not seen anywhere in the fortress.
+- Light 6 rooms `$1D`-`$20`: the shutter at the end of room `$1D` did not open for the explorer or placed jumps.
+- Light 4 rooms `$1B`-`$20` and `$22`-`$29`, Light 3 rooms `$25`-`$27`: not played (pits beat the explorers).
+- The end of the Quick Man escape in Light 2, the end of the playable staff roll (rooms `$21`-`$27`, with three Dr. W
+  emblems on the floor in room `$26`), and whether Wily's victory line ("Now the age of me begins!Muahahahahaha!",
+  text.md §2.7) appears there.
+- The masked robot's identity; the Instant Floor reset in Light 1 room `$2B` (cheat artefact or real bug).
+
 ## Lessons for Rockman 6 GP
 
-(to be filled)
+**Design**
+
+- **Make the final boss's weakness a story beat.** CX's giant Light ignores the buster and the other six weapons and
+  only takes the Print Cutter (the author's own robot) and the Power Bomb, and his size is driven by the damage you
+  deal. The rule is in eight bytes of code (`LDA $A9 / CMP #$08 / CMP #$05`), but it changes the whole fight. RM6 GP
+  can do the same with a hidden counter instead of the boss bar.
+- **A boss can talk to the player between lives.** Light 6 turns the death screen into content: every respawn brings
+  a new taunt, a Yes/No trap, or an upgrade offer from the villain. RM6's Mr. X fortress could use its respawns the
+  same way.
+- **Re-skin RM's own set pieces for the guests.** Ultraman takes the Mecha Dragon's chase-over-blocks arena, Guts Man
+  takes the Guts Tank, the teleporter hub becomes a refight room with a Dragon Quest joke. Reusing the engine's boss
+  scenes with new art and one new twist (the color timer, the helmet, the band) is cheaper than new bosses and reads
+  as homage.
+- **Let the credits be played.** The staff roll as a short walk with 99 lives, as the second character, is a reward
+  that costs one tileset and the existing text engine.
+- **Telegraph required tools.** Light 1's first wall needs the Instant Floor and nothing says so; Light 4's pits and
+  Light 6's shutter stopped every automatic player. A sign (Light 3 has a "USE" sign) or a safe practice spot would
+  help.
+
+**Technical**
+
+- **One boss index for every boss.** CX extends RM2's `$B3` table from 6 to 15 entries and drives all its bosses
+  (robot masters, refights, fortress, opening) through the same dispatcher. RM6 GP should keep its boss scenes in one
+  table too, so new bosses are a table entry plus a routine.
+- **Background-drawn bosses** (the giant Light, like RM2's Wily Machine) need their own hit test against weapon
+  objects; CX's is a box test around a moving centre per weapon type (`$31:A948`-`$AA17`).
+- **Reversed stages need reversed checkpoints.** The death code picks the restart entry by counting table entries
+  below the current room and special-cases stage 5 (`$C1A8: LDA $2A / CMP #$05`) because Mega Man's stage runs right
+  to left [code]. Light 2 also runs backwards (room numbers fall as you climb) and its deaths do restart behind you:
+  dying in room `$27` restarts at `$2B`, dying in `$1E` restarts at `$20` [seen: `cpwarp.py`]. RM6 GP should store the
+  direction per stage rather than test stage numbers, and test every checkpoint with a real death, not only a pit
+  drop (falling off the screen does not kill in Light 4's first rooms).
+- **Test harness**: kill-at-held-room checkpoint warps, per-room first-visit states, and a damage-per-weapon sweep made
+  this survey possible in one session; build the same three tools for RM6 GP's QA.
