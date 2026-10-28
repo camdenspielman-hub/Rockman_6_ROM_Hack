@@ -1,0 +1,24 @@
+# Script $07 (alternate copyright/licence screen) uses its own tile layout. Mapping solved from the text itself [code]/[guess];
+# its CHR set was never seen on screen (no caller found).
+00= 
+60=U
+61=S
+63=T
+65=©
+66=C
+67=A
+68=P
+69=O
+6A=M
+6B=1
+6C=9
+6D=3
+6E=L
+6F=E
+70=.
+71=,
+72=D
+73=I
+74=N
+75=B
+76=Y

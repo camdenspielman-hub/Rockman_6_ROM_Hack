@@ -1,0 +1,18 @@
+# Boss-intro data panel: the small label letters baked into the panel CHR (HEIGHT WEIGHT ATTACK DEFENCE MOBILE).
+# Only these 16 letters exist. Values and names on the panel use rm6_main.tbl codes (bold glyphs) [seen].
+30=A
+31=B
+32=C
+33=D
+34=E
+35=F
+36=G
+37=H
+40=I
+41=K
+42=L
+43=M
+44=N
+45=O
+46=T
+47=W

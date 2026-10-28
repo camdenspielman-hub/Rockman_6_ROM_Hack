@@ -1,0 +1,18 @@
+# Title screen: the letters of GAME START / PASS WORD / ©CAPCOM 1993 are scattered tiles inside the title CHR (script $00) [seen].
+00= 
+01=©
+20=1
+30=9
+67=C
+6C=A
+6F=P
+84=O
+85=M
+93=3
+9C=W
+9D=D
+A6=G
+A7=E
+A8=S
+A9=T
+AA=R
