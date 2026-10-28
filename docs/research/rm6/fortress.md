@@ -1,27 +1,27 @@
-> **RESUME NOTE (for the rm6-fortress agent):** a previous attempt at this task was killed by a container restart. This file is its partial output, so keep and extend it rather than starting over. Its transcript is `/root/.claude/projects/-home-user-Rockman-6-ROM-Hack/a09240aa-db93-50a5-a9e2-d80dec84cb86/subagents/workflows/wf_db7e2da8-dc7/agent-aaeb7864f3ca8b231.jsonl` (JSONL; extract the assistant texts and tool results). Remove this note when you finish.
-
 # Rockman 6 (J) fortresses: Mr. X Fortress 1-4, Wily Fortress 1-4, boss rush, Wily Machine, ending (rm6-fortress)
 
-Status: **v1, complete for the requested fields** (all eight stages, the boss rush, the Wily Machine and Capsule, the reveal and the ending; open points at the end). Tags: **[seen]** emulator, **[code]**
+Status: **v2, complete for the requested fields** (all eight stages, the boss rush, the Wily Machine and Capsule, the reveal and the ending; v2 walked the three side routes that v1 had only from data; open points at the end). Tags: **[seen]** emulator, **[code]**
 disassembly/data, **[text]** in-game text, **[doc]** manual/readme, **[guess]** unverified.
 Scripts: `build/research/rm6/rm6-fortress/` (listed at the end). Static decoder and map renderer:
 `tools/analysis/rm6/rm6_stagemap.py` (storage format: `stages_a.md` section 0). States: the scout's
 `build/research/rm6/states/` (`mrx1..4`, `wily1..4`, `*_ck1`, `*_ck2`, `*_boss`) plus the new ones listed in
 section 12. Text of the cutscenes is transcribed in `text.md` 5.5/5.6; this doc covers what happens on screen.
 
-Boss names: the game never names its fortress bosses (no text, no boss panel) [text]. Names below such as
-"Rounder II" or "Wily Machine 6" are the usual English-manual names, tagged **[doc]** and not verified here.
+Boss names: the game never names its fortress bosses (no text, no boss panel) [text]. The English names used
+below (Rounder II, Power Piston, Metonger Z, X Crusher; Mechazaurus, Tank CSII, Wily Machine 6, Wily Capsule)
+are the ones the Mega Man fan wiki lists for the two castles (checked by web search in v2), matched to the
+fights by their look; tagged **[doc]**, not from any Capcom text in this ROM.
 
 ## 0. Overview
 
 | $51 | Stage | Screens | BG CHR set (source) | Palette | Music | Mid checkpoint | Boss room | Boss (all 27 HP) |
 |---|---|---|---|---|---|---|---|---|
-| 8 | Mr. X 1 | 22 (00-15) | $9D (bank $18+$1000) | $68 | $09 | 0E | 11 | rail riders on a pipe lattice ("Rounder II" [doc]) |
-| 9 | Mr. X 2 | 18 (00-11) | $A4 (bank $1A+$0000) | $88 | $09 | 08 | 11 | wall pod column, BG-drawn |
-| 10 | Mr. X 3 | 18 (00-11) | $B1 (bank $1B+$0000) | $AB | $09 | 08 | 11 | pilot pod + tank, BG-drawn ("Tank CSII" [doc]) |
-| 11 | Mr. X 4 | 25 (00-18) | $C3 (bank $1C+$1000) | $C8 | $09 | 09 | 15 | Mr. X Machine, BG-drawn |
-| 12 | Wily 1 | 24 (00-17) | $89 (bank $14+$1000) | $7C | $0B | 0E | 13 | long-necked dinosaur, static BG ("Mechazaurus" [doc]) |
-| 13 | Wily 2 | 19 (00-12) | $A2 (bank $19+$1000) | $89 | $0B | 0A | 0F | walking cannon, BG-drawn |
+| 8 | Mr. X 1 | 22 (00-15) | $9D (bank $18+$1000) | $68 | $09 | 0E | 11 | rail riders on a pipe lattice (Rounder II [doc]) |
+| 9 | Mr. X 2 | 18 (00-11) | $A4 (bank $1A+$0000) | $88 | $09 | 08 | 11 | wall pod column, BG-drawn (Power Piston [doc]) |
+| 10 | Mr. X 3 | 18 (00-11) | $B1 (bank $1B+$0000) | $AB | $09 | 08 | 11 | pilot pod + tank, BG-drawn (Metonger Z [doc]) |
+| 11 | Mr. X 4 | 25 (00-18) | $C3 (bank $1C+$1000) | $C8 | $09 | 09 | 15 | Mr. X Machine, BG-drawn (X Crusher [doc]) |
+| 12 | Wily 1 | 24 (00-17) | $89 (bank $14+$1000) | $7C | $0B | 0E | 13 | long-necked dinosaur, static BG (Mechazaurus [doc]) |
+| 13 | Wily 2 | 19 (00-12) | $A2 (bank $19+$1000) | $89 | $0B | 0A | 0F | walking cannon, BG-drawn (Tank CSII [doc]) |
 | 14 | Wily 3 | 17 (00-10) | $A2 (same set as Wily 2) | $96 | $0B | 08 (hub) | 09-10 | **boss rush**: the 8 Robot Masters behind 8 teleporters |
 | 15 | Wily 4 | 7 (00-06) | $BA (bank $1B+$1000) | $18 | $0B | - | 06 | **Wily Machine 6** (2 phases) then the **Wily Capsule**, same room |
 
@@ -37,19 +37,30 @@ fortress progress (`cheats.md`); a game over in a fortress offers CONTINUE only 
 **No Beat plate and no Energy Balancer in any fortress stage** [code]: none of the eight object lists contains
 the Balancer dropper $8A or item $8C, and the plate rule (`$3F:$F518`, second boss room) only exists for
 stages 4-7. The fortress "alternate exits" are shortcuts and item pockets opened by adaptors or weapons
-(Mr. X 1, Wily 1, Wily 2), all listed here:
+(Mr. X 1, Wily 1, Wily 2) plus one open risky branch (Mr. X 4), all listed here:
 
 | Stage | Where | Needs | Gives |
 |---|---|---|---|
-| Mr. X 1 | screen 06 glass door -> 12-15 -> 0F | **charged** Power punch [seen] | skips 07-0E; 6 small + 2 big WE, big HP, **four 1-ups** |
-| Mr. X 1 | screen 0C | Power block | E-tank |
-| Mr. X 3 | 08, 09, 0B, 0E | Power blocks | small HP, **E-tank** (09), 2 small HP, big HP |
-| Mr. X 4 | 03, 04 | Power blocks | big HP + big WE, small WE + small HP |
-| Mr. X 4 | 09 -> 16-18 -> 0F | nothing (open) | skips 0A-0E (and the 1-up at 0E) |
-| Wily 1 | 01 | Power block | 1-up |
-| Wily 1 | 09 -> 14-17 -> 0E | Power blocks [code] | skips 0A-0D; E-tank, 8 small HP, 3 big WE |
+| Mr. X 1 | screen 06 glass door -> 12-15 -> 0F | **charged** Power punch [seen] | skips 07-0E; 6 small + 2 big WE, big HP; **four 1-ups sealed inside one more Power block at 15** |
+| Mr. X 1 | screen 0C | Power block | E-tank (inside the block) |
+| Mr. X 3 | 00, 08, 09, 0B, 0E | Power blocks | 1-up (00), small HP, **E-tank** (09), 2 small HP, big HP |
+| Mr. X 4 | 03, 04, 08 | Power blocks | big HP + big WE inside blocks (03), small WE + small HP (04), 3 small HP in a sealed chamber (08); 0A has one more block with nothing behind it |
+| Mr. X 4 | 09 -> 16-18 -> 0F | nothing (open) [seen: flown through with Jet] | skips 0A-0E (and the 1-up at 0E): small floating platforms over a bottomless pit, cowboy gunners |
+| Wily 1 | 01 | Power block | 1-up (inside the block) |
+| Wily 1 | 09 -> 14-17 -> 0E | **charged** Power punch [seen: a tapped punch does nothing] | skips 0A-0D; E-tank (15), 8 small HP behind a second Power wall (16), 3 big WE (17) |
 | Wily 2 | 00 | Power block | E-tank |
-| Wily 2 | 04 -> 10-12 -> 0A | F.BLAST plug [seen: it breaks] | skips 05-09, straight to the checkpoint |
+| Wily 2 | 04 -> 10-12 -> 0A | F.BLAST [seen: walked through] | skips 05-09, straight to the checkpoint; **one blast opens both plugs** (04 and 12 use the same metatiles) |
+
+"Power block" = collision B, broken only by the **charged** Power punch [seen on Wily 1 09; also Mr. X 1 06 and
+`stages_b.md`]. Breakable state is stored per **metatile id**, not per position (`$0340` bitfield, 1 bit per
+metatile; it survives deaths and respawns, and is cleared when a stage starts, i.e. the next stage or
+CONTINUE after a game over [seen]): every other breakable in the fortresses has its own four metatile ids, so the
+bit acts as a per-block flag, but Wily 2 reuses ids $24/$25 for both of its plugs, and Rockman walked from 04 to
+0A after breaking only the first one [seen][code] (`img/fortress_alt_routes.png`).
+
+![Side routes](img/fortress_alt_routes.png)
+*The three side routes walked in v2: Wily 1 charged punch at 09 and the pocket 14/16 back to 0E; Wily 2 F.BLAST
+at 04, then 10, 12 and the checkpoint 0A; Mr. X 4's open branch 09 -> 16 -> 17 -> 0F (Jet, fuel frozen).*
 
 Music [seen] (sound queue `$B0-$BF` logged while walking into each boss room, `music.py`): stage tracks $09
 (Mr. X) and $0B (Wily); on entering a fortress boss room the game requests $30 (shutter), **$0C (fortress boss
@@ -60,7 +71,7 @@ Collision remap [code]: the attribute's collision nibble is remapped per stage g
 16-byte row of `$DB13`). Group 3 = Mr. X 1-4: **D -> $1B** (big Power-punch wall, handler $38:$8DF8 breaks a
 whole 32x32 block), 5 -> $1D, 9 -> 1. Group 1 = Wily 3 (and Plant): **D -> $1F, E -> $10** (teleporter pad
 floor and inside, tested by `$064B` = $1F in $39:$89A5/$8E47), 5 -> $11. Group 0 = Wily 1, 2, 4: identity
-(B = Power block, D = Flame-Blast block, F = deadly, 8 = water).
+(A = updraft, B = Power block, D = Flame-Blast block, F = deadly, 8 = water).
 
 Raster/IRQ [seen]: `$F4` = 0 on every non-boss screen of all eight stages (`tour_*.json`). The IRQ split is
 used only by the BG-drawn bosses (section 11).
@@ -91,7 +102,7 @@ shared with the Robot Master stages keep the names used in `stages_a.md`/`stages
 | $2D | 0 | spiked stomper on a girder | Mr. X 1, 3, Wily 1 |
 | $33 (+$31/$32, $46/$47) | 2 | orange cage cylinder on the floor; white pod and green bird drones come out of it | Mr. X 4 |
 | $34 (+$35) | 2 | small flying shield-car | Mr. X 1 06, Wily 1 07 |
-| $36 / $41 | 2 / 2 | blue cage canisters on the shaft walls with spiked balls around them | Wily 1 05, 06, 0A |
+| $36 / $41 | 2 / 2 | blue cage blowers puffing white air rings: $36 stands on the floor at the foot of each updraft column (collision A), $41 hangs from the ceiling over each E column; spike strips beside them | Wily 1 05, 06, 0A |
 | $3C | 0 | white dome "spider" that drops from the ceiling and hops over the crates | Mr. X 4 0A-0E |
 | $4F (+$15, $14, $79) | 14 | dome dispenser (Tomahawk's), drops hard-hat walkers and rocks | Wily 4 03 |
 | $54 (+$55) | 2 | walking eye cannon | Mr. X 4 08, Wily 4 01 |
@@ -141,7 +152,8 @@ shaft 03-09 climbs the outside of the tower; the Power-gated branch 12-15 runs r
 Power punch** breaks it (`$0340` flag byte 7 changes) and Rockman walks into screen 12; a normal punch,
 the buster, F.BLAST and Jet did nothing (`door.py`, `img/fortress_mrx1_door.png`). 12-15 is blue/green
 machinery with grasshopper robots $60, more Power blocks (12, 13, 15) and the stage's whole reward stash:
-**6 small + 2 big weapon energy, 1 big life energy and four 1-ups** (15). Screen 15's exit (up*, target $10)
+**6 small + 2 big weapon energy, 1 big life energy and four 1-ups** (15; the 1-ups sit inside a Power block,
+x $80-$9F y $60-$7F, so they need a second charged punch [code]). Screen 15's exit (up*, target $10)
 climbs into 0F, skipping 07-0E. So it needs **Rush Power** (from Flame Man).
 
 ![Mr. X 1 door](img/fortress_mrx1_door.png)
@@ -154,7 +166,7 @@ Items: E-tank 0C (Power block); branch: 12 6x small WE, 13 big HP + 2 big WE, 15
 Spike rows on the climb (F tiles, 01-09, 0E, 13), bottomless space below the platforms, the dark-blue machinery
 pits of 12-15. Nothing else (no conveyors, no water). `$F4` = 0 everywhere [seen].
 
-### Boss: rail riders ("Rounder II" [doc]), room 11
+### Boss: rail riders (Rounder II [doc]), room 11
 
 ![Fortress bosses](img/fortress_bosses.png)
 *All six ordinary fortress bosses plus Wily Machine phase 1, three frames each (godmode, firing).*
@@ -207,7 +219,7 @@ uses 249 of 256 blocks [code]. Palette $68, music $09.
 No alternate route and no adaptor-gated items [code: object list, collision]. Object $8B (AI $30:$9F9F) is
 placed once at 05 and shows up on 06 [seen: tour log]; [guess] it belongs to the bell row.
 
-### Boss: wall pod column, room 11
+### Boss: wall pod column (Power Piston [doc]), room 11
 
 [seen] A dark room with a pink frame. On the right wall a column of three pods (controller $EB in slot 8,
 parts $EC-$EE) slides up and down; it throws orange rocks that burst into white pellets across the room. The
@@ -254,9 +266,9 @@ bank $2F is shared with Mr. X 3 at pages $89/$92). Palette $88, music $09.
 No alternate route. **Power Rockman opens five item pockets** (00, 08, 09, 0B, 0E) [code: collision B around
 the items].
 
-### Boss: pilot pod + tank ("Tank CSII" [doc]), room 11
+### Boss: pilot pod + tank (Metonger Z [doc]), room 11
 
-[seen] An orange robot in a glass dome flies in from above and docks on top of a big blue tank; the tank then
+[seen] A hard-hat (Metall-style, orange helmet) pilot in a glass dome flies in from above and docks on top of a big blue tank; the tank then
 rolls back and forth along the floor and lobs orange cannonballs ($EA) in arcs. The tank is **BG-drawn** in
 NT1 together with a copy of the floor girder, positioned by the horizontal scroll above an IRQ split at line
 $C1 (chain `$0677` = $1A, handler $3E:$C4F2). That handler also scrolls the strip below the split by `$0678`
@@ -288,14 +300,14 @@ to the right and rejoins at 0F.*
 | 00 | start | Grey stone and metal blocks with red lights over purple stripes. Green spiked ceiling unit $A1. Exit up loads CHR $C4 (49 tiles at $0900). Big WE |
 | 00 -> 01 -> 02 | up | wheel cannons $C0/$C9 on platforms, orange spike rows on floor and ceiling |
 | 02 -> 03-07 | scroll | Orange X crates $CB that release drones, orange cage cylinders $33, wall cannons. **03-04: big HP, big WE, small WE + small HP behind Power blocks**; E-tank at 04 (0C,77) |
-| 07 -> 08 -> 09 | up | eye cannon $54 (08, 3 small HP), totem walkers $12 (09). **Checkpoint 1 = 09** (script 4C `CKPT@here`) |
+| 07 -> 08 -> 09 | up | eye cannon $54 (08; its 3 small HP lie in a floor chamber sealed by Power blocks at x $40/$A0, y $A0-$BF), totem walkers $12 (09). **Checkpoint 1 = 09** (script 4C `CKPT@here`) |
 | 09 -> 0A-0E | up, scroll | ceiling "spiders" $3C hopping over crates (10 of them). **1-up at 0E** (12,57) |
-| 09 -> 16-18 | right (branch) | **Alternate route**: open to the right of 09, three screens with cowboy gunners $6C on crates; 18's exit (right, target $0E) lands in 0F, skipping 0A-0E. No gate in the collision; [guess] it is just the harder/shorter path without the 1-up |
+| 09 -> 16-18 | right (branch) | **Alternate route** [seen]: open to the right of 09 (rows 2-7, no gate). 16-18 are small two-tile floating platforms over a bottomless pit with cowboy gunners $6C standing on them; 18 is walled at rows 6-E, so its exit is high (y $20-$5F, right, target $0E) and lands in 0F, skipping 0A-0E. Walking blindly into 16 falls into the pit; Jet Rockman flew 09 -> 16 -> 17 -> 18 -> 0F in ~1,200 frames (`run2/x4jet.py`). It is the shorter, riskier path without the 1-up |
 | 0E -> 0F -> 10 | down | **E-tank at 10** (E8,B7) |
 | 10 -> 11-13 | scroll | crates and cages again |
 | 13 -> 14 -> 15 | shutters | 14 corridor (init `$8B93`: sprite set $6B = 96 tiles, palette $D0, `$064F` = 0), 15 boss room |
 
-### Boss: Mr. X Machine, room 15
+### Boss: Mr. X Machine (X Crusher [doc]), room 15
 
 [seen] A huge spiked sphere with Mr. X in a glass cockpit floats around the room (moving left/right and
 bobbing), dropping orange rings from its top and firing pink and white balls. It is **BG-drawn** in NT0 (the
@@ -332,14 +344,18 @@ music $09.
 |---|---|---|
 | 00-02 | start, scroll | Outside the castle at night: purple mountains, red chain fence, green pipe pillars, orange rubble ground. Metalls $18, Fire-Telly drones $2C. **1-up at 01 behind Power blocks** |
 | 02 -> 03 -> ... -> 0D | down x 11 | **The long fall**: a vertical shaft of red brick and red pipes between green pipe pillars, spike strips on ledges and walls, bombers $1B, stompers $2D, shield-car $34 (07), blue cage canisters $36/$41 with spiked balls (05, 06, 0A), skeleton $65 at 03, cannon rider $20 at 0B. Exits 02/03 load palettes $80/$81. Big HP at 04 |
-| 09 -> 14-17 | right (Power blocks) | **Alternate pocket**: a 2x2 Power-block plug (collision B, cols 14-15 rows 8-9 of screen 09) opens a side passage: E-tank (15), **eight small life energies** (16), three big WE (17); 17's exit (down*, target $0F) drops back into 0E. [code: collision + object list; the emulator test did not get Rockman into 09 in 80k frames, `block.py`] |
+| 09 -> 14-17 | right (Power blocks) | **Alternate pocket**: a 2x2 Power-block plug (collision B, cols 14-15 rows 8-9 of screen 09) opens a side passage: E-tank (15), **eight small life energies** (16), three big WE (17); 17's exit (down*, target $0F) drops back into 0E. [seen, v2: a tapped punch leaves the plug, a **charged** punch breaks all four metatiles ($0340 byte $1E = $0F); Rockman walked 09 -> 14 -> 15 (ladder) -> 16 -> 17 -> 0E (`run2/w1fall.py`, `run2/w1pocket2.py`)]. In 16 the eight small HP lie behind a second Power wall (x $60-$7F, y $80-$9F) |
 | 0D -> 0E-11 | right (sprite set $61) | Blue riveted blocks and green pipes. **Checkpoint 1 = 0E** (script 7E `CKPT@here`). Samurai spearman $A2 + 4 small items at 0F, **giant jester head $10** (HP 15) at 10, cannon rider $20 at 11 |
 | 11 -> 12 -> 13 | shutters | 12 corridor (init `$88F1`: sprite set $55, palette $B9, `$064F` = $8B = **162 BG tiles at $0500** for the dinosaur), 13 boss |
 
-Collision types A, C and E line the canister columns in 05, 06 and 0A [code] (the player code tests A/C while
-climbing, $38:$8BA2, and E while airborne, $38:$8205) [guess: rails/updraft for the canisters].
+**Updraft columns** in 05, 06 and 0A [seen][code]: collision A (Wind Man's updraft type, `stages_b.md`) over a
+C base, with a $36 blower at the foot. Rockman dropped into 05's column at Y $A0 rose to $3D in 60 frames,
+fell back when the lift ran out at the top of the column, and was lifted again in 06's column below
+(`run2/w1cols.py`). E columns under the hanging $41 blowers behaved like air for Rockman in the same test
+[guess: a down-draft that only acts through the blower object]. The player code tests A/C while climbing
+($38:$8BA2) and E while airborne ($38:$8205).
 
-### Boss: dinosaur ("Mechazaurus" [doc]), room 13
+### Boss: dinosaur (Mechazaurus [doc]), room 13
 
 [seen] A big purple-and-green sauropod robot fills the right half of the room; the head on the long neck
 spits orange fireballs ($E3) and it launches small green flyers ($E2). It does not move: the whole body and
@@ -373,13 +389,13 @@ to the checkpoint screen 0A.*
 |---|---|---|
 | 00-03 | start, scroll | Pink machine blocks on a green circuit wall. **E-tank at 00 behind Power blocks**; totem walkers $12, capped walkers $1E |
 | 03 -> 04 | up | **Disappearing-block room** [seen]: a big dark-green mesh hall over a spike floor; eleven block objects $8F at fixed grid points (X $28-$C8, Y $38-$B8) appear and vanish in sequence (`w2_04.png`); climb them to the exit at the top |
-| 04 -> 10-12 | right (Flame-Blast blocks) | **Alternate route**: a 1x2 plug of D blocks (Flame Blast, group 0) at the upper right of 04 (x $E0-$EF, y $40-$5F); F.BLAST breaks it (`$0340` flag byte 4 changes [seen], `block.py`); the Power punch does not. 10-12 have skeleton robots $65; 12 ends in another D plug and its exit (right, target $09) enters 0A, skipping 05-09 |
+| 04 -> 10-12 | right (Flame-Blast blocks) | **Alternate route**: a 1x2 plug of D blocks (Flame Blast, group 0) at the upper right of 04 (x $E0-$EF, y $40-$5F); F.BLAST breaks it (`$0340` flag byte 4 changes [seen], `block.py`); the Power punch does not. 10-12 have skeleton robots $65; 12 ends in another D plug and its exit (right, target $09) enters 0A, skipping 05-09. [seen, v2: after one F.BLAST at 04 Rockman walked 04 -> 10 -> 11 -> 12 -> 0A without firing again: both plugs use metatiles $24/$25, so they open together (`run2/w2branch.py`)] |
 | 05-09 | scroll | red riders $C6 throwing balls; E-tank at 09 |
 | 09 -> 0A | down (CHR $A3, palette $79) | **Checkpoint 1 = 0A** (script 50 `CKPT@here`); big WE |
 | 0B-0D | scroll | riders $C6; big WE and big HP at 0C |
 | 0D -> 0E -> 0F | shutters | 0E corridor (palette $B9, sprite set $60), 0F boss (`$064F` = $B8) |
 
-### Boss: walking cannon, room 0F
+### Boss: walking cannon (Tank CSII [doc]), room 0F
 
 [seen] An orange two-legged walker with a cannon on its back strides in from the right edge, pushes toward
 Rockman and fires white rings that bounce around. It is **BG-drawn** in NT1 together with its own copy of the
@@ -664,6 +680,8 @@ warp values the scout measured).
 | `mrx1_boss`, `mrx4_boss`, `wily2_boss`, `wily4_boss` | boss intro, bar filling (the scout had mrx2/mrx3/wily1) |
 | `mrx1_ck2`, `mrx4_ck2`, `wily2_ck2`, `wily4_ck2` | shutter corridor (RAM warp with the walker's CHR/palette) |
 | `mrx1_door` | Mr. X 1 screen 06 next to the Power door of the shortcut |
+| `wily1_pocket` | Wily 1 screen 09 on the ledge below the Power plug of the pocket (v2; respawn checkpoint 03) |
+| `wily2_plug` | Wily 2 screen 04, the disappearing-block room, below the F.BLAST plug (v2; checkpoint 03) |
 | `wily3_hub` | the boss-rush hub, playable |
 | `wily3_rush_<boss>` x8 | each refight, bar full (blizzard, wind, plant, flame, yamato, tomahawk, knight, centaur) |
 | `wily3_rush_done` | the hub after all eight refights, exit teleporter open |
@@ -681,7 +699,9 @@ options `shield`, `poke`), `hitzone.py` (grid search of a boss's hit zone), `kil
 what follows), `rec.py` (record a long cutscene with a stage/screen log), `bossnt.py` (nametables, CHR, IRQ
 shadows in a fight), `hub.py`/`hub2.py`/`hub3.py` (boss-rush teleporters), `fstrips.py` (enemy strips),
 `ftiles.py` (tileset sheets), `maps.py` (stitched maps), `music.py` (sound requests), `door.py`/`block.py`/
-`altx.py` (gate tests), `curate.py` (the contact sheets in img/).
+`altx.py` (gate tests), `curate.py` (the contact sheets in img/). v2 (`run2/`): `extract.py` (transcript
+recovery), `w2branch.py`, `w1fall.py` (shaft descent by placing Rockman over each exit), `w1punch.py`,
+`w1pocket2.py`, `x4branch.py`, `x4jet.py`, `altroutes.py` (`img/fortress_alt_routes.png`).
 
 ---
 
@@ -717,6 +737,11 @@ shadows in a fight), `hub.py`/`hub2.py`/`hub3.py` (boss-rush teleporters), `fstr
   crumbling bells ($1D) and big Power walls ($1B) in the Mr. X group, teleporter pads ($1F/$10) in Wily 3,
   Flame-Blast plugs (D) in Wily 2. New GP stages can pick a group to get these behaviours.
 
+- **Breakables are flagged per metatile id** (`$0340`, 256 bits, kept through deaths, cleared at stage
+  start). Give every breakable block its own metatile ids, unless two plugs are meant to open together
+  (Wily 2 does that on purpose or by accident: one F.BLAST at 04 also opens the exit plug of 12). The
+  32-byte bitfield also caps a stage at 256 metatiles, which the block-table limits already enforce.
+
 **Design takeaways:**
 
 - Vanilla fortresses use adaptors and weapons as **route keys for shortcuts and rewards**, not as hard
@@ -735,8 +760,6 @@ shadows in a fight), `hub.py`/`hub2.py`/`hub3.py` (boss-rush teleporters), `fstr
 
 ## Open points
 
-- Wily 1's Power pocket (09 -> 14-17) and the full pass through Wily 2's Flame-Blast branch were confirmed
-  from collision and object data only (the plug breaks, but the walk-through was not completed); Mr. X 4's
-  branch 16-18 has no gate in the data.
-- Collision types 6/7 (used around doors and pipes) and A/C/E (Wily 1 canister columns) are not pinned down.
-- Fortress boss names are from the English manual, not verified.
+- Collision types 6/7 (used around doors and pipes, e.g. Wily 1 15-17) and E (Wily 1, under the $41 blowers)
+  are not pinned down; A is the updraft.
+- Fortress boss names come from the fan wiki (one source, v2 web search), not from Capcom text.

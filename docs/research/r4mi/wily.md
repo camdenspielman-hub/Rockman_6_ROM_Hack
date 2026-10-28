@@ -1,6 +1,6 @@
 # 4MI Wily Castle stages 1-4 and the ending (r4mi-wily)
 
-Status: IN PROGRESS (this file is rewritten as the investigation proceeds).
+Status: complete for Wily 1-4, the final battle, the escape and the ending; open points are listed per stage.
 
 Scope: Rockman 4 Minus Infinity v1.01 (`roms/r4mi_mmc5.nes`), Wily stages 1-4 (`$22` = 12, 13, 14, 15): route
 screen by screen, gimmicks, enemies, mid-bosses, hidden rooms, pickups, HARD differences, the bosses (patterns,
@@ -11,7 +11,22 @@ Tags: **[seen]** emulator, **[code]** disassembly/data, **[text]** in-game text,
 
 ## 0. Method
 
-(pending)
+- States: the scout's `wily1..4_cp0/1/2` (EXTRA CONFIG warps; they carry PROG `$00` and all weapons) and MY ARENA
+  `fight_0c/0d/0e/0f/28-2c` states; godmode (`cheats.godmode`: frozen HP, lives and player i-frames + SHOCK GUARD,
+  TRAMPOLINE, BEAT). Drivers in `build/research/r4mi/r4mi-wily/` (`nav.py` route driver with teleports, `brawl.py`
+  autoplayer, `dmg.py`/`dmgbar.py` damage tables, `explore.py`/`rwalk.py` maze explorers, `secmap.py` section renders).
+- New tool: **`tools/analysis/r4mi/r4mi_dis.py`**, a 4MI-aware disassembler. It decodes the inline-argument far calls
+  (`JSR $DF8C` + hi, lo, bank = FARCALL; `JSR $DF66`/`$DF5F` = FARJMP) and `JSR $C4B8` jump tables, which break a
+  plain linear disassembly, and maps a bank at `$A000` (where most 4MI object code runs).
+- Finding an object's code: id `$5E` objects keep their `$A000` bank in `$7618+slot`; read it live, disassemble that
+  bank from `$A001`.
+- Damage: teleport beside the target each frame, fire every 6 frames, log `$0450+slot` drops and `$05B8+slot`
+  (i-frames), criticals off (`$78C9 = 1`, `$78F6 = 1`).
+- Savestates added to `build/research/r4mi/r4mi-wily/r2/` (all need godmode): `cap_17800` (capsule mid-fight),
+  `capk_end` (capsule at 0 HP), `post_capsule_s12` (underground), `cp2/s26` (Petit RM void, Wily Buster already given
+  by the cp2 respawn), `w4_final_nogift` / `w4_gift_text` (meddling about to trigger, set `$7722 = 0` and HP < 6),
+  `w4_final_gifted2`, `petit_dead`, `escape_start` (first escape attempt), `esc_attempt2`, `esc2/s00..s32` (every escape
+  screen), `esc_outside`, `esc_sky`, `esc_capture`, `ending_train`, `end_20000`, `end_31500` (RESULT).
 
 ## 1. Wily 1 (`$22` = 12) -FATAL MISCALCULATION-
 
@@ -290,12 +305,255 @@ numbers are a lower bound [method caveat].
 
 ## 4. Wily 4 (`$22` = 15) -FINAL FARCE-
 
-(pending)
+**In one line:** the subtitle is a promise. Three teal halls of new **chimera robots**, a secret **SUPER SHADOWMAN**
+who **kills you in one grab**, and the **OPTICAL CAPSULE**, 56 HP over two bars. Beat the capsule and the floor
+collapses, dropping Rockman into the **organic underground of the fortress** (ribs, blood drops, a purple liquid to
+swim through). From there a black void where **eight chibi "Petit Robot Masters"** attack at once. That fight is the
+"impossible game": **as soon as Rockman's HP drops below 6, Proto Man warps in ("BLUES: IT'S A GIFT BY Dr.COSSACK.
+TAKE IT.") and swaps the buster for the WILY BUSTER**, which melts them. Then Wily grovels and flees in his saucer, the
+self-destruct starts a **timed escape** (50 s, quietly **90 s after three failures**), Rockman bursts out into a
+forest and the sky, Wily's saucer crashes in the snow, and **Rockman pins Wily and carries him off: Wily rides the
+ending train as a captive**.
 
-## 5. The ending and RESULT
+### 4.1 Structure [code + seen]
 
-(pending)
+| Section | Global screens | Contents |
+|---|---|---|
+| A | 0-7 | hub corridor (0), teal halls (1, 3, 5) with corridors between (2, 4), a cannon corridor (6), the capsule approach (7, checkpoint 1) |
+| B | 8-10 | the capsule room (9) |
+| C | 11-28 | the organic underground (11-24), the teal machine room (25, checkpoint 2), the Petit RM void (26), Wily's chamber (27-28) |
+| escape | stage 13's map | screens 1-32, then a second section (0-2), the outdoor run (6-16), the snow clearing (17) |
 
-## 6. Lessons for Rockman 6 GP
+Links (bank `$71`, `r4mi_links.py 15`): 0 → 1 → … → 7 → 9, 10 ↓ 11, 11 ↓ 12, 13 → 14, 17 ↓ 18, 22 ↓ 23, 23 → 24, 25 → 26.
+The placement table (bank `$2F`, `stagemap.enemy_table(15)`) puts a **room controller (type `$88`) at x = 8 on screens
+0, 2, 7, 11, 12, 14, 18, 23 and 25**, whose y value selects its script (bank `$56`: y 1 → `$A02C`, 2 → `$A182`,
+3 → `$A17E`, 4 → `$A140`, 5+ → `$40:$AFDB`) [code].
 
-(pending)
+**PROG (`$7890`)** tracks the stage: `$A0` at cp0, `$A2` after hall 1, `$A4` after hall 2, **`$A6`** written by the
+SUPER SHADOWMAN object's init (bank `$57`, so a death in that fight cannot bring him back), **`$B0`** once the capsule
+is dead [code + seen]. **4MI's new objects all have id `$5E`**; the real routine is the `$A000` bank stored in
+**`$7618+slot`** (sprite bank in `$7600+slot`), entered at `$A001` [code]. That is how every boss below was traced.
+
+### 4.2 Route, halls and the secret boss [seen]
+
+| Screen | What happens |
+|---|---|
+| 0 | Hub corridor of teal pipework with "W" shutters; small Joes and hopping robots. |
+| 1 | **Teal hall, chimera #1** (fight `$28`): a red robot with a white V crest and red/white body, sparks. |
+| 2 | Corridor with W blocks, ledges over a blue void, small robots. |
+| 3 | **Teal hall, chimera #2** (fight `$29`): a big round red robot that throws **Leaf Shield-style leaves**. |
+| 4 | Corridor: green hopping robots with scythes, W blocks. |
+| 5 | **Teal hall, chimera #3** (fight `$2A`): two blue spiky robots that fuse into one spiked ball. Then, **only if you have not died**, a silver ninja drops in: **SUPER SHADOWMAN** (fight `$2B`). |
+| 6 | A one-tile-high corridor blocked by a **red cannon robot on a pedestal** (object anim `$1F`, 32 HP) that opens its visor to fire white plasma balls. |
+| 7 | Capsule approach, checkpoint 1; a row of small pellets (object `$7C` ×6) at the right. |
+| 9 | The capsule room. |
+
+The staff roll lists **CHIMERABOT #1-#3** among the FABRICATED ENEMIES, and the fight-name roster ends `… CHIMERABOT
+#1-#3, SUPER SHADOWMAN, ???, COCKROACH, -O M E G A-` [text]. The chimeras look like mash-ups of MM2/MM3 masters (a
+Quick Man-like body with sparks, Hard Man-like body with Wood Man's leaves, Needle Man-like spikes) [guess].
+
+**SUPER SHADOWMAN** (bank `$57` at `$A000`, fight `$2B`) [seen + code]:
+- 56 HP (two bars; `$0450+22` climbs to 56). He leaps around the hall, then **grabs Rockman** with a shuriken spinning
+  over his head; a white flash later the player state is set to `$07` (death) directly, so **the grab is an instant
+  kill that even godmode does not stop**. After the kill he poses while blue bubbles fall.
+- When his slot-6 body dies, `$57:$B073` does `$7898 |= $02`: the **SHADOWMAN** friend/bonus flag [code].
+- Proto Man's debrief explains the gate. EN placeholder: *"IN ORDER TO COMBAT THE SECRET BOSS, YOU SHOULD ARRIVE AT
+  THE CERTAIN PLACE OF WILY LEVEL 4 WITHOUT DYING."* JP: a smudged *yabumi* (arrow letter) stuck to a wall, readable
+  as 「拙者の本当の力を見たければ、一度もやられることなく、Dr.ワイリーの基地の最深部まで…」 ("if you want to see my true power,
+  [come] to the deepest part of Dr. Wily's base without being beaten once…"), with Proto Man's "what does that mean?
+  I have no idea" [text; reconstruction of the smudged characters is mine]. The predecessor's godmode run (no deaths
+  from `wily4_cp0`) met him on screen 5 and was killed by the grab [seen].
+
+![Wily 4 halls](img/wily_w4_halls.png)
+*The three chimera halls (fights `$28`, `$29`, `$2A`) and SUPER SHADOWMAN (`$2B`): his entrance, the grab, and the
+pose after the instant kill.*
+
+Damage (MY ARENA fight states, criticals off, `dmg.py`; values > 1 hit that equal the remaining HP were fight resets
+and are dropped) [measured]:
+
+| Weapon | Chimera #1 (`$28`, 28 HP, 61 i-fr) | Chimera #2 (`$29`, 28 HP, 14 i-fr) | Super Shadowman (56 HP, 39 i-fr) |
+|---|---|---|---|
+| Rock Buster | 2 | 1 | – (grabbed first) |
+| Rush Cannon | **28 (one shot)** | one shot | – |
+| Wish Star | **28 (one shot)** | one shot | – |
+| Toad | 2 | 1 | 1 |
+| Water Cutter (Dive) | 2 | ? | – |
+| **Ring** | **4** | 1 | 1 |
+| **Drill** | **4** | 1 | 1 |
+| Dust | 2 | 1 | – |
+| Pharaoh | 2 | 2 | – |
+| Spark Manbow (Bright) | 2 | 2 | 1 |
+| Hell Wheel (Skull) | 2 | ? | – |
+
+### 4.3 OPTICAL CAPSULE (fight `$0F`) [seen + measured + code]
+
+- **Object `$5E`, AI in bank `$45` at `$A000`.** The init (`$A01F`) branches on `PROG >= $B0`. The death handler
+  (`$AEC0` → `$AEF5`) plays sound `$E4`, sets **`$780A = stage | $20`** and **PROG = `$B0`**, and fades the room; in MY
+  ARENA (`$78C6` set) it farjumps to the arena result code (`$4C:$BA01`) instead. Attacks come from the sequence
+  table at `$A29E` (cursor `$6988`); **on HARD (`BIT $78DE`) the cursor starts at `$12`**, further down the list. The
+  19 attack routines are dispatched by two jump tables (`$A223` setup, `$A262` run) [code].
+- **56 HP shown as two bars**: `$0467` starts at `$B8` (bit 7 = boss bar). The bar `$BF` shows HP-28 while HP > 28,
+  then refills to 28 with a white flash at HP 28 and extra beam emitters (object `$5E`, AI bank `$48`) join in.
+- **Attacks seen**: it **teleports** with a horizontal scanline "dissolve", fires **long teal laser beams** in pairs
+  (horizontal, then diagonals that sweep the room), sprays a **burst of teal shards** that rains down, throws an
+  expanding ring of beads, small white pellets, and at times **splits into two capsules**.
+- A HUD sits at the bottom of the screen from this room on: `WPN` + weapon code, a horizontal weapon gauge,
+  Rockman's face with the lives, and a second gauge (the boss or target bar).
+- **At 0 HP**: a white-orb explosion, the capsule sits flashing on the floor, and the moment Rockman stands on the
+  ground PROG becomes `$B0` and **the floor gives way**: he drops down a shaft into the underground. A later attempt
+  (PROG already `$B0`) opens the floor as soon as the room loads [seen].
+- Vanilla RM4's Wily Capsule teleports and fires a spread of energy balls; 4MI keeps the teleport and the dome but
+  gives it a whole new beam/shard repertoire and doubles its HP [guess on vanilla, from memory].
+
+Damage (MY ARENA `fight_0f_wily4`, criticals off) [measured]:
+
+| Weapon | Damage | Notes |
+|---|---|---|
+| Rock Buster | 1 | min gap 41 frames; in-stage, 59 frames of boss invincibility (`$05B8+23`) |
+| **Rush Cannon** | **14** | 4 shots kill it |
+| Water Cutter (Dive) | 1 | min gap 13 frames: the best sustained damage |
+| Drill | 1 | min gap 12 frames |
+| Toad, Ring, Dust, Bright, Skull | 1 | |
+| Pharaoh, Wish Star | – | never connected |
+
+![The capsule](img/wily_w4_capsule.png)
+*OPTICAL CAPSULE: lasers, the teleport "dissolve", shard bursts, twin beams, two capsules; the 0-HP explosion, the
+floor giving way, and the first screen of the underground.*
+
+### 4.4 The organic underground (screens 11-24) [seen]
+
+Red fleshy rock with veins and fat-like blobs, **ribs along the ceiling**, dripping **blood drops**, **flames**, orange
+crawling blobs, orange claw-like vents, and pools of a **purple liquid** (collision type 6) that Rockman swims through
+(screens 19-22). Screen 24 holds a red organic "tree" or heart. The fortress is literally alive below the capsule
+room [guess on intent]. Screen 25 (checkpoint 2) is a teal machine room with tiny drones and a shutter on the right.
+(My automated route stalled at the screen 22 drop, so I reached 25 from `wily4_cp2`; the screen-by-screen layout of
+11-24 is in `build/research/r4mi/r4mi-wily/r2/w4C_sec.png`.)
+
+### 4.5 The final battle: the Petit Robot Masters and Proto Man's meddling (screen 26) [seen + code]
+
+- A black void with the bottom HUD. **Eight chibi Robot Masters** (Skull, Ring, Dive, Toad, Bright, Pharaoh, Drill,
+  Dust in their RM4 colours; objects `$5E` with AI bank `$46`, anims `$60`-`$67`, **28 HP each, 224 in all**) swarm
+  the floor and the air. The staff roll calls them **PETIT ROBOT MASTERS** [text]. The HUD's right gauge shows the bar
+  of the one you last hit.
+- **The meddling** (bank `$46`, `$AB35`): every 8 frames the controller checks **`$7722` (the super-special weapon in
+  use) = 0 and `$B0 < $86` (HP < 6)**. When both hold, the screen goes black with yellow sparkles, sound `$F1` and the
+  music change, and dialogue script 14 plays (`FARCALL $2D:8BF6` with Y = `$0E`): **"BLUES: IT'S A GIFT BY
+  Dr.COSSACK. TAKE IT."** Proto Man beams down, throws a pink orb, the screen flashes white, and **`LDY #$0B / FARCALL
+  $49:AA7C`** gives **EXWP 11, the WILY BUSTER**: `$7722 = $0B`, its energy `$BE = $9C`, HP refilled from max
+  (`$7944`), `$7800 = 2`. The HUD then reads **`WPN WB`** and Rockman fires big white plasma balls.
+- This is limited.txt's `某人のおせっかいでバスターが使えなくなります` ("a certain someone's meddling makes the buster unusable")
+  and `より完璧に縛りを行いたい場合は、１回目の挑戦で無理ゲーを突破する必要があります` ("for a perfect buster-only run you must clear
+  the impossible game on the first try") [doc]: the only way to finish buster-only is to kill all eight (224 HP at 1
+  per hit) without ever dropping below 6 HP.
+- `$49:$AA7C` is the generic "receive a super-special weapon" routine (also used for the Wily 1 vehicles and the
+  Dive/Drill weapons); `$49:$AB90` takes it away. `$56:$B6D5` re-gives the Wily Buster when you respawn (player state
+  `$0A`) at Wily 4's later checkpoints, so dying after the gift keeps it [code]. **Correction to text.md §3:** the
+  `LDA #$0B / STA $7722` in bank `$56` is this Wily Buster re-give, not a trigger of script 11.
+- **Wily Buster vs Petit RMs: 4 damage per hit, 7 frames of invincibility**, so 7 hits each; all eight died in 593
+  frames [measured].
+
+![The final battle](img/wily_w4_final.png)
+*The eight Petit Robot Masters; at HP < 6 the screen blacks out, "BLUES: IT'S A GIFT BY Dr.COSSACK. TAKE IT.", Proto Man
+beams in, throws the gift, white flash; the HUD now reads WPN WB and the Wily Buster's plasma shots clear the room. Last
+tile: swimming in the underground's purple liquid.*
+
+### 4.6 Wily's surrender and the self-destruct (screens 26-28) [seen + text]
+
+When the eighth dies the Wily Buster is taken back (`$7722 = 0`), the void lights up into Wily's blue chamber, and
+**Wily kneels and grovels** (the series' traditional begging scene) between two monitors. An explosion knocks Rockman
+back, Wily jumps into his yellow-rimmed saucer, and the PA (script 15) plays: *"ANNOUNCE: THE SELF-DESTRUCT SEQUE-NCE
+HAS BEEN ACTIVATED. REPEAT. … THIS SEQUENCE MAY NOT BE ABORTED. Dr.WILY PROCEED TO THE EMERGENCY PLANE AT THE SECRET
+PASSAGE."* Wily flies off, the room strobes red (alarm), Rockman runs through screens 27-28, and the game loads
+**stage 13's map** for the escape.
+
+![Surrender](img/wily_w4_surrender.png)
+*Wily's chamber, the grovel, the saucer, the self-destruct announcement, the red alarm, the first escape screen.*
+
+### 4.7 The escape [seen + RAM + text]
+
+- A countdown sits above the life bar in seconds and tenths, three digits at **`$7689` (tenths), `$768A` (ones),
+  `$768B` (tens)**, drawn as sprites. At 00.0 the screen flashes red, then white, and Rockman dies whatever his HP.
+- **Time limit per attempt: 50 s, 50 s, 50 s, then 90 s from the fourth attempt on** (read at each respawn: 49.3,
+  49.3, then 89.3 every time) [seen]. Proto Man's JP debrief entry 13 explains it: *"This time was close. If the
+  self-destruct's output had stayed high, we would both have shared the base's fate. Who lowered the output? …heh, who
+  knows."* He quietly makes the escape easier after you fail three times. The EN placeholder says the BONUS needs the
+  escape done *"BY FEW CHALLENGES"* [text + seen].
+- Route: a light-blue fortress interior full of explosions (white orb clusters), slopes, purple doors, red mine lines
+  and drop-offs (screens 1-32; a green-leafed background from 16). A purple exit corridor (new section, 0-2), a white
+  flash with Rockman in black silhouette as he bursts out, a **pine forest with a red-railed bridge** while
+  **Wily's blue saucer flies overhead** (6-8), a leap into **open sky above the clouds** after the saucer (10-16),
+  a white flash with a black ink-blot blast, the saucer hit and smoking, and a landing in a snowy clearing (17).
+- **Screen 17, the capture**: the camera locks and Rockman's controls freeze, the game **forces `A0` = 5 (WIRE)**,
+  Wily lies in the snow next to his wreck, and a red helper (Eddie?) and a blue one (Beat?) hover above. When the
+  countdown reaches zero, Wily jumps up in fright, **Rockman tackles and pins him and beams out holding him**. This is
+  limited.txt's `その後の流れで、ある武器を強制利用することになりますが、不可避です` ("in the flow after that you are forced to use a
+  certain weapon; it cannot be avoided") [doc + seen; that the Wire is what ties Wily up is my reading].
+- The stage then ends with player state `$13` and the ending (stage id 20) starts.
+
+![The escape](img/wily_w4_escape.png)
+*The countdown, time-out, the exit corridor, the burst outside, the forest bridge under Wily's saucer, the sky, the
+ink-blot blast, the saucer hit, Wily startled in the snow with the Wire forced on, Wily pinned, beamed out, and the
+skull cloud that opens the ending.*
+
+## 5. The ending and RESULT [seen]
+
+The ending itself (skull mushroom cloud, vanilla's train credits, the RM cards with WINS/LOSSES, "A WEEK LATER", the
+4MI staff roll, RECORDS with real times and deaths, FABRICATED ENEMIES, the RESULT panel and Proto Man's debrief) is
+documented in **text.md §6-§7**. What my natural run adds:
+
+- **Wily is a captive on the train.** For the whole train-credits ride he lies flat on the roof next to Rockman
+  (vanilla RM4's train ride is Rockman alone [guess, from memory]). Near the end of the ride he seems to drop off
+  the train [seen, small sprite; unclear].
+- **RESULT of this run** (from the EXTRA CONFIG `wily4_cp2` state, not a full playthrough): **MISSION 60/60, FRIENDS
+  10/15, EQUIPMENT 4/12, PLAY STYLE 10/10, BONUS 2/5 → "YOUR HERO SCORE IS 86"**, then "THANK YOU FOR PLAYING!",
+  "THERE'S MORE...", CAPCOM PRESENTS, the **Neo Borokuzu Koubou logo with its URL (`borokobo.web.fc2.com`)**, "AD 200X"
+  and the game's JP intro story.
+- Proto Man's debrief picked the **Rush** hint: *"YOUR DOG ... RUSH. I HAVE GOOD NEWS ABOUT HIM. IT SEEMS THAT HIS CORE
+  FOUND IN THE RUIN OF WILY'S FORTRESS. SO I THINK HE'LL BE YOUR BEST PARTNER AGAIN. PAINFUL MEMORIES MIGHT HAVE
+  REMAINED IN HIM. WILY HAD NO TIME TO HIDE HIM. HE MIGHT HAD BEEN NEAR WILY."* **Found: Rush is sealed in the wall of
+  Wily 4's checkpoint-2 machine room (screen 25), right before the Petit RM void ("near Wily").** A patterned panel
+  sits in the wall at about x 80, y 112. It is a hidden target (object `$7B`, AI bank `$56`, state 9, `$B6E5`-`$B73C`):
+  shoot it **through the wall from the left-hand shaft** and it flashes, breaks (sound `$D3`), Rush drops out lying on
+  the floor below, and `$7898 |= $08` (**RUSH**) [seen + code]. Weapons that break it (measured with `$7722` cleared):
+  **Rush Cannon, Water Cutter, Ring, Drill, Pharaoh, Spark Manbow, and the Wily Buster**; the plain buster (tapped or
+  charged), Toad, Dust, Hell Wheel and Wish Star do nothing. Since the cp2 respawn hands back the Wily Buster
+  (`$56:$B6D5`), a player who dies after the gift and returns here can also free him with it.
+
+![Rush found](img/wily_w4_rush.png)
+*Screen 25: shooting the panel through the wall (here with the Wily Buster the cp2 state carries), the panel breaking,
+and Rush lying on the lower floor with the RUSH flag set.*
+
+![Ending](img/wily_ending.png)
+*The train with Wily captive, the end of the ride, RESULT 86, the Rush debrief, the Hero Score, and the Neo Borokuzu
+Koubou logo.*
+
+## 6. Hidden rooms, HARD mode and secrets across the Wily stages
+
+- **Hidden rooms**: hint.txt says `最初の８ステージには、隠し部屋がそれぞれあります … 隠し部屋は、必ず1画面分のマップになっています`
+  ("the first eight stages each have a hidden room … always exactly one screen") [doc]. The Wily stages are not part of
+  that rule. The nearest thing is Wily 3's **treasure room (screen 19: six 1UPs and five `$56` items)** on the descent to
+  the boss [code: enemy table], and Wily 1's 1UPs on screens 17 and 32 [seen].
+- **HARD** (`$78CD` = 1 → `$78DE` bit 7): the capsule starts its attack list at entry `$12` instead of 0 [code]; bank
+  `$56`'s Wily 4 controller sets `$7827` to 4 on HARD instead of `$2C` (`$A02F`-`$A03B`) [code]. I did not compare Wily layouts on HARD (the
+  Cossack and RM investigators found HARD mostly changes enemy placement).
+- **Secrets**: SUPER SHADOWMAN (no deaths → Wily 4 screen 5), the Rush rescue (the panel in Wily 4 screen 25's wall), the escape BONUS (escape in
+  the first three tries), Eddie in Wily 1 (screen 18; the EDDY flag is set in bank `$41` `$AC17`, not traced), Kalinka
+  and the fake Roll in Wily 3 (KALINKA flag, bank `$50` `$A4DB`).
+
+## 7. Lessons for Rockman 6 GP
+
+- **An unwinnable fight with a story rescue is a great climax, and 4MI makes it fair**: the trigger is concrete
+  (HP < 6, no super weapon), it refills your HP, and a skilled player can still win "pure". The text and the
+  readme both acknowledge the purist route. RM6 GP could gate a cameo the same way.
+- **Hidden mercy beats a difficulty menu**: the escape quietly grows from 50 s to 90 s after three failures, and the
+  debrief later reveals who did it. Rubber-banding with an in-fiction excuse.
+- **Spend the ending on a punchline**: Wily captured, pinned in the snow and riding the credits train is cheap (reused
+  sprites) and memorable.
+- **One generic object id with a per-object code bank** (`$5E` + `$7618`) let the author add dozens of bosses without
+  touching the vanilla dispatch tables. A clean pattern for an MMC5 expansion.
+- **Two-bar HP (56) via "bar = HP - 28"** doubles a boss's life without a new HUD. The bottom horizontal HUD in Wily 4
+  shows how a late-game HUD swap can signal "this is different".
+- **Secret bosses need a written hint somewhere**: 4MI hides SUPER SHADOWMAN behind "no deaths" and hints it only in
+  the post-game debrief (EN placeholder, JP riddle).
+- **Reuse a stage slot for set pieces**: the escape runs on stage 13's map id with its own sections; the "rooms" of
+  Wily 3 borrow other stages' data. Cheap content multiplication.
