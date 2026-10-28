@@ -218,9 +218,8 @@ dangerous one. Light's switch from わたし (polite) to わし (old-man) marks 
 | Dr. Light (stern) | birds fly, sun shines, / and... | 、鳥が飛び、日が差して……… | birds fly, the sun shines... |
 | Dr. Light | I crash you. | そして、わたしはお前をブチのめす。 | ...and I beat you to a pulp. |
 
-Quotes the *Patlabor*... no: it is the Sergeant Hartman-style "grass grows, birds fly, sun shines, and brother, I hurt
-people" line from **Team Fortress 2's "Meet the Soldier"**... [guess, to verify] The EN line structure matches TF2
-"Meet the Heavy"/Soldier? See section 5.
+This is the Scout's line from *Team Fortress 2*'s **"Meet the Scout"** ("Grass grows, birds fly, sun shines, and
+brother, I hurt people."), in both languages. TF2 is the hack's house reference (ÜBERCHARGE, DEAD RINGER).
 
 **s12 - "if you could just... that'd be great"** (Yes/No choice, `09 F9 AE 24`)
 

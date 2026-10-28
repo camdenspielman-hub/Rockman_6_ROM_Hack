@@ -356,34 +356,40 @@ How it works [code, bank `$4C`]:
 
 ### The 45 fights [seen: one screenshot each, `cheats_fights.png`]
 
-Stage = the stage ID (`$22`) the fight loads in. Labels for the extra fights are descriptive only; the boss
-investigators should name them.
+Stage = the stage ID (`$22`) the fight loads in, and screen = `$0348` about 4 s in, so you can place each fight on
+the stage maps. Labels for the extra fights are descriptions of what is on screen, not names; the boss investigators
+should name them. Notable [seen]: `$10-$13` are four set-piece fights in a **city at dusk** (onion-dome skyline)
+belonging to stage 8 (Cossack 1) at screens 27-31, past the Cossack 1 boss room (screen 23). `$20-$22` are the same
+**shuriken-throwing ninja** in three Robot Master stages (in Toad's he rides a frog): probably the SHADOWMAN flag
+[guess]. `$23-$27` are five humanoid robots in Dive, Drill and Cossack 4 that look like the Game Boy Mega Man Killers
+and Stardroids whose weapons EXWP carries (ENKER, QUINT, PUNK, BALLADE, EARTH) [guess]. `$28-$2B` share one teal
+hall in Wily 4.
 
-| ID | Stage | Fight | | ID | Stage | Fight |
+| ID | Stage, screen | Fight | | ID | Stage, screen | Fight |
 |---|---|---|---|---|---|---|
-| `00` | Bright | Bright Man | | `17` | Ring | sky: ring swarm |
-| `01` | Toad | Toad Man | | `18` | Ring | pink platforms room |
-| `02` | Drill | Drill Man | | `19` | Dive | whale submarine |
-| `03` | Pharaoh | Pharaoh Man | | `1A` | Skull | red T-rex mech |
-| `04` | Ring | Ring Man | | `1B` | Cossack3 | green snail mech |
-| `05` | Dust | Dust Man | | `1C` | Cossack3 | blue whale head |
-| `06` | Dive | Dive Man | | `1D` | Cossack4 | orange machine room |
-| `07` | Skull | Skull Man | | `1E` | Drill | red-white robot in a star room |
-| `08` | Cossack1 | Cossack 1 boss (moth machine) | | `1F` | Dive | grey machine hall |
-| `09` | Cossack2 | Cossack 2 boss (block machine) | | `20` | Bright | dark figure in Bright Man stage |
-| `0A` | Cossack3 | Cossack 3 boss (white walker mech) | | `21` | Pharaoh | shuriken ninja |
-| `0B` | Cossack4 | Cossack 4 boss (Cossack Catcher) | | `22` | Toad | frog + rider, shuriken |
-| `0C` | Wily1 | Wily 1 boss (green robots) | | `23` | Dive | spear figure |
-| `0D` | Wily2 | Wily 2 boss (dark copy figure) | | `24` | Drill | green-haired robot |
-| `0E` | Wily3 | Wily 3 boss (Wily Machine 4) | | `25` | Cossack4 | robot 1 |
-| `0F` | Wily4 | Wily 4 boss (Wily Capsule) | | `26` | Cossack4 | robot 2 |
-| `10` | Cossack1 | train: Joe in a cannon walker | | `27` | Cossack4 | robot 3 (green hair) |
-| `11` | Cossack1 | train: big frog | | `28` | Wily4 | capsule room 1 |
-| `12` | Cossack1 | train: flying pod + birds | | `29` | Wily4 | capsule room 2 |
-| `13` | Cossack1 | train: 4th set piece | | `2A` | Wily4 | capsule room 3 |
-| `14` | Toad | giant frog mech | | `2B` | Wily4 | capsule room 4 |
-| `15` | Drill | cave flyer | | `2C` | Drill | green cave: round robot |
-| `16` | Drill | purple hippo | |  | | |
+| `00` | Bright 31 | Bright Man | | `17` | Ring 5 | sky room: spring/ring swarm |
+| `01` | Toad 47 | Toad Man | | `18` | Ring 12 | pink platform room: Saturn-ring UFOs |
+| `02` | Drill 33 | Drill Man | | `19` | Dive 22 | whale battleship over the sea |
+| `03` | Pharaoh 36 | Pharaoh Man | | `1A` | Skull 38 | red T-rex mech |
+| `04` | Ring 26 | Ring Man | | `1B` | Cossack3 20 | green snail mech |
+| `05` | Dust 36 | Dust Man | | `1C` | Cossack3 30 | blue whale-head machine |
+| `06` | Dive 41 | Dive Man | | `1D` | Cossack4 31 | orange machine room, wall turrets |
+| `07` | Skull 47 | Skull Man | | `1E` | Drill 38 | red-white robot in a star room |
+| `08` | Cossack1 23 | Cossack 1 boss: big moth machine (you ride a sled/Rush) | | `1F` | Dive 46 | orange robot in a grey machine hall |
+| `09` | Cossack2 32 | Cossack 2 boss: green block machine over spikes | | `20` | Bright 17 | shuriken ninja + birds |
+| `0A` | Cossack3 43 | Cossack 3 boss: white giant built from blocks | | `21` | Pharaoh 47 | shuriken ninja |
+| `0B` | Cossack4 40 | Cossack 4 boss: Cossack Catcher, you hang on a wire | | `22` | Toad 21 | shuriken ninja riding a frog |
+| `0C` | Wily1 44 | Wily 1 boss: green jet robot + white robot | | `23` | Dive 33 | orange spear robot |
+| `0D` | Wily2 37 | Wily 2 boss: dark outline Rockman-like figure | | `24` | Drill 26 | green pogo robot |
+| `0E` | Wily3 23 | Wily 3 boss: Wily Machine (skull) | | `25` | Cossack4 37 | spiky white robot |
+| `0F` | Wily4 9 | Wily 4 boss: Wily Capsule | | `26` | Cossack4 35 | blue-white robot |
+| `10` | Cossack1 27 | city at dusk: Sniper Joe in a cannon walker + white runner | | `27` | Cossack4 33 | green-haired robot |
+| `11` | Cossack1 28 | city at dusk: big frog + tadpoles | | `28` | Wily4 1 | teal hall: sparks |
+| `12` | Cossack1 29 | city at dusk: round pod + birds | | `29` | Wily4 3 | teal hall: red robot throwing leaves |
+| `13` | Cossack1 31 | city at dusk: two-bar fight, small green mounds | | `2A` | Wily4 5 | teal hall: blue spiky robots |
+| `14` | Toad 7 | giant frog mech with a rider | | `2B` | Wily4 5 | teal hall: blue robot |
+| `15` | Drill 35 | cave room, small flyers | | `2C` | Drill 47 | green cave: round one-eyed robot |
+| `16` | Drill 20 | purple hippo on a brick pillar | |  | | |
 
 ![All 45 fights](img/cheats_fights.png)
 *Every MY ARENA fight ID, about 4 s after its state loads (godmode on).*
