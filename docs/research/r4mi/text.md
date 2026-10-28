@@ -14,6 +14,21 @@ Deliverables: this doc; tables in `docs/research/r4mi/tables/` (`r4mi_menu.tbl`,
 `build/research/r4mi/r4mi-text/out/all_text.txt`. Regenerate everything with
 `python3 -I build/research/r4mi/r4mi-text/gen_md.py` (it re-runs `extract_all.py`).
 
+**Reusable states and tricks (r4mi-text)** [seen]:
+
+| State (`build/research/r4mi/states/`) | What |
+|---|---|
+| `ending_train.state` | Main ending, just after the fortress explosion (vanilla train credits next) |
+| `ending_staffroll.state` | Ending at the Robot Master cards / A WEEK LATER / 4MI staff roll |
+| `ending_before_result.state` | Ending at PRESENTED BY CAPCOM, about 10 s before RESULT and the debrief. Poke `$78B0` (0 JP / 1 EN) here to choose the debrief language |
+
+- **Reach the ending from any stage:** load a stage state and poke player state `$30 = $13`. The stage loop
+  (`$7E:$C80B`) then maps bank `$1B` and runs the ending (`$1B:$8003`). Script: `build/research/r4mi/r4mi-text/ending2.py`.
+  Patching the savestate PC to `$C83C` directly hangs (no task context).
+- **Dialogue in Japanese:** poke `$78B0 = 0` *before* ENTER STAGE. The script language is latched when the script starts.
+- `build/research/r4mi/r4mi-text/uniq.py` records a state and keeps only frames whose text band changed and settled,
+  which is handy for typed-out text.
+
 
 ---
 
@@ -22,33 +37,43 @@ Deliverables: this doc; tables in `docs/research/r4mi/tables/` (`r4mi_menu.tbl`,
 - **The language option is literally named `ENGRISH`**, with the subtitle `ENGLISH COMING SOON` [seen]. The staff roll's
   TRANSLATION credit reads `(RESERVED)` [text]. The author did the English himself and labels it as Engrish up front.
 - **The English debrief ships two unfinished entries**. They read `WIP WIP WIP / UNDER CONSTRUCTION`, then state the hidden
-  conditions outright in brackets: *"IN ORDER TO COMBAT THE SECRET BOSS, YOU SHOULD ARRIVE AT THE CERTAIN PLACE OF WILY
-  LEVEL 4 WITHOUT DYING!"* In Japanese, the same slot is a riddle: Shadow Man's *yabumi* (矢文, a letter shot on an arrow),
+  conditions outright in parentheses: *"(IN ORDER TO COMBAT THE SECRET BOSS, YOU SHOULD ARRIVE AT THE CERTAIN PLACE OF
+  WILY LEVEL 4 WITHOUT DYING.)"* In Japanese, the same slot is a riddle: Shadow Man's *yabumi* (矢文, a letter shot on an arrow),
   smudged so that every few characters are missing (§4) [text].
-- **The post-game debrief is a hint system.** After the ending, Proto Man comments on your RESULT. For each Hero Score
-  point you missed, he drops a "by the way…" rumour that points at the hidden equipment, the friends, or the bonuses
-  (§4) [text].
+- **The post-game debrief is a hint system.** After the ending, Proto Man comments on your RESULT. He picks one Hero Score
+  point you missed and drops a "by the way…" rumour about it. There are 15 such entries, covering the hidden
+  equipment, the friends, play style and the bonuses (§4) [text][seen].
 - **The Energy Splitter's help text hides a dark joke.** "YOU SEEM TO HEAR SOMETHING IN THIS UNIT." Proto Man's Eddie
   entry says Eddie's core was never found, that his signal "DISAPPEARED NEAR YOU", and that "YOU SAW HIS LAST MOMENT".
   The Recycle Inhaler turns enemies into items ("LET'S INHALE VARIOUS THINGS"), and Proto Man suggests inhaling a Metall
   to get METALL'S HELMET. The reading that follows: the Energy Splitter is what is left of Eddie after you inhale him
   [text + guess].
 - **Wily 3 is a Zelda-style dungeon** with a MAPPING UNIT, a COMPASS UNIT ("PINPOINT THE LAIR OF THE LABYRINTH'S ROBOT
-  MASTERS") and a WARP SENSOR, each with a *"YOU GOT …!"* text box [text]. The staff roll names the stage *WILY'S LABYRINTH*.
+  MASTERS") and a WARP SENSOR, each with its own pickup text box ("YOU GOT / YOU FOUND / YOU'VE GOT … UNIT!") [text]. The staff roll names the stage *WILY'S LABYRINTH*.
 - **A fake Roll** guards Kalinka in Wily 3. In Japanese she speaks in robot-voice katakana, with the people's names in
   hiragana (`アラ　ろっく　ナニカ　ヨウカシラ`). She beats Mega Man up ("OUCH! STOP BEATING!"), and as she breaks down she
   hands him the key to Wily's lair [text].
 - **"DR.RIGHT"**: in the EN space-scene script Dr. Light is introduced as `DR.RIGHT`, the early US-manual misreading of
-  ライト [text].
+  ライト [text][seen].
 - **The self-destruct announcement is addressed to Wily**: *"DR.WILY PROCEED TO THE EMERGENCY PLANE AT THE SECRET
   PASSAGE."* [text]
 - **The staff roll gives every stage a subtitle**, from *-BLIZZARD SKY-* to *-FATAL MISCALCULATION-*, *-RUSHED OUT
   PRODUCTS-* and *-FINAL FARCE-*. It also prints per-stage TIME and **TIWNS** (deaths, from the *tiun tiun* death sound),
   and lists the hack's new enemies under **FABRICATED ENEMIES**: SI'N'COSINE, DIG'N'DUGN, RONG/RANG/RUNG, NIGHTMARE SUZY,
   JUMBIG THE DEATH MACHINE and more (§7) [text].
-- **The fonts have no zero.** In the dialogue and credits fonts, byte `$00` is the space, so the author writes `1OO
-  MINUTES` and `TIME OO:OO:OO` with the letter O [text][code].
-- **The MY ARENA presets include `SPIXXXMAN`**, a censored name (§5.6).
+- **The ending keeps score.** After vanilla's Robot Master roll call, every RM gets a new card with a job title
+  (`ILLUMINATON ROBOT`, sic; `WASTE COMPRESSION ROBOT`) and **your `WINS / LOSSES` against him**. Toad Man's card alone
+  has an extra `AND n DRAW` line. The staff roll prints your real per-stage TIME and TIWNS. RESULT then counts up
+  `60/60 … 2/ 5`, Proto Man gives **one** hint, and the screen ends on the total and a sprite line: EN **"THERE'S
+  MORE..."**, JP **"AND MORE..."** (§6-7) [seen].
+- **A 49-name fight roster** (bank `$6F`) includes CLASHMAN (Crash Man), WAVEMAN, PAKKUN SHADOW (Shadow Man on a frog),
+  the Game Boy Mega Man Killers, **SUPER SHADOWMAN**, a name stored as `???`, a blank name, and `-O M E G A-` (§7.3)
+  [code][seen].
+- **The text has no zero.** In the dialogue and credits encodings, byte `$00` is the space, so the author writes `1OO
+  MINUTES` and the template `TIME OO:OO:OO` with the letter O. Run-time numbers such as RESULT's `60/60` are drawn by
+  code [text][code][seen].
+- **The MY ARENA presets include `SPIXXXMAN`**: its only weapon is the WIRE, so it is "SPIDERMAN" with the DER
+  censored (§5.4) [text; joke = guess].
 - Super-special weapons borrowed from the **Game Boy** games have their own HELP pages: SCREW CRUSHER (Punk, MM III GB),
   BALLADE CRACKER (Ballade, MM IV GB) and SPARK CHASER (Terra/Earth, MM V GB). So does the **WILY BUSTER**, "FINAL WEAPON
   DEVELOPPED BY COSSACK WITH WILY'S TECHNOLOGY", which reduces the damage you take [text].
@@ -96,13 +121,29 @@ LZ format (`lz.py`) starts with a destination word, then control bytes: `<$40` l
 ## 2. HELP screens (weapon menu → B)
 
 Press B on the weapon menu to open a 3-box page: title + icon, description, and four stat rows. LEFT/RIGHT pages through
-the weapons and equipment you own [seen]. The page index is a fixed slot order, and **page 7 is an unused duplicate of
-the buster page** (the vanilla 8-RM slot order with Dive pushed to 8) [code]. In JP mode, the title box keeps the EN
+the weapons and equipment you own [seen]. The page index is its own fixed order (buster, the 8 RM weapons, Rush, Wire,
+Balloon, equipment, super weapons). **Page 7 is a duplicate of the buster page** (both pointer tables give page 0's
+address), with Dive at page 8, so it looks like a dropped slot [code; reason = guess]. In JP mode, the title box keeps the EN
 title and the body starts with a kana header line between `■` marks [seen].
 
-Stats are as shown in game [seen] (sprites, `stats_w.png`). Equipment pages show `-` for all four. The author's readme
+Stats are as shown in game [seen] (sprites; close-ups in `img/text_help_stats.png`). Equipment pages show `-` for all four. The author's readme
 warns that some descriptions are deliberately useless and some hide secret functions [doc]. Commentary follows the pages
 (§2.1).
+
+![EN weapon help pages](img/text_help_weapons_en.png)
+*Every weapon HELP page in EN, in paging order, with the stat boxes (the last row wraps back to the buster) [seen].*
+
+![EN equipment help pages](img/text_help_equipment_en.png)
+*The equipment pages, BIRD ROBOT through ?DAGGER, all with `-` stats [seen].*
+
+![JP help pages](img/text_help_jp.png)
+*JP mode: EN title box, kana body with a `■` header line and `－` bullets, dakuten as separate tiles [seen].*
+
+![Super-special weapon help pages](img/text_help_superweapons.png)
+*Pages 25-28 appear only when an EXWP super-special weapon replaces the buster (EXTRA CONFIG EXWP 8-11) [seen].*
+
+![Stat close-ups](img/text_help_stats.png)
+*Stat sprites at 4× (POWER / SPEED / RAPIDNESS / COST), read for the tables below [seen].*
 
 **Page 0: ROCK BUSTER MI** (weapon slot 0 (buster) | POWER 1 · SPEED 4.2 · RAPIDNESS 3 · COST 0) `EN $6A:AA83` `JP $6A:A000`
 
@@ -254,25 +295,25 @@ warns that some descriptions are deliberately useless and some hide secret funct
 |---|---|
 | THIS IS CONVERTER OF LIFE ENERGY.<br>THIS CONVERTS THE HALF OF REMAINDER OF LIFE ENERGY INTO WEAPON ENERGY.<br>THIS IS USED WITH ENERGY BALANCER. | ■　エクスチェンジャー　■<br>－ライフエネルギーの　へんかんそうち<br>－ライフエネルギーのよじょうぶんの　はんぶんをぶきエネルギーに　へんかんする<br>－エネルギーバランサーと　へいようされる |
 
-**Page 25: SCREW CRUSHER** (EXWP super-special weapon) `EN $6A:B58B` `JP $6A:A8AE`
+**Page 25: SCREW CRUSHER** (EXWP super-special weapon | POWER 2 · SPEED 4.0 · RAPIDNESS 4 · COST 0) `EN $6A:B58B` `JP $6A:A8AE`
 
 | EN [text] | JP [text] |
 |---|---|
 | YOU THROW SPINNING SAW.<br>THIS FLIES ALONG PARABOLIC ORBIT.<br>THIS INVALIDATES THE ENEMY'S ARMOR.<br>YOU CAN THROW THIS INFINITELY. | ■　スクりュー　クラッシャー　■<br>－こうそくかいてんする　ノコギりを　なげる<br>－なげたあと　ほうぶつうんどうするためじょうげに　こうげきすることが　かのう<br>－あいての　そうこうや　ぼうぎょを　つらぬく<br>－いくらでも　なげることが　できる |
 
-**Page 26: BALLADE CRACKER** (EXWP super-special weapon) `EN $6A:B5F8` `JP $6A:A923`
+**Page 26: BALLADE CRACKER** (EXWP super-special weapon | POWER 2 · SPEED 6.0 · RAPIDNESS 4 · COST 0) `EN $6A:B5F8` `JP $6A:A923`
 
 | EN [text] | JP [text] |
 |---|---|
 | YOU THROW BOMBERS TOWARD 8 DIRECTION.<br>WHEN BOMBERS HIT TO ENEMY OR WALL, IT'S EXPLOSION ATTACK A LARGE RANGE.<br>YOU CAN THROW THIS INFINITELY. | ■　バラード　クラッカー　■<br>－8ほうこうに　ばくだんを　なげる<br>－てきや　ちけいにあたると　ばくはつを　おこしひろいはんいに　こうげき　かのう<br>－いくらでも　なげることが　できる |
 
-**Page 27: SPARK CHASER** (EXWP super-special weapon) `EN $6A:B675` `JP $6A:A985`
+**Page 27: SPARK CHASER** (EXWP super-special weapon | POWER 2 · SPEED 8.0 · RAPIDNESS 1 · COST 0) `EN $6A:B675` `JP $6A:A985`
 
 | EN [text] | JP [text] |
 |---|---|
 | INTENSE SPARK CHASES ENEMIES AND ATTACKS REPEATEDLY.<br>IF YOU PUSH B AGAIN, YOU CAN RE-FIRE.<br>YOU CAN EMIT THIS INFINITELY. | ■　スパーク　チェイサー　■<br>－はげしいほうでんが　てきをおいかけれんぞくして　こうげきする<br>－もういちど　Ⓑをおすと　うちなおせる<br>－いくらでも　うつことが　できる |
 
-**Page 28: WILY BUSTER** (EXWP super-special weapon (final battle)) `EN $6A:B6D6` `JP $6A:A9DC`
+**Page 28: WILY BUSTER** (EXWP super-special weapon (final battle) | POWER 4 · SPEED 6.0 · RAPIDNESS 3 · COST 0) `EN $6A:B6D6` `JP $6A:A9DC`
 
 | EN [text] | JP [text] |
 |---|---|
@@ -319,11 +360,12 @@ bullet, and the extras are the *useful* bits:
 **Deliberately useless descriptions** [text]:
 
 - **?DAGGER**: the whole page is `UNCERTAIN ITEM` / `？たんとう　■　－しきべつされていないので　よくわからない` ("?Dagger:
-  unidentified, so you can't tell"). The joke is the roguelike *unidentified item* (Shiren / Nethack).
+  unidentified, so you can't tell"). The joke is the roguelike *unidentified item*; 識別 "identify" is *Fushigi no Dungeon* vocabulary [guess on the reference]. The EXTRA CONFIG label `?D` confirms the item is real (`$7839` bit7).
 - **METALL'S HELMET**: "FOR THIS HAVE BROKEN A BIT WHEN RECYCLEING, THIS MAY BE USELESS. THIS SOMETIMES REDUCES
   DAMAGES." JP: `あまり　やくにたちそうもない` ("doesn't look very useful"), `まれに` ("rarely").
 - **BIRD ROBOT** (Beat): "HE SEEMS TO TAKE TO YOU." / `ロックマンに　なついたようだ`: flavour only.
-- **ENERGY BALANCER**: "THIS IS ACTIVE WHATEVER YOU EQUIPS." In vanilla RM4 the Balancer only works with the buster.
+- **ENERGY BALANCER**: "THIS IS ACTIVE WHATEVER YOU EQUIPS." / `どのぶきを　そうびじにも　ゆうこう`. This is the one
+  line that matters: the balancer works even with a special weapon selected.
 - **EXCHANGER**: "THIS IS USED WITH ENERGY BALANCER": half the surplus life energy becomes weapon energy.
 
 **Equipment origins in the text** [text]: SKULL AMULET is the gem from Skull Man's chest ("BRING YOU GUTS", JP
@@ -762,6 +804,11 @@ AT THE SECRET PASSAGE.</pre></td><td><pre>アナウンス「
 
 ### 3.1 Notes on the story
 
+![Wily 3 space scene in JP](img/text_dialogue_wily3_jp.png)
+*Script 11/12 in JP, live (`$78B0 = 0` before ENTER STAGE): Dr. Light's warning, the single life signal, 「ワープはできません
+ライトはかせ」, and 「はかせ…はかせ…つうしんそうちが　つかえない！？」 [seen]. The EN version is in the scout's
+`cheats_wily3_story.png`. Its first page reads `Dr.RIGHT:MEGAMAN, IT'S DANGEROUS!` on screen (my `w3_raw.png`).*
+
 **What changed from vanilla RM4's story** [text]:
 
 - **Script 0** reworks vanilla RM4's Cossack confession. In vanilla, Proto Man arrives with the rescued Kalinka. In
@@ -1091,6 +1138,12 @@ DO YOU THINK DR.WILY GIVEUP? NO ANSWER NEEDED.</pre></td><td><pre>おれから�
 
 ### 4.1 Reading the debrief
 
+**How it plays** [seen]: in a live ending (§6), the RESULT panel stays up while Proto Man's text types into a
+2-line box below it. After the greeting (entry 0) **only one hint entry** followed: entry 1 (Beat), the first missed
+friend, in a run with FRIENDS 5/15, EQUIPMENT 0/12 and BONUS 2/5. So the debrief gives you *one* lead per clear, in a
+priority order [seen for this run; the order is a guess from the table order]. The JP and EN versions are picked by
+the language flag live.
+
 The entries line up one-to-one with the Hero Score categories (readme_e: MISSION 60, FRIENDS 5×3, EQUIPMENT 2×6,
 PLAY STYLE 10 = no revisit 2 / no Game Over 4 / play time 4, BONUS 5 = "XXXXman" 1 / Escape 2 / "XXXXXXman" 2)
 [doc][text]:
@@ -1098,20 +1151,20 @@ PLAY STYLE 10 = no revisit 2 / no Game Over 4 / play time 4, BONUS 5 = "XXXXman"
 | Entry | Category | Hint in plain words |
 |---|---|---|
 | 1 | FRIENDS: Beat | Beat's core turned up in the ruins. Cossack will rebuild him and send him to you as thanks and apology. "SCISSORS AND LEAVES ARE SCATTERED NEAR HIS CORE. DO YOU THINK WHERE HE WAS?" (JP `はものや　このは`, "blades and leaves") is a clue to where Beat was caged [guess: a stage with cutters and foliage]. |
-| 2 | FRIENDS: Rush | Rush's core turned up in the ruins. "WILY HAD NO TIME TO HIDE HIM. HE MIGHT HAD BEEN NEAR WILY!" So Rush was captured, and was close to Wily. |
-| 3 | FRIENDS: Eddie | Eddie's core was **not** found. "AS I HEARD THAT HIS SIGNAL DISAPPEARED NEAR YOU, YOU SAW HIS LAST MOMENT ... DIDN'T YOU? DON'T MIND, YOU HAD DONE BEST EFFORT TO HIM!" JP: `ふるえているのか　ロックマン` ("Are you trembling, Rockman?"). With the Energy Splitter's "YOU SEEM TO HEAR SOMETHING IN THIS UNIT", the implication is that you *recycled Eddie* with the inhaler [guess, strongly suggested]. |
+| 2 | FRIENDS: Rush | Rush's core turned up in the ruins. "WILY HAD NO TIME TO HIDE HIM. HE MIGHT HAD BEEN NEAR WILY." So Rush was captured, and was close to Wily. |
+| 3 | FRIENDS: Eddie | Eddie's core was **not** found. "AS I HEARD THAT HIS SIGNAL DISAPPEARED NEAR YOU, YOU SAW HIS LAST MOMENT ... DIDN'T YOU? DON'T MIND, YOU HAD DONE BEST EFFORT TO HIM." JP: `ふるえているのか　ロックマン` ("Are you trembling, Rockman?"). With the Energy Splitter's "YOU SEEM TO HEAR SOMETHING IN THIS UNIT", the implication is that you *recycled Eddie* with the inhaler [guess, strongly suggested]. |
 | 4 | EQUIPMENT | "DID YOU USE 'RECYCLE INHALER'? … HOW ABOUT TRYING IT TO A METALL?" → METALL'S HELMET. |
-| 5 | EQUIPMENT | Skull Man's chest gem "BRINGS THE GUTS UNDER SEVERE SITUATION … I WANT TO LEND IT BUT HE MAY REFUSE IT!" → SKULL AMULET. |
+| 5 | EQUIPMENT | Skull Man's chest gem "BRINGS THE GUTS UNDER SEVERE SITUATION … I WANT TO LEND IT BUT HE MAY REFUSE IT." → SKULL AMULET. |
 | 6 | EQUIPMENT | "SHADOW MAN INTERRUPTED YOUR MISSION … THE STAR SHAPED WEAPON ON HIS HEAD … INCREASES THE CRUEL FEELING" → SUPER STAR. Shadow Man (MM3) is a recurring intruder; JP `まったく　わけわかんねーやろうだぜ` ("what a weirdo"). |
-| 7 | EQUIPMENT | "DRILL MAN HID [THE WIRE] IN SOMEWHERE … IT MAY RECYCLEABLE INTO SOMETHING USEFUL! HOW ABOUT TRY DOING IF YOU HAVE 2 OR MORE IT!" → inhale a spare Wire → SHOCK GUARD. Also confirms the Wire is in Drill Man's stage. |
+| 7 | EQUIPMENT | "DRILL MAN HID [THE WIRE] IN SOMEWHERE … IT MAY RECYCLEABLE INTO SOMETHING USEFUL. HOW ABOUT TRY DOING IF YOU HAVE 2 OR MORE IT." → inhale a spare Wire → SHOCK GUARD. Also confirms the Wire is in Drill Man's stage. |
 | 8 | EQUIPMENT | The same for the Balloon in Dive Man's stage → TRAMPOLINE. |
-| 9 | PLAY STYLE | "YOU WENT THE LEVEL WHOSE BOSS HAD ALREADY BEATEN … IT ISN'T EVALUATE WELL!" → the no-revisit 2 points (FLAG `RE-EN`). |
-| 10 | PLAY STYLE | "YOU USE 'CONTINUE' A FEW TIMES! THE REAL HERO WILL NEVER DEFEATED!" → the no-Game-Over 4 points. |
+| 9 | PLAY STYLE | "YOU WENT THE LEVEL WHOSE BOSS HAD ALREADY BEATEN … IT ISN'T EVALUATE WELL." → the no-revisit 2 points (FLAG `RE-EN`). |
+| 10 | PLAY STYLE | "YOU USE 'CONTINUE' A FEW TIMES. THE REAL HERO WILL NEVER DEFEATED." → the no-Game-Over 4 points. |
 | 11 | PLAY STYLE | "HAD THIS MISSION COMPLETED WITHIN 1OO MINUTES?" → the play-time 4 points (the limit is 100 minutes; note the letter-O zeros). |
-| 12 | BONUS "XXXXman" | "TOAD MAN WANT TO BECOME REAL TOAD … THE SAME ADORATION WE THINK TO HUMAN!" → the Toad Man bonus (FLAG `TOAD`). JP: `おれたちの　にんげんへの　あこがれと　おなじような　ものなのかもな`, a Pinocchio wish that is touching for a robot to voice. |
-| 13 | BONUS Escape | **JP**: "This time was close. Who'd have thought they'd raise a warp-jamming field (`ワープそがいフィールド`). If the self-destruct output had stayed high, we'd both have shared the base's fate. Who lowered the output? …Heh, who knows." **EN**: `WIP WIP WIP / UNDER CONSTRUCTION / [IN ORDER TO GET BONUS POINTS, YOU SHOULD ESCAPE THE FORTRESS BY FEW CHALLENGES]`. The EN text was never written, and the placeholder gives the condition away. |
-| 14 | BONUS "XXXXXXman" | **JP**: Proto Man finds a *yabumi* stuck to the wall. It is smudged: `せっしゃの　.んとうの　ち.らを　.たけ.ば／い.ども　や.れること　なく／Dr.ワ..ーのきち.　さいしんぶ　ま.`. Filled in, it reads 拙者の本当の力を見たければ 一度もやられることなく Dr.ワイリーの基地の最深部まで, "If you wish to see this one's (*sessha*, ninja first person) true power, [come] to the deepest part of Dr. Wily's base without being defeated even once". He adds `ここからさきは　よめないぜ` ("the rest is unreadable"). **EN**: `WIP … [IN ORDER TO COMBAT THE SECRET BOSS, YOU SHOULD ARRIVE AT THE CERTAIN PLACE OF WILY LEVEL 4 WITHOUT DYING!]`. So the secret boss is **Shadow Man**, in Wily 4, and you must not die on the way. |
-| 15 | perfect | "I HAVE NO ADVICE! YOU ARE REAL HERO. I HOPE YOU WILL NOT FIGHT AS MEGAMAN ANY MORE! DO YOU THINK DR.WILY GIVEUP? NO ANSWER NEEDED!" (JP `…いや　へんとうは　いいぜ`) |
+| 12 | BONUS "XXXXman" | "TOAD MAN WANT TO BECOME REAL TOAD … THE SAME ADORATION WE THINK TO HUMAN." → the Toad Man bonus (FLAG `TOAD`). JP: `おれたちの　にんげんへの　あこがれと　おなじような　ものなのかもな`, a Pinocchio wish that is touching for a robot to voice. The ending's Toad Man card is the only one with an extra `AND n DRAW` line (§7). |
+| 13 | BONUS Escape | **JP**: "This time was close. Who'd have thought they'd raise a warp-jamming field (`ワープそがいフィールド`). If the self-destruct output had stayed high, we'd both have shared the base's fate. Who lowered the output? …Heh, who knows." **EN**: `WIP WIP WIP / UNDER CONSTRUCTION / (IN ORDER TO GET BONUS POINTS, YOU SHOULD ESCAPE THE FORTRESS BY FEW CHALLENGES)`. The EN text was never written, and the placeholder gives the condition away. |
+| 14 | BONUS "XXXXXXman" | **JP**: Proto Man finds a *yabumi* stuck to the wall. It is smudged: `せっしゃの　.んとうの　ち.らを　.たけ.ば／い.ども　や.れること　なく／Dr.ワ..ーのきち.　さいしんぶ　ま.`. Filled in, it reads 拙者の本当の力を見たければ 一度もやられることなく Dr.ワイリーの基地の最深部まで, "If you wish to see this one's (*sessha*, ninja first person) true power, [come] to the deepest part of Dr. Wily's base without being defeated even once". He adds `ここからさきは　よめないぜ` ("the rest is unreadable"). **EN**: `WIP … (IN ORDER TO COMBAT THE SECRET BOSS, YOU SHOULD ARRIVE AT THE CERTAIN PLACE OF WILY LEVEL 4 WITHOUT DYING.)`. So the secret boss is **Shadow Man**, in Wily 4, and you must not die on the way. |
+| 15 | perfect | "I HAVE NO ADVICE. YOU ARE REAL HERO. I HOPE YOU WILL NOT FIGHT AS MEGAMAN ANY MORE. DO YOU THINK DR.WILY GIVEUP? NO ANSWER NEEDED." (JP `…いや　へんとうは　いいぜ`) |
 
 The smudges in entry 14 are the plain period glyph (`$24`) standing in for the lost kana [code]. The missing characters
 are exactly the ones that would give away *who* wrote it, apart from the giveaway *sessha*.
@@ -1135,7 +1188,27 @@ intro change language [seen].
 (bank `$30:$8B2E`) [code][seen]. NEW GAME needs START+A when a save exists [seen]. The title graphics are tile art,
 not font text [code].
 
-<!--TITLE-->
+![Title and CONFIGURATION](img/text_title_config.png)
+*Left: the title with SPECIAL MODE unlocked. Note `NEW GAME(START+A)`, `VER.1.01`, `©CAPCOM 1991` and `MODIFIED BY
+PURESABE 2008-2016`. Right: CONFIGURATION with the cursor elsewhere, where the option just reads ENGRISH [seen].*
+
+**Intro** [seen]. The opening story stays **Japanese even in ENGRISH mode**. It is vanilla RM4's intro text with kanji
+added (vanilla is kana-only), drawn from the intro's own glyph set:
+
+| # | JP (as shown) | Gloss |
+|---|---|---|
+| 1 | ロボット工学のけんい、Dr.ライトによって／かいはつされた　かてい用ロボット　ロックと／ロールは、平和な日々を　送っていた。 | Rock and Roll, household robots built by robotics authority Dr. Light, were living peaceful days. |
+| 2 | ところが　ある日、各地の工ぎょう用ロボットが／とつぜん　あばれだし　世界中が／パニックと化した。 | But one day, industrial robots everywhere suddenly ran amok and the world fell into panic. |
+| 3 | Dr.ライトは、ナゾの天才科学者Dr.ワイリーの／しわざであると　きづいたが／なすすべが　なかった。 | Dr. Light realised it was the work of the mysterious genius Dr. Wily, but was powerless. |
+| 4 | せいぎかんあふれるロックは　自らのいしで　改造／を望み、Dr.ライトによって　スーパーロボット／ロックマンとして　生まれかわったのである。 | Rock, full of justice, asked to be rebuilt and was reborn by Dr. Light as the super robot Rockman. |
+| 5 | Dr.ワイリーの野望を三度阻止し、世界の平和を／守ったロックマン。　・・・が　しかし／平和は　長くは　つづかなかった。 | Rockman foiled Wily's ambitions three times and protected world peace... but the peace did not last. |
+| 6 | ナゾの科学者　Dr.コサックが、8体の／ロボットを造り出し　ロックマンに／挑戦してきたのだった。 | The mysterious scientist Dr. Cossack built eight robots and challenged Rockman. |
+| 7 | ロックマンは　あらたにかいはつした／ニューロックバスターをそうびして／再び戦いへと　たび立つのであった。 | Equipped with the newly developed New Rock Buster, Rockman set off to fight once more. |
+
+![Intro text screens](img/text_intro.png)
+*The seven intro text screens (2×). Dakuten are separate tiles after the kana [seen].*
+
+The title then fades in with a `∞` logo over Mega Man's helmet [seen].
 
 ### 5.2 CONFIGURATION (LZ #16, rom `0x17601`)
 
@@ -1157,11 +1230,12 @@ not font text [code].
 ```
 
 The value words (`JAPANESE ENGRISH NORMAL EASY HARD STABLE EDIT` and `ENGLISH COMING SOON`) are a separate string list at
-rom `0x99077` [text]. The DIFFICULTY row is a preset that sets the six sub-rows; changing a sub-row by hand shows
-**EDIT** [guess from the list + doc/config.txt]. **ENGRISH** is the EN option's real name.
+rom `0x99077` [text]. The DIFFICULTY row is a preset that sets the six sub-rows. Changing a sub-row by hand turns it into
+**EDIT** (MAIN → HARD gave `DIFFICULTY ◀EDIT ▶`) [seen]. **ENGRISH** is the EN option's real name.
 
 ![CONFIGURATION in ENGRISH mode](img/text_config.png)
-*CONFIGURATION with LANGUAGE = ENGRISH ("ENGLISH COMING SOON").*
+*CONFIGURATION with the cursor on LANGUAGE = ENGRISH: the sub-line reads "ENGLISH COMING SOON" (nametable row 6 =
+`◀ENGRISH ▶`, row 7 = `ENGLISH COMING SOON`) [seen].*
 
 ### 5.3 SPECIAL MODE (LZ #09, rom `0x17890`)
 
@@ -1186,8 +1260,8 @@ Locked items show as `?` runs. That is the readme's "??? ???? ?????" list: each 
 
 - **SUPER HERO**: 100 Hero Points.
 - **HARD ROCK**: HARD with no Game Over (Rock + hard rock).
-- **PROOF OF OMEGA**: beat THE TRUE ARENA. The plate shows a red **Mega Man Ω**, a nod to *Rockman & Forte*-era "Ω"
-  boss refights [guess on the reference].
+- **PROOF OF OMEGA**: beat THE TRUE ARENA. The plate shows a red Rockman with an Ω (cheats.md), and the fight roster
+  ends with `-O M E G A-` (§7.3), so the TRUE ARENA's last opponent is presumably an "Omega" Rockman [guess].
 
 THE TRUE ARENA is the readme's final mode that the author "cannot beat" [doc].
 
@@ -1315,11 +1389,72 @@ The packed screen stores the **maximum** for each row as its template (the secon
 which this font cannot draw, so it is a tile drawn at run time) [text][code]: MISSION 60, FRIENDS 15, EQUIPMENT 12,
 PLAY STYLE 10, BONUS 5 = 100, matching readme_e [doc].
 
-<!--RESULT_LIVE-->
+**Live** [seen]. I reached the ending by setting the player state `$30 = $13` inside Wily 4, so the stage loop exits
+to the ending at `$7E:$C80B` (`LDA $30 / CMP #$13 / BEQ → map bank $1B, JMP $8003`). `ending2.py` does this, and the
+states `end_t2/t3/t4/end_result.state` are saved in my scratch dir. RESULT counts each row up as `got/max`. With the
+scout's fortress loadout it read **MISSION 60/60, FRIENDS 5/15, EQUIPMENT 0/12, PLAY STYLE 10/10, BONUS 2/5**, and the
+total shown afterwards was **77**. Proto Man's debrief types into the 2-line box under the panel, page by page. **Only the
+greeting plus one hint entry is shown**: here entry 1 (Beat), the first missed friend. Then the screen clears to the total
+and a sprite line: EN **"THERE'S MORE..."**, JP **"AND MORE..."**, typed as "AND" → "AND MORE..." (bank `$1C:$8FC9`/`$8FD8`,
+chosen by `$78B0`). It points at the SPECIAL MODE that this clear just unlocked (`$788D |= 3` at `$1C:$8EEC`). Switching
+`$78B0` mid-ending makes the debrief play in Japanese (`ブルース「ひさしぶりだな　ロックマン`) [seen].
+
+![RESULT, THERE'S MORE, AND MORE](img/text_result.png)
+*RESULT with the debrief typing (EN), then the final "THERE'S MORE..." (EN) and "AND MORE..." (JP) [seen].*
+
+![EN debrief, live](img/text_debrief_en.png)
+*The EN debrief bands as typed (2×): Beat hint, then the total 77 and "THERE'S MORE...".*
+
+![JP debrief, live](img/text_debrief_jp.png)
+*The same run in JP: greeting, Beat hint, 77, "AND / AND MORE...".*
 
 ---
 
-## 7. Staff roll (LZ #04, rom `0xE4718`, `r4mi_credits.tbl`)
+## 7. The ending sequence [seen]
+
+In order, as recorded (`endframes/`, one frame per 2 s):
+
+1. **Wily's skull fortress explodes** in a skull-shaped mushroom cloud over the snowfield.
+2. **The vanilla RM4 train ride**, with vanilla's Capcom staff credits on the carriage sign, kept as is: `PLANNER
+   BAMBOO`, `S.KOBASHI INAFKING`, `OBJECT DESIGNER TOSHICHAN ZIZI`, `K.HAYATO IKKI`, `SCROLL DESIGNER MACHAKO MAMIMU-`,
+   `MISS.21 TAKAP`, `SPECIAL DESIGNER YASUKICHI INAFKING`, `SOUND COMPOSER OJALIN BUN BUN`, `PROGRAMMER T.K KERO CHAN`.
+3. **ROBOT MASTERS**: vanilla's roll call (`NO.25 BRIGHT MAN / YOSHITAKA ENOMOTO`, which credits the fan-contest designer
+   of each boss), now followed by a **new 4MI card** for each RM. The card shows the RM standing in his boss room, a job
+   title, and **your fight record against him**: `n WINS / n LOSSES` (LZ #03, rom `0x2AED0`, each card drawn with its
+   stage's own font tiles, so each uses a different tile base) [seen][code]:
+
+   | RM | Job title (verbatim) |
+   |---|---|
+   | BRIGHT MAN | `ILLUMINATON ROBOT` (sic) |
+   | TOAD MAN | `AGRICULTURE ROBOT` + an extra line **`AND n DRAW`** |
+   | DRILL MAN | `DIGGING WORK ROBOT` |
+   | PHARAOH MAN | `ARCHEOLOGY ROBOT` |
+   | RING MAN | `BATTLE PURPOSE ROBOT` |
+   | DUST MAN | `WASTE COMPRESSION ROBOT` |
+   | DIVE MAN | `DEEP SEA WORKING ROBOT` |
+   | SKULL MAN | `BATTLE PURPOSE ROBOT` |
+
+   Only Toad Man can end in a **draw**. That fits the Toad Man BONUS and the debrief's "TOAD MAN WANT TO BECOME REAL
+   TOAD": turning him into a toad with ●TOAD would count as neither a win nor a loss [guess]. The DRAW line is hidden on
+   a normal run [seen: absent in my run].
+4. **"A WEEK LATER"**: vanilla's epilogue outside Light's house, kept.
+5. **The 4MI staff roll** (below) over the scrolling sky, then **RECORDS** with your real per-stage TIME and TIWNS
+   (`EXCEPT GAME SCENE TIME 00:06:36`, `TOTAL TIME 00:06:41` in my warped run), then **FABRICATED ENEMIES**.
+6. **ORIGINAL ROCKMAN 4 SPECIAL THANKS** (4MI's header) over vanilla RM4's own name list (`DAIGO SEGUCHI`, `TAKUYA
+   YAMAGISHI`, `HIDEMITSU KIKUCHI` … `MASATO MATSUZAKI`), which is at the same offset `0x3759D` in `rm4j.nes` [code].
+7. `PRESENTED BY CAPCOM`, spelled out letter by letter by little robots.
+8. **RESULT** + Proto Man's debrief (§6), then a Mega Man pose sequence ending in a white flash, the total (77 here),
+   and **THERE'S MORE... / AND MORE...**. Bank `$1C:$8F95` also holds sprite strings `YOUR HERO SCORE IS` (followed by
+   a 3-digit field) and `THANK YOU FOR PLAYING!` [code]. I only caught the number on screen, not those words [seen].
+
+![Ending: RM cards](img/text_ending_cards.png)
+*Vanilla's RM roll call, the new cards (Bright, Toad, Skull: job title + WINS/LOSSES), "A WEEK LATER", Light's lab.*
+
+![Ending: staff roll](img/text_ending_roll.png)
+*The 4MI roll (TOTAL ADVISER RIRIKA…), the PURESABE signature, RECORDS with stage subtitles, FABRICATED ENEMIES,
+ORIGINAL ROCKMAN 4 SPECIAL THANKS, PRESENTED BY CAPCOM.*
+
+### 7.1 Staff roll text (LZ #04, rom `0xE4718`, `r4mi_credits.tbl`)
 
 Verbatim, one line per row (column bytes stripped) [text]:
 
@@ -1389,8 +1524,8 @@ ORIGINAL ROCKMAN 4
 SPECIAL THANKS
 ```
 
-The `OO` fields are templates that are filled in with your real times and deaths: the ending doubles as a stat sheet
-[text; guess: filled at run time like RESULT].
+The `OO` fields are templates that are filled in with your real times and deaths, so the ending doubles as a stat
+sheet [seen]. The signature line is the author's handle in kana tiles followed by `-(PURESABE)` [seen].
 
 **The jokes in the credits:**
 
@@ -1413,6 +1548,50 @@ The `OO` fields are templates that are filled in with your real times and deaths
 
 ---
 
+### 7.2 Other in-game strings (bank `$39`, A=`$80`, rom `0x733C6-0x73584`) [code]
+
+Pointer-addressed PPU strings (`hi lo` VRAM address + text + `$FF`):
+
+- Weapon get: `YOU GOT` / `SPARK MANBOW` / `●TOAD` / `DRILL TORPEDO` / `PHARAOH SHOTGUN` / `HCR BOOMERANG` /
+  `RECYCLE INHALER` / `WATER CUTTER` / `HELL WHEEL` / `WISH STAR` / `RUSH CANNON`; the boss line `BRIGHT MAN` … `SKULL
+  MAN`; and `ADAPTOR` for the Rush pair. This is vanilla RM4's weapon-get layout (vanilla has `YOU GOT`/`ADAPTOR` at
+  the same offsets) with the new weapon names. 131 bytes of the block differ from `rm4j.nes`.
+- Game Over: `STAGE SELECT` / `CONTINUE` / `GAME OVER`, all vanilla.
+- **`PASS WORD ERROR`**: vanilla's password-screen message (same offset in `rm4j.nes`), still in the ROM although 4MI
+  replaced passwords with autosave [code]. It is unused leftover text [guess: no password screen is reachable].
+
+### 7.3 The fight-name roster (bank `$6F`, rom `0xDED99`, A=`$17`) [code]
+
+A list of names for every fight. `$10` is a hard space, `$FF` a line break, `$00` the separator; `$3A` is `.`, `$D8`
+is `'`, `$DA` is `-`, `$DC` is `?`, and digits are `$30+n`. I could not find what displays it: not the arena
+fight start and not the MY ARENA editor [seen]. A nearby lo/hi table points into `$69xx`, which suggests the names are
+rendered into CHR-RAM as a banner [guess]. In order, matched to the scout's fight IDs where the scene fits [seen in
+`arena_names.png` for 0x22, 0x1E, 0x0D]:
+
+| # | Name | Fight / notes |
+|---|---|---|
+| 0-7 | BRIGHTMAN … SKULLMAN | the 8 RMs |
+| 8 | MOTHRAYA | Cossack 1 (vanilla RM4's moth boss) |
+| 9 | SQUARE MACHINE | Cossack 2 (vanilla) |
+| 10 | AQUA DEVIL | Cossack 3 |
+| 11 | C.CATCHER AND C.HOPPER | Cossack 4: vanilla's Cossack Catcher plus a new "Hopper" |
+| 12 | JOE NI-NIN VA ALL | Wily 1: a pair of Joes (*ni-nin* 二人, "two people") vs. all [guess] |
+| 13 | SNATCHMAN | Wily 2: a dark Rockman silhouette [seen] |
+| 14-15 | W.MACHINE 4 / OPTICAL CAPSULE | Wily 3-4 [guess: "optical" for the capsule's teleport-blink] |
+| 16-19 | WILY'S ARMY / WILY'S NAVY / WILY'S AIRFORCE / GREEN HELMET | the four Cossack 1 city fights |
+| 20 | GAMARN AND GAMADAYU | the frog mech with a ninja rider |
+| 21-29 | GUNDRILL, KABATONCUE, WHOPPER, RONG RANG RUNG, HOGALE, KING GOJULUS, ESCAROO, MOBY, NIGHTMARE SUZIES | stage mini-bosses: vanilla RM4's own Kabatoncue (hippo), Whopper, Escaroo (snail) and Moby (whale), plus new ones |
+| 30 | **CLASHMAN** | Crash Man (MM2) in a star room [seen]. "Clash" is the katakana クラッシュ read back. |
+| 31 | **WAVEMAN** | MM5's Wave Man |
+| 32-34 | SHADOWMAN B, SHADOWMAN P, **PAKKUN SHADOW** | Shadow Man in Bright's and Pharaoh's stages, and Shadow Man riding a frog in Toad's stage [seen] |
+| 35 | (11 blank spaces) | a deliberately blank name |
+| 36-41 | ENKER, QUINT, PUNK, BALLADE, EARTH, TERRA | the Game Boy Mega Man Killers, and Terra under both names (アース "Earth" is his JP name) |
+| 42-44 | CHIMERABOT #1-#3 | Wily 4 teal-hall fights |
+| 45 | **SUPER SHADOWMAN** | the secret boss of Shadow Man's *yabumi* (§4) |
+| 46 | `???` | a name hidden even in the data |
+| 47 | COCKROACH | vanilla RM4's Cockroach Twin |
+| 48 | **-O M E G A-** | spaced out with decorations; the PROOF OF OMEGA achievement's Mega Man Ω [guess] |
+
 ## 8. Hidden, unused and unfinished text
 
 | What | Where | Notes |
@@ -1426,8 +1605,11 @@ The `OO` fields are templates that are filled in with your real times and deaths
 | `SAVE DATA WILL BE BROKEN. PLEASE SAVE STATE HERE.` | LZ #16 | an emulator-user warning on EXTRA CONFIGURATION [seen] |
 | `TRANSLATION (RESERVED)` | staff roll | [text] |
 | `RECORDS` page `OTHERS` row | RECORDS(MAIN) | deaths outside any stage (cut-scenes, boss rush?) [guess] |
-
-<!--HIDDEN_MORE-->
+| `PASS WORD ERROR` | bank `$39` | vanilla password text, unreachable [code/guess] |
+| Blank and `???` roster names, `-O M E G A-` | bank `$6F` | names kept secret even in the data [code] |
+| `YOUR HERO SCORE IS` / `THANK YOU FOR PLAYING!` | bank `$1C:$8F95` | end-screen sprite strings [code] |
+| Toad Man's `AND n DRAW` | LZ #03 | the ending card line for the toad outcome [code] |
+| JP `...AND MORE...` vs EN `THERE'S MORE...` | bank `$1C:$8FC9/$8FD8` | the JP version's closing line is in English too [seen] |
 
 
 ## 9. Lessons for Rockman 6 GP

@@ -63,8 +63,28 @@ ALT_BOSS_SCREEN = {4: 0x1D, 5: 0x1F, 6: 0x1A, 7: 0x17}   # boss room screen of t
 # stage-select cursor ($04 col, $05 row) per stage
 SEL_POS = {0: (0, 0), 1: (1, 0), 3: (2, 0), 2: (0, 1), 5: (2, 1), 4: (0, 2), 6: (1, 2), 7: (2, 2)}
 
-# checkpoints: stage -> list of (screen, chr id, palette id); index 0 = stage start
-CHECKPOINTS = {s: [(0, 0, 0)] for s in range(16)}
+# checkpoints: stage -> list of (screen, chr id, palette id): [0] stage start, [1] mid-stage checkpoint,
+# [2] boss shutter (entering the boss room sets $0684 = boss screen - 1).  Values written by the game
+# itself when the autoplayer got there, except the ones marked 'rule' (derived from the screen-script
+# exits, see cheats.md) - all were checked by warping there.
+CHECKPOINTS = {
+    0: [(0, 0, 0), (0x0D, 0x85, 0x1A), (0x17, 0x84, 0x1C)],   # Blizzard
+    1: [(0, 0, 0), (0x08, 0x8D, 0x17), (0x14, 0x8E, 0x3D)],   # Wind
+    2: [(0, 0, 0), (0x09, 0x92, 0x32)],                       # Plant
+    3: [(0, 0, 0), (0x0E, 0x87, 0x1F), (0x16, 0x87, 0x1F)],   # Flame
+    4: [(0, 0, 0), (0x0A, 0x98, 0x5B)],                       # Yamato (rule)
+    5: [(0, 0, 0), (0x0A, 0x95, 0x95)],                       # Tomahawk
+    6: [(0, 0, 0), (0x0B, 0x00, 0x78), (0x16, 0x00, 0x7B)],   # Knight
+    7: [(0, 0, 0), (0x0A, 0x00, 0xA7), (0x19, 0x00, 0xA9)],   # Centaur
+    8: [(0, 0, 0), (0x0E, 0xB9, 0x6C)],                       # Mr. X 1
+    9: [(0, 0, 0), (0x08, 0x00, 0x00), (0x10, 0xB8, 0x00)],   # Mr. X 2
+    10: [(0, 0, 0), (0x08, 0x00, 0x00), (0x10, 0xB4, 0xD0)],  # Mr. X 3
+    11: [(0, 0, 0), (0x09, 0xC4, 0x00)],                      # Mr. X 4 (rule)
+    12: [(0, 0, 0), (0x0E, 0x00, 0x81), (0x12, 0x8B, 0x81)],  # Wily 1
+    13: [(0, 0, 0), (0x0A, 0x00, 0x00)],                      # Wily 2 (rule)
+    14: [(0, 0, 0), (0x08, 0xA9, 0x00)],                      # Wily 3
+    15: [(0, 0, 0)],                                          # Wily 4 (capsule stage)
+}
 
 
 def state(name):
@@ -272,14 +292,19 @@ def _press(act, j):
     return out
 
 
+OBJWIN = 0x0649   # first entry of the level object list in range; advances along the level path, also
+                  # through vertical sections where $57/$046F stay put (free vertical scrolling, camera Y $58)
+CAM_Y, CAM_YSCR = 0x58, 0x50
+
+
 def _cell(r, xshift=5, yshift=5):
-    return (r[STAGE], r[XSCR], r[X] >> xshift, r[Y] >> yshift)
+    return (r[STAGE], r[OBJWIN], r[XSCR], r[X] >> xshift, r[Y] >> yshift, r[CAM_Y] >> 6, r[CAM_YSCR])
 
 
 def progress(r):
-    """Default explore score: the player's screen ($046F, which counts screens along the level path,
-    also through vertical shafts), then X in 32-pixel steps."""
-    return r[XSCR] * 8 + (r[X] >> 5)
+    """Default explore score: the object-list window ($0649).  X is deliberately left out: many paths
+    turn back left after a ladder, and an X term starves those cells (novelty does the rest)."""
+    return r[OBJWIN]
 
 
 DEATH_AI = {(0x8F, 0x13): 'pit', (0x8E, 0x7F): 'hp'}   # player AI pointer ($0413/$042A, bank $38) while dying
@@ -344,3 +369,34 @@ def explore(e, budget=200000, seed=0, acts=ACTS, done=None, keep=None, log=print
 def boss_score(r):
     """Frontier score for boss fights: screen first, then damage dealt to the boss ($03ED)."""
     return progress(r) * 32 + ((0x1B - min(r[BOSSHP], 0x1B)) if r[BOSSBAR] else 0)
+
+
+def enemy_hp(r):
+    """Total HP (capped at 63) of the live, damageable objects in the enemy slots 8-$15."""
+    return min(63, sum(r[O_HP + k] for k in range(8, 0x16) if r[O_TYPE + k] and 0 < r[O_HP + k] < 0x7F))
+
+
+def explore_to(e, until='ckpt', budget=300000, jet=True, damage=False, seed=0, log=None, **kw):
+    """Run the autoplayer from the current in-stage state until the game writes a new checkpoint
+    (until='ckpt'), the boss bar appears (until='boss'), or either ('any').  Sets everything up the way
+    that worked: all items except the current stage's own boss (a beaten boss's room beams Rockman
+    out), Jet form with frozen fuel, godmode.  damage=True adds the enemy-HP term (mid-bosses).
+    Returns (state_bytes, reached, (ckpt screen, chr, pal))."""
+    st = e.peek(STAGE)
+    give_all(e)
+    if st < 8:
+        set_progress(e, beaten=[s for s in range(8) if s != st], plates=[s for s in (4, 5, 6, 7) if s != st])
+    if jet: e.poke(FORM, 1)
+    godmode(e, fuel=jet)
+    ck0 = (e.peek(CKPT_SCR), e.peek(CKPT_CHR), e.peek(CKPT_PAL))
+    def ck(r): return (r[CKPT_SCR], r[CKPT_CHR], r[CKPT_PAL])
+    def done(e_, r):
+        hit_ck, hit_boss = ck(r) != ck0, r[BOSSBAR] != 0
+        return {'ckpt': hit_ck, 'boss': hit_boss, 'any': hit_ck or hit_boss}[until]
+    if damage:
+        kw.setdefault('score', lambda r: r[OBJWIN] * 16 + (63 - enemy_hp(r)) // 4)
+        kw.setdefault('cell', lambda r: enemy_hp(r) // 4)
+    best, arch = explore(e, budget=budget, done=done, seed=seed, log=log, god=False, **kw)
+    e.load(best); e.step(None)
+    r = ram(e)
+    return best, done(e, r), ck(r)

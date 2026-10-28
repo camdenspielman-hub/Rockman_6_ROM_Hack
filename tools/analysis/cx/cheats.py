@@ -1,14 +1,21 @@
-"""Rockman CX / Mega Man CX cheat + warp + autoplay helpers (work in progress, see docs/research/cx/cheats.md).
+"""Rockman CX / Mega Man CX cheats, warps, checkpoint warps and autoplayers (docs: docs/research/cx/cheats.md).
 
     import sys; sys.path.insert(0, 'tools/analysis'); sys.path.insert(0, 'tools/analysis/cx')
     from emu import Emu
     import cheats as cx
-    e = Emu('roms/cx_en.nes'); e.load(cx.state('stage_select'))
-    cx.godmode(e)                 # freeze HP / lives / i-frames
-    cx.explore(e, budget=300000)  # Go-Explore autoplayer, returns the best savestate
+    e = Emu('roms/cx_en.nes')
+    e.load(cx.state('fire_mario_boss'))   # 62 ready states in build/research/cx/states/ (see the doc, section 1)
+    cx.godmode(e)                         # freeze HP / lives / i-frames (pits still kill)
+    cx.give_all_weapons(e)                # $9A = $FF, all energies full, 4 E-tanks
+    print(cx.info(e))
+    cx.warp(e, 3)                         # fresh stage start from a crafted save (0-15; 9 via the fortress map)
+    cx.warp_cp(e, 10, 2)                  # checkpoint warp: die with the room byte held at the checkpoint room
+    cx.autorun(e, 4000, until=cx.boss_active)   # dumb autoplayer;  cx.explore(...) = Go-Explore autoplayer
+    cx.finish_boss(e)                     # boss to 1 HP, shoot until it dies (poking 0 does not kill)
 
 Only one Emu per process (stable-retro limit): reuse it with e.load().
 After e.load(), run one frame before e.shot() (the frame buffer is not in the state).
+All warps start from build/research/cx/states/title.state.
 """
 import os, random, time
 
@@ -243,6 +250,49 @@ def warp_cp(e, stage, cp, wait=True, **save):
 
 # ---- autoplay ----------------------------------------------------------------------------------
 # Held-button macros.  'A*' / 'B*' = mash (pressed 3 frames, released 3): needed for wall kicks and rapid fire.
+
+def boss_active(e):
+    """True when a scroll-locked room with a filled boss bar is running (boss HP in $06C1, $14 == $15)."""
+    return e.peek(0x14) == e.peek(0x15) and 0 < e.peek(BOSSHP) <= 0x40
+
+
+def finish_boss(e, limit=4000):
+    """Set the boss/mid-boss in object slot 1 to 1 HP and fire the buster at it (walking back and forth,
+    jumping) until it dies.  Poking $06C1 = 0 does NOT kill: death is checked when a shot hits.
+    Returns frames used, or None.  Leaves godmode on."""
+    godmode(e)
+    e.poke(BOSSHP, 1); st = e.peek(STAGE)
+    for i in range(limit):
+        if e.peek(BOSSHP) == 0 or e.peek(STAGE) != st: return i
+        e.step((['RIGHT'] if (i // 40) % 2 else ['LEFT']) + (['B'] if i % 6 < 3 else []) +
+               (['A'] if (i // 20) % 3 == 0 else []))
+    return None
+
+
+def autorun(e, frames=3000, direction='RIGHT', shoot=True, until=None, god=True):
+    """Dumb autoplayer: hold `direction`, mash B, jump (full height) when X stops changing, try UP (ladders)
+    and the other direction when stuck for long.  until(e) -> True stops early.  Returns frames used.
+    Gets through many CX rooms with godmode; use explore() for mazes and vertical shafts."""
+    if god: godmode(e)
+    back = 'LEFT' if direction == 'RIGHT' else 'RIGHT'
+    last, stuck, jump = None, 0, 0
+    for t in range(frames):
+        x = _xpos(e)
+        stuck = stuck + 1 if x == last else 0
+        last = x
+        b = [direction]
+        if jump > 0:
+            b.append('A'); jump -= 1
+        elif stuck > 6:
+            jump = 22
+        if stuck > 120: b = ['UP']
+        if stuck > 200: b = [back, 'A'] if (t // 30) % 2 else [direction, 'A']
+        if stuck > 320: stuck = 0
+        if shoot and t % 8 < 4: b.append('B')
+        e.step(b)
+        if until and until(e): return t + 1
+    return frames
+
 ACTS = [['RIGHT'], ['RIGHT', 'A'], ['LEFT'], ['LEFT', 'A'], ['UP'], ['DOWN'], ['A'], [],
         ['RIGHT', 'DOWN', 'A'], ['LEFT', 'DOWN', 'A'], ['UP', 'RIGHT'], ['UP', 'LEFT'],
         ['RIGHT', 'B'], ['LEFT', 'B'], ['B'], ['RIGHT', 'A*'], ['LEFT', 'A*'], ['RIGHT', 'B*'], ['LEFT', 'B*']]

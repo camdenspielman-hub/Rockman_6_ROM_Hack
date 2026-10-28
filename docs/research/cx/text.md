@@ -1,302 +1,385 @@
 # Rockman CX / Mega Man CX: the complete text
 
-Agent: cx-text. Status: **v0, work in progress** (dialogue complete; scene context, menus, ending and screenshots being
-added). Sources: `roms/cx_en.nes`, `roms/cx_jp.nes` (v1.1). Scripts: `build/research/cx/cx-text/` (predecessor run)
-and `build/research/cx/cx-text2/` (this run). Tags: **[seen]** emulator, **[code]** ROM data/disassembly, **[text]**
-in-game text, **[doc]** readme, **[guess]**.
+Agent: cx-text (resumed after a container restart; the first run's scripts are in `build/research/cx/cx-text/`, this
+run's in `build/research/cx/cx-text2/`). ROMs: `roms/cx_en.nes`, `roms/cx_jp.nes` (v1.1). Offsets are ROM offsets
+without the iNES header. Tags: **[seen]** emulator, **[code]** ROM data or disassembly, **[text]** in-game text,
+**[doc]** readme, **[guess]** speculation.
 
-## 1. Where the text lives and how it is drawn
+## 0. The short version
 
-Diffing the JP and EN builds gives about 110 differing runs. Most of them are glyph graphics; the real text is in
-six places [code]:
+- CX has **six text systems**: a pre-rendered story crawl, a 26-script portrait **dialogue engine** (bank $26), a
+  top-of-screen **cutscene box** for the opening stage, fixed-font menus, a **weapon-get** list, and the ending's
+  roll call and staff roll. The English build is not a table swap: it rewrote the dialogue renderer into a real
+  **variable-width font** with a highlight colour, and replaced every JP glyph string with pre-rendered English
+  strips.
+- The JP title is **ロックマンCX ワイリー課長の挑戦!**, a parody of *GameCenter CX* ("Section Chief Arino's
+  Challenge"). That is the "CX".
+- The script is a running gag on the series formula: **Dr. Light is the villain** and gets every Wily trope (the
+  fortress, the taunts, the **dogeza** surrender followed by an escape, the "get BIGGER" final form), while Wily's
+  mass-produced gray **Fake Rockman** and Quick Man are the heroes.
+- Memes are stacked into the final battle: Light quotes ***Undertale*'s Sans**, ***TF2*'s "Meet the Scout"**,
+  ***Office Space*** (EN only), offers you a ***Mega Man X* capsule** mid-fight, threatens you with a **Shoryuken**,
+  and asks you to kill yourself with a **Yes/No prompt; "Yes" really kills you** [seen].
+- The game **counts your spike deaths** and Light comments on the number (s01).
 
-| What | Where (ROM offset, no header) | EN encoding | JP encoding |
+## 1. Where the text lives
+
+Diffing the JP and EN builds gives about 110 differing runs; almost all are text or glyph graphics [code]:
+
+| What | Where | EN | JP |
 |---|---|---|---|
-| Story crawl (intro) | pre-rendered tile strips, banks $13/$27 | proportional font baked into tiles | kana/kanji baked into tiles |
-| Dialogue boxes (26 scripts + 3 branches) | bank $26, `0x4c700-0x4d9c7` EN / `-0x4d780` JP; pointer table lo `$85B0`, hi `$85D0` (CPU $8000) | **ASCII**, drawn by a variable-width-font (VWF) renderer; font 1bpp at `0x53000` (bank $29 $B000, widths in the first 128 bytes); bytes >= $80 = same letter in the **highlight colour** | tile codes; the script itself loads 16-glyph CHR pages (`CHR` op) from banks $01/$03/$09/$10/$12/$17/$28/$29/$2A; 327 distinct glyphs |
-| Opening cutscene box (Guts Man) | bank $1E (`0x3ccdf` JP glyph strings) | small fixed font | kana tile string, glyphs at `0x4f500` |
-| Pause menu names | bank $1F `0x3e380` (16-byte rows: 3 icon tiles + name) | `A=$01`, space `$1F`, `.`=$1B | identical table, only MEGA/ROCK differ |
-| Boss roll call (ending) | bank $12 `0x24500` (offsets) / `0x24510` (lengths) / `0x24520` (strings) | `A=$31`, space `$20`, `.`=$4F, digits `$50+` | same |
-| Staff roll | bank $12, tables at `0x24a62` (offset lo), `0x24ac0` (hi), `0x24b20`/`0x24b80` (PPU address), `0x24be0` (length), strings at `0x24c40` | `A=$31`, `a=$61`, space `$30`/`$20`/`$60` | same, ROCKMAN for MEGAMAN |
+| Story crawl | bank $13 `0x26600` | pre-rendered proportional-font strips | pre-rendered kana/kanji strips |
+| Title logo | bank $13 `0x27000` | MEGA MAN CX | ROCKMAN CX + subtitle ワイリー課長の挑戦! |
+| Dialogue scripts | bank $26 `0x4c700`; pointers lo `$85B0` / hi `$85D0` (CPU $8000) | ASCII, VWF renderer; 1bpp font + widths at `0x53000` (bank $29) | tile codes; each script loads 16-glyph CHR pages from banks $01/$03/$09/$10/$12/$17/$28/$29/$2A; 327 distinct glyphs |
+| Portraits | banks $39/$3B, index tables `$26:86B0/86C0/86D0` | same | same |
+| Opening cutscene box | EN strips bank $27 `0x4e000`, `0x4f200`; JP strings bank $1E `0x3cc9b` | pre-rendered strips | 96-glyph set at `0x4f200-0x4f7ff` |
+| Title/file/continue menus | bank $1B `0x36e6c`, `GAME OVER` at `0x3719b` | ASCII+$80 / ASCII | identical bytes (English in both) |
+| Stage-select names, portraits | bank $10 `0x20700` (graphics) | MEGA MAN, KAMEN RIDER, Dr.L | ROCK MAN, 仮面 RIDER, Dr.R, 空気男 |
+| Pause menu | bank $1F `0x3e380` | `A=$01` table | same, MEGA/ROCK differ |
+| Weapon-get list | bank $1B `0x37d21` | "You got:" + mixed-case names | katakana + "を 装備します…", glyphs at `0x51300` |
+| Quick Man's menu reply | bank $3A `0x749a0` | pre-rendered | pre-rendered |
+| Cheat Man battle banner | bank $2A `0x54c00` | pre-rendered | pre-rendered |
+| Villain's last line | bank $28 `0x51b00` | pre-rendered | 16 glyphs |
+| Boss roll call, staff roll | bank $12 `0x24500`, `0x24c40` | `A=$31` | same, MEGA/ROCK and DLN/DRN differ |
+
+Tables built for this doc (`docs/research/cx/tables/`): `cx_en_dialogue.tbl` (ASCII + highlight range + control
+codes), `cx_jp_dialogue.tbl` (most common kana page per code row; JP pages vary per script), `cx_jp_glyphs.tsv` (327
+glyph bitmaps by ROM offset → character, the real JP decoder), `cx_menu.tbl`, `cx_credits.tbl`, `cx_title.tbl`. The
+JP weapon-get glyphs are listed in §3. Decoder: `python3 -I build/research/cx/cx-text2/turns.py both` prints every
+script as speaker turns in both languages, including the branch texts.
 
 ### 1.1 The dialogue engine (bank $26) [code]
 
-Each dialogue box is a game object (type $26) whose `$0460,X` holds the script number x 2. The interpreter reads the
-script byte by byte; bytes below $20 are opcodes:
+A dialogue box is game object **type $41**. Its X position `$0460,X` holds the script number x 2 (bit 0 picks the
+box row), which is how level code chooses a script: it spawns a $41 and writes the number into the new object's X.
+The interpreter (`$26:8000`, a state machine on `$0480,X`) reads bytes; bytes below $20 are opcodes:
 
 | Op | Args | Meaning |
 |---|---|---|
 | `00` | | END |
 | `01` | | new line |
-| `02` | | wait (page continues on the next line after a beat) |
-| `03 f` | face | show portrait *f* (16x16 tiles from bank $39/$3B) |
-| `04 hi bank dst` | 3 | copy a CHR page into PPU $dst00 (JP uses this to swap glyph pages mid-script) |
+| `02` | | wait, then continue on the next line |
+| `03 f` | 1 | portrait *f* |
+| `04 hi bank dst` | 3 | copy a CHR page to PPU `$dst00` (JP swaps glyph pages with this) |
 | `05` | | short pause |
-| `06` | | clear box (new page) |
-| `07` | EN 0 / JP 5 | print a decimal number (the spike-death counter) |
+| `06` | | clear the box |
+| `07` | EN 0 / JP 5 | print a decimal number (spike deaths) |
 | `08 n` | 1 | text speed |
-| `09 lo hi bank` | 3 | far call: scripted action (Yes/No menu at `$24:AEF9`, teleport attempt, which-hero test at `$24:B5BF`, screen shake...) |
-| `0A n` | 1 | input lock flags |
-| `0B` | | close box |
-| `0C n` | 1 | skip *n* bytes if the last call returned carry (used for **Fake Rockman vs Quick Man** variants and Yes/No branches) |
-| `0D n` | 1 | (EN only) VWF base column |
+| `09 lo hi bank` | 3 | far call to a scripted action: Yes/No menu `$24:AEF9`, which-hero test `$24:B5BF`, teleport-out animation `$24:B85F...` |
+| `0A n` | 1 | input lock |
+| `0B` | | close the box |
+| `0C n` | 1 | skip *n* bytes if the last call set carry (hero variants, Yes/No branches) |
+| `0D n` | 1 | EN only: VWF start column |
 
-The EN build rewrote the renderer: the JP routine at $80C4 stores tile codes into a line buffer; the EN routine at $8490
-shifts 1bpp glyphs into a 16-byte buffer pixel by pixel (`LSR`/`ROR $03C8,X`) and advances by a per-character width.
-That is a proper VWF on an NES, added just for the translation [code].
+The JP renderer (`$80C4`) writes tile codes into a line buffer. The EN renderer (`$8490`) shifts each 1bpp glyph into
+a 16-byte tile buffer pixel by pixel (`LSR` / `ROR $03C8,X`), advances by the character's width from the table at
+`0x53000`, and draws bytes >= $80 into bitplane 1, so they appear in a **second colour** (red in the box)
+[code, seen]. The EN code after the scripts is the same as JP's, just relocated (`0x4dc00` vs `0x4d800`).
 
-Portraits used by `03 f` [code, rendered `build/research/cx/cx-text/faces_en.png`]: 00 Rock, 01 Dr. Light, 02 Roll,
-03 Ultraman (black silhouette), 04/08 Guts Man, 05 the player's **Fake Rockman** (Rock's face, other palette),
-06/07 Quick Man, 09 a masked robot, 0A/0B a two-part robot, 0C Dr. Light (stern), 0D Dr. Light (furious),
-0E Dr. Light (beaten).
+![EN dialogue box with highlight colour](img/text_dialogue_highlight.png)
+*EN VWF dialogue box: s10 with "your destruction" in the highlight colour (script injected into the fortress-1 box).*
+
+![JP dialogue box](img/text_dialogue_jp.png)
+*JP box (s12 injected): "みようという気はないかな？", "いや、そうしてくれるとわたしが楽なのじゃ。", "たのむよ。", matching the
+decoder output.*
+
+![JP s10 without its glyph pages](img/text_dialogue_jp_no_pages.png)
+*JP s10 run on its own: the kana slots hold stage tiles, because s10 relies on pages loaded by s08 (only the kanji it
+loads itself, such as 約束, 殺す, ロボット三原則, render). Proof of the per-script glyph paging.*
+
+![Portraits](img/text_portraits.png)
+*The 15 portraits: 00 Rock, 01 Light, 02 Roll, 03 Ultraman (silhouette), 04/08 Guts Man, 05 Fake Rockman, 06/07 Quick
+Man, 09 masked robot, 0A/0B two-part robot, 0C/0D/0E Light stern/furious/beaten.*
+
+![EN VWF font](img/text_font_vwf.png)
+*The EN variable-width font (`0x53000`), with the second sheet at `0x53400` below.*
 
 ## 2. The script, in order
 
 ### 2.1 Story crawl (attract mode) [seen]
 
-| EN (verbatim, including the typo) | JP | JP gist |
+![Intro crawl EN and JP](img/text_intro_crawl.png)
+*The four crawl pages, EN left, JP right.*
+
+| EN (verbatim, typo included) | JP | JP gist |
 |---|---|---|
-| In the year of 20XX, Dr. Light is appriciated by defeating the evil | 20XX年 ー Dr.ライトはナゾの科学者 Dr.ワイリーの野望を阻止したことを認められ | 20XX: Dr. Light is recognised for stopping the plans of the mysterious scientist Dr. Wily, |
-| desire of Dr. Wily. His robots are world-famous. | 彼の造るロボットは世界的に信頼されるようになっていた。 | and the robots he builds came to be trusted all over the world. |
-| While Dr. Wily thinks he can win if he creates many robots of only one kind. | 一方、Dr.ワイリーは1 VS 複数に持ちこめば、Dr.ライトを倒せると考えていた。 | Meanwhile Wily thought: if he can make it **1 VS many**, he can beat Light. |
-| Thus, a new fake Mega Man has been sent out to the world... | こうして、新たにロボットが大量生産され、世に送りだされたのだった……。 | And so new robots were **mass-produced** and sent out into the world... |
+| In the year of 20XX, Dr. Light is appriciated by defeating the evil | 20XX年 ー Dr.ライトはナゾの科学者 Dr.ワイリーの野望を阻止したことを認められ | 20XX. Dr. Light is honoured for stopping the ambitions of the mysterious scientist Dr. Wily, |
+| desire of Dr. Wily. His robots are world-famous. | 彼の造るロボットは世界的に信頼されるようになっていた。 | and the robots he builds came to be trusted worldwide. |
+| While Dr. Wily thinks he can win if he creates many robots of only one kind. | 一方、Dr.ワイリーは1 VS 複数に持ちこめば、Dr.ライトを倒せると考えていた。 | Wily, meanwhile, reasoned that if he could make it **1 VS many**, he could beat Light. |
+| Thus, a new fake Mega Man has been sent out to the world... | こうして、新たにロボットが大量生産され、世に送りだされたのだった……。 | And so new robots were **mass-produced** and sent into the world... |
 
-The JP crawl is the readme joke ("We lose because we fight 8 vs 1!") stated straight: the whole series is reframed as
-Wily losing on numbers. "ナゾの科学者 Dr.ワイリー" quotes the phrasing of the original Rockman 2 manual/opening.
+This is the readme's joke ("We lose because we fight 8 vs 1!") stated straight [doc]. ナゾの科学者 ("the mysterious
+scientist") echoes the series' stock description of Wily.
 
-### 2.2 Opening stage: Guts Man captures you [seen]
+### 2.2 Title and file select [seen]
 
-Cutscene box at the top of the screen, gray Fake Rockman on the left, Guts Man on the right
-(`build/research/cx/cx-scout/guts.png`, `build/research/cx/cx-text/guts_jp.png`):
+![Title and stage select, EN and JP](img/text_title_stage_select.png)
+*Title (top) and stage select (bottom), EN left, JP right.*
+
+| | EN | JP |
+|---|---|---|
+| Logo | MEGA MAN / CX | ROCKMAN / CX, subtitle **ワイリー課長の挑戦!** |
+| Menu | NEW GAME / LOAD GAME | same (English in both) |
+| Footer | 2017 VER 1.1 / HIMAJIN JICHIKU | same |
+| LOAD GAME | DATA 1 / DATA 2 / DATA 3 | same |
+| Continue menu | CONTINUE / STAGE SELECT / SAVE GAME, GAME OVER | same |
+
+**The subtitle** "Section Chief Wily's Challenge!" parodies **ゲームセンターCX** (*GameCenter CX*), the TV show in which
+comedian Shinya Arino, "Section Chief Arino" (有野課長), plays retro games in "Arino's Challenge" (有野の挑戦). Rockman
+2 was one of the show's famous challenges. Wily as a *kachō* (a middle manager running a production line) also fits the
+mass-production premise. Rockman 2's own subtitle was "Dr.ワイリーの謎". The EN logo drops the subtitle.
+
+### 2.3 Stage select [seen]
+
+Top row WHISPY WOODS, FIRE MARIO, (centre: Dr. Light emblem), KAMEN RIDER, BOMBER MAN; bottom row CHEAT MAN, YOSHINO
+MAN, MEGA MAN, AIR MAN. JP differences: **ROCK MAN**, **仮面 RIDER** in kanji, the centre emblem reads **Dr.R** (Dr.
+Right, Light's Japanese name) instead of **Dr.L**, and Air Man's portrait, which in EN is just the words "Air Man" in
+place of a face, reads **空気男** (a literal "air man"; 空気 is also slang for someone nobody notices). Cheat Man's
+portrait is Mega Man X's face, the ultimate "cheat" robot.
+
+### 2.4 Opening stage [seen]
+
+**Scene 1: the capture** (cutscene box at the top of the screen; gray Fake Rockman, Guts Man):
+
+![Opening capture scene](img/text_opening_capture.png)
+*Opening stage, scene 1: EN left, JP right.*
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
 | Fake Rockman | Hey, Guts Man, what are you doing? | きみは ワイリーはかせが気に入っているガッツマンじゃないか。 | Aren't you Guts Man, the one Dr. Wily is so fond of? |
-| (Guts Man throws a boulder; you are buried in rubble) | | | |
+| (Guts Man throws a boulder and buries him) | | | |
 | Guts Man | You're far too unaware, gray man. I'm a member of Dr. Light Numbers. | 油断したようだな ワシはDr.ライトナンバーズの一員だ。 | You let your guard down. I'm one of the Dr. Light Numbers. |
 | Guts Man | Now you're captured. | 悪いが お前をつかまえる。 | Sorry, but I'm taking you in. |
 
-Joke: in Rockman 1 Wily stole Guts Man because he wanted him for construction, and his RM2 Guts Dozer is a Guts Man
-tribute. The JP line plays on that ("the Guts Man Wily likes"). "Gray man" is the mass-produced Fake Rockman's palette.
+In Rockman 1 Wily stole Guts Man because he wanted him for construction work; the JP line plays on that. "Gray man"
+is the Fake Rockman's mass-production palette.
 
-### 2.3 Dr. Light's fortress dialogue (26 scripts)
+**Scene 2: the rescue.** You now play Quick Man and fight Guts Man as the opening boss. Rock (blue) drops in, Guts
+Man escapes, Rock leaves, and Quick Man breaks the Fake Rockman out of a cell:
 
-Script numbers are the index in the pointer table. EN and JP were written separately: JP is the original, EN is a loose
-(sometimes meme-ified) rewrite, so the JP gist column matters. **Bold** = highlight colour in EN.
-
-**s00 - Light's lab is attacked** (Light stage 1 start, room $19 [seen: dialogue logger])
+![Opening finale](img/text_opening_finale.png)
+*Opening stage, scene 2: EN left, JP right.*
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
-| Roll | W...Wily UFO is here! / It's heading towards us! | ワ、ワイリーはかせのUFOが来ました！ / まっすぐこちらへ向かってきます！！ | W-Wily's UFO is here! Heading straight for us! |
+| Rock | Guts Man, escape now!! [text: strip at `0x4e000`; not captured on screen] | (not captured) | |
+| Guts Man | Thanks, Mega Man! | ありがとよ！ロックマン！ | Thanks, Rockman! |
+| Quick Man | Are you ok? | だいじょうぶか？ | You all right? |
+| Fake Rockman | Thanks, Quick Man. I'm ok. [text] | あ、ああ。ありがとう。助か… (partly seen) | Y-yeah. Thanks. You saved me... |
+| Quick Man | I'll scout ahead and collect as much information on Dr. Light's lab as I can. | オレは、Dr.ライトの研究所を探す。 / ただ、奴らももう行動を始めている。 | I'll look for Dr. Light's lab. But they're already on the move. |
+| Quick Man | Now there're 8 Robot Masters including Mega Man. You'll have to beat them up. | しかも 今回はロックマンだけじゃなくさらに7体の仲間がいるらしい。 | And this time it's not just Rockman: he seems to have seven more allies. |
+| Quick Man | See you later. | お前は そいつらをぶっ潰してくれ。 / じゃ、頑張れよ。 | You go smash them. Well, good luck. |
+
+Quick Man teleports out and the stage select opens. EN keeps all of this as strips of a proportional font, so each
+line is a run of consecutive tile numbers [code].
+
+### 2.5 Robot master stages
+
+**Cheat Man.** His boss room wall is covered in repeating hex strings, "00EA24A1" and "C93D854B" [seen], and he refills
+his own health bar when knocked to zero [seen]. Cheat codes as wallpaper; `$4B` is CX's invincibility timer, so
+"854B" reads as 6502 `STA $4B` **[guess]**. A *Dragon Quest*-style battle message sits pre-rendered in the stage's
+graphics bank (`0x54c00`) [code; not seen in play]: EN "The Cheatous Bass and its cohorts used a jam session attack!!
+Cheat Man attacks!"; the JP tiles read "…ちのれんぞくこうげき" (DQ's "...'s consecutive attack!") and "チートマン …
+セッション…".
+
+![Cheat Man's hex wall](img/text_cheatman_hex_wall.png)
+*Cheat Man's boss room: "00EA24A1 / C93D854B" tiled over the walls.*
+
+**Weapon get and item "upgrades".** After each boss a full-screen Rockman artwork, recoloured to the weapon, types
+the message. After the 2nd, 4th and 6th boss a second screen hands over an item "upgrade" with the same wording
+(cx-scout's finding, `docs/research/cx/cheats.md` §6); there is no separate "from Dr. Light" text in the game.
+
+![Weapon get EN and JP](img/text_weapon_get.png)
+*Top EN: "You got: Power Bomb", then the item screen "You got: Übercharge". Bottom JP: "ユーバーチャージ を 装備します…".*
+
+### 2.6 Dr. Light's fortress (26 dialogue scripts)
+
+**Who triggers what** [code: every `LDA #$41` spawn site and the X it writes; seen where marked]:
+
+| Spawn site | Script(s) | Scene |
+|---|---|---|
+| `$1F:B985` (`STA $047F` = $01) | s00 | fortress 1 start, room $19 [seen] |
+| `$25:B081`, `$25:B1FC` | s02, s03 | Light presents Quick Man; Quick Man wakes up |
+| `$1F:BBE2` | s04 | Quick Man joins |
+| fortress 3, room $21 (spawn path not located) | s05 | Guts Man and the short circuit [seen] |
+| `$25:B41F` | s06 | Guts Tank intro [seen: fortress 3 boss] |
+| `$17:ABFC` (RM2's Wily-boss bank) | s23 | Guts Tank destroyed [seen] |
+| `$16:9739` (when counter `$06AF` = 7) | s08 | Light sends his "pet" |
+| `$30:8660`, table `$30:8584` | s10, s11, s12, s15, s16, s17, s18, s19, s20, s13, s14, s24 | **the fortress-6 Dr. Light battle**: one line per round, in this order in the table |
+| `$30:889E` | s21 if screen < $16, else s25 | Light beaten |
+| `$30:8C16` | s22 | Light flees |
+| not located | s01, s07, s09 | spike counter; masked robot; two-part robot |
+
+In the fortress-6 boss room Light warps in through the **"Dr.LIGHT TELEPORT SYSTEM"** (its monitors say so) for each
+round [seen]. From cx-scout's `light6_boss` state, knocking his HP down gave s24 and then s25, which sends you to the
+giant-Light stage $0E [seen]; I did not see the earlier rounds play out, so the per-round order is from the table.
+
+![Fortress 6: s24 and s25](img/text_light6_s24_s25.png)
+*Fortress 6: Light in his teleporter: "You respawn repeatedly / while I heal myself permanently. How amazing story!",
+then "Ha! I have the last plan... It is... to become much bigger!".*
+
+![Teleport monitor](img/text_light6_teleport_monitor.png)
+*The monitors behind him: "Dr.LIGHT TELEPORT SYSTEM E:00".*
+
+The scripts follow, roughly in story order. EN is a loose, often meme-ified rewrite of the JP original, so the JP gist
+column matters. **Bold** in EN = highlight colour. Speakers are from the portrait codes.
+
+**s00: Light's lab is attacked** (fortress 1 start)
+
+| Speaker | EN | JP | JP gist |
+|---|---|---|---|
+| Roll | W...Wily UFO is here! / It's heading towards us! | ワ、ワイリーはかせのUFOが来ました！ / まっすぐこちらへ向かってきます！！ | W-Wily's UFO is here! It's heading straight for us! |
 | Dr. Light | Soldiers near him, / assume combat mode! | 付近の者はただちに戦闘準備をしたまえ！！ / 戦闘力のない者は避難せよ！！ | Everyone nearby, prepare for battle! Non-combatants, evacuate! |
 | Rock | Beware, they will come / over and over again... | 倒しても倒しても彼らはやってきます… / 注意してください…… | No matter how many we beat, they keep coming... be careful. |
 | Dr. Light | Ultra Man, SMASH him. | ロックはまだ休んでおれ。 / …ウルトラマン、彼らをティウンさせなさい。 | Rock, you keep resting. ...Ultraman, **make them "tiun"**. |
 | Ultraman | Dwah!! | デュワ！！ | (Ultraman's battle cry) |
 
-"ティウン" (*tiun*) is the fan onomatopoeia for the Rockman death sound, used as a verb ("make them die"). The JP also
-explains why Rock is not the hero: he is resting, so Light deploys Ultraman. The "they keep coming" line is the
-mass-production premise: you are one of many identical units, and your lives are the horde.
+ティウン (*tiun*) is the fan onomatopoeia for the Rockman death sound, used as a verb. "They keep coming" is the
+mass-production premise: your extra lives are the horde.
 
-**s01 - the spike counter**
+**s01: the spike counter**
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
-| Dr. Light | By the way, my spiky things seem / good at killing instantly. | ところで、あのウニみたいなやつ、いい具合に / 即死させることができるみたいじゃな？ | By the way, those sea-urchin things seem to kill instantly rather nicely, don't they? |
+| Dr. Light | By the way, my spiky things seem / good at killing instantly. | ところで、あのウニみたいなやつ、いい具合に / 即死させることができるみたいじゃな？ | By the way, those sea-urchin things kill instantly rather nicely, don't they? |
 | Guts Man | They've got *N* kills. | *N*ティウンしたらしいぞい。 | Apparently *N* "tiuns" so far. |
-| Dr. Light | Hmm... / Bring more spikes.  I guess we can / stop him. | ふーむ…………… / たーくさん置いておきなさい。彼らが通りそう / なところに、ぎっしりと詰めるのじゃ。 | Hmm... Put out lo-ots of them. Pack them tight wherever they're likely to pass. |
+| Dr. Light | Hmm... / Bring more spikes.  I guess we can / stop him. | ふーむ…………… / たーくさん置いておきなさい。彼らが通りそう / なところに、ぎっしりと詰めるのじゃ。 | Hmm... Put out lo-ots of them. Pack them in wherever they're likely to pass. |
 
-*N* is printed live by op `07`: **the game counts how many times you have died on spikes** and the villain comments on
-it. Meta humour, and a justification for the spike density of the next stages.
+*N* is printed live by op `07` from `$0098`, a spike-death counter: `$1F:B12E` does `INC $98` whenever one of the
+player's collision tiles (`$32-$34`) is type 3 (spikes), and `$98` is stored in the battery save, so the count
+covers the whole playthrough [code]. The villain reads your death statistics and orders more spikes.
 
-**s02 - Light's "new friend"**
+**s02 / s03 / s04: Quick Man is turned, then rejoins**
 
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Dr. Light | Look who I found wandering around! / My friend here has a small problem with you. / It seems that you let him die and he's not too happy about that! | …わたしのロボットたちがお世話になっている / ようじゃのう。 / さて、君にどうしてもわたしの新しい仲間を / 紹介したいのじゃ。 | ...It seems my robots have been "well looked after" by you. Now, there's a new companion of mine I simply must introduce. |
-| Fake Rockman | !? | ！？ | |
-| Dr. Light | Now I think it is time that he / repays the favor! | まあ、楽しんでくれたまえ。 | Well, do enjoy yourself. |
+| Script | Speaker | EN | JP | JP gist |
+|---|---|---|---|---|
+| s02 | Dr. Light | Look who I found wandering around! / My friend here has a small problem with you. / It seems that you let him die and he's not too happy about that! | …わたしのロボットたちがお世話になっている / ようじゃのう。 / さて、君にどうしてもわたしの新しい仲間を / 紹介したいのじゃ。 | ...It seems my robots have been "well looked after" by you. Now, there's a new friend of mine I simply must introduce. |
+| s02 | Fake Rockman | !? | ！？ | |
+| s02 | Dr. Light | Now I think it is time that he / repays the favor! | まあ、楽しんでくれたまえ。 | Well, do enjoy yourself. |
+| s03 | Fake Rockman (EN) / Quick Man (JP) | Quick Man... Do you remember me...? | どうやら、悪い夢を見ていたようだ……… | (QM) Looks like I was having a bad dream... |
+| s03 | Quick Man (EN) / Fake Rockman (JP) | Yea... I guess so... / Sorry to cause you so much trouble. | クイックマン！ / お前には、ずいぶん迷惑をかけたみたいだな。 | (FR) Quick Man! (QM) Seems I caused you a lot of trouble. |
+| s03 | Fake Rockman | Go back to our lab first! | まずは研究所に戻ろう！話は後だ！ | Back to the lab first! We'll talk later! |
+| s03 | Fake Rockman | (Can't I teleport...!?) | テレポートができない……！？ | I can't teleport...!? |
+| s04 | Quick Man | Let's split out. / Call me in the menu if you need help. | 二手に分かれて勢力を分散させるぞ！！ / 必要な時はサブメニューから呼び出してくれ！ | Let's split up and divide their forces! Call me from the sub-menu when you need me! |
 
-The new friend is **Quick Man** (RM2's DWN-012), rebuilt by Light. EN adds "you let him die": Wily abandoned him after
-RM2.
+Light caught Quick Man while he was scouting the lab (opening scene 2) and turned him against you. Between the last two
+s03 lines, four far calls play the teleport-out animation and fail [code: `09 5F/77/96/A9 B8 24`]. s04 is the story
+unlock of the second playable character; when you call him from the menu he answers "Ok, I'm on my way!" /
+"わかった、いますぐ行くぜ!!" (§3).
 
-**s03 - Quick Man wakes up**
+**s05 / s06 / s23: Guts Tank** (fortress 3) [seen]
 
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Fake Rockman (EN) / Quick Man (JP) | Quick Man... Do you remember me...? | どうやら、悪い夢を見ていたようだ……… | (QM) Looks like I was having a bad dream... |
-| Quick Man (EN) / Fake Rockman (JP) | Yea... I guess so... / Sorry to cause you so much trouble. | クイックマン！ / お前には、ずいぶん迷惑をかけたみたいだな。 | (FR) Quick Man! (QM) Seems I caused you a lot of trouble. |
-| Fake Rockman | Go back to our lab first! | まずは研究所に戻ろう！話は後だ！ | Back to the lab first! We'll talk later! |
-| Fake Rockman | (Can't I teleport...!?) | テレポートができない……！？ | I can't teleport...!? |
+| Script | Speaker | EN | JP | JP gist |
+|---|---|---|---|---|
+| s05 | Guts Man | There's a short circuit zap!! / Our base's gonna ruin!! | ろ、ローデンを起こしているでガス！ / もうダメでガス！ | Th-there's a current leak, -degasu! We're done for, -degasu! |
+| s05 | Dr. Light | Don't worry, Guts. / ...We're now **SERIOUS**. | わざと漏電させているのじゃ。 / ……こちとら / マ / ジじゃからのう。 | I'm leaking current **on purpose**. ...Because we're dead "ma... ji" (serious) here. |
+| s06 (vs Quick Man) | Guts Man | Whoa!! / You should be in our clocktower...! | あ！ / こいつはさっき時計塔に / 閉じ込めたはずの…！ | Ah! This one should be locked in the clock tower...! |
+| s06 (vs Fake Rockman) | Guts Man | I've lost you once... / Not again... | ……あの時つかまえ損ねたニセロックマンが、 / ここまでたてつくとは……… | ...The fake Rockman who slipped through my hands back then, defying us this far... |
+| s06 | Guts Man | I'm going to STOP you with... / The Fierce Dr.Light's Guts Tank!! | こうなったら、博士特製のガッツタンクで / 全力でひねり潰してやるでガス！！ | Then I'll crush you with all my might in the Doctor's special **Guts Tank**, -degasu!! |
+| s23 | Guts Man | Where... did that... power come from...!? / Arrrggghhh!!! | お…お前のどこに……そんな力が………… / ぐわあああああああ！！ | W-where in you... did such power... GWAAAAAH!! |
 
-Between the last two lines the script runs four far calls that play the teleport-out animation and fail (the fortress
-blocks teleporting) [code: `09 5F B8 24`, `09 77/96/A9 B8 24`].
+でガス (*-degasu*) is Guts Man's verbal tic, *-desu* + "Guts". Light electrifies his own base on purpose; JP stretches
+"マジ" over two box-closes, EN uses the highlight colour. Guts Tank is RM2's Wily-stage-3 boss, now in Light's
+stage 3. "お前のどこにそんな力が" is a stock anime defeat line. Variant choice [code]: s06 starts with the which-hero
+call `$24:B5BF` and two `0C` skips; in s21/s25 the same pattern picks portrait 05 (Fake Rockman) on the taken branch,
+so the taken branch of s06 ("I've lost you once", JP "the fake Rockman who slipped through my hands", i.e. the opening
+rescue) is the Fake Rockman's, and the clock-tower line is said to Quick Man. When Quick Man was locked in a clock
+tower is not shown by any text I found.
 
-**s04 - Quick Man joins**
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Quick Man | Let's split out. / Call me in the menu if you need help. | 二手に分かれて勢力を分散させるぞ！！ / 必要な時はサブメニューから呼び出してくれ！ | Let's split up and divide their forces! Call me from the sub-menu when you need me! |
-
-This is the in-story unlock of the second playable character (Quick Man, swapped in from the pause menu) [doc/text].
-
-**s05 - "We're now SERIOUS"**
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Guts Man | There's a short circuit zap!! / Our base's gonna ruin!! | ろ、ローデンを起こしているでガス！ / もうダメでガス！ | Th-there's a current leak, -degasu! We're done for, -degasu! |
-| Dr. Light | Don't worry, Guts. / ...We're now **SERIOUS**. | わざと漏電させているのじゃ。 / ……こちとら / マ / ジじゃからのう。 | I'm leaking current **on purpose**. ...Because we're dead "ma... ji" (serious) here. |
-
-"でガス" (*-degasu*) is Guts Man's verbal tic, a pun on *-desu* + "Guts". Light deliberately electrifies his own base;
-the JP stretches "マジ" (slang for "serious") over two box-closes for comic timing, which the EN reproduces with the
-highlight colour.
-
-**s06 - Guts Tank** (two variants chosen by `0C SKIP` after the which-hero call `$24:B5BF`)
+**s07: the masked robot** (two variants)
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
-| Guts Man (variant A) | Whoa!! / You should be in our clocktower...! | あ！ / こいつはさっき時計塔に / 閉じ込めたはずの…！ | Ah! This one should be locked up in the clock tower...! |
-| Guts Man (variant B) | I've lost you once... / Not again... | ……あの時つかまえ損ねたニセロックマンが、 / ここまでたてつくとは……… | ...The fake Rockman I failed to catch back then, defying us this far... |
-| Guts Man | I'm going to STOP you with... / The Fierce Dr.Light's Guts Tank!! | こうなったら、博士特製のガッツタンクで / 全力でひねり潰してやるでガス！！ | Then I'll crush you with all my might in the Doctor's special **Guts Tank**, -degasu!! |
-
-Guts Tank is the Wily Castle 3 boss of Rockman 2, here rebuilt as a Light weapon. The "clock tower" refers to where
-you were locked up after the opening capture.
-
-**s23 - Guts Tank defeated**
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Guts Man | Where... did that... power come from...!? / Arrrggghhh!!! | お…お前のどこに……そんな力が………… / ぐわあああああああ！！ | W-where in you... did such power... GWAAAAAH!! |
-
-"お前のどこにそんな力が" is the stock anime "where did you get that strength" line (a *Dragon Ball*/*Hokuto no Ken*
-style defeat cliché).
-
-**s07 - the masked robot** (variant per hero)
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| masked robot (vs Quick Man) | You're, um...the robot master who inherits me? / You look weird... | お前が、その…………わたしを受けついだ / ロボットか。ヘンなツノなんかつけて………。 | So you're... the robot who **inherited** me. Wearing some weird horn... |
+| masked robot (vs Quick Man) | You're, um...the robot master who / inherits me? / You look weird... | お前が、その…………わたしを受けついだ / ロボットか。ヘンなツノなんかつけて………。 | So you're... the robot who **inherited** me. Wearing some weird horn... |
 | Quick Man | Shut up, you are. | お前こそ、ヘンな仮面をつけているじゃないか。 | Says you, with that weird mask on. |
 | masked robot | You are. | ………ふん。それならどっちがヘンか、 / ハッキリさせようではないか。 | ...Hmph. Then let's settle which of us is weird. |
 | masked robot (vs Fake Rockman) | You finally got here. / This is the fourth / "Dr.Light's Sanctuary location. / It's ours now. / Take it from us, if you dare... | よく、きた。 / しかし、ここは「わたしの場所」だ。 / うばい取ってみよ。 / …………できるものなら。 | Welcome. But this is "my place". Try and take it... if you can. |
 
-The EN "Shut up, you are." / "You are." is a schoolyard "no, you" exchange. ("fourth" = the fourth fortress stage.)
+EN turns the JP banter into a schoolyard "no, *you* are". "The fourth" suggests fortress stage 4 **[guess]**. Who the
+masked robot is was not established; a Light-built predecessor of Quick Man is implied **[guess]**.
 
-**s09 - the two-part robot**
+**s09: the two-part robot**
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
 | part A | I might be weak... | ひとりでダメなら…… | If one of us is no good... |
 | part B | **But we are strong!** | 2人がかりでどうだ！！ | ...how about two at once!! |
 
-**s08 - Light sends his "pet"**
+**s08: Light sends his "pet"**
 
 | Speaker | EN | JP | JP gist |
 |---|---|---|---|
-| Dr. Light | Welcome!  I see you destroyed my lab by yourself. / Very impressive! / I could destroy you, but I would not rob my pet of that pleasure. / He knows how to deal with wastes. / Should you live, I will be waiting for you.  Don't disappoint me! | フフフ…キミはすばらしいよ。 / この短時間でここまでわたしの研究所を / 荒らして回るとは…………実にすばらしい。 / さてと、すぐにでもわたしとお手合わせ / 願いたいのだが、あいにく…こいつがそれを / 許してくれなくてねえ。なにしろ、 / いつもは研究所のゴミ出し担当なのでね…… / しばらくしても、こいつが戻ってこないよう / なら、キミと試合をすることにしよう。では、 / 楽しみにしているぞ。 / ハハハハハ……… | Fufufu... you're wonderful. To wreck my lab this far in so little time... truly wonderful. I'd love a match with you right away, but unfortunately... this fellow won't allow it. After all, he's normally the lab's **garbage-disposal duty**... If he doesn't come back after a while, I'll have that match with you. Looking forward to it. Hahahaha... |
+| Dr. Light | Welcome!  I see you destroyed my lab by yourself. / Very impressive! / I could destroy you, but I would not rob my pet of that pleasure. / He knows how to deal with wastes. / Should you live, I will be waiting for you.  Don't disappoint me! | フフフ…キミはすばらしいよ。 / この短時間でここまでわたしの研究所を / 荒らして回るとは…………実にすばらしい。 / さてと、すぐにでもわたしとお手合わせ / 願いたいのだが、あいにく…こいつがそれを / 許してくれなくてねえ。なにしろ、 / いつもは研究所のゴミ出し担当なのでね…… / しばらくしても、こいつが戻ってこないよう / なら、キミと試合をすることにしよう。では、 / 楽しみにしているぞ。 / ハハハハハ……… | Fufufu... you're wonderful. To wreck my lab this far in so little time... truly wonderful. I'd love a match right away, but unfortunately this fellow won't allow it; he's normally the lab's **garbage-disposal duty**... If he doesn't come back after a while, I'll have that match with you. Looking forward to it. Hahahaha... |
 
-Light is written as a classic Wily-style villain, complete with the boss-taunt monologue.
-
-**s10 - Light, round 1: the Three Laws** (runs right after s08; JP reuses s08's glyph pages)
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Dr. Light | Excellent job! / But, the time of **your destruction** has arrived! / And you cannot hurt me... | ……………………。 / では、約束どおりキミを殺すことにしよう。 / そして、キミはわたしを傷つけることは / できない…… / さて、どうするかね？ | ...... Then, as promised, I shall kill you. And you **cannot harm me**... So, what will you do? |
-| Dr. Light (stern) | How will you survive? | (same page) | |
-| Dr. Light | Welp, you defy The Three Laws of Robotics? | ……キミはロボット三原則すら守れないような / ロボットなのかね？ | ...Are you a robot that can't even obey the **Three Laws of Robotics**? |
-| Dr. Light (stern) | Dangerous robots like you... | そんな危険なモノはね………… | Something that dangerous... |
-| Dr. Light (furious) | AREN'T NEEDED IN THIS PEACEFUL WORLD!! / I   D E S T R O Y   Y O U ! ! | この平和な世界には必要ないのじゃ！！ / わしがこの手で八つ裂きにしてやるわ！！ | ...is NOT NEEDED in this peaceful world!! I'll tear you limb from limb with my own hands!! |
-
-The Asimov joke: a robot may not harm a human, so Light "wins" by definition; when you fight back, you are the
-dangerous one. Light's switch from わたし (polite) to わし (old-man) marks his snap into rage.
-
-**s11 - "a law of nature"**
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Dr. Light | You listening?  Okay. / Grass grows, | ……非常にカンタンな、自然の摂理じゃ。 / 草木が生え | ...It's a very simple law of nature. Grass grows, |
-| Dr. Light (stern) | birds fly, sun shines, / and... | 、鳥が飛び、日が差して……… | birds fly, the sun shines... |
-| Dr. Light | I crash you. | そして、わたしはお前をブチのめす。 | ...and I beat you to a pulp. |
-
-This is the Scout's line from *Team Fortress 2*'s **"Meet the Scout"** ("Grass grows, birds fly, sun shines, and
-brother, I hurt people."), in both languages. TF2 is the hack's house reference (ÜBERCHARGE, DEAD RINGER).
-
-**s12 - "if you could just... that'd be great"** (Yes/No choice, `09 F9 AE 24`)
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Dr. Light | So, if you could just do me a favor and off yourself, that'd be great. / Yes  No | ところで、せっかくだから自分から死んで / みようという気はないかな？ / いや、そうしてくれるとわたしが楽なのじゃ。 / たのむよ。 | By the way, since you're here, how about dying by your own hand? It'd make things easy for me. Please. |
-| Dr. Light (Yes) | Thanks, pumpkin. | そう。それでいいのじゃよ。 | Yes. That's a good boy. |
-| Dr. Light (No) | No...? / Since when have you thought you can say no? | そうか………それなら、 / わしが手にかけるしかないか………。 | I see... then I'll just have to do it myself... |
-
-EN turns Light into **Bill Lumbergh from *Office Space*** ("Yeah, if you could just... that'd be great"). The Yes branch
-presumably kills the player (to verify).
-
-**s13 - "on days like these"**
-
-| Speaker | EN | JP | JP gist |
-|---|---|---|---|
-| Dr. Light (stern) | it's a beautiful day outside. / birds are singing, flowers are blooming... / on days like these, scraps like you... | ………外はとてもよい天気じゃぞ。 / 鳥は歌って、花も咲いて、 / そして、キミみたいなポンコツは………… | ...It's lovely weather outside. Birds are singing, flowers are blooming, and junk like you... |
-| Dr. Light | Should be burning in hell. | ……………………こうじゃ。 | ...... gets **this**. |
-
-Verbatim **Sans** from *Undertale*'s genocide-route fight ("it's a beautiful day outside. birds are singing, flowers are
-blooming... on days like these, kids like you... Should be burning in hell."), lower case included. It ties to the
-readme's "a terrible bad time awaits" [doc]. The JP ends on a bare "...this." followed by the attack.
-
-**s14 / s15 / s16 / s17 - Light's capsules and gifts**
+**The fortress-6 battle, round by round** (table order s10, s11, s12, s15, s16, s17, s18, s19, s20, s13, s14, s24)
 
 | Script | Speaker | EN | JP | JP gist |
 |---|---|---|---|---|
-| s15 | Dr. Light | So you want to get more power from me, eh? / If not, too bad - I'm giving you anyway. | またわしの技を受けたいっていうんですかい？ / ま、いやだといっても受けさせますがねえ。 | So you want to take my technique again, huh? Well, even if you say no, I'm making you take it. |
-| s14 | Dr. Light | No problem. | うむ。問題なし。 | Mm. No problem. |
-| s16 | Dr. Light | So you've come... I hope not to want to fight anymore... | はあ…………… / やはりまた、来てしまったか………。 / できればわたしは、もう戦いたくないのだが… / これも運命なのかのう………。 | Sigh... so you came again after all. If I could, I'd rather not fight anymore... is this fate too? |
+| s10 | Dr. Light | Excellent job! / But, the time of **your destruction** has arrived! / And you cannot hurt me... / How will you survive? | ……………………。 / では、約束どおりキミを殺すことにしよう。 / そして、キミはわたしを傷つけることは / できない…… / さて、どうするかね？ | ...... Then, as promised, I shall kill you. And you **cannot harm me**... So, what will you do? |
+| s10 | Dr. Light | Welp, you defy The Three Laws of Robotics? / Dangerous robots like you... | ……キミはロボット三原則すら守れないような / ロボットなのかね？ / そんな危険なモノはね………… | ...Are you a robot that can't even obey the **Three Laws of Robotics**? Something that dangerous... |
+| s10 | Dr. Light (furious) | AREN'T NEEDED IN THIS / PEACEFUL WORLD!! / I   D E S T R O Y   Y O U ! ! | この平和な世界には必要ないのじゃ！！ / わしがこの手で八つ裂きにしてやるわ！！ | ...is NOT NEEDED in this peaceful world!! I'll tear you limb from limb with my own hands!! |
+| s11 | Dr. Light | You listening?  Okay. / Grass grows, birds fly, sun shines, / and... I crash you. | ……非常にカンタンな、自然の摂理じゃ。 / 草木が生え、鳥が飛び、日が差して……… / そして、わたしはお前をブチのめす。 | ...A very simple law of nature. Grass grows, birds fly, the sun shines... and I beat you to a pulp. |
+| s12 | Dr. Light | So, if you could just do me a favor / and off yourself, that'd be great. / Yes  No | ところで、せっかくだから自分から死んで / みようという気はないかな？ / いや、そうしてくれるとわたしが楽なのじゃ。 / たのむよ。 | By the way, since you're here, how about dying by your own hand? It'd make things easy for me. Please. |
+| s12 (Yes) | Dr. Light | Thanks, pumpkin. | そう。それでいいのじゃよ。 | Yes. That's a good boy. |
+| s12 (No) | Dr. Light | No...? / Since when have you thought you / can say no? | そうか………それなら、 / わしが手にかけるしかないか………。 | I see... then I'll just have to do it myself... |
+| s15 | Dr. Light | So you want to get more power from me, eh? / If not, too bad - I'm giving you anyway. | またわしの技を受けたいっていうんですかい？ / ま、いやだといっても受けさせますがねえ。 | So you want to take my technique again, huh? Even if you say no, you're taking it. |
+| s16 | Dr. Light | So you've come... I hope not to want to fight anymore... | はあ…………… / やはりまた、来てしまったか………。 / できればわたしは、もう戦いたくないのだが… / これも運命なのかのう………。 | Sigh... you came again after all. If I could, I'd rather not fight anymore... is this fate too? |
 | s16 | Dr. Light | Well, step into this capsule. / and receive a mid-air acceleration system to boost your mobility. / Good Luck! | さて、カプセルに入るのじゃ。 / そうすれば、お前は空中でダッシュすることが / できるようになるはずじゃ。 / つらいことも多かろうが、がんばるのじゃぞ。 | Now, step into the capsule. Then you should be able to **dash in mid-air**. It will be hard, but do your best. |
 | s16 | Dr. Light | Step into capsule? / Yes  No | カプセルに、入りますか？ | Enter the capsule? |
 | s16 (No) | Dr. Light | Okay, I'll go back to **my job**. | ………………こんなところじゃろう。 / では、仕事に戻らねばな。 | ...That'll do. Well, back to work. |
 | s17 | Dr. Light | I teach you something good. / You must defeat my Dragon Punch to stand a chance! | お前にいいことを教えてやろう。 / 昇龍拳を破らぬ限り、お前に勝ち目はない！！ | Let me tell you something good. Unless you break my **Shoryuken**, you have no chance!! |
+| s18 | Dr. Light | Great, another dead Mega Man-shaped robot... / ......Wait a minute, it's not dead! / YES!  I must make it die! | またロックの形をしたガラクタか……… / ワイリーも忙しくしているようじゃのう。 / ………うん？おぬし生きておるな！？ / こりゃわしが本当にガラクタにしなければな。 | Another piece of Rock-shaped junk... Wily's keeping busy, I see. ...Hm? You're alive!? Then I really must turn you into junk. |
+| s19 | Dr. Light | You have destroyed so much. / What is it exactly, that you have created? / Can you even name one thing? / ......I thought not. / I guess you are useless. / So, let's finish your whole life. | キミは本当に多くのものを壊してきたが… / ところで、キミが作り出したものは何だ？ / 1つでもあるのか？…………ないだろう。 / そんなものはムダでしかない。 / すぐにでもわしが処分してやろう。 | You've destroyed so much... but what have you created? Even one thing? ...No. Pure waste. I'll dispose of you right now. |
+| s19 | Dr. Light | I have laid the foundation for robotics, / and not as we have narrowly defined ourselves, / but as something greater than we could ever imagine. / My robots will become something we can only now begin to glimpse. | ちなみにわたしにはあるぞ。わたしはロボット / 工学の基礎を確立させた。 / それも、ロボットの可能性を限定する方向に / ではなく、想像を超えて大いなるものへと成長 / できるように……………だ。 / わたしのロボット三原則に則ったロボットはね、 / 現時点では予想すらできないような大いなる / 存在に、なれるのだよ。 | I, for the record, have: I founded robot engineering, and not to limit what robots can be, but so they can grow beyond imagination. Robots that follow my **Three Laws** can become great beings no one can predict today. |
+| s20 | Dr. Light | You think I'm professional of creating robots, but also expert of destroying. / Let's show you how I do. | わたしはロボットを作る人だと思われている / ようだが、実はロボットを壊す方法についても / よく知っているのじゃよ。それを今から / キミに教えてやろう。 | People think I'm the man who builds robots, but I know a great deal about breaking them too. Let me show you. |
+| s13 | Dr. Light | it's a beautiful day outside. / birds are singing, flowers are blooming... / on days like these, scraps like you... / Should be burning in hell. | ………外はとてもよい天気じゃぞ。 / 鳥は歌って、花も咲いて、 / そして、キミみたいなポンコツは………… / ……………………こうじゃ。 | ...It's lovely weather outside. Birds are singing, flowers are blooming, and junk like you... gets **this**. |
+| s14 | Dr. Light | No problem. | うむ。問題なし。 | Mm. No problem. |
+| s24 | Dr. Light | Heh heh heh... / You respawn repeatedly / while I heal myself permanently. / How amazing story! | ふふふふふ……… / お前は無限に復活してわたしを追い詰める。 / そして、わたしもまた、無限に回復してお前を / 追い詰める。最高のシナリオだと思わんかね？ | You revive endlessly and corner me; I recover endlessly and corner you. Isn't that the best scenario? |
 
-The *Mega Man X* capsule gag turned inside out: Light's hologram capsules in X give X his armour; here Light, the enemy,
-sighs "is this fate?" and gives the *Fake Rockman* an **air dash**. s17 cites the hidden *X* **Hadouken/Shoryuken**
-capsules (Light in a Ryu gi), but as a boss threat. Placement of s14/s15 [to verify].
+![s12: answering Yes kills you](img/text_s12_yes_kills_you.png)
+*s12 injected into the fortress-1 box: the Yes/No prompt, then the Fake Rockman explodes on "Thanks, pumpkin."*
 
-**s18-s22, s24, s25 - Light, the final fights**
+**Answering "Yes" in s12 kills you on the spot** [seen: HP drops to 0 and the death explosion plays during "Thanks,
+pumpkin."]. s15 is not an item upgrade: JP "わしの技を受けたい" means "you want to be hit by my technique again"; the
+EN "more power from me" is loose. In s16 Light, the villain, offers the Fake Rockman a *Mega Man X*-style capsule with
+an air dash in the middle of his own boss fight, and sighs "is this fate?".
+
+**s21 / s22 / s25: Light beaten**
 
 | Script | Speaker | EN | JP | JP gist |
 |---|---|---|---|---|
-| s18 | Dr. Light | Great, another dead Mega Man-shaped robot... / ......Wait a minute, it's not dead! / YES!  I must make it die! | またロックの形をしたガラクタか……… / ワイリーも忙しくしているようじゃのう。 / ………うん？おぬし生きておるな！？ / こりゃわしが本当にガラクタにしなければな。 | Another piece of Rock-shaped junk... Wily's keeping busy, I see. ...Hm? You're alive!? Then I really must turn you into junk. |
-| s19 | Dr. Light | You have destroyed so much. / What is it exactly, that you have created? / Can you even name one thing? / ......I thought not. / I guess you are useless. / So, let's finish your whole life. | キミは本当に多くのものを壊してきたが… / ところで、キミが作り出したものは何だ？ / 1つでもあるのか？…………ないだろう。 / そんなものはムダでしかない。 / すぐにでもわしが処分してやろう。 | You've destroyed so much... but what have you created? Even one thing? ...No. Something like that is pure waste. I'll dispose of you right now. |
-| s19 | Dr. Light | I have laid the foundation for robotics, | ちなみにわたしにはあるぞ。わたしはロボット / 工学の基礎を確立させた。 | I, for the record, have: I founded robot engineering. |
-| s19 | Dr. Light (stern) | and not as we have narrowly defined ourselves, / but as something greater than we could ever imagine. | それも、ロボットの可能性を限定する方向に / ではなく、想像を超えて大いなるものへと成長 / できるように……………だ。 | And not so as to limit what robots can be, but so they can grow into something greater than imagination... |
-| s19 | Dr. Light | My robots will become something we can only now begin to glimpse. | わたしのロボット三原則に則ったロボットはね、 / 現時点では予想すらできないような大いなる / 存在に、なれるのだよ。 | Robots that follow my **Three Laws** can become great beings we can't even predict today. |
-| s20 | Dr. Light | You think I'm professional of creating robots, but also expert of destroying. / Let's show you how I do. | わたしはロボットを作る人だと思われている / ようだが、実はロボットを壊す方法についても / よく知っているのじゃよ。それを今から / キミに教えてやろう。 | People think I'm the man who builds robots, but I know a great deal about breaking them too. Let me show you. |
-| s24 | Dr. Light | Heh heh heh... / You respawn repeatedly / while I heal myself permanently. / How amazing story! | ふふふふふ……… / お前は無限に復活してわたしを追い詰める。 / そして、わたしもまた、無限に回復してお前を / 追い詰める。最高のシナリオだと思わんかね？ | You revive endlessly and corner me. And I recover endlessly and corner you. Isn't that the best scenario? |
-| s21 | Dr. Light (stern/beaten) | *Cough* *cough* ...I am defeated... / I have no choice...... *cough* / but to throw myself... on your... / MERCY! | ゲホッ…ゴホッ…あわれむが、よい……ゴホッ / わしはもう、ダメじゃ……………… / 土下座して……お許しこいます…………！ | *cough* *cough* ...pity me... *cough* I'm finished... I prostrate myself... and beg forgiveness...! |
-| s21 | hero (Fake Rockman or Quick Man, `0C` picks the face) | That's right, Dr.Light! / Your justice is finally... | ……………………分かった！ / もうわれわれの計画のジャマをしないのならば | ......All right! If you'll stop getting in the way of our plans... |
+| s21 | Dr. Light (stern, then beaten) | *Cough* *cough* ...I am defeated... / I have no choice...... *cough* / but to throw myself... on your... / MERCY! | ゲホッ…ゴホッ…あわれむが、よい……ゴホッ / わしはもう、ダメじゃ……………… / 土下座して……お許しこいます…………！ | *cough* *cough* ...pity me... *cough* I'm finished... I prostrate myself... and beg forgiveness...! |
+| s21 | hero (portrait chosen by `0C`) | That's right, Dr.Light! / Your justice is finally... | ……………………分かった！ / もうわれわれの計画のジャマをしないのならば | ......All right! As long as you stop getting in the way of our plans... |
 | s21 | Dr. Light | Phew, it was worth a shot. | ………ふう、あぶないところじゃった。 | ...Phew, that was a close one. |
 | s21 | hero | We will capture you! | 逃がさないぞ！Dr.ライト！ | You won't get away, Dr. Light! |
 | s21 | Dr. Light | Remember, you are still in my lab. | ……………… / ここはわたしの研究所だ。忘れないように。 | ...This is my lab. Don't forget that. |
 | s22 | Dr. Light (stern) | Escaping does not only mean that I keep a distance from you. | わたしがキミから遠ざかることだけを / 「逃げる」というのではないのだよ。 | "Running away" doesn't only mean getting further from you. |
 | s25 | Dr. Light (beaten) | Awww, it cannot be... | こ、こんなはずでは…………… | Th-this can't be... |
 | s25 | hero | The war is now over. | もう、おしまいだ。Dr.ライト。 | It's over, Dr. Light. |
-| s25 | Dr. Light (stern) | Ha!  I have the last plan... / It is... | なにをバカなことを……… / よおし、こうなったら…………… | What nonsense... Right, in that case... |
-| s25 | Dr. Light (furious) | to become much bigger! | こうなったら、大きくなってやる！！！！ | In that case, I'll get **BIG**!!!! |
+| s25 | Dr. Light (stern, then furious) | Ha!  I have the last plan... / It is... / to become much bigger! | なにをバカなことを……… / よおし、こうなったら…………… / こうなったら、大きくなってやる！！！！ | What nonsense... Right, in that case... in that case, **I'll get BIG**!!!! |
 
-Series in-jokes: s21 is the **Wily dogeza** (every classic ending has Wily kneeling and begging), done by Light, who then
-escapes exactly as Wily always does. s19 paraphrases Light's message to the future from *Mega Man X* (X's capsule
-letter about unlimited potential and the risks of the Three Laws). s24 is a jab at the player's infinite continues.
-s25 "get bigger" sets up the giant final form.
+s21 is the **Wily dogeza**: every classic ending has Wily kneeling, and Rock forgiving him before he escapes. In JP the
+hero falls for it exactly like Rock ("All right! As long as you stop..."); EN changes the hero's line into a gloat,
+which loses the joke. s25 sets up stage $0E, where a giant Light fills the background [seen].
 
-## 3. Menus and fixed UI text
+### 2.7 Ending
 
-Pause menu (bank $1F `0x3e380`) [code]: `MEGAMAN` (JP `ROCKMAN`) header, `MEGA BUSTER` (JP `ROCK BUSTER`),
-`CHEAT SABER`, `RIDER KICK`, `DEAD RINGER`, `POWER BOMB`, `RINGO SHIELD`, `1.FLOOR`, `FIRE BALL`, `2.SUBTANK`,
-`PRINT CUTTER`, `3.ÜBERCHARGE` (tile $1C is the Ü) [to confirm on screen].
+After fortress 6 the game runs a cutscene at `$1B:B60A` (it loops over the 16 roll-call strings via `$D634` ->
+`$12:8603`) and then starts stage $0E, the giant-Light fight [code]. I could not beat the giant in this run, so the
+ending text below is from ROM.
 
-(Title, NEW GAME / LOAD GAME, DATA 1-3, stage select, weapon get, game over: being added.)
+A villain's victory line is pre-rendered in both builds at `0x51b00`, and no dialogue script uses it. That it is
+Wily's closing line is a **[guess]** from the wording (じゃ, "Muahaha") and its separate storage:
 
-## 4. Ending: boss roll call and staff roll [code]
+| EN | JP | JP gist |
+|---|---|---|
+| Now the age of me begins!Muahahahahahaha! | ワガハシの時代到来じゃ！ヌァーッ… | My era has arrived! Nwaaah... (ワガハシ [sic]; the glyph is シ, surely for ワガハイ, Wily's pompous "I") |
 
-Boss roll call (`0x24500`), EN / JP:
+![Pre-rendered strips](img/text_prerendered_strips.png)
+*Pre-rendered strips, EN over JP: Cheat Man's DQ banner (`0x54c00`), the villain's line (`0x51b00`), Quick Man's
+menu reply (`0x749a0`).*
+
+**Boss roll call** (`0x24500`; offsets, lengths, then strings) [code]:
 
 | EN | JP | Credit |
 |---|---|---|
@@ -305,43 +388,131 @@ Boss roll call (`0x24500`), EN / JP:
 | DLN.010 CHEATMAN | DRN.010 CHEATMAN | HIMAJIN JICHIKU |
 | DLN.011 AIRMAN | DRN.011 AIRMAN | HIMAJIN JICHIKU |
 | DLN.012 FIREMARIO | DRN.012 FIREMARIO | NINTENDO |
-| DLN.013 KAMEN RIDER | DRN.013 仮面 RIDER (3 kanji tiles $4C-$4E) | ISHINOMORI PROD. |
+| DLN.013 KAMEN RIDER | DRN.013 仮面 RIDER | ISHINOMORI PROD. |
 | DLN.014 BOMBERMAN | DRN.014 BOMBERMAN | HUDSON SOFT |
 | DLN.015 WHISPYWOODS | DRN.015 WHISPYWOODS | HAL LABORATORY |
 
-The numbering is canon-aware: Light's robots in Rockman 1 are DLN-001 (Rock) through DLN-008 (Elec Man), so CX's new
-Light robots continue at 009. JP writes **DRN** because Light's Japanese name is "Dr. Right". Air Man, a Wily robot in
-RM2, is re-registered as a Light Number "by Himajin Jichiku".
+The numbering is canon-aware: Light's Rockman 1 robots are DLN-001 (Rock) to DLN-008 (Elec Man), so CX's new Light
+Numbers start at 009. JP uses **DRN** because Light is "Dr. Right" in Japanese. Air Man, a Wily robot in RM2, is
+re-registered as a Light Number "by Himajin Jichiku".
 
-Staff roll (`0x24c40`, 88 strings): first the **original Rockman 2 staff** kept from the vanilla ending ("original
-megaman2 staff": CHARACTER DESIGNER YASUKICHI, INAFKING, TOM PON, NAGINEKO, 2M03CM MAN, A.K; sound programmer OGERETSU
-KUN, MANAMI IETEL, YUUKICHAN&S PAPA; PROGRAMMER H.M.D.; PLANNER A.K; then the long vanilla special-thanks list ending in
-FISH MAN), then **"megaman cx staff"**: SPECIAL THANKS PROUDMAN, PROETE, ROCK5EASILY, BAD DUMMY; SPECIAL THANKS ENSIS,
-**PURESABE** (author of *Rockman 4 Minus Infinity*), NARFNRA, COLASAUR; SPECIAL THANKS ALL BETA TEST PLAYERS. AND YOU..;
-HACKED BY (logo tiles); original megaman2 presented by capcom. JP differs only in "rockman2"/"rockman cx".
+**Staff roll** (`0x24c40`, 88 strings, PPU addresses alongside) [code]: first the **original Rockman 2 staff**, copied
+from the vanilla RM2 ending, under the heading "original megaman2 staff" (JP "rockman2"): CHARACTER DESIGNER YASUKICHI,
+INAFKING, TOM PON, NAGINEKO, 2M03CM MAN, A.K; sound programmer OGERETSU KUN, MANAMI IETEL, YUUKICHAN&S PAPA;
+PROGRAMMER H.M.D.; PLANNER A.K; then RM2's long special-thanks list (HIROYUKI MAETANI ... FISH MAN). Then **"megaman
+cx staff"**: SPECIAL THANKS PROUDMAN, PROETE, ROCK5EASILY, BAD DUMMY; SPECIAL THANKS ENSIS, **PURESABE** (author of
+*Rockman 4 Minus Infinity*), NARFNRA (corrected the English readme [doc]), COLASAUR; SPECIAL THANKS ALL BETA TEST
+PLAYERS. AND YOU..; HACKED BY (logo tiles $E4-$EE); "original megaman2 presented by capcom".
 
-## 5. Jokes and references (summary, being extended)
+## 3. Menus, weapon names and other fixed text
 
-| Line | Reference |
-|---|---|
-| 1 VS 複数 / mass production | the readme's "we lose because we fight 8 vs 1" |
-| ティウン as a verb (s00, s01) | fan onomatopoeia for the Rockman death jingle |
-| spike kill counter (s01) | meta: the game counts your spike deaths |
-| でガス (s05, s06) | Guts Man's verbal tic |
-| Guts Tank (s06) | RM2 Wily stage 3 boss, now Light's |
-| Three Laws (s10, s19) | Asimov; *Mega Man X* backstory |
-| "that'd be great" (s12) | *Office Space* (Lumbergh) |
-| "it's a beautiful day outside" (s13) | *Undertale* (Sans) |
-| capsule + air dash (s16) | *Mega Man X* Light capsules |
-| Dragon Punch / 昇龍拳 (s17) | *Street Fighter* via *Mega Man X* |
-| dogeza (s21) | every classic Wily surrender |
-| DEAD RINGER, ÜBERCHARGE | *Team Fortress 2* (Spy watch, Medic) |
+**Pause menu** (bank $1F `0x3e380`, seen in `build/research/cx/cx-scout/menu_allw_sheet.png`): `MEGAMAN` (JP
+`ROCKMAN`); `MEGA BUSTER` (JP `ROCK BUSTER`), `CHEAT SABER`, `DEAD RINGER`, `RINGO SHIELD`, `FIRE BALL`,
+`PRINT CUTTER` / `RIDER KICK`, `POWER BOMB`, `1.FLOOR`, `2.SUBTANK`, `3.ÜBERCHARGE` (tile $1C = Ü).
 
-## 6. Hidden and unused text
+**Weapon-get list** (bank $1B `0x37d21`) [code, seen for Power Bomb and Übercharge]:
 
-- Three branch texts live in gaps between scripts and are only reached through `0C SKIP`: s07 (vs Fake Rockman), s12
-  (No), s16 (No) [code]. All three are reachable, so they are variants, not unused text.
+| Boss | EN | JP | Reference |
+|---|---|---|---|
+| Cheat Man | Cheat Saber | チートサーベル | |
+| Air Man | Dead Ringer | デッドリンガー | *TF2*: the Spy's fake-death watch |
+| Whispy Woods | Ringo Shield | リンゴシールド | *ringo* = apple; Whispy drops apples in *Kirby*; RM2's Leaf Shield |
+| Fire Mario | Fire Ball | ファイアボール | Fire Mario's fireball |
+| Yoshino Man | Print Cutter | プリントカッター | |
+| Mega Man | Mega Buster | ロックバスター | you take Rock's own buster |
+| Kamen Rider | Rider Kick | ライダーキック | Kamen Rider's finishing move |
+| Bomberman | Power Bomb | パワーボム | *Bomberman*'s Power Bomb item |
+| item 1 | Instant Floor | インスタント足場 | menu `1.FLOOR` |
+| item 2 | Sub Tank | サブタンク | *Mega Man X* Sub Tank |
+| item 3 | Übercharge | ユーバーチャージ | *TF2*: the Medic's invulnerability |
+
+![JP weapon-get glyphs](img/text_font_jp_weapon_get.png)
+*The 48 JP weapon-get glyphs (`0x51300`, codes $D0-$FF): D0 チ D1 ー D2 ト D3 サ D4 ベ D5 ル D6 デ D7 ッ D8 ド D9 リ
+DA ン DB ガ DC ゴ DD シ DE フ DF ァ E0 イ E1 ア E2 ボ E3 プ E4 カ E5 タ E6 ロ E7 ク E8 バ E9 ス EA ラ EB ダ EC キ ED ユ
+EE ャ EF ジ F0 ブ F1 パ F2 ワ F3 ム F6 足 F7 場 F8 を FA 装 FB 備 FC し FD ま FE す FF …*
+
+**Quick Man answers a call from the menu** (bank $3A `0x749a0`): EN "Ok, I'm on my way!" / JP "わかった、いますぐ
+行くぜ!!" ("Got it, I'm coming right now!!") [code].
+
+## 4. Jokes and references
+
+| Where | Line or element | Reference |
+|---|---|---|
+| title (JP) | ワイリー課長の挑戦! | *GameCenter CX*, 有野課長の挑戦 |
+| crawl | 1 VS 複数, mass production | the readme's "we lose because we fight 8 vs 1" |
+| stage select | 空気男 / "Air Man" written instead of a face; Cheat Man = X's face | Air Man as a non-presence; X as the "cheat" |
+| opening | "the Guts Man Wily is fond of" | Rockman 1: Wily stole Guts Man for construction |
+| s00, s01 | ティウン as a verb | fan word for the Rockman death sound |
+| s00 | Ultraman, "Dwah!!" | Ultraman's battle cry; a tokusatsu cameo beside Kamen Rider |
+| s01 | live spike-death count | meta: the villain reads your stats |
+| s05, s06 | でガス | Guts Man's verbal tic |
+| s06, s23 | Guts Tank | RM2 Wily stage 3 boss, here Light's stage 3 boss |
+| s10, s19 | Three Laws of Robotics | Asimov; the *Mega Man X* backstory (Light's letter on X's potential) |
+| s11 | "Grass grows, birds fly, sun shines, and..." | *Team Fortress 2*, "Meet the Scout" ("...and brother, I hurt people") |
+| s12 | "if you could just... that'd be great" | *Office Space*, Lumbergh (EN only) |
+| s13 | "it's a beautiful day outside..." | *Undertale*, Sans (both languages); the readme's "bad time" [doc] |
+| s16 | capsule with an air dash | *Mega Man X* Light capsules |
+| s17 | Dragon Punch / 昇龍拳 | *Street Fighter*, via *Mega Man X*'s hidden Shoryuken |
+| s21 | dogeza, then escape | every classic Wily surrender |
+| s24 | "You respawn repeatedly while I heal myself" | the player's infinite continues |
+| s25 | "I'll get BIG" | the giant final form (stage $0E) |
+| weapons | DEAD RINGER, ÜBERCHARGE | *TF2* again |
+| Cheat Man | hex-code wallpaper, self-healing HP, DQ battle banner | cheating; *Dragon Quest* |
+| roll call | DLN.009-015, DRN in JP | Light Number canon |
+
+## 5. EN vs JP, hidden and unused text
+
+- **The EN is a rewrite, not a translation.** It adds memes (Lumbergh, "Shut up, you are"), drops some JP jokes (the
+  Rock-style forgiveness in s21; "my place" becomes "the fourth Dr.Light's Sanctuary location"), and has
+  non-native slips kept verbatim here ("appriciated", "How amazing story!", "I teach you something good", "You think
+  I'm professional of creating robots"). The readme only credits NARFNra for correcting the readme; the dialogue was
+  most likely translated by the author **[guess]**.
+- **JP-only typo**: ワガハシ for ワガハイ in the villain's line (glyph-verified).
+- **Branches**: three texts live in gaps between scripts and are reached only through `0C SKIP`: the s07 Fake Rockman
+  variant, the s12 "No" answer and the s16 "No" answer [code]. All are reachable.
+- **Unused**: pointer-table entries 26-31 all point into the tail of s24 (`$9900`); nothing else is hidden in bank
+  $26 (the rest of the EN diff region is relocated code) [code].
+- Not captured on screen in this run: Rock's "Guts Man, escape now!!" and the JP of it, the Cheat Man banner in play,
+  the staff roll and roll call on screen, and the villain line's scene.
+
+## 6. Files
+
+- Scripts (this run): `build/research/cx/cx-text2/turns.py` (dialogue decoder, both languages), `intro_pages.py`,
+  `menus.py`, `boxseq.py` (cutscene-box page grabber), `bossdlg.py` (fight a boss and log scripts and pages),
+  `yesno.py` (s12 test), `explore_from.py`, `toboss.py`, `scriptlog.py`, `curate.py` (builds the images above),
+  `regsheet.py` (EN-over-JP tile renders).
+- Predecessor scripts: `build/research/cx/cx-text/dlg.py`, `jprender.py`, `jpalign.py` (built the glyph map),
+  `credits.py`, `inject.py`, `faces.py`, `vwf.py`.
+- Savestates (this run, `build/research/cx/cx-text2/`): `ex_open/best.state` (Quick Man at the opening boss door),
+  `open_door.state` (opening finale), `boss_cheat/best.state` (outside Cheat Man's shutter),
+  `log_light1/s00.state` (fortress-1 dialogue running; used for script injection), `log_light3/s05.state`
+  (s05 starting). Shared states used: `build/research/cx/states/` (cx-scout's `*_boss`, `ending`, `light*`).
 
 ## Lessons for Rockman 6 GP
 
-(being written)
+**Design**
+
+- **Give the boss a voice.** CX turns a pattern fight into a stand-up routine: one line per round, each a different
+  joke (s10-s24). RM6 has no boss dialogue at all; a short line per Mr. X / Wily phase would carry the hack's tone.
+- **Text can be a mechanic.** The spike-death counter (s01), the Yes/No prompt that really kills you (s12) and the
+  mid-fight capsule offer (s16) all play with the player through the dialogue box. Cheap to build, memorable.
+- **One inversion goes a long way.** Every line follows from "Light is the villain": Wily tropes given to Light make
+  the jokes without new mechanics.
+- **Write the JP original and adapt, do not translate.** CX's EN replaces jokes that do not travel with ones that do;
+  where it translated literally (s21), the joke died. Plan per-language joke notes.
+
+**Technical**
+
+- **A script interpreter with far calls** (`09 lo hi bank`) lets text drive cutscene actions (teleport attempts, Yes/No,
+  hero checks) without new engine code. RM6 GP should copy that shape: text ops + "call routine" + "skip if carry".
+- **Select scripts through object data.** CX encodes the script number in the dialogue object's X coordinate, so any
+  code that can spawn an object can start a conversation. In RM6 the same trick works with an object parameter byte.
+- **Kanji on an NES: page-swap glyphs per script.** JP CX streams 16-glyph pages into CHR as the script runs (op `04`),
+  which fits 327 distinct glyphs into a 256-tile pattern table. RM6 GP's text needs a similar scheme if it uses kanji.
+- **A real VWF is worth it for English**, and the highlight colour comes free from the second bitplane. Pre-rendered
+  strips work for fixed cutscenes but cost ROM and cannot be edited as text, so keep them for set pieces only.
+- **Keep text out of code banks.** CX's EN text grew and pushed the code that followed it, which had to be relocated.
+  Put each language's text in its own bank with pointer tables.
+- **Test tooling:** dialogue injection (point `$C0/$C1` at another script inside a running box) and a page grabber keyed
+  on the interpreter's opcode made it possible to capture every script without reaching every scene. Build the same
+  hooks for RM6 GP's text QA.
