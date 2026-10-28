@@ -51,7 +51,7 @@ Per-stage tables in the fixed bank $3E, indexed by stage id `$51`:
   **alternate set at $9B00-$9F00**: a metatile whose bit is set in the 32-byte bitfield `$0340` (indexed by
   metatile id) is drawn and collided from the alternate tables instead (broken/melted blocks).
 - **Collision types** (attribute high nibble). Odd = solid (`AND #1` tests, [code] $38:$9CAD). [code][seen]:
-  0 air, 1 solid, 3 ladder top, 4 ladder, 5 solid (every ice/snow surface in Blizzard; whether it is slippery was not tested), 8 water (Centaur; skipped by the floor probe at $38:$837C), **$B = breakable by Power
+  0 air, 1 solid, 3 ladder top, 4 ladder, 5 solid (every ice/snow surface in Blizzard; **slippery: answered by critic** [code][seen]: a type-5 floor latches `$A7` = 5 and runs the momentum code `$38:$8B0F`, so after letting go Rockman slides 24-36 px in ~19 frames; `ram.md` `$A7`), 8 water (Centaur; skipped by the floor probe at $38:$837C), **$B = breakable by Power
   Rockman's punch** (attack code $14, $38:$8D67 -> $8D9D), **$D = destroyed by Flame Blast** (the F.BLAST
   shot, type $84, probes for $0D at $38:$9CA9 and calls $8DB5), $F = deadly (spikes, bottomless sea).
   Flame's oil uses 2/6/9: entering 6 or 9 plays sound $50 and spawns a splash ($38:$88CC); jumping off
@@ -312,6 +312,17 @@ ladders, red cave rock with flame tufts, boss-room pistons. Palette $1E; **palet
 
 - No raster split [seen: `$F4` = 0 on every screen]. Effects are the palette cycle above and the oil
   collision types (splash sound/object, lower jump from type 9).
+- **The oil ignites (added by critic)** [code][seen]: the oil *surface* metatiles (collision 2, ids
+  $98-$A6...) have alternates with **collision $F (deadly)** and flame tiles $E6-$E9. When a fire
+  projectile lands on type 2 (the Fire Telly drop `$30`: `$30:$94A1`; the juggler's thrown flame `$2F`:
+  `$30:$8FA9`) it calls `$3E:$DDFC`, which sets the `$0340` bit of that metatile id, repaints the column and
+  starts effect thread 4. Because the flag is per metatile id, **every oil tile with that id catches fire at
+  once**, and like a broken block it stays lit through deaths until the stage is started again [code, per
+  the `$0340` rule in `fortress.md`]. On an ordinary solid floor the drop just burns for
+  about 1 s ($83/$84/$C3 animations). Walking on oil: 0.5 px/frame (`$38:$8BF6`) instead of 1.3.
+  ![Oil ignites](img/critic_flame_oil_ignites.png)
+  *Flame screens 04 and 0B: a Fire Telly's drop lands on oil, and that oil metatile id flips to its
+  burning alternate (`$0340` bits for $9C and $A4).*
 
 ---
 

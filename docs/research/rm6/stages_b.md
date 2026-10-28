@@ -88,7 +88,7 @@ byte for byte and the palettes matched on every screen tested [seen].
 | Screens used | 00-17 | 00-17 + 18-1F | 00-15 | 00-17 + 18-1D |
 | Mid-stage checkpoint [code][seen] | 09 (set in both gorilla rooms 08 and 0E) | 0A (sunset, script $21 init) | 08 | 0A (set on 09) |
 | Boss shutter checkpoint | 16 | 16 (plate route 1E) | 14 | 16 (plate route 1C) |
-| Alternate exit | none | **B plate** room 1F via the right-hand ladder of 12 and 13's right edge (no adaptor); **Energy Balancer** room 1C via 13 left (breakable block, charged Power punch); sky bypass 18-1B via a ladder high on 0A (entry not reproduced) | none | **E plate** room 1D via 0B up (**Rush Jet**); lower bypass 0C-0F via 02 right (**charged Power punch**) |
+| Alternate exit | none | **B plate** room 1F via the right-hand ladder of 12 and 13's right edge (no adaptor); **Energy Balancer** room 1C via 13 left (breakable block, charged Power punch); sky bypass 18-1B via a ladder high on 0A (**Rush Jet**; entry found by the critic, see below) | none | **E plate** room 1D via 0B up (**Rush Jet**); lower bypass 0C-0F via 02 right (**charged Power punch**) |
 | Mid-boss | gorilla tank, twice (08, 0E) | dome dispenser (05, 10) | none | dark-room rider tank (0E, bypass only) |
 | Raster split | gorilla rooms (mode 7) | desert parallax (mode $C), sunset shimmer (mode $E) | none | none |
 | Boss weakness [seen] | B.ATTACK (4) | PLANT.B (4) | C.FLASH (4) | SILVER.T (4) |
@@ -204,7 +204,7 @@ the sky bypass; the lower-right rooms are 1C (Energy Balancer, left of 13) and 1
 | 14-16 | up into the sunset again, shutters | `$64`/`$66` propeller drones dropping `$A4`, `$67` |
 | 17 | Tomahawk Man (blue/green mesh room) | |
 | 18-1B | sky bypass: small lifts `$A0` bob over a floor of spikes, white bubbles `$08` rise; 1B holds an E-tank `$1D`, large weapon energy `$4A` and large energy `$39`, and drops down a shaft into **0D** | |
-| 1C | small pipe room; holds the **Energy Balancer** (`$8A`, appears only while `$0696` = 0; touching it sets `$0696` = 1) [seen]; right edge returns to 13 | |
+| 1C | small pipe room; holds the **Energy Balancer** (`$8A`, appears only while `$0696` = 0; touching it sets `$0696` = 1) [seen]; right edge returns to 13. **What it does (added by critic)** [seen, `rm6-critic/emuchecks.py`]: with the buster equipped, a weapon-energy pickup goes to the weapon with the **lowest** energy (big = +10, small = +2; B.ATTACK 3 -> 13 while Y.SPEAR 20 and W.STORM 6 stayed); without the Balancer the same pickup is wasted; with a weapon equipped the pickup refills that weapon either way | |
 | 1D-1F | plate route: one corridor, shutters, the second Tomahawk Man room (1F); beating him there sets `$0692` bits 1+2 and shows "YOU GET SILVER.T AND BEAT B-PARTS" [seen][text] | |
 
 ![Energy Balancer room](img/stages_b_tomahawk_balancer.png)
@@ -229,6 +229,14 @@ Requirements, from the collision grids [code] plus tests [seen]:
   [seen], which is not enough, and the higher platform on 0B (y $60) cannot be used because 0B's script locks
   the camera against scrolling back left (mode 1). How the bypass is meant to be entered is **open**; screen 18's
   own down exit leads back to 0A, so it is at least the way out.
+  **Answered by critic** [seen, `rm6-critic/skybypass.py`, `skybypass2.py`]: it is a **Rush Jet** route. From
+  0A's floor, standing under the hanging ladder (x $44-$4C), holding A *and* UP makes Jet Rockman fly up past
+  y $3E to y $09 and grab the ladder (55-90 frames; 7 of the 19 fuel units used, so frozen fuel is not
+  needed). Climbing on goes 0A -> 18. Normal and Power Rockman peak at y $60. The 86-px limit above came from
+  a test that did not keep flying long enough.
+  ![Sky bypass](img/critic_tomahawk_skybypass.png)
+  *Tomahawk 0A: Jet Rockman (form poked without the menu, hence the garbled sprite) flies up, grabs the
+  hanging ladder and climbs into screen 18, the sky bypass.*
 
 ### Enemies [seen]
 
@@ -495,6 +503,7 @@ second gorilla must be beaten again.
   `$C5`; Tomahawk `$29`, `$39` in 1B/1D.
 - How Tomahawk's sky bypass (18-1B) is entered: its ladder on 0A is higher than Jet Rockman's measured climb
   from the floor. A different Jet technique, or a lift/enemy to stand on, may be the answer.
+  **Answered by critic**: Rush Jet, flying up under the ladder while holding UP (section 4).
 - The Energy Balancer block in Tomahawk 13 was not broken in play (the item was reached by teleporting past it);
   the charged-punch rule comes from the Yamato 02 test.
 - Enemy names: none are in the ROM text; the descriptions above are by look.

@@ -134,6 +134,18 @@ Meanings (from rm6-stages-a/b and the code they cite): 0 air, 1 solid, 3 ladder 
 spike beds: the type is the index into the player's floor handler table). Collision types used per stage
 are in the summary table (section 13).
 
+**Player-side meanings (added by critic)** [code][seen]: the player code reads the type at its position into
+`$064B` every frame and latches the last non-air floor type in `$A7` (`$38:$875A`). Then:
+5 (Blizzard; also the remapped `$15`, i.e. type 7 in Yamato/Knight) = **slippery**: X momentum `$A1.$A0`
+starts at the walk speed $01.4C (2.00 px/f for `$15`), changes by $00.06 per frame, and decays when the pad is
+released (`$38:$8B0F-$8B87`; [seen] Rockman slides 24-36 px in ~19 frames on Blizzard ice). 9 = **oil**: jump
+`$FB.CC` instead of `$FA.CC` (`$38:$80D7`), walk 0.5 px/f (`$8BF6`), splash on entry. 2 = **oil surface**:
+fire projectiles that land on it ignite it (the metatile id flips to a deadly type-$F alternate; `stages_a.md`
+Flame). 8 = **water**: gravity $00.18 instead of $00.40 (`$38:$86D7`) and a slower top fall speed. $A / $C =
+**updraft / fan**: lifts the player while climbing (`$38:$8BAA`, up to -4 px/f). $E = blocks the Rush Jet's
+thrust (`$38:$8205`). 6 = the **ship deck** the Blizzard ship carries Rockman on (`$3E:$D4F8`). Still
+unexplained: 7 outside group 2 and the remapped `$10-$1F` values other than `$15`, `$1B`, `$1D`, `$1F`.
+
 ## 5. How the game paints a screen [code]
 
 `$D8AF` turns the paint cursor (`$4D` X, `$4E` Y) into a nametable address (`$5C/$5D`) and an attribute

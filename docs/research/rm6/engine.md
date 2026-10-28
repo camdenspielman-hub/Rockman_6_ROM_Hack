@@ -115,6 +115,34 @@ more fight (`$39:$8229`) an enemy projectile hit by the full punch (`$14`) is re
 1-damage hit (`$11`) into the controller's latch [code]. How the buster and the other weapons that `fortress.md`
 measured against Wily 1 reach the controller is not resolved here (section 2.5).
 
+### 1.5 Metasprite (sprite mapping) format (added by critic) [code][seen]
+
+Decoded from the OAM builder `$3F:$E1E1-$E41B` and checked by rebuilding the OAM of every drawn object from ROM
+data in five scenes (Blizzard start, Knight Man intro, Tomahawk start, Wily Machine, Plant Man refight):
+**118 of 118 predicted sprites were present in the live OAM** (the other OAM entries are the HUD bars,
+drawn elsewhere). Script: `build/research/rm6/rm6-critic/spritefmt.py`.
+
+- Per object: sprite bank pair `B = $0458` (mapped with `$CBC0`: B at `$8000`, B+1 at `$A000`; `$3A:$85C9`
+  picks `$20`, `$22` or `$24` by type row), animation pointer `$0527/$053E` (hi/lo), frame index x2 `$0510`,
+  frame timer `$0555`, frame count x2 `$04F9`, flags `$03B7` (b6 h-flip, b7 v-flip, b5 priority; b0 hidden,
+  b1 not drawn). Screen position = `$0486 - $F7`, `$04CB - $F9`; objects with Y screen `$04B4` != 0 or less
+  than 4 px from the left edge are skipped.
+- Tables in each sprite bank: `$8000+i` / `$8200+i` = frame pointer lo / hi for frames 0-255, `$8100+i` /
+  `$8300+i` for frames 256-511; `$8400+i` / `$8500+i` = layout pointer lo / hi; `$8600+i` / `$8700+i` =
+  animation pointer lo / hi (`$E526`, Y = animation id).
+- **Animation**: byte 0 bit 7 = which frame-table half; then `[frame id][duration]` pairs. Each time the
+  timer runs out, `$0510` advances by 2 and wraps at `$04F9`.
+- **Frame**: `[n-1][layout id]` then n x `[tile][attribute]`. **Layout**: n x `[dy][dx]`, signed offsets
+  from the object's position. A frame and its layout are separate, so many frames share one layout (pose
+  geometry) with different tiles.
+- Flips: `$E2A2` picks one of four emitters by `$03B7` bits 7-6: none `$E320` (attribute OR flags), h-flip
+  `$E357` (x = X - 8 - dx, attribute EOR flags), v-flip `$E395`, both `$E3D4`. Sprites that would wrap past a
+  screen edge are dropped by sign checks. The OAM order list `$07D9` is reversed on odd frames (flicker).
+- Census: bank pair `$20/$21` has 202 animations, 417 frames, 251 layouts (Rockman, Rush, items, most
+  enemies); `$22/$23` 197 / 331 / 199; `$24/$25` 134 / 205 / 140 (bosses). Fill-like free bytes: 1,196 /
+  2,319 / 4,297. Each table maxes at 256 entries per pair (512 frames), so new sprites mostly need a new
+  sprite bank pair, which `$85C9` assigns per 16-type row.
+
 ---
 
 ## 2. Collision and damage
@@ -438,13 +466,13 @@ Which id plays where (`sndcensus.py`: every id queued during the coverage tour, 
 | 03 | Flame Man (`$DFA5`) | 12 | Wily fortress map |
 | 04 | Plant Man (`$DFA5`) | 13 | boss defeated (`$F982`) |
 | 05 | Centaur Man | 16 | weapon get (YOU GET room) |
-| 06 | Tomahawk Man (`$DFA5`) | 15 | after the weapon get, before the stage select; a looping tune [guess: the password screen] |
+| 06 | Tomahawk Man (`$DFA5`) | 15 | after the weapon get, before the stage select; a looping tune. **(critic)** the password / continue screen music: requested by `$3F:$F2C6` (post-stage password) and `$3C:$801D`/`$8043` (game over / continue) [code][seen] |
 | 07 | Knight Man (`$DFA5`) | 17 | Wily defeated, start of the ending |
 | 08 | ending "STAFF" roll | 18 | Wily Machine (Wily 4 boss, `$FA19`) |
 | 09 | Mr. X Fortress stages | 0E | CAPCOM PRESENTS; 0D "IN THE YEAR 20XX AD..." opening; 19 title |
 | 0A | final credits (starfield) | 1B-22 | ending: one track per Robot Master scene (`$3B:$8D10` = `1B 21 1F 1D 22 20 1E 1C`) |
 | 0B | Wily Fortress stages | 0C | fortress boss (`$FA0F`) |
-| 14 | a short one-shot jingle (channels end with `END`), not heard in the tour, not the game over (silent) | 1A | **never requested**: an empty 4-channel stub (15 bytes) |
+| 14 | a short one-shot jingle (channels end with `END`), not heard in the tour. **(corrected by critic)** it is the **GAME OVER jingle**: `$3C:$8029` requests it when `$A9` has gone negative, just before script $18 GAME OVER; a death with 0 lives queued `$14` and, 255 frames later, `$15` [seen, `rm6-critic/gameover_snd.py`] | 1A | **never requested**: an empty 4-channel stub (15 bytes) |
 
 ![music ids](img/engine_music_ids.png)
 *90 frames after each music id was first queued in the tour (label = id, scene).*
@@ -618,6 +646,39 @@ Mean over 12,000 autoplay frames (`prof2.py`; 1,440 frames around real lag momen
 The enemy AI code itself (banks `$29/$30/$3B`) takes under 1% (0.5-0.7% together): enemies are cheap, **drawing and colliding them
 is expensive**, at ~1,800 cycles per extra object (linear fit `busy = 10,900 + 1,760 x objects` on non-lag
 frames), so about 10 live objects fill the frame.
+
+---
+
+## 9. Porting checklist (added by critic) [code]
+
+From `build/research/rm6/rm6-critic/static_checks.py` (pattern scan of all 64 banks, filtered by the
+instructions this doc's 139,200-frame tour actually executed; RESET is added by hand, since the tour starts
+after it).
+
+- **MMC3 register writes that run** (every other pattern hit is data):
+  - `$8000`/`$8001` bank select/data: helpers `$3E:$CBB3-$CBBA` (`$CB91`/`$CBAF`), `$CBC4-$CBD6` (`$CBC0`),
+    `$CBE1/$CBE5` (`$CBDA`), `$CBF2-$CC09` (`$CBE9`, the restore helper); the sound service `$C8C3-$C901`;
+    the NMI's PPU-transfer bank `$C7AF/$C7B4`; **the sound driver's own reader `$34:$804E-$8060`** (maps bank
+    `$36` at `$A000` for one byte, then `$35` back); RESET `$FFCE/$FFD4` (CHR R5..R0 from `$FF50` =
+    `00 02 04 05 06 07`, an identity map that nothing changes later).
+  - `$A000` mirroring: NMI `$3E:$C021` (from `$FB`), pause menu `$38:$9295` and `$38:$95BA`, RESET `$3F:$FFC9`.
+    No `$A001` write anywhere (PRG-RAM never enabled).
+  - IRQ `$C000`/`$C001`/`$E000`/`$E001`: the NMI in two paths (`$C06F-$C077` and `$C0CD-$C0D5`), the handler
+    entry `$C151/$C154`, the chain handlers `$C188-$C4EE` (19 sites), init `$C51A`, RESET `$FF96`.
+- **Fixed-bank numbers used as data**: `LDA #$3E / JSR $CB91` at `$3F:$E204` (OAM builder) and `$3F:$E430`
+  (object loop) map bank `$3E` into the `$8000` window as a placeholder before each object's own bank is
+  mapped. Nothing reads that window in between, but in a 1 MB layout where `$3E` becomes new space these two
+  bytes should become `$7E`. No other immediate `$3E`/`$3F` reaches a bank helper, and no bank table (AI
+  banks `$3A:$84C9` = `29 30 31 38 39 3B`, sprite banks `$20-$24`, far-call `$CB5F` = `3C 3A 38 36`) holds them.
+- **Stage-id assumptions** (`rm6-critic/stage_id_sites.txt`, 45 executed reads of `$51`): five `AND #$08`
+  "fortress?" tests (`$38:$916B`, `$3C:$805F`, `$3F:$F0FB`, `$3F:$F9A0`, and `ORA #$08` at `$3B:$BB74`),
+  three `CPY #$08` (`$3F:$EF6B` boss damage, `$F4EB` plate flags, `$F96A`), 14 `CMP #n` stage specials in
+  enemy AIs and the engine, `stage & 7` (`$063D`) for the Robot Master tables, `stage - 8` for `$3F:$EFE4`,
+  and 8-entry tables indexed by `$51` (boss intro `$3F:$F200/$F208/$F210/$F218`, panel `$3C:$8606`, YOU GET
+  `$60 + $51`, plates `$F518`, flags `$F6B3/$F6BB/$F6C3`). The 16-entry stage table (`$3E:$DF25`, 9 x 16),
+  object-list pointers (`$3A:$80BF/$80CF/$80DF`) and collision groups (`$3E:$DB03`) are packed back to back.
+  A stage id of 16 or more fails every `AND #$08` test (bit 3 clear), so more stages need either the
+  tests rewritten or ids kept below 16 with a separate "venue" variable.
 
 ---
 

@@ -59,10 +59,10 @@ the boss in the second one sets bit 2 = the plate).
 | $99 / $9A | player input direction / jump-request bits (derived from `$40`) | [code] $D434 |
 | **$9B** | **adaptor form: 0 normal, 1 Jet Rockman, 2 Power Rockman** | [seen] menu select -> 1/2 |
 | **$9C** | **Rush Jet hover fuel**, $13 full, counts down while hovering, refills on landing | [seen] jet trace |
-| $9D, $9E, $A0, $A1 | player action latches (slide, charge, shoot). **(corrected by critic, from `engine.md` 2.1/3.2)**: `$9E` = charge counter (+1 per frame while B is held, +2 for Power Rockman; half charge at `$24`, full at `$06AB` = `$5A`); `$9D` = Rush Jet fuel sub-counter (one fuel unit per 4 frames of flight). `$A0`/`$A1` still unassigned | [code] $803B, $38:$8651, $38:$825D; [seen] |
+| $9D, $9E, $A0, $A1 | player action latches (slide, charge, shoot). **(corrected by critic, from `engine.md` 2.1/3.2)**: `$9E` = charge counter (+1 per frame while B is held, +2 for Power Rockman; half charge at `$24`, full at `$06AB` = `$5A`); `$9D` = Rush Jet fuel sub-counter (one fuel unit per 4 frames of flight); `$A1.$A0` = **X momentum on slippery floors** (critic: set from `$38:$8BEA` = walk speed $01.4C on type 5, 2.00 px/f on remapped type $15; +-$00.06 per frame with input, decays by $00.06 per frame without) | [code] $803B, $38:$8651, $38:$825D, $38:$8B0F-$8B87; [seen] critic `icetest.py`: on Blizzard ice Rockman slides 24-36 px in ~19 frames after letting go |
 | **$A2** | **invincibility timer**: $3C after a hit, counts down; while non-zero no damage; the player blinks on bit 1 | [seen] every enemy contact sets 60 and costs 2-3 HP; freeze=2 -> no damage, no blink; [code] $8EA2, $8F72 |
 | $A5 | ? set FF on hit | [code] |
-| $A7 | player animation id | [code] |
+| $A7 | ~~player animation id~~ **(corrected by critic)**: **floor type latch** = the last non-air collision type under the player (`$38:$875A`: `$11` -> `$064B`, and -> `$A7` when non-zero). `$064B` = the collision type at the player this frame. Uses: 5 / $15 slippery (momentum `$A0/$A1`), 9 oil (jump `$FB.CC`, walk $00.80 from `$8BF6`), 8 water (gravity $00.18 instead of $00.40, `$38:$86D7`), A / C updraft and fan (lift while climbing, `$38:$8BAA`), E blocks the Jet's thrust (`$38:$8205`), 6 rideable ship deck (`$3E:$D4F8`), 3 / 4 ladder top / ladder | [code] [seen] |
 | $A8 | player left X clamp (camera-relative, $10 normally) | [code] $8F31 |
 | **$A9** | **lives** (menu shows it as-is; 1-up caps at 9; a death with `$A9` = 0 is game over) | [seen] pit death 2->1; [code] $8E8A, $B435 |
 | $AE | current palette set id | [code] |
@@ -143,6 +143,10 @@ icon. E-tanks `$06A1` and lives `$A9` are displayed as-is ([seen] 7 -> "07", 5 -
 Pause menu state [seen]: while it is open the scheduler threads 1 and 2 are suspended (`$22` = `$23` =
 $80, 0 in play), `$FB` (mirroring) = 0, `$0688` (buster) is refreshed to $1B, `$0699` = highlighted
 weapon, `$06A3` = menu section; the menu runs in $38:$92B4-$95FF (`LDA $42 / BEQ` loop at $9397).
+**(added by critic)** [seen, `rm6-critic/emuchecks*.py`]: opening and closing the menu on a ladder leaves
+Rockman on it (`$94` = 4, same Y); a full charge (`$9E` = $5A) survives the menu as long as B stays held, and
+fires the charged shot (type $0B) on release; releasing B while paused drops the charge. E-tank use
+(`$38:$9537-$9560`) [code]: +1 HP every 4 frames with sound $31 per point, so a full refill takes 108 frames.
 
 Stage rules found on the way [seen]:
 - **No Robot Master rematch.** If a stage's boss is already marked beaten when Rockman walks into its
