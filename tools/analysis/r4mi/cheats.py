@@ -15,7 +15,8 @@ Regenerate the whole savestate set:  python3 -I tools/analysis/r4mi/cheats.py [o
 
 Everything below was found by RAM diffing and by reading the game's code; details and evidence are in
 docs/research/r4mi/cheats.md.
-  * RAM: $22 stage (16 = stage select, 17 = game-over/DATA SAVED screen), $1F checkpoint, $A0 weapon slot,
+  * RAM: $22 stage (16 = stage select, 17 = game-over/DATA SAVED screen), $1F checkpoint, $30 player state
+    (7 = dying: poke it to kill the player; see warp()), $A0 weapon slot,
     $A1 lives, $A2 E-tanks, $A9 boss-clear bits, $AA fortress bits, $B0 HP, $B1-$BD weapon energy
     (bit7 = owned, bits0-4 = 0..28; energy of the current weapon = $B0+$A0), $3C player i-frames,
     $0330/$0348 player X pixel/page, $0378 player Y, $FC/$F9 scroll X pixel/page, $7839 equipment bits.
@@ -35,7 +36,7 @@ STAGE = {'BRIGHT': 0, 'TOAD': 1, 'DRILL': 2, 'PHARAOH': 3, 'RING': 4, 'DUST': 5,
 STAGE_NAME = {v: k for k, v in STAGE.items()}
 
 RAM = dict(
-    stage=0x22, checkpoint=0x1F, weapon=0xA0, lives=0xA1, etanks=0xA2, clear=0xA9, fortress=0xAA,
+    stage=0x22, checkpoint=0x1F, pstate=0x30, weapon=0xA0, lives=0xA1, etanks=0xA2, clear=0xA9, fortress=0xAA,
     hp=0xB0, iframes=0x3C, px=0x0330, ppage=0x0348, pxsub=0x0318, py=0x0378, pysub=0x0360, pvy=0x03F0,
     scroll_x=0xFC, scroll_page=0xF9, ss_col=0x10, ss_row=0x11, joy_held=0x14, joy_new=0x16,
     equip=0x7839, prog=0x7890, flag=0x7898, sval=0x7820, tml=0x78D3, crfl=0x78CA, exwp=0x78CB,
@@ -193,20 +194,21 @@ def give_all(e, etanks=9, equip=0xFF):
     e.poke(0x7839, equip); e.poke(0xA2, etanks)
 
 def warp(e, stage, cp=0, maxf=600):
-    """In-stage warp without menus: set $22/$1F, then drop the player into a pit (Y=$F0 every frame) so the respawn
-    loads that stage and checkpoint with the current loadout. TRAMPOLINE/BEAT ($60) and a frozen lives/HP value
-    are suspended during the fall and restored after. Returns frames to control (None on failure)."""
-    saved = {a: e._frozen.pop(a) for a in (0xA1, 0xB0, 0x378) if a in e._frozen}
-    eq = e.peek(0x7839); e.poke(0x7839, eq & ~0x60)
+    """In-stage warp without menus: set $22 (stage) / $1F (checkpoint), then kill the player by setting the player
+    state $30 = 7 (the vanilla RM4 death state; the stage loop then restarts at $22/$1F, costing one life). Works from
+    any gameplay screen and keeps the current loadout. A frozen lives value is suspended during the death so it can be
+    detected. Returns frames to control after the respawn (None on failure). ~520 frames in total."""
+    saved = {a: e._frozen.pop(a) for a in (0xA1,) if a in e._frozen}
     if e.peek(0xA1) < 2: e.poke(0xA1, 2)
-    e.poke(0x22, stage); e.poke(0x1F, cp)
+    e.poke(0x22, stage); e.poke(0x1F, cp); e.poke(0x30, 7)
     lives = e.peek(0xA1); died = False
-    for _ in range(maxf):
-        e.poke(0x378, 0xF0); e.step()
+    for k in range(maxf):
+        e.poke(0x22, stage); e.poke(0x1F, cp)     # the checkpoint logic may still raise $1F while dying
+        if k % 60 == 59 and e.peek(0x30) != 7: e.poke(0x30, 7)   # something (a ride, a scene) reset the state
+        e.step()
         if e.peek(0xA1) != lives: died = True; break
-    f = wait_control(e) if died else None
-    e.poke(0x7839, e.peek(0x7839) | (eq & 0x60)); e._frozen.update(saved)
-    return f
+    e._frozen.update(saved)
+    return wait_control(e) if died else None
 
 def infinite_energy(e):
     for a in range(0xB1, 0xBE): e.freeze(a, 0x9C)
@@ -221,6 +223,69 @@ def status(e):
                 etanks=p(0xA2), weapon=p(0xA0), clear='%02x' % p(0xA9), fort='%02x' % p(0xAA),
                 x=p(0x348) * 256 + p(0x330), y=p(0x378), iframes=p(0x3C), equip='%02x' % p(0x7839))
 
+# ----------------------------------------------------------------------------- MY ARENA = boss / mid-boss select
+# MY ARENA (SPECIAL MODE item 4) edits a live setup at $78ED-$78FF; START runs bank $4C:$95CC, which (for MY ARENA,
+# $78F7 = $0A) keeps the setup, builds the fight list at $7900 from the table at $4C:$97A3 (only IDs whose bit is set
+# in BOSS0-5 = $78FA-$78FF, bit (id & 7) of byte id >> 3), and jumps straight into the first fight.
+ARENA_FIELD = {'WEAPON1': 0x78F1, 'WEAPON2': 0x78F2, 'BOSS0': 0x78FA, 'BOSS1': 0x78FB, 'BOSS2': 0x78FC,
+               'BOSS3': 0x78FD, 'BOSS4': 0x78FE, 'BOSS5': 0x78FF, 'INTERVAL': 0x78F0, 'RAND': 0x78F9,
+               'EQUIPM': 0x78F5, 'TANK': 0x78F4, 'LIFE_RCV': 0x78EF, 'EN_GEN': 0x78EE, 'E_RFL': 0x78F3,
+               'CRIT_OFF': 0x78F6, 'SHORT_INV': 0x78F8, 'HARD': 0x78ED, 'MODE': 0x78F7}
+# fight IDs (MY ARENA BOSS bits): stage $22 the fight is loaded in, and a short label (see cheats.md section 5b).
+FIGHTS = {
+    0x00: ('BRIGHT', 'Bright Man'), 0x01: ('TOAD', 'Toad Man'), 0x02: ('DRILL', 'Drill Man'),
+    0x03: ('PHARAOH', 'Pharaoh Man'), 0x04: ('RING', 'Ring Man'), 0x05: ('DUST', 'Dust Man'),
+    0x06: ('DIVE', 'Dive Man'), 0x07: ('SKULL', 'Skull Man'),
+    0x08: ('COSSACK1', 'Cossack 1 boss (moth machine)'), 0x09: ('COSSACK2', 'Cossack 2 boss (block machine)'),
+    0x0A: ('COSSACK3', 'Cossack 3 boss (white walker mech)'), 0x0B: ('COSSACK4', 'Cossack 4 boss (Cossack Catcher)'),
+    0x0C: ('WILY1', 'Wily 1 boss (green robots)'), 0x0D: ('WILY2', 'Wily 2 boss (dark copy figure)'),
+    0x0E: ('WILY3', 'Wily 3 boss (Wily Machine 4)'), 0x0F: ('WILY4', 'Wily 4 boss (Wily Capsule)'),
+    0x10: ('COSSACK1', 'train: Joe in a cannon walker'), 0x11: ('COSSACK1', 'train: big frog'),
+    0x12: ('COSSACK1', 'train: flying pod + birds'), 0x13: ('COSSACK1', 'train: 4th set piece'),
+    0x14: ('TOAD', 'giant frog mech'), 0x15: ('DRILL', 'cave flyer'), 0x16: ('DRILL', 'purple hippo'),
+    0x17: ('RING', 'sky: ring swarm'), 0x18: ('RING', 'pink platforms room'), 0x19: ('DIVE', 'whale submarine'),
+    0x1A: ('SKULL', 'red T-rex mech'), 0x1B: ('COSSACK3', 'green snail mech'), 0x1C: ('COSSACK3', 'blue whale head'),
+    0x1D: ('COSSACK4', 'orange machine room'), 0x1E: ('DRILL', 'red-white robot in a star room'),
+    0x1F: ('DIVE', 'grey machine hall'), 0x20: ('BRIGHT', 'dark figure in Bright Man stage'),
+    0x21: ('PHARAOH', 'shuriken ninja'), 0x22: ('TOAD', 'frog + rider, shuriken'), 0x23: ('DIVE', 'spear figure'),
+    0x24: ('DRILL', 'green-haired robot'), 0x25: ('COSSACK4', 'robot 1'), 0x26: ('COSSACK4', 'robot 2'),
+    0x27: ('COSSACK4', 'robot 3 (green hair)'), 0x28: ('WILY4', 'capsule room 1'), 0x29: ('WILY4', 'capsule room 2'),
+    0x2A: ('WILY4', 'capsule room 3'), 0x2B: ('WILY4', 'capsule room 4'), 0x2C: ('DRILL', 'green cave: round robot'),
+}
+
+def to_my_arena(e):
+    """title menu (cursor on CONTINUE) -> SPECIAL MODE -> MY ARENA (cursor on EDIT)"""
+    to_special_menu(e)
+    for _ in range(3): e.tap('DOWN', 4); e.run(15)
+    e.tap('START', 4); e.run(220)
+
+def arena_fight(e, fights, weapons=(0xFF, 0x3F), equip=0x30, tanks=4, interval=0, rand=0, crit_off=0,
+                short_inv=0, hard=0, life_rcv=0, en_gen=0, e_rfl=0, frames=40):
+    """From the MY ARENA screen (cursor on EDIT, i.e. my_arena_menu.state): set up a gauntlet of the given fight IDs
+    (int or list, run in the table order of $4C:$97A3, not in the order given) and START it. Lives are 0 inside the
+    arena, so use godmode(). Leaves the emulator `frames` after START (the fight intro is still to come)."""
+    if isinstance(fights, int): fights = [fights]
+    bits = [0] * 6
+    for f in fights: bits[f >> 3] |= 1 << (f & 7)
+    vals = dict(WEAPON1=weapons[0], WEAPON2=weapons[1], INTERVAL=interval, RAND=rand, EQUIPM=equip, TANK=tanks,
+                LIFE_RCV=life_rcv, EN_GEN=en_gen, E_RFL=e_rfl, CRIT_OFF=crit_off, SHORT_INV=short_inv, HARD=hard,
+                **{'BOSS%d' % i: b for i, b in enumerate(bits)})
+    for k in range(4): e.tap('DOWN', 4); e.run(12)          # EDIT -> SAVE -> LOAD -> LOAD PRESET -> START
+    for k, v in vals.items(): e.poke(ARENA_FIELD[k], v)
+    e.run(4); e.tap('START', 4); e.run(frames)
+
+def make_fight_states(outdir='build/research/r4mi/states'):
+    """fight_XX_<stage>.state for all 45 MY ARENA fight IDs (needs my_arena_menu.state)."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    from emu import Emu
+    P = lambda n: os.path.join(outdir, n + '.state')
+    e = Emu(ROM); out = {}
+    for fid, (stage, label) in FIGHTS.items():
+        e.load(P('my_arena_menu')); e.run(1)
+        arena_fight(e, fid)
+        name = 'fight_%02x_%s' % (fid, stage.lower()); e.save(P(name)); out[name] = label
+    return out
+
 # ----------------------------------------------------------------------------- regenerate the state set
 def make_states(outdir='build/research/r4mi/states'):
     """Power-on -> unlocked title -> menus -> every stage x checkpoint 0-2. ~1 minute."""
@@ -232,6 +297,7 @@ def make_states(outdir='build/research/r4mi/states'):
     e.save(P('title'))
     new_game(e); e.save(P('stage_select_new'))
     e.load(P('title')); e.run(1); to_special_menu(e); e.save(P('special_menu'))
+    e.load(P('title')); e.run(1); to_my_arena(e); e.save(P('my_arena_menu'))
     e.load(P('title')); e.run(1); to_extra_config(e); e.save(P('extra_config'))
     boss_select(e, 'fortress'); e.save(P('stage_select_all'))
     out = {}
@@ -245,3 +311,4 @@ def make_states(outdir='build/research/r4mi/states'):
 
 if __name__ == '__main__':
     for k, v in make_states(*sys.argv[1:]).items(): print(k, v)
+    for k, v in make_fight_states(*sys.argv[1:]).items(): print(k, v)

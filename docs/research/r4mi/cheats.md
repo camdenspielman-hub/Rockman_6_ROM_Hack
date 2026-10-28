@@ -46,6 +46,7 @@ the player moves under a simple autoplayer for 6 seconds without crashing [seen]
 | `special_menu.state` | SPECIAL MODE menu (all 9 items + 3 achievements shown) |
 | `extra_config.state` | EXTRA CONFIGURATION, cursor on EXIT. **Use this as the level select** (see §5) |
 | `time_attack_menu.state`, `mechanical_arena_menu.state` (defaults to THE TRUE ARENA, LEFT/RIGHT toggles), `limited_arena_menu.state`, `my_arena_menu.state`, `audio_player.state`, `config_menu.state`, `records.state` | The entry screen of every other SPECIAL MODE item |
+| `fight_XX_<stage>.state` × 45 | **Boss / mid-boss select**: every fight the arenas know, started through MY ARENA with one BOSS bit set (§5b). Saved 40 frames after START, so the fight's own intro plays when you load it. All 14 weapons, SHOCK GUARD + TRAMPOLINE, 4 E-tanks, 0 lives (apply `godmode()`) |
 | `<stage>_cp0/1/2.state` × 16 | Player standing at the start / checkpoint 1 / checkpoint 2 of `bright toad drill pharaoh ring dust dive skull cossack1..4 wily1..4` |
 
 Stage-state loadouts: RM stages use `new` (Rock Buster + Rush Search only, 9 lives, 0 E-tanks, no equipment bits).
@@ -317,6 +318,75 @@ the castle. After that, Cossack 1 opens on **the roof of a moving train** [seen]
 
 ![Menus](img/cheats_menus.png)
 *Title after unlock, SPECIAL MODE, EXTRA CONFIGURATION, stage select (new), stage select (all 8 cleared).*
+
+---
+
+## 5b. MY ARENA = boss and mid-boss select (45 fights)
+
+MY ARENA (SPECIAL MODE item 4) edits a live setup at `$78ED-$78FF`, and its BOSS0-5 rows are a bitmask over **45
+fight IDs**. Setting exactly one bit and choosing START drops you straight into that fight in its own stage room
+[code + seen]. `cheats.arena_fight(e, fid)` does this from `my_arena_menu.state`, and `fight_XX_<stage>.state` are
+ready-made.
+
+How it works [code, bank `$4C`]:
+
+- START runs `$95CC`: `$78F7` = mode (0 MECHANICAL, 1-9 the LIMITED ARENA entries, `$0A` MY ARENA, `$0B` THE TRUE
+  ARENA). Every mode except MY ARENA first loads a preset (`$955F`, 7 presets in column tables at `$94E1-$955E`).
+- `$9762` walks the fight table at `$97A3` and copies each ID whose bit is set (bit `id & 7` of `$78FA + (id >> 3)`)
+  into the run list at `$7900` (terminated by `$0F`). Bit 7 in the table marks the start of a shuffle block for
+  RAND = 11.
+- Table order (= the order a full run plays): `[10-1D] [00-07] [1E-2A] [08-0E] [0F 2B 2C]`. So the full TRUE ARENA
+  is 45 fights: 14 mid-bosses, the 8 Robot Masters, 13 more extra fights, the 7 fortress bosses, then the Wily
+  Capsule and two final fights.
+- THE MECHANICAL ARENA preset = BOSS0 `FF` + BOSS1 `FF` = IDs `$00-$0F`, the 16 stage bosses, with WEAPON `$91 $3F`
+  (buster + the 8 Robot Master weapons), EQUIPM `$30`, TANK 4, CRIT 1 (no criticals). LIMITED ARENA's
+  "(15 STAGES)" / "(13 STAGES)" entries drop IDs from BOSS1 via the table at `$9866` (HCR and RECYCLE drop ID 9,
+  HELL WHEEL drops IDs 8, 9 and 11).
+
+| Field (MY ARENA row) | WRAM | Notes |
+|---|---|---|
+| WEAPON | `$78F1` / `$78F2` | Same bit layout as EXTRA CONFIG WPN1/WPN2 |
+| BOSS0 … BOSS5 | `$78FA` … `$78FF` | Fight-ID bitmask (BOSS5 has 5 bits: IDs `$28-$2C`) |
+| INTERVAL | `$78F0` | 5 bits. 0 = no rest stops between fights |
+| RAND. | `$78F9` | 0 fixed, 1 shuffle, 2 all but last, 3 per block |
+| EQUIPM. / TANK | `$78F5` / `$78F4` | Equipment bits (as `$7839`) / E-tanks |
+| LIFE RCV. / EN.GEN. / E.RFL. AT PAUSE | `$78EF` / `$78EE` / `$78F3` | |
+| CRIT. / SHORT INV. / HARD | `$78F6` / `$78F8` / `$78ED` | CRIT 1 = no criticals. SHORT INV 1 = caps enemy i-frames |
+| (mode) | `$78F7` | Set by the menu that started the run |
+
+### The 45 fights [seen: one screenshot each, `cheats_fights.png`]
+
+Stage = the stage ID (`$22`) the fight loads in. Labels for the extra fights are descriptive only; the boss
+investigators should name them.
+
+| ID | Stage | Fight | | ID | Stage | Fight |
+|---|---|---|---|---|---|---|
+| `00` | Bright | Bright Man | | `17` | Ring | sky: ring swarm |
+| `01` | Toad | Toad Man | | `18` | Ring | pink platforms room |
+| `02` | Drill | Drill Man | | `19` | Dive | whale submarine |
+| `03` | Pharaoh | Pharaoh Man | | `1A` | Skull | red T-rex mech |
+| `04` | Ring | Ring Man | | `1B` | Cossack3 | green snail mech |
+| `05` | Dust | Dust Man | | `1C` | Cossack3 | blue whale head |
+| `06` | Dive | Dive Man | | `1D` | Cossack4 | orange machine room |
+| `07` | Skull | Skull Man | | `1E` | Drill | red-white robot in a star room |
+| `08` | Cossack1 | Cossack 1 boss (moth machine) | | `1F` | Dive | grey machine hall |
+| `09` | Cossack2 | Cossack 2 boss (block machine) | | `20` | Bright | dark figure in Bright Man stage |
+| `0A` | Cossack3 | Cossack 3 boss (white walker mech) | | `21` | Pharaoh | shuriken ninja |
+| `0B` | Cossack4 | Cossack 4 boss (Cossack Catcher) | | `22` | Toad | frog + rider, shuriken |
+| `0C` | Wily1 | Wily 1 boss (green robots) | | `23` | Dive | spear figure |
+| `0D` | Wily2 | Wily 2 boss (dark copy figure) | | `24` | Drill | green-haired robot |
+| `0E` | Wily3 | Wily 3 boss (Wily Machine 4) | | `25` | Cossack4 | robot 1 |
+| `0F` | Wily4 | Wily 4 boss (Wily Capsule) | | `26` | Cossack4 | robot 2 |
+| `10` | Cossack1 | train: Joe in a cannon walker | | `27` | Cossack4 | robot 3 (green hair) |
+| `11` | Cossack1 | train: big frog | | `28` | Wily4 | capsule room 1 |
+| `12` | Cossack1 | train: flying pod + birds | | `29` | Wily4 | capsule room 2 |
+| `13` | Cossack1 | train: 4th set piece | | `2A` | Wily4 | capsule room 3 |
+| `14` | Toad | giant frog mech | | `2B` | Wily4 | capsule room 4 |
+| `15` | Drill | cave flyer | | `2C` | Drill | green cave: round robot |
+| `16` | Drill | purple hippo | |  | | |
+
+![All 45 fights](img/cheats_fights.png)
+*Every MY ARENA fight ID, about 4 s after its state loads (godmode on).*
 
 ---
 
