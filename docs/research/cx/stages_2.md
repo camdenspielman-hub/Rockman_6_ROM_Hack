@@ -139,6 +139,27 @@ the drop through the two down-arrows into the next segment.*
 Within the time box the explorer did not link the post-drop rooms (`$11-$13`, `$15`) to room `$0D` and checkpoint
 `$08`. So the first half of the route is only partly mapped.
 
+**(added by critic) Why the maps and explorers disagree: scripted pit warps** [code]. Mega Man's special-object
+table holds seven copies of event script `$18` (object `$41`, code in the stage's own bank, `$0B:BC13`): room `$01`
+(x `$88`), `$08` (x `$24`), `$0D` (x `$F4`), `$0E` (x `$2C` and x `$F8`), `$11` (x `$51`) and `$13` (x `$B2`). The low
+bits of the object's X pick what it does:
+
+- no bit set (room `$01`, room `$0E` x `$F8`): while in segment 0, a fall below Y `$E2` in the script's room is not a
+  death: the room, camera and both scroll limits are rewritten to `$10` (with `$48/$49 = $0F/$10`) and the player
+  reappears at Y `$E8`. This is the green down-arrow drop of room `$0E`.
+- bit 1 (room `$13`): when the room is scroll-locked (`$1F | $F9 = 0`) and the player falls below Y `$E2`, the script
+  sets segment `$38 = 8`, transition `$37 = 3` (down) and room `$0F` (limits `$0F-$0F`): a pit that **warps you into
+  a different segment** instead of the next one.
+- bit 0 (room `$11`) adds `$180` to the pointer pair `$16-$19` (and the segment-non-zero branch subtracts it).
+- bit 2 (rooms `$08`, `$0D`, `$0E` x `$2C`) sets or clears bit 0 of `$70` by the X bit 3: the copies in rooms `$08`
+  and `$0D` set it and the one in the start room `$0E` clears it, so `$70` bit 0 looks like a stage-wide
+  "run backwards" switch that flips when you enter the right-to-left half [code; meaning guess].
+
+So the stage is wired by warping pits, not only by its `$B400` segment list. That is why the live segment / room
+values (segment 1 = `$11-$13`, segment 10 = `$15`) do not follow a forward reading of the list, why stage 5 needs its
+own case in the death code, and why random explorers that treat pits as deaths do not find the route. The route from
+room `$13` is most likely through its pit (warp to segment 8) [guess; not played].
+
 **Enemies** (second half) [seen]: Sniper Joes (`$4F`, their shots are `$35`) and **Sniper Armors** (`$4E`, the
 magenta mech with Joe riding it) in nearly every room from `$07` to `$02`, plus green spike rows. Walking right from
 checkpoint `$08` into room `$0B` also shows floating green spike mines, a red bird robot and a blue blob. Items:

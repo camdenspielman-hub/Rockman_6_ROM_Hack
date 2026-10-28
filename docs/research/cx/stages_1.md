@@ -315,6 +315,13 @@ So the tank is hidden above the normal swimming path, where SMB players will loo
 emulator, forcing the player's Y above `$72` in room `$08` did create the `$BB` object at `$7D,$22`, but it disappeared
 within 20 frames without being collected (`$7FFB` stayed 0). How you are meant to reach it and keep it is still open.
 
+**(corrected by critic)** The tank does not disappear: it is re-created in another object slot after about 10 frames
+(slot 26, then slot 21) and then drifts up from Y `$22` to `$13`, where it stays for as long as you remain in the room
+[seen, 400 frames logged, `build/research/cx/cx-critic/fmheart.py`]. It sits at the very top edge of the screen,
+in a gap of the coral ceiling. Touching it (player at X `$7D`, Y `$18`) set `$7FFB = 1` and raised the save's max HP
+from 24 to 28 at once [seen], so it is the real tank. To reach it in play you swim up to the top of room `$08` with
+RM2's floaty underwater jump [guess for the intended route].
+
 ### 4.4 Boss: Fire Mario [seen]
 
 ![Fire Mario intro](img/stages1_firemario_intro.png)

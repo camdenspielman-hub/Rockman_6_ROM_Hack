@@ -9,6 +9,22 @@ Played with godmode (`cheats.godmode()`), so the "intended challenge" notes are 
 
 Tags: **[seen]** emulator, **[code]** disassembly/data, **[text]** in-game text, **[doc]** readme, **[guess]**.
 
+## Highlights: how crazy it gets
+
+- **Wily 1** is a castle over a bottomless drop that does not kill (you fall out of the bottom and back in at the
+  top), and you **hijack Sniper Joes' walkers and copters**; the boss is a Joe tag team.
+- **Wily 2**'s factory arenas mass-produce **unpainted grey copies of classic enemies**, its space station
+  **re-streams four different layouts into the same nine screen numbers**, and its boss's **"Dr.WILY STEALING SYSTEM
+  E:-∞" steals every weapon you equip** (five of them stay stolen) and sends Rockman copies armed with them.
+- **Wily 3** is a **Zelda dungeon** with a MAPPING UNIT, COMPASS UNIT and WARP SENSOR, rooms that lead to different
+  rooms depending on the row you leave by, and a regenerating Wily Machine 4 skull.
+- **Wily 4**: three **CHIMERABOT** halls; a no-death secret **SUPER SHADOWMAN** whose grab kills even through
+  godmode; a 56-HP **OPTICAL CAPSULE** whose death collapses the floor into the **fortress's living, fleshy insides**;
+  **Rush sealed in a wall** you must shoot through; an "impossible" battle against **eight chibi Robot Masters** that
+  ends when **Proto Man barges in at HP < 6 and swaps your buster for the WILY BUSTER**; Wily grovelling; a
+  **self-destruct escape whose timer secretly grows from 50 to 90 s after three failures**; and **Wily captured in the
+  snow and carried off on the credits train**.
+
 ## 0. Method
 
 - States: the scout's `wily1..4_cp0/1/2` (EXTRA CONFIG warps; they carry PROG `$00` and all weapons) and MY ARENA
@@ -26,7 +42,10 @@ Tags: **[seen]** emulator, **[code]** disassembly/data, **[text]** in-game text,
   `capk_end` (capsule at 0 HP), `post_capsule_s12` (underground), `cp2/s26` (Petit RM void, Wily Buster already given
   by the cp2 respawn), `w4_final_nogift` / `w4_gift_text` (meddling about to trigger, set `$7722 = 0` and HP < 6),
   `w4_final_gifted2`, `petit_dead`, `escape_start` (first escape attempt), `esc_attempt2`, `esc2/s00..s32` (every escape
-  screen), `esc_outside`, `esc_sky`, `esc_capture`, `ending_train`, `end_20000`, `end_31500` (RESULT).
+  screen), `esc_outside`, `esc_sky`, `esc_capture`, `ending_train`, `end_20000`, `end_31500` (RESULT), `rush_found`. Copies for other agents in
+  `build/research/r4mi/states/`: `wily4_capsule_mid`, `wily4_capsule_0hp`, `wily4_underground_s12`,
+  `wily4_petit_rms_nogift` (poke HP < 6 to trigger Proto Man), `wily4_petit_rms_dead`, `wily4_escape_start`,
+  `wily4_escape_capture`, `ending_train_wily_captive`, `ending_result_86`.
 
 ## 1. Wily 1 (`$22` = 12) -FATAL MISCALCULATION-
 
@@ -96,7 +115,7 @@ run passed him (I fired the buster the whole way, and he was in the line of fire
 for this outcome: *"YOUR ROOKIE ... EDDY. IT'S REGRETTABLE ABOUT HIM. … HIS CORE HAVE NOT FOUND IN THE RUIN OF WILY'S
 FORTRESS … HIS SIGNAL DISAPPEARED NEAR YOU, YOU SAW HIS LAST MOMENT"* [text]. Combined with the Energy Splitter's
 "YOU SEEM TO HEAR SOMETHING IN THIS UNIT", the reading is that Eddie can be lost here [guess]; what sets FLAG bit7 (EDDY)
-is code in bank `$41` (cheats.md) and was not traced.
+is code in bank `$41` (cheats.md): `$41:$AC10` sets it inside a general item-drop routine when the chosen item value is 0 [code], but I did not trace which Eddie encounter reaches it.
 
 ### 1.5 Open points in Wily 1
 
@@ -312,7 +331,7 @@ swim through). From there a black void where **eight chibi "Petit Robot Masters"
 "impossible game": **as soon as Rockman's HP drops below 6, Proto Man warps in ("BLUES: IT'S A GIFT BY Dr.COSSACK.
 TAKE IT.") and swaps the buster for the WILY BUSTER**, which melts them. Then Wily grovels and flees in his saucer, the
 self-destruct starts a **timed escape** (50 s, quietly **90 s after three failures**), Rockman bursts out into a
-forest and the sky, Wily's saucer crashes in the snow, and **Rockman pins Wily and carries him off: Wily rides the
+forest and the sky, Wily's saucer crashes in the snow (and Rush can be freed from a wall on the way, §5), and **Rockman pins Wily and carries him off: Wily rides the
 ending train as a captive**.
 
 ### 4.1 Structure [code + seen]

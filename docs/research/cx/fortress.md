@@ -24,7 +24,7 @@ playable level** with 99 lives.
 | `$09` | Light 2, the clock tower (optional) | Air Man (bank 1) | `$2B` down to `$16` | `$17`, `$20`, `$2B` | **Quick Man**, brainwashed (room `$16`) |
 | `$0A` | Light 3, the electrified base | Whispy Woods (bank 2) | `$18`-`$2B` | `$18`, `$21`, `$28` | **Guts Tank**, two phases (room `$2B`) |
 | `$0B` | Light 4, water works | Fire Mario (bank 3) | `$17`-`$2B` | `$17`, `$21`, `$2A` | **the masked robot** (room `$2B`) |
-| `$0C` | Light 5, teleporter refights | Yoshino Man (bank 4) | `$18`-`$29` | `$18`, `$1D`, `$29` | five robot-master **refights** |
+| `$0C` | Light 5, teleporter refights | Yoshino Man (bank 4) | `$18`-`$2A` | `$18`, `$1D`, `$29` | five robot-master **refights**; **(corrected by critic)** all eight refights, then **Rush** (room `$2A`, §6.1) |
 | `$0D` | Light 6, Light's inner lab | Mega Man (bank 5) | `$15`-`$2B` | `$15`, `$16`, `$20` | **Dr. Light himself**, twice |
 | `$0E` | final stage + staff roll | Kamen Rider (bank 6) | `$18`-`$28` | `$18`, `$1A`, `$28` | **giant Dr. Light** (only Print Cutter / Power Bomb hurt him) |
 
@@ -58,6 +58,13 @@ Light stages run with all eight robot-master bits set (`$9A = $FF`) and the fort
 
 - **Cheat Saber one-shots Quick Man and Dr. Light** (40 damage in one hit) and does 14 to Ultraman, 8 to Guts Tank.
   The weapon of Cheat Man is literally a cheat.
+  **(corrected by critic)** Not on Dr. Light: the Saber's boss-hit handler (`$17:A668`) finds a 0 in its fortress
+  table for boss `$0D` and falls through to `STY $06C0`, so a Saber hit on Light **sets the player's HP to 13** and
+  leaves Light at 40. Seen 9 times in 40 point-blank slashes from `light6.state` (player HP 20 → 13, boss 40 → 40;
+  the other attempts missed or took 3 of contact damage; `build/research/cx/cx-critic/saber4.py`). The "40 (40)" in
+  the table above was probably Light's bar resetting at a respawn, which happens every time he kills you.
+  ![Saber on Light](img/critic_saber_on_light.png)
+  *Point-blank Cheat Saber on Dr. Light: the slash connects, your HP drops 20 → 13, his bar stays full.*
 - **Rock's own Mega Buster does nothing to Dr. Light** (and nothing to Ultraman); Rider Kick does nothing to Ultraman.
   The heroes' weapons will not hurt their own side [guess at intent; the zeros are seen].
 - Every fortress boss has 40 HP (`$28`) per bar.
@@ -68,7 +75,7 @@ table at `$16:803D` (15 entries) [code]. RM2 used it for its six Wily bosses; CX
 | `$B3` | Boss | `$B3` | Boss |
 |---|---|---|---|
 | 0-7 | the eight robot masters, in stage order (also their Light 5 refights) | `$0B` | Light 4's masked robot |
-| 8 | Ultraman (Light 1) | `$0C` | **not met in this run**: the routine that spawns s08, Light's "pet" (§11) |
+| 8 | Ultraman (Light 1) | `$0C` | **not met in this run**: the routine that spawns s08, Light's "pet" (§11). **(corrected by critic)** It is **Rush**, Light 5's real boss after all eight refights (§6.1) |
 | 9 | Quick Man (Light 2) | `$0D` | Dr. Light (Light 6) |
 | `$0A` | Guts Tank (Light 3) | `$0E` | Guts Man (opening stage) |
 
@@ -184,6 +191,16 @@ Boomerangs that fly across the room in formation.*
   `$0141` = `$14` and bit 3 is set [code], which looks like the call itself [guess].
 - The escape back down the tower as Quick Man was played to room `$25` (explorer, rooms `$16` → `$25` in order)
   [seen]; where it ends and where s04 plays was not reached.
+  **(resolved by critic)** The escape ends where the stage began. Script `$22` (object `$41` at room `$2B`, x `$90`;
+  code `$25:B317`) waits for Quick Man (`$9B` bit 7) standing on the floor at Y `$C4` of room `$2B`, then freezes
+  input, walks him left off the screen, restores max HP from the save, **forces `$9B = $2F`** (Quick Man off, bit 3
+  "Quick Man joined", fortress progress 2, and all three item-upgrade bits) and clears the stage [code]. A Go-Explore
+  run from the room-`$20` restart walked `$20` → `$2B` in 370,000 frames and the stage changed [seen,
+  `build/research/cx/cx-critic/p_l2qm/`]. A Quick Man death in Light 2 restarts at room `$20` whatever room is held.
+  The fortress map follows, then **Light 3 opens with s04**: Quick Man stands on the ledge of the first room and says
+  "Let's split out. / Call me in the menu if you need help." before beaming away. The trigger is `$1F:BBC7`: at the
+  stage start, slot 1's `$0140` field is `$14` and `$9B` bit 3 is set, so it halves that field (so it fires once),
+  switches every object off and spawns dialogue s04 [code][seen]. Image: `img/critic_light2_exit_s04.png`.
 
 ---
 
@@ -284,11 +301,48 @@ these destinations:
 | lower right (`$E0`, `$C0`) | `$22` | **Bomberman**, climbing a pole and dropping bombs in a green-grid room |
 
 Five of the eight robot masters are refought here [seen]; Fire Mario, Yoshino Man and Mega Man had no pad in the scan.
+
+**(corrected by critic)** There are **eight** pads, one per robot master, exactly RM2's Wily 5 layout [code][seen].
+The hub's setup routine (`$3C:81E0`) spawns a pad object `$BC` for every bit still clear in `$BC` (the refight
+mask) at Y `$3C:8266` / X `$826E`: 0 Cheat Man (`$20`,`$44`), 1 Air Man (`$20`,`$84`), 2 Whispy (`$20`,`$C4`),
+3 **Fire Mario** (`$70`,`$C4`), 4 **Yoshino Man** (`$90`,`$C4`), 5 **Mega Man** (`$E0`,`$44`), 6 Kamen Rider
+(`$E0`,`$84`), 7 Bomberman (`$E0`,`$C4`). The pad fires only when the player stands on it within 4 px of its X
+(contact test `$3F:E557`, X tolerance 4); a player dropped onto a pad from above is pushed 8 px aside and misses,
+which is why the brute-force scan found only five destinations and why "upper right" looked like a second Air Man pad
+(it is Mega Man's). Teleporter `$BA` → `$B3 = $BA − 1`, room from `$3C:824C`: Fire Mario, Yoshino Man and Mega Man
+are refought in room `$1E`, the same blue-grid room as Air Man. All eight were entered in the emulator
+(`build/research/cx/cx-critic/l5pads.py`; image `img/critic_light5_refights.png`). After a refight the player must
+touch the return teleporter (object `$BD`, which appears at the room's left side) to go back.
 The second hub (room `$29`, the third restart point) has the same pad table [seen]. After the Whispy Woods refight the
 player is beamed back to hub 1 about 100 frames after the kill; `$BC` then holds Whispy's bit (`$04`, bit n = boss n)
 and `$B4` = 1, and a second scan found no working pad [seen: `a_l5w.log`, RAM diff]. (Killing Kamen Rider from the
 scout's `light5_boss` state left the player in room `$24` for 3,000 frames, probably because that state starts on the
 road part of the arena [guess].) How the stage continues after the refights is open (§11).
+
+### 6.1 After the eighth refight: Rush, Light's "pet" (added by critic) [code][seen]
+
+- After each refight `$3C:842B` ORs the boss's bit into `$BC`; while `$BC` ≠ `$FF` the return teleporter leads back
+  to hub 1 (room `$1D`), and once all eight are done it leads to **hub 2 (room `$29`)** instead. There the hub routine
+  spawns no pads but one **exit teleporter** (object `$BE`) at the top centre (`$80`,`$44`).
+- The exit leads to room `$2A`, a black room with brick walls and a cyan floor, `$B3 = $0C`. Dr. Light beams in
+  inside his teleporter capsule and says **s08** ("Welcome! I see you destroyed my lab by yourself. Very impressive!
+  I could destroy you, but I would not rob my pet of that pleasure. He knows how to deal with wastes. Should you
+  live, I will be waiting for you. Don't disappoint me!"). The capsule leaves and **Rush** (red robot dog) runs in;
+  the boss bar fills from frame ~1,400 after the teleport.
+- **Rush's fight** (40 HP; 1,800 frames recorded under godmode, `build/research/cx/cx-critic/l5pet.py`): he runs and
+  jumps along the floor; turns into a **Rush Marine-style craft with a glass dome** that hovers and fires a
+  **green laser line across the whole room** plus round shots; **clings to the side walls** and fires from there; and
+  at times disappears while a **screen-tall green spiral column**, drawn in the background (no objects are live while
+  it is on screen), sweeps across the room. Boss index `$0C` is the routine at `$16:96C0`, and s08 is the spawn at
+  `$16:973E` (X = `$11`). Damage row: buster 2, Saber 37, Ringo 5, Rider Kick 4 (ROM table).
+- **Beating Rush does not end the stage with a map**: Light beams back into room `$2A` and says **s10**, the first
+  line of the Light 6 round table ("Excellent job! But, the time of your destruction has arrived! And you cannot hurt
+  me... How will you survive? Welp, you defy The Three Laws of Robotics? Dangerous robots like you... AREN'T NEEDED
+  IN THIS PEACEFUL WORLD!! I DESTROY YOU!!"), and about 1,370 frames after the kill the game is in **Light 6 room
+  `$15`**, round 1 against Light (`$9B` progress 5). So s10 is the opener of the Light 6 fight, spoken at the end of
+  Light 5.
+- Image: `img/critic_light5_rush.png`. States (critic scratch): `build/research/cx/cx-critic/l5_hub2_all8.state` (hub 2
+  with all eight refights done), `l5_pet_fight.state` (Rush's bar full), `l5pad_<n>_<boss>.state` (each refight).
 
 ---
 
@@ -411,6 +465,10 @@ Shared states added to `build/research/cx/states/` (all load straight into play;
 | `fortress_final_phase2` | Final stage at the switch to phase 2 (`$B2` = 7) |
 | `fortress_ending` | The first frame of the ending sequence (the stage byte reads 6 during the ending) |
 | `fortress_staff_roll` | The playable staff roll, room `$1A`, as Quick Man with 99 lives and 99 E-tanks |
+| `fortress_light5_firemario`, `_yoshino`, `_megaman` | (added by critic) Light 5 room `$1E`: the three refights the scan missed, boss bar full |
+| `fortress_light5_hub2_all8` | (added by critic) Light 5 hub 2 (room `$29`) with `$BC = $FF`; the exit teleporter (object `$BE`) is at `$80`,`$44` |
+| `fortress_light5_rush` | (added by critic) Light 5 room `$2A` after s08: Rush's bar is filling (the fight starts a few frames later) |
+| `light2_qm_exit` | (added by critic) Light 2 room `$2B` as Quick Man at the end of the escape; land on the floor (Y `$C4`) to end the stage |
 
 Corrections to `cheats.md` §1 [seen]: `light1_cp1` (room `$21`, limits `$11-$18`), `light4_cp1`, `light4_cp2`,
 `ending_cp1` and `ending_cp2` have inconsistent scroll limits (the kill-to-checkpoint trick failed where falling off the
@@ -436,6 +494,7 @@ Scripts in `build/research/cx/cx-fortress/`:
 - Light 5's boss `$0C` (the s08 "pet", "garbage-disposal duty") was never reached. The two teleporter hubs showed the
   same five destinations; after one refight the pads stopped working (`$BC` gets the boss's bit, `$B4` counts up)
   [seen], and setting `$BC`/`$B4` by hand did not open anything. Fire Mario, Yoshino Man and Mega Man had no pad.
+  **(resolved by critic)** Eight pads, all eight refights, then hub 2's exit teleporter, s08 and **Rush** (§6, §6.1).
 - s09 (the two-part robot, text.md) was not seen anywhere in the fortress.
 - Light 6 rooms `$1D`-`$20`: the shutter at the end of room `$1D` did not open for the explorer or placed jumps.
 - Light 4 rooms `$1B`-`$20` and `$22`-`$29`, Light 3 rooms `$25`-`$27`: not played (pits beat the explorers).

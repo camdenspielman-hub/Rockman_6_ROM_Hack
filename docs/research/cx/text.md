@@ -210,6 +210,14 @@ the message. After the 2nd, 4th and 6th boss a second screen hands over an item 
 | `$30:8C16` | s22 | Light flees |
 | not located | s01, s07, s09 | spike counter; masked robot; two-part robot |
 
+**(added by critic)** Scenes now seen in play: **s04** plays on the first screen of fortress 3 when Quick Man has
+rejoined (trigger `$1F:BBC7`); **s08** plays in fortress 5 room `$2A` after all eight teleporter refights, and the
+"pet" is **Rush** (`$16:973E`, X = `$11`); **s10** plays when Rush is beaten, still in fortress 5, and the game then
+cuts straight into fortress 6's round 1; **s22** is spawned by event script `$2D` (`$30:8C16`) placed in fortress 6
+room `$1E`. A search of all eight stage banks' enemy tables (object `$41` with Y = `$1C`, the dialogue script) and of
+every immediate `LDA #$1C / STA $04B0,Y` spawn finds no site for **s09**, so the two-part robot may be cut content
+[code]; s01 and s07 were seen in play but their spawn path was not traced.
+
 In the fortress-6 boss room Light warps in through the **"Dr.LIGHT TELEPORT SYSTEM"** (its monitors say so) for each
 round [seen]. From cx-scout's `light6_boss` state, knocking his HP down gave s24 and then s25, which sends you to the
 giant-Light stage $0E [seen]; I did not see the earlier rounds play out, so the per-round order is from the table.

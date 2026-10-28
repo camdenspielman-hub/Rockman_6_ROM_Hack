@@ -14,6 +14,12 @@ data read, each with the 8 KB bank mapped at that moment, plus the cycles the ma
     r = sh.frame(e.save(), buttons=['RIGHT'])   # trace the frame e.step(['RIGHT']) is about to run
     e.step(['RIGHT']); print(sh.ram_diff(e))     # fidelity: bytes of RAM that differ from the real frame
     sh.exec_   # set of (bank, addr) opcode fetches;  sh.data = set of (bank, addr) ROM data reads
+    sh.prof = collections.Counter(); sh.frame(...)   # optional: CPU cycles per (bank, pc) for that frame
+    r['busy']  # cycles of the frame not spent in the scheduler's idle loop $C581 (r = return of frame())
+
+Used by build/research/rm6/rm6-engine/tour.py (coverage of 139,200 frames, docs/research/rm6/engine.md
+section 6) and prof*.py (lag profile, section 8). Not traced: the PPU side (CHR-RAM is filled by CPU
+writes, so every CHR read is seen) and DPCM (unused by Rockman 6).
 
 Timing model (FCEU): a retro frame starts at scanline 240; NMI ~118 CPU cycles later; MMC3 clocks at
 dot ~260 of the pre-render line and of lines 0-239 while rendering is on. Accuracy is "good enough for

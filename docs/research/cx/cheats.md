@@ -145,7 +145,7 @@ Stage IDs (`cx.STAGES`): `0` Cheat Man, `1` Air Man, `2` Whispy Woods, `3` Fire 
 | `$00A4` / `$00A5` / `$00A6` | Item 1 Floor / Item 2 Subtank / Item 3 Ubercharge energy | [seen] |
 | `$00A7` | E-tanks | [seen] menu |
 | `$00A8` | Lives | [seen] menu |
-| `$0098` | Saved byte (field 11). `$1F:9110` increments it up to `$C8` when `$97 = $C0`, bit 7 of `$9B` is clear and one of `$32-$34` is 3. Meaning unknown [guess: a statistics counter] | [code] |
+| `$0098` | Saved byte (field 11). `$1F:9110` increments it up to `$C8` when `$97 = $C0`, bit 7 of `$9B` is clear and one of `$32-$34` is 3. Meaning unknown [guess: a statistics counter]. **(corrected by critic)** It is the **spike-death counter** (collision type 3 = spikes) that Dr. Light reads aloud in script s01 (text.md §2.6) | [code] |
 
 Weapon ids and names [seen, pause menu]: 0 MEGAMAN (buster), 1 CHEAT SABER, 2 DEAD RINGER, 3 RINGO SHIELD,
 4 FIRE BALL, 5 PRINT CUTTER, 6 MEGA BUSTER, 7 RIDER KICK, 8 POWER BOMB, 9 1.FLOOR, 10 2.SUBTANK,
@@ -199,6 +199,27 @@ stage start. The tank locations themselves were not searched for here.
 | 5 Mega Man | `0E 08 01` (reverse) | `$0D` Light 6: `15 16 20` |
 | 6 Kamen Rider | `00 0A 13` | `$0E` final: `18 1A 28` |
 | 7 Bomberman | `00 08 11` | `$0F` opening: `17 1D` |
+
+**(corrected by critic)** The raw 6-entry tables are always **3 + 3**: three restart rooms for the robot-master
+stage and three for its partner [code, `$BB06` of each bank, dumped with `cx.cp_table`]:
+
+| Bank | Robot-master entries | Partner entries (room, then scroll limits `$14-$15`) |
+|---|---|---|
+| 0 | `00 08 16` | Light 1: `18` (`19-20`), `19` (`19-20`), `21` (`21-21`) |
+| 1 | `00 0A 14` | Light 2: `17`, `20` (`1D-20`), `2B` |
+| 2 | `00 0D 16` | Light 3: `18 21 28` |
+| 3 | `00 0C 14` | Light 4: `17 21 2A` |
+| 4 | `00 07 16` | Light 5: `18 1D 29` |
+| 5 | `01 08 0E` | Light 6: `15 16 20` |
+| 6 | `00 0A 13` | final: `18 1A 28` |
+| 7 | `00 08 11` | opening: `17 1D 1D` |
+
+So Cheat Man has three restart points, not four: "checkpoint 3" (room `$18`, limits `$19-$20`) is Light 1's start
+entry, reached only because the warp held the room byte at `$18`, which explains the "black room of glitchy tiles"
+(Light 1's room drawn under Cheat Man's ID), not a glitch joke. Likewise Air Man's "cp3/cp4" are Light 2 entries
+(stages_1.md §6.1). Every robot-master stage has exactly a start and two checkpoints. The death code (`$C190`) picks
+the highest entry ≤ the current room, with no −1 for stage 5; a forced death in Mega Man's stage at rooms `$0E-$14`
+gave index 3 but still restarted at `$0E`, so the restart code clamps it [seen].
 
 **Checkpoint warp** (`cx.warp_cp(e, stage, cp)`): warp to the stage start, drop the player below the screen
 (`$04A0 = $F0`), and hold `$0440` at the target room until the life counter drops. The restart code then picks that

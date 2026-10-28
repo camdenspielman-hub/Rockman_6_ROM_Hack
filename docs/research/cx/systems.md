@@ -45,7 +45,10 @@ Special interactions [code][seen]:
   then `JMP $A870` copies Y into your i-frame timer and spawns effect object `$35` on you; with HP 0 that is a
   death. Boss numbers 1-7 → boss HP set to 0. Fortress bosses 8-12 → table damage (14, 40, 8, 8, 37). Boss 13 has
   a 0 entry, which falls through to the same `STY $06C0` with Y = 13, so the Saber on the Light 6 boss should
-  **set your HP to 13** [code; not tested, the boss did not activate in my runs]. Seen on Cheat Man: two frames
+  **set your HP to 13** [code; not tested, the boss did not activate in my runs].
+  **(confirmed by critic)** Seen in `light6.state` (round 1, `$B3 = $0D`): point-blank slashes took the player
+  from 20 to exactly 13 HP while Dr. Light stayed at 40 (`build/research/cx/cx-critic/saber4.py`). Boss 12
+  (`$0C`) is Rush, Light 5's boss (fortress.md §6.1), so the "37" entry is Rush's. Seen on Cheat Man: two frames
   after a point-blank slash the player's HP went 24 → 0, the death rings played, a life was lost, and Cheat Man
   still had 40 HP.
   ![Cheat Saber on Cheat Man](img/systems_saber_kills_you.png)
@@ -348,6 +351,10 @@ Scripts:
   with scroll limits that keep the room locked; where the stage ends, and where script s04 ("Let's split out") and
   the `$1F:BBC7` check (a boss whose HP reaches 20 while bit 3 is set gets its HP halved and triggers s04) fire, was
   not reached. State: `build/research/cx/states/light2_quickman.state`.
+  **(resolved by critic)** The stage ends back at the bottom room `$2B` (script `$22`, `$25:B317`), which sets
+  `$9B = $2F`. `$0141` is not boss HP: it is object slot 1's `$0140` field, which reads `$14` at the start of Light 3,
+  so `$1F:BBC7` fires there once and Quick Man says s04 on the first screen of Light 3 (fortress.md §3,
+  `img/critic_light2_exit_s04.png`).
 - **Boss numbers 8, 11 and 12**: which fortress bosses they are (Light 1, Light 4 and Light 5 are the candidates;
   the Light 5 teleporter fight runs with `$B3 = 6`).
 - **The Fire Ball's jump-table entry** one byte into its handler (`$A6ED`): a bug or "fire ignores armour"?

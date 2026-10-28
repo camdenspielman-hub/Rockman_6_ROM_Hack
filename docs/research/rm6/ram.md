@@ -47,7 +47,7 @@ the boss in the second one sets bit 2 = the plate).
 | **$51** | **stage id** (table above) | [seen] |
 | $52/$53 | per-stage values from $DF35/$DF45 | [code] |
 | **$56 / $57** | **camera X pixel / camera screen** (`$57` = screen number along the level path) | [seen] scrolls with the player |
-| $58 / $59 | camera Y pixel / Y screen. Vertical sections scroll freely on these while `$57`/`$046F` stay put | [seen] Flame ladder climb: `$58` $E4 -> 0 over 100 frames, `$57` unchanged; [code] $DC87 |
+| $58 / $59 | camera Y pixel / Y screen. `$58` scrolls during a vertical transition. **(corrected by critic)** `$57` and `$046F` do change: they switch to the target screen on the *first* frame of a vertical transition, and `$0697` follows when the ~120-frame scroll ends | [seen] Flame ladder climb: `$58` $E4 -> 0 over 100 frames; [seen, critic `emuchecks2.py`] Blizzard 0C -> 0D and 05 -> 06 down exits: `$57`/`$046F` = new screen at frame 1, `$0697` at frame ~122; [code] $DC87 |
 | $63, $67, $6E, $6F | per-stage level-data pointers / bank (`$6F` = level bank) | [code] $DC00 |
 | $70-$7F | current screen's object-list pointers (`$74..$7F`, bank $3A tables) | [code] $3A:$8032 |
 | $80 | per-screen flag index (bitfield at $0340) | [code] $DB98 |
