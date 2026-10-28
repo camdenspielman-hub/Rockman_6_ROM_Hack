@@ -303,7 +303,8 @@ With FLAG KALINKA set (she joins in Wily 3) the cost routine `$42:$A17B` halves 
 *The four things Rush can dig up: large life, large weapon energy, 1UP, E-tank.*
 
 **The "death refill" is the ENERGY CHARGER (= CONFIG E.GEN)** [code `$7B:$AB9A`/`$AE25` + seen]. On every stage
-(re)start after a death, if any owned weapon is not full, every owned weapon (not HP) gets **+max(4, ⌊missing/2⌋)**,
+start or restart (after a death, and when the fortress moves on to its next stage, config.txt's "後半のステージが
+進んだ時"), if any owned weapon is not full, every owned weapon (not HP) gets **+max(4, ⌊missing/2⌋)**,
 capped at 28. Measured with E.GEN ON: R.SEARCH 1 → 14, 10 → 19, 19 → 23; Drill 3 → 15; Dive 20 → 24. With E.GEN OFF:
 no refill at all. A **Game Over** resets R.SEARCH to a full 28 (fixed bank `$C53D`: `LDA #$9C / STA $B1`).
 
@@ -409,23 +410,26 @@ starting items have no bit and cannot be lost. Pickups are object `$0A` with ani
 
 | Item | How you get it | Effect (exact) | Hero Score |
 |---|---|---|---|
-| **ENERGY CHARGER** (start) | always shown; works only while CONFIG **E.GEN = ON** (`$78DC = 0`) - "can only be obtained through this setting" (config.txt) | on every stage (re)start after a death, every owned weapon not full gets +max(4, ⌊missing/2⌋) (`$7B:$AE25`) [seen: 1 → 14, 3 → 15, 20 → 24] | - |
+| **ENERGY CHARGER** (start) | always shown; works only while CONFIG **E.GEN = ON** (`$78DC = 0`) - "can only be obtained through this setting" (config.txt) | on every stage start/restart (deaths, fortress stage changes), every owned weapon gets +max(4, ⌊missing/2⌋) (`$7B:$AE25`) [seen: 1 → 14, 3 → 15, 20 → 24] | - |
 | **ENERGY BALANCER** (start) | hard-wired | a weapon-energy unit picked up while the buster (or a full weapon) is selected goes to the **owned weapon with the least energy** (`$41:$B594`) | - |
 | **EXCHANGER** (start) | hard-wired | life energy picked up at full HP: every 2 surplus units become 1 weapon unit (then the Balancer routes it) (`$41:$B553`) [seen: a Rush-Search large life at full HP put +5 into R.SEARCH] | - |
 | **BEAT** (`$40`) | free him from his cage (a friend; not saved in the game block) | pit rescue for 3 HP if HP ≥ 4 (§8.1) | FRIENDS 5 |
 | **METALL'S HELMET** (`$08`) | **inhale a Metall** with the RECYCLE INHALER (any of the 9 Metall types) [seen: the first Metall of Drill Man's stage] | halves hits of 2+ (round up) on 1 frame in 8, and always at HP ≤ 4 | EQUIPMENT 2 |
 | **SKULL AMULET** (`$02`) | **inhale Skull Man himself**: the inhaler does 6 to him, and once his HP ≤ 6 the next pull swallows him and drops the amulet [seen: `fight_07_skull`, HP poked to 5] | survive any lethal hit at 1 HP if HP ≥ 2 | EQUIPMENT 2 |
-| **SUPER STAR** (`$04`) | **inhale Shadow Man** (sub-ids `$11`/`$20`/`$8C`/`$E6`) while his HP is 1-6: the star on his forehead is torn off and sucked in (`$41:$A6D0`) [code] | crit chance ×4 (§2), +2 crit damage | EQUIPMENT 2 (shared with ?DAGGER) |
+| **SUPER STAR** (`$04`) | **inhale Shadow Man** (sub-ids `$11`/`$20`/`$8C`/`$E6`) while his HP is 1-6: the star on his forehead is torn off and sucked in (`$41:$A6D0`) [code; seen: SHADOWMAN B in Bright Man's stage, `fight_20`, HP poked to 5] | crit chance ×4 (§2), +2 crit damage | EQUIPMENT 2 (shared with ?DAGGER) |
 | **ENERGY SPLITTER** (`$01`) | **inhale Eddie** (object `$42`/`$43`): you get the item and FLAG EDDY = "Eddie lost" [code; modes.md] | every weapon-energy unit is added to *every* owned weapon (`$41:$B57C`) | EQUIPMENT 2, but FRIENDS −5 |
 | **SHOCK GUARD** (`$10`) | own the **Wire**, then **inhale a Wire capsule** (the second copy: Drill Man's stage and the Cossack stages each have one) | spikes drop you to 1 HP instead of killing (HP ≥ 2), 120 i-frames | EQUIPMENT 2 |
 | **TRAMPOLINE** (`$20`) | own the **Balloon**, then **inhale a Balloon capsule** [seen: Cossack 1 screen 16's "B" capsule with the Balloon owned] | pit bounce for 8 HP if HP ≥ 9 | EQUIPMENT 2 |
-| **?DAGGER** (`$80`) | object `$5E/$E2` (AI `$43:$B4DA`) sets out **two pickups side by side**: the left one refills every weapon and HP, the right one is the ?DAGGER (`$43:$B530`) [code; seen with the object spawned by hand]. Where the game places it: not found | **every hit is a critical** | counts with SUPER STAR as one item |
+| **?DAGGER** (`$80`) | object `$5E/$E2` (AI `$43:$B4DA`) sets out **two pickups side by side**: the left one refills every weapon and HP, the right one is the ?DAGGER (`$43:$B530`) [code; seen with the object spawned by hand: walking to the right one also took the left one in passing, so the pair is not exclusive]. Where the game places it: not found | **every hit is a critical** | counts with SUPER STAR as one item |
 
 ![Metall's Helmet](img/systems_metall_helmet.png)
 *Drill Man's stage, screen 1: the Metall is pulled in, flashes, and a helmet pops out; touching it sets bit `$08`.*
 
 ![Skull Amulet](img/systems_skull_amulet.png)
 *Skull Man at 5 HP meets the RECYCLE INHALER: he is swallowed whole, and the amulet drops when he "arrives".*
+
+![Super Star](img/systems_super_star.png)
+*SHADOWMAN B (Bright Man's stage) at 5 HP: the inhaler rips the white star off his forehead and pulls it in; he fights on without it.*
 
 ![Trampoline](img/systems_trampoline.png)
 *Cossack 1, screen 16, Balloon already owned: the "B" capsule is inhaled and comes back as the green TRAMPOLINE item.*
@@ -472,8 +476,8 @@ drops a fixed 8-step cycle.
 - SHOCK GUARD was not obtained in play (no spare Wire capsule was reached); the code path is the same as the
   TRAMPOLINE one, which was.
 - What the checkpoint-2 jump after picking up SHOCK GUARD / TRAMPOLINE in a Robot Master stage looks like.
-- The exact frames/positions of each Shadow Man appearance where SUPER STAR can be torn off (sub-ids `$8C` and `$E6`
-  were not placed).
+- Where Shadow Man's other two inhalable forms (sub-ids `$8C`, `$E6`) appear; SUPER STAR was confirmed only on
+  SHADOWMAN B (`$20`).
 - Damage numbers for weapon variants (charged Pharaoh ×2 is in the code; the Spark Manbow flash and orbiting bulbs,
   the Wire's hook, Hell Wheel's run were not measured individually).
 
