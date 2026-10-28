@@ -1,0 +1,11 @@
+# Never commit ROMs, patch-output ROMs, or the original hack archives.
+*.nes
+*.zip
+*.ips
+*.bps
+roms/
+build/
+# Local Python toolchain (installed by tools/setup_env.sh)
+.pylib/
+__pycache__/
+*.png.tmp
