@@ -10,7 +10,12 @@ Banks `$7E`/`$7F` are fixed at `$C000`/`$E000`. Tags: **[code]** disassembly/dat
 Scripts (all in `build/research/r4mi/r4mi-engine/`): `regscan.py` (absolute accesses to any address range, all
 banks), `farxref.py` (every far call `JSR $DF8C/$DF66/$DF5F` → target bank and entry), `bankset.py` (every store to the
 bank shadows `$F5`/`$F6`), `profile.py` (per-bank profile), `banksheet.py` (render banks as 2bpp tiles),
-`sections.py` (the section table and the NORMAL/HARD patch lists). Disassembler: `tools/analysis/r4mi/r4mi_dis.py`.
+`sections.py` (the section table and the NORMAL/HARD patch lists), `songs.py` (sound table, song banks, vanilla
+match), `songmap2.py` (stage music ids by warping), `featmap.py` (which states use IRQ effect 7, vertical wrap, slope
+mode, bitmap blocks), `rlist.py` (dump the live raster list + screenshot), `chrsrc.py` (source bank of every live CHR
+tile), `chrsets.py` (CHR upload lists), `lag.py` (frame-overrun count, run once per build), `rsearch.py` (Rush
+Search sampler, inconclusive). Disassembler: `tools/analysis/r4mi/r4mi_dis.py`. All run from the repo root with
+`python3 -I`.
 
 ## 0. Headline findings
 

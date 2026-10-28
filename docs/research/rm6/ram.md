@@ -59,7 +59,7 @@ the boss in the second one sets bit 2 = the plate).
 | $99 / $9A | player input direction / jump-request bits (derived from `$40`) | [code] $D434 |
 | **$9B** | **adaptor form: 0 normal, 1 Jet Rockman, 2 Power Rockman** | [seen] menu select -> 1/2 |
 | **$9C** | **Rush Jet hover fuel**, $13 full, counts down while hovering, refills on landing | [seen] jet trace |
-| $9D, $9E, $A0, $A1 | player action latches (slide, charge, shoot) | [code] $803B, [guess] roles |
+| $9D, $9E, $A0, $A1 | player action latches (slide, charge, shoot). **(corrected by critic, from `engine.md` 2.1/3.2)**: `$9E` = charge counter (+1 per frame while B is held, +2 for Power Rockman; half charge at `$24`, full at `$06AB` = `$5A`); `$9D` = Rush Jet fuel sub-counter (one fuel unit per 4 frames of flight). `$A0`/`$A1` still unassigned | [code] $803B, $38:$8651, $38:$825D; [seen] |
 | **$A2** | **invincibility timer**: $3C after a hit, counts down; while non-zero no damage; the player blinks on bit 1 | [seen] every enemy contact sets 60 and costs 2-3 HP; freeze=2 -> no damage, no blink; [code] $8EA2, $8F72 |
 | $A5 | ? set FF on hit | [code] |
 | $A7 | player animation id | [code] |
@@ -99,9 +99,9 @@ $E46C to yield a frame, which stores its return address back here).
 | $04B4 / $04CB / $04E2 | **Y screen / Y pixel / Y sub-pixel** | [seen] jumping |
 | $04F9 / $0510 / $0555 | animation: frame count, frame index (x2), frame timer | [code] $E225 |
 | $0527 / $053E | animation script pointer hi / lo | [code] |
-| $056C | contact / hit result flags ($20, $30, $40 written on collisions) | [code] $8F6C |
-| $0583 / $059A | hitbox half-width / half-height | [code] [guess] |
-| $05B1 / $05C8 | player: **Y velocity lo / hi** (signed, + = down; jump = $FB.4C, gravity +$00.40 per frame) | [seen] trace |
+| $056C | contact / hit result flags ($20, $30, $40 written on collisions). **(corrected by critic, from `engine.md` 2.1)**: the **hit latch**: a player shot touching this object copies its attack byte here, and the victim's damage routine reads and clears it | [code] $8F6C, $38:$8FDF |
+| $0583 / $059A | ~~hitbox half-width / half-height~~ **(corrected by critic, from `engine.md` 1.3)**: `$0583` = **attack byte** (high nibble = collision class, low nibble = contact damage / shot power), `$059A` = **hit box id** (size table used by `$3F:$F72A`); both come from the 6-byte AI header (AI-1, AI-3) | [code] $3F:$EBD5 |
+| $05B1 / $05C8 | player: **Y velocity lo / hi** (signed, + = down; gravity +$00.40 per frame). **(corrected by critic)** the jump stores `$FA.CC` (`$FB.CC` from oil type 9); the first airborne frame reads `$FB.0C` after one gravity step, the second `$FB.4C` (the value this table used to give) | [seen] trace; [code] $38:$80D7-$80EC |
 | $05B1-$0624 | ($05B1, $05C8, $05DF, $05F6, $060D, $0624) six general AI variables for other objects | [code] |
 
 Player X speed is not stored: it is looked up each frame from $38:$801B/$8022 into `$EB/$ED` (walk =
@@ -193,13 +193,24 @@ run. Static references come from the linear disassemblies (`run2/ramrefs.py`).
 | **$06AF-$06FF** | 81 | never written, canary survives, trace identical, no code references (the few operand hits are inside music/graphics data) |
 | **$07FA-$07FF** | 6 | same (just above the PPU-update queue `$07F0-$07F9`) |
 | **$0698**, **$064C** | 1 + 1 | same, no references at all |
-| $01A0-$01E4 | 69 | never written: headroom of the main stack (deepest use seen $01E5). Free in practice; a deeper call chain would reach it |
+| $01A0-$01E4 | 69 | never written: headroom of the main stack (deepest use seen $01E5). Free in practice; a deeper call chain would reach it. **(critic)** also never written in the late-game run below; but a stack overflow lands here first (see the zero-page note), so treat it as a safety margin, not storage |
 | $0100-$010D, $0160-$0167, $0180-$0184 | 27 | never written: bottoms of the scheduler threads' stacks ($C5C3: tops $013F/$015F/$017F/$019F). Same caveat |
 
 No free zero page: the seven zero-page bytes that were never written in the run ($2D, $3B, $AF,
 $DD, $DE, $EA, $F5) all have code references (thread table, rare paths). Everything inside the
 object table, the palette buffers ($0360-$039F), the per-screen flags ($0340-$035F) and the sound
 work area ($0700-$07EF) counts as used even where a byte never changed.
+
+**Late-game confirmation (added by critic)** [seen] (`build/research/rm6/rm6-critic/freeram_late.py`,
+results in `freeram_late.txt`): the paths this run did not cover were played for 114,196 frames with two
+canaries ($5A, then $A5) in every candidate above: the Mr. X reveal into Wily 1, the Wily 3 hub and two
+refights killed, the rush exit into Wily 4, the Wily Machine phase 1 and 2 and the Wily Capsule killed, the
+whole ending (24,000 frames), boot after the START reset, a fortress game over with CONTINUE, and 8,000 frames
+of the title attract demo. **No candidate was written** (`$01A0-$01E4`, `$064C`, `$0698`, `$06AF-$06FF`,
+`$07FA-$07FF`), and the seven zero-page bytes, only observed, never changed either. Caution: a first attempt
+that also poked the canary into those zero-page bytes made the Wily Capsule's death overflow the stack (a
+repeating 8-byte frame with P = $B4, i.e. a BRK storm, written down through $01A0). They are live state
+(thread table and rare paths), so never borrow them.
 
 ## SELECT button
 
@@ -248,5 +259,9 @@ the password screen's cursor blink. **SELECT is free for Rockman 6 GP.**
 - **The object table is 23 slots x 29 arrays with cooperative AI threads** (resume pointer + bank per
   slot). New enemies slot in by adding type entries to the $3A tables ($82C9/$83C9/$84C9/$85C9) with
   code in a free bank; each AI yields with `JSR $E46C`.
-- **Vertical sections do not change `$57`**: any GP code that keys on "the current screen" (music
-  changes, checkpoints, gimmicks) must use `$0697`/`$0649`/camera Y as the game does.
+- ~~**Vertical sections do not change `$57`**~~ **(corrected by critic)**: `$57` *does* hold the
+  current screen index after every transition, vertical ones included (`levels.md` section 3: vertical
+  sections are simply more screen indices). It switches on the first frame of the transition, while
+  `$0697` switches when the scroll ends. The vanilla checkpoint routine (`CMP $57`, `$39:$8416`) relies on
+  it. GP code that keys on "the current screen" can use `$57`; use `$0697` if it must wait for the end of
+  the scroll. Within one screen, ladders move only the player (`$04CB`), not `$57`.

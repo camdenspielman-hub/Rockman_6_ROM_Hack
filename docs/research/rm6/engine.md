@@ -310,7 +310,7 @@ Weapon behaviour code (all bank `$38`, header via `$EBD5`, energy via `$9E8E` on
 | | Normal | Jet Rockman (`$9B` = 1) | Power Rockman (`$9B` = 2) |
 |---|---|---|---|
 | walk | 1.297 px (`$01.4C`) | same | same |
-| jump | vy0 = -4.95 px (`$FB.0C`), gravity 0.25 px/f², peak 51 px, 42 f airtime | same start, then **flight** while A is held | same as normal |
+| jump | vy0 = -4.95 px (`$FB.0C`), gravity 0.25 px/f², peak 51 px, 42 f airtime. **(critic)** the stored jump speed is `$FA.CC` (-5.20, `$38:$80E5`; `$FB.CC` off oil type 9); `$FB.0C` is the value after the first gravity step | same start, then **flight** while A is held | same as normal |
 | slide (DOWN+A) | 2.5 px/f (40 px in 16 f) | none | none |
 | charge `$9E` | +1 per frame; half at `$24`, full at `$5A` (= `$06AB`, 90 f) | **no charge** (always `$09`) | **+2 per frame** (full in 45 f); punch shots `$0C/$0E/$0F` |
 | B weapon energy | weapons cost energy | buster only | punch only |

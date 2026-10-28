@@ -143,13 +143,16 @@ Each weapon has a 256-byte table (bank `$20+w` @ `$B700`, by object id). Countin
 | Ring | 2 (52), 1 (20) | 8 | 2 / 8 |
 | Drill | **4 (44)**, 1 (20), 2 (13) | 6 | 4 / 6 |
 | Pharaoh | 2 (52), 1 (18) | 5 | 2 / 5 |
-| Bright | 2 (50); `$FF` for 21 ids | 8 | 2 / 8 |
-| Skull (Hell Wheel) | **3 (45)**, 1 (13), 2 (9); `$80`/`$FF` specials | 10 | - |
+| Bright | 2 (50); `$FF` (= 127, **instant kill**) for 21 ids | 8 | 2 / 8 |
+| Skull (Hell Wheel) | **3 (45)**, 1 (13), 2 (9); `$FF` instant kill for 20 ids, `$80` = no damage for 9 | 10 | - |
 | Rush Cannon | **63 (59 ids)**, 28 (17), 40 (2) | 8 | 28 / 8 |
 | Wish Star | 1 (74) | **60** | - |
 | ●TOAD / RECYCLE INHALER | own classification tables (§4.1, §5): transform, delete, damage, or inhale | 9 / 9 | - |
 
-These are hint.txt's "Drill 4, Skull 3, Ring/Pharaoh/Bright 2, Dive 1" [doc], confirmed. Normal enemies have tiny HP
+These are hint.txt's "Drill 4, Skull 3, Ring/Pharaoh/Bright 2, Dive 1" [doc], confirmed. Bit 7 in a table entry
+means "special" (`$42:$8B62`): for a special weapon it becomes 127 (instant kill) or 0; for the buster it is 0 unless
+an EXWP super-special weapon is equipped, in which case it is 127, so 4 object ids are immune to the plain buster
+but die at once to the set-piece weapons. Normal enemies have tiny HP
 (1-8 for most of what a walker meets in Bright, Drill and Skull), so the weapon number is roughly "hits to kill".
 
 ## 4. Boss weakness chart [code]
@@ -157,8 +160,8 @@ These are hint.txt's "Drill 4, Skull 3, Ring/Pharaoh/Bright 2, Dive 1" [doc], co
 Cell = damage per hit / invincibility frames set by the hit, read from the two ROM tables (chart.py). Robot-Master
 values match every earlier measurement in stages_a.md / stages_b.md / cossack.md / wily.md to the frame (their
 "126" is the 127 timer read one frame later). "Best" = frames to kill 28 HP if every hit lands the moment
-invincibility ends (fire rate floor 8 frames for Buster/Ring/Bright, 4 otherwise). Toad, Dust, Wish Star and Rush
-Search go through their own code and are covered in §5. Rush Cannon is shown for completeness (14 energy).
+invincibility ends (fire rate floor 8 frames for Buster/Ring/Bright, 4 otherwise). ●TOAD and the RECYCLE INHALER go through their own
+code (§4.1), as do Wish Star (§9) and Rush Search (§6). Rush Cannon is shown for completeness (14 energy).
 
 | Fight | Buster | Wire | Dive | Ring | Drill | Pharaoh | Bright | Skull | R.Cannon | Best (frames to kill 28) |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -205,8 +208,8 @@ Search go through their own code and are covered in §5. Rush Cannon is shown fo
 
 Reading the chart [code]:
 
-- **Robot Masters**: the buster and the Rush adaptors give all eight 127 frames; every other weapon gives 15-25,
-  except one or two "weakness" columns with 1-8 frames: **Bright Man ← Spark Manbow (1 frame: his own weapon
+- **Robot Masters**: the buster and the Rush adaptors give all eight 127 frames; every other weapon gives 15-40
+  (Spark Manbow 40, the inhaler 60), except one or two "weakness" columns with 1-8 frames: **Bright Man ← Spark Manbow (1 frame: his own weapon
   overloads him)**, Drill Man ← Hell Wheel (3), Ring Man ← Hell Wheel (8), Dive Man ← Spark Manbow (8), Pharaoh Man ←
   Drill (15 and the only 4-damage cell), Toad Man ← Pharaoh / ●TOAD (15), Dust Man ← ●TOAD (15), Skull Man ← Recycle
   Inhaler (15, and 6 damage instead of 3). Damage barely moves (1-4); **the weakness is in the i-frame column**,
@@ -255,7 +258,7 @@ Pressing B (4 energy) makes a suction field **56 px either side of a point 56 px
 | Class | Objects | Effect |
 |---|---|---|
 | `$01` | 111 ordinary enemy ids | sucked in, turned into a random pickup |
-| `$2n` | 25 ids + 18 sub-ids at `$21`, bosses at `$22`-`$2F` | n damage, never inhaled |
+| `$21`-`$3E` | 74 ids/sub-ids, including most fortress bosses and mid-bosses | that much damage (`& $1F`), never inhaled |
 | `$4n` | Whopper's part (`$45`) | n damage while it survives, inhaled when n ≥ HP |
 | `$60` | 11 projectiles/props | deleted outright |
 | `$83` / `$86` | the 8 Robot Masters (Skull Man `$86`) | 3 (6) damage; **when HP ≤ damage the boss itself is inhaled** and dies on arrival (28 damage) |

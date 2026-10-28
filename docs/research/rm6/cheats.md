@@ -131,6 +131,9 @@ What made it work on RM6:
 - **Score by the object-list window `$0649` only.** Vertical sections scroll the camera freely
   (`$58`) without touching `$57`/`$046F`, and many paths turn back left after a ladder. Scoring by
   screen or X stalled every stage at a ladder top. `$0649` advances along the path in both cases.
+  **(corrected by critic)**: `$57`/`$046F` do switch to the new screen on the first frame of a vertical
+  transition (`ram.md`). The stall came from screen numbers not growing monotonically along the path
+  (vertical runs and back-left turns reuse lower or higher indices), not from `$57` standing still.
 - **Death test by the player's AI pointer** (`dying(r)`): pit death parks it at $38:$8F13 for 60
   frames, HP death at $38:$8E7F for 240 frames. Y >= $F0 is not a death test, because dropping into
   the next screen of a shaft passes there too.

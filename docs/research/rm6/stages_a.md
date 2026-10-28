@@ -76,7 +76,10 @@ Per-stage tables in the fixed bank $3E, indexed by stage id `$51`:
   Exit = direction (1 down, 2 up, 5 right, 6 left = forward; 3 down*, 4 up* = back), CHR set, palette id,
   optional target (b7). Forward exits go to `target + 1` (default: this screen + 1), back exits to
   `target - 1`. Routine $8416 (`CMP $57`) = "set the checkpoint when the camera is on screen A";
-  $8480/$848E = boss shutter (next screen to the right); mode $FF = boss room. Init routines can start a
+  $8480/$848E = boss shutter (next screen to the right); ~~mode $FF = boss room~~ **(corrected by critic,
+  per `levels.md` section 0/9)**: the boss room is script `$0A`, whose pointer leads into the fixed bank
+  (`$3F:$F947` = init `$F94A`, mode 0); reading that address from bank $3A gave the `FF FF FF` that looked
+  like "mode $FF". Init routines can start a
   **stage effect thread** with `LDX #n / JSR $C5C7` (table $3E:$C632/$C64D/$C668/$C683; thread 2 is the
   effect thread). Many effect threads are palette cyclers ($3B:$911C, a delay byte then palette ids).
 - **Items** ([seen]: each type spawned next to Rockman with low HP/energy, `items.py`): $37 1-up,
@@ -510,7 +513,7 @@ Technical:
   chain $11) and the tide ($39:$8A70 + chain $14) all work by an IRQ split plus a collision offset that
   `$3E:$DA1C-$DA6A` applies **only for stage ids 0, 6 and 7**. Moving one of these gimmicks to another stage
   (or adding a new one) means extending that stage check; the IRQ handler chain table at `$3E:$C116` has
-  24 entries to pick from.
+  ~~24~~ **27 entries ($00-$1A; corrected by critic, see `engine.md` 4.2)** to pick from.
 - **Stage effect threads are a generic hook** (`LDX #n / JSR $C5C7`, thread 2): palette cyclers are pure data
   at `$3B:$9143` (delay + palette id list), so new animated palettes (lava, water, alarms) are cheap.
 - **Revisit palettes** (bank $28, used when `$06A0` = stage cleared) already give Knight and Centaur a second
