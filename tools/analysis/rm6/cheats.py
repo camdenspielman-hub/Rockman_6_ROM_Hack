@@ -251,11 +251,12 @@ def wait_playable(e, limit=3000, step=10):
 
 
 def in_stage(e):
-    """Heuristic: the stage main loop is running (player object alive, stage id sane)."""
-    return e.peek(O_TYPE) != 0 and e.peek(STAGE) < 16 and e.peek(GAMEFLOW) == 0
+    """The stage main loop is running: object slot 0 is the player (type 4, AI bank $38; Wily 4 starts
+    with type 3) rather than a menu cursor (title $2C, stage select $01, password $50)."""
+    return e.peek(O_TYPE) in (3, 4) and e.peek(STAGE) < 16 and e.peek(GAMEFLOW) == 0
 
 
-def warp(e, stage, ckpt=0, base='blizzard', wait=True, screen=None, chr_=None, pal=None):
+def warp(e, stage, ckpt=0, base='stage_blizzard', wait=True, screen=None, chr_=None, pal=None):
     """Teleport by RAM: from any in-stage state (else `base` is loaded first), set the stage id and the
     checkpoint, then raise the respawn code ($F0 = 2).  The game reloads the stage at that checkpoint,
     exactly as after a death (no boss-intro screen, no life lost).  ckpt indexes CHECKPOINTS[stage];

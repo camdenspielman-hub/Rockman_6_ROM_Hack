@@ -1,7 +1,7 @@
 # Rockman 6 (J) RAM map, v0 (rm6-scout)
 
-Status: **v0, in progress** (second run of rm6-scout; the first was killed by a container restart and its
-findings were recovered from its transcript). Tags: **[seen]** = verified in the emulator (how is noted),
+Status: **v0, complete for the requested fields** (second run of rm6-scout; the first was killed by a
+container restart and its findings were recovered from its transcript). Tags: **[seen]** = verified in the emulator (how is noted),
 **[code]** = from disassembly, **[guess]** = unverified. Helper constants for everything here live in
 `tools/analysis/rm6/cheats.py`; the warp toolkit and savestates are in `cheats.md`.
 
@@ -36,9 +36,9 @@ the boss in the second one sets bit 2 = the plate).
 
 | Addr | Meaning | Tag |
 |---|---|---|
-| $00-$0F | scratch / pointer temps (`$08/$09` = indirect JMP vector for AI calls) | [code] |
+| $00-$0F | scratch / pointer temps (`$08/$09` = indirect JMP vector for AI calls); on the stage select `$04`/`$05` = cursor column/row | [code]; [seen] cursor |
 | $10, $11, $15-$18 | far-call ($CB28) and bank-switch ($CB91) temps; `$11` = far-call id | [code] |
-| $21-$3C | 4 cooperative "threads": `$21+n` state, `$25` wait, `$29+n` saved S, `$2D+n` hi, `$34/$38+n` banks | [code] $C568 scheduler |
+| $21-$3F | 4 cooperative threads (n = 0-3): `$21+n` state (0 off, 1 waiting, 2 running, 8 new, $80 suspended), `$25+n` wait frames, `$29+n` saved S / start lo, `$2D+n` start hi, `$34+n`/`$38+n` saved $8000/$A000 banks, `$3C+n` saved `$10`; `$33` = current thread. Stacks: tops $013F/$015F/$017F/$019F, scheduler at $01FF | [code] $C568-$C61B; [seen] pause sets `$22`/`$23` = $80 |
 | $40 / $41 | joypad 1 / 2 held. A=$80 B=$40 SELECT=$20 START=$10 UP=$08 DOWN=$04 LEFT=$02 RIGHT=$01 | [code] $C711, [seen] |
 | $42 / $43 | joypad 1 / 2 newly pressed this frame | [code] [seen] |
 | $44 / $45 | previous held, inverted (edge detection) | [code] |
@@ -47,7 +47,7 @@ the boss in the second one sets bit 2 = the plate).
 | **$51** | **stage id** (table above) | [seen] |
 | $52/$53 | per-stage values from $DF35/$DF45 | [code] |
 | **$56 / $57** | **camera X pixel / camera screen** (`$57` = screen number along the level path) | [seen] scrolls with the player |
-| $58 / $59 | camera Y pixel / Y screen | [code] $DC87 |
+| $58 / $59 | camera Y pixel / Y screen. Vertical sections scroll freely on these while `$57`/`$046F` stay put | [seen] Flame ladder climb: `$58` $E4 -> 0 over 100 frames, `$57` unchanged; [code] $DC87 |
 | $63, $67, $6E, $6F | per-stage level-data pointers / bank (`$6F` = level bank) | [code] $DC00 |
 | $70-$7F | current screen's object-list pointers (`$74..$7F`, bank $3A tables) | [code] $3A:$8032 |
 | $80 | per-screen flag index (bitfield at $0340) | [code] $DB98 |
@@ -111,7 +111,9 @@ $01.4C px/frame) [seen] [code].
 
 | Addr | Meaning | Tag |
 |---|---|---|
+| $063D | stage id AND 7 | [code] $DBE1 |
 | $0642 | boss bar mode: 0 none, $FF intro (bar filling), 1 fight | [seen] boss room |
+| $0649 / $064A | level object list window: first / last entry in range. Advances along the level path, also through vertical sections (the best progress measure for an autoplayer) | [seen] 10 -> 13 on Flame's climb; [code] $3A:$8140 |
 | $064E / $064F | current base CHR set / extra CHR set | [code] $DC19, $D552 |
 | $0672 | IRQ scanline latch | [code] PLAN.md |
 | $067D-$067F | demo (attract-mode) input playback | [code] $C739 |
@@ -122,7 +124,7 @@ $01.4C px/frame) [seen] [code].
 | **$0688-$0691** | **weapon energy, slot 0-9** = R.BUSTER, Y.SPEAR, W.STORM, B.ATTACK, F.BLAST, PLANT.B, KNIGHT.C, SILVER.T, C.FLASH, BEAT. `$80` = not owned, else 0..$1B | [seen] menu order and bars; [code] $3B:$BA3F gives energy from the flags |
 | **$0692-$0695** | **progress bytes** (the password payload), 3 bits each, see the stage table | [seen] Blizzard kill sets `$0692` = 1; passwords |
 | **$0696** | **Energy Balancer** owned | [seen] password variant sets it; menu icon |
-| $0697 | screen number written by screen-transition scripts | [code] $D564 |
+| $0697 | target screen of the current screen transition (`$57` and `$046F` are set from it when it ends) | [seen] 5 -> 6 on a vertical transition; [code] $D564, $39:$82A8 |
 | **$0699** | **current weapon** (0-9, menu cursor); HUD weapon bar reads `$0688+$0699` | [seen] menu; [code] $CF77 |
 | $069E | current palette id | [code] |
 | $06A0 | "boss already beaten" (stage revisit) -> palettes come from bank $28 instead of $37 | [code] $CDF4, $C9F7 |
@@ -152,6 +154,16 @@ Stage rules found on the way [seen]:
 - `$06A0` = "stage already cleared" is latched at stage start ($3E:$CDF4) and only selects the
   revisit palette bank ($28 instead of $37).
 
+## Stage flow
+
+The game loop ($3E:$CD3B-$CDBA) starts a stage three ways: `$CD3B` new stage with its intro (fortress
+map, boss intro), `$CD43` new stage without the intro (`$CE52` resets checkpoint and boss state),
+`$CD46` respawn at the checkpoint (`$CDBD` loads stage `$51` at screen `$0684` with CHR `$0685` and
+palette `$0686`). The stage then runs until `$F0` != 0 ($CD5D): 1 = cleared (Robot Master stage:
+weapon get + stage select; fortress: `INC $51` and the next stage), 2 = respawn, 3 = game over
+(password screen with STAGE SELECT / CONTINUE, `$A9` reset to 2). [seen] all four outcomes by poking
+`$F0`; see `cheats.md`.
+
 ## Password RAM
 
 - `$0300-$0323`: the 6x6 grid, cell = row*6 + col (A1 = $0300 ... F6 = $0323); non-zero = orb
@@ -160,6 +172,9 @@ Stage rules found on the way [seen]:
 - Decoder $3F:$F3D0 writes `$0692-$0696`; `$0696` = the Energy Balancer bit of the key variant [seen].
 - Display after game over: $3F:$F477 picks one of two variants with `$F3` bit 1, so the same progress
   can show two different passwords [code].
+- An invalid grid (not exactly one key cell and one orb per byte) shows **"PASS WORD ERROR"** [text]
+  and leaves `$0692-$0695` = $FF [seen] (`img/scout_password_edge.png`). The empty password (nothing
+  beaten) A1 B1 B4 C4 E6 is valid [seen].
 
 ## Free RAM
 
@@ -197,3 +212,41 @@ revisit-palette loader at $C9FC), so it is unreachable. [seen] Holding/tapping S
 eight states (title, stage select, stage, boss fight, after the boss, all items, pause, password) leaves
 RAM identical except: pause menu = the generic "any key but B" cursor blip (sound $32, $38:$9397), and
 the password screen's cursor blink. **SELECT is free for Rockman 6 GP.**
+
+## Images
+
+- `img/scout_pause_flags.png`: pause menu with single flags poked: none, `$0695`=1 (JET), `$0694`=1
+  (POW), `$0696`=1 (Energy Balancer icon), E-tanks 7 / lives 5, `$0691`=$1B (BEAT listed), bit 2 in all
+  four bytes (B-E-A-T lit).
+- `img/scout_no_rematch.png`: walking into a beaten boss's room: Rockman beams out, the password
+  screen follows.
+- `img/scout_password_edge.png`: the empty password and Blizzard-only password accepted; 4 and 6 orbs
+  give PASS WORD ERROR.
+- `img/scout_gameover.png`: death with `$A9` = 0: GAME OVER over the password, then STAGE SELECT /
+  CONTINUE.
+- `img/scout_soundplayer_forced.png`: the bank-$28 sound player forced to run from an object slot
+  (draws its "O E" strip over the stage; rm6-text has the full screen).
+
+## Lessons for Rockman 6 GP
+
+- **Free RAM is scarce but real**: `$06AF-$06FF` (81 bytes) plus `$07FA-$07FF`, `$0698`, `$064C` are
+  never written and not read. That is the place for new GP state (new weapons' energy, extra
+  progress bits, a SELECT-menu cursor, the "spun" counters of a new mechanic). If more is needed,
+  the main-stack headroom `$01A0-$01E4` is untouched in practice, but anything new that recurses or
+  nests interrupts eats into it. There is no free zero page; borrow scratch `$00-$0F` inside a routine.
+- **SELECT is unused**, so GP can give it a job (quick weapon cycle, adaptor toggle, a GP-specific
+  menu) without breaking any vanilla behaviour. The only handler is in the dead sound player.
+- **Progress is four 3-bit bytes**, and the password format has no spare capacity (key cell +
+  exactly one orb per byte). New progress (extra stages, items) cannot ride in vanilla passwords;
+  GP needs either a new password scheme or save RAM. Vanilla has none: TGROM, header without the
+  battery bit, no `$A001` (PRG-RAM enable) write in the fixed banks and no real `$6000-$7FFF` access
+  [code]; GP would have to declare and enable it.
+- **Adaptors and Beat are derived from boss flags**, not stored. To award Rush Jet/Power or Beat
+  differently in GP, patch $38:$931D (menu) and $3B:$BA3F (stage start), not a separate inventory.
+- **No rematches**: a beaten boss's room ends the stage. A GP refight/boss-rush feature needs that
+  check changed, not just a new room.
+- **The object table is 23 slots x 29 arrays with cooperative AI threads** (resume pointer + bank per
+  slot). New enemies slot in by adding type entries to the $3A tables ($82C9/$83C9/$84C9/$85C9) with
+  code in a free bank; each AI yields with `JSR $E46C`.
+- **Vertical sections do not change `$57`**: any GP code that keys on "the current screen" (music
+  changes, checkpoints, gimmicks) must use `$0697`/`$0649`/camera Y as the game does.
