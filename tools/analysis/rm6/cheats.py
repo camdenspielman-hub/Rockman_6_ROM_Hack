@@ -5,9 +5,10 @@
     import cheats as c6
     e = Emu('roms/rm6j.nes'); e.load(c6.state('stage_select'))
     c6.give_all(e)                # every weapon, adaptor, Beat plate, the Energy Balancer, E-tanks, lives
-    c6.warp(e, 'tomahawk')        # stage start (or c6.warp(e, 5, ckpt=1) for its mid-stage checkpoint)
-    c6.godmode(e)                 # frozen HP / lives / invincibility timer
-    best, arch = c6.explore(e, budget=200000)   # Go-Explore autoplayer, returns the best savestate
+    c6.warp(e, 'tomahawk')        # stage start (ckpt=1 mid-stage checkpoint, ckpt=2 boss shutter)
+    c6.godmode(e, fuel=True)      # frozen HP / lives / invincibility timer (/ Rush Jet fuel)
+    best, ok, ck = c6.explore_to(e, until='ckpt')   # Go-Explore autoplayer to the next checkpoint
+    e.load(c6.state('knight_boss'))                 # ready states: see docs/research/rm6/cheats.md
 
 Only one Emu per process (stable-retro limit): reuse it with e.load().
 After e.load(), run one frame before e.shot() (the frame buffer is not in the state).
