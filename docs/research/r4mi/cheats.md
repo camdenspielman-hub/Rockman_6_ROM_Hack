@@ -331,7 +331,7 @@ the castle. After that, Cossack 1 opens on **the roof of a moving train** [seen]
 | Refill at pause | `$78CA ≠ 0` (C.RFL) |
 | Pick a weapon | `$A0 = slot` (`set_weapon(e, 'DIVE')`) |
 | A super-special weapon | `$78CB = 1..11`, then enter a stage. It replaces the buster (§9) |
-| Warp | `enter_stage()` from `extra_config.state`. Or, in a stage, poke `$22`/`$1F` and die (the respawn uses them) [guess, untested] |
+| Warp | `enter_stage()` from `extra_config.state`. Or, faster, in any stage: poke `$22` (stage) / `$1F` (checkpoint), then die (`$B0 = $81` and wait for a hit, or fall). The respawn reads both, so you reappear at that stage's checkpoint with your current loadout [seen: Ring → Ring cp2, and Ring → Bright cp1, 240 frames each]. `cheats.warp(e, stage, cp)` does this |
 | English | sys `$79` bit0 / `$78B0 = 1`. The opening story crawl stays Japanese even in EN [seen] |
 
 ---

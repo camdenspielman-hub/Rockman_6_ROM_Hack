@@ -192,6 +192,22 @@ def give_all(e, etanks=9, equip=0xFF):
     for a in range(0xB0, 0xBE): e.poke(a, 0x9C)
     e.poke(0x7839, equip); e.poke(0xA2, etanks)
 
+def warp(e, stage, cp=0, maxf=600):
+    """In-stage warp without menus: set $22/$1F, then drop the player into a pit (Y=$F0 every frame) so the respawn
+    loads that stage and checkpoint with the current loadout. TRAMPOLINE/BEAT ($60) and a frozen lives/HP value
+    are suspended during the fall and restored after. Returns frames to control (None on failure)."""
+    saved = {a: e._frozen.pop(a) for a in (0xA1, 0xB0, 0x378) if a in e._frozen}
+    eq = e.peek(0x7839); e.poke(0x7839, eq & ~0x60)
+    if e.peek(0xA1) < 2: e.poke(0xA1, 2)
+    e.poke(0x22, stage); e.poke(0x1F, cp)
+    lives = e.peek(0xA1); died = False
+    for _ in range(maxf):
+        e.poke(0x378, 0xF0); e.step()
+        if e.peek(0xA1) != lives: died = True; break
+    f = wait_control(e) if died else None
+    e.poke(0x7839, e.peek(0x7839) | (eq & 0x60)); e._frozen.update(saved)
+    return f
+
 def infinite_energy(e):
     for a in range(0xB1, 0xBE): e.freeze(a, 0x9C)
 
