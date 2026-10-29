@@ -1,3 +1,10 @@
+> **Superseded in depth by the full investigation (October 2026).** This file was the first, readme-level
+> teardown. The definitive results, from playing, decoding and disassembling the hacks, are in
+> [`docs/research/cx/SUMMARY.md`](research/cx/SUMMARY.md),
+> [`docs/research/r4mi/SUMMARY.md`](research/r4mi/SUMMARY.md) and, for the base game,
+> [`docs/research/rm6/SUMMARY.md`](research/rm6/SUMMARY.md), plus about 16,000 lines of topic docs beside them.
+> Where this file disagrees with them (for example on what the buster's invincibility applies to in 4MI), they win.
+
 # Deconstruction: Rockman CX and Rockman 4 Minus Infinity
 
 This is a teardown of the two reference hacks, covering both their technical construction and their design, and what each
