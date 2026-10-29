@@ -327,7 +327,7 @@ Three cards stacked vertically, each 6 tiles tall. Kalinka holds the clipboard a
 │ [8 venue icons: lit = won, medal colour]  │
 │  E1 E2 E3 E4   H1-H5 ▮▮▮▯▯   W ▯▯▯        │
 │  HOF PTS 37    BOLTS 625     12:34:56     │
-│  ★ RATING 87 (FINALIST)        TIUNS 143   │
+│  ★ RATING 87 (FINALIST)        KOS 143     │
 └───────────────────────────────────────────┘
 ```
 
@@ -388,9 +388,9 @@ GP keeps the shape (three rows of three frames and a centre) and the vanilla cur
 **bracket** and replaces the cell table with a node table.
 
 **Layout and pairing.** Four portraits stay in their vanilla cells (Blizzard, Wind, Tomahawk, Yamato). Four move so
-that each Exhibition pair (the PLAN §3.3 pairs) meets at one of the four inner crossings around the centre:
-
-The screen as a 5×5 grid. The frames sit on the even rows and columns, the badges on the four inner crossings:
+that each Exhibition pair (the PLAN §3.3 pairs, which both venue docs also use) meets at one of the four inner
+crossings around the centre. Think of the screen as a 5×5 grid: the frames sit on the even rows and columns, the
+badges on the four inner crossings.
 
 | | col 0 | (gap) | col 1 | (gap) | col 2 |
 |---|---|---|---|---|---|
@@ -518,9 +518,77 @@ the bracket code free of story special cases (CX lesson 7: special cases in visi
 | EVENTS2 b5 | RATEFLAGS.DOPED set | BREAK MAN WALKS: he stands at the bracket's edge, says one line, and leaves for good (§6.3) |
 | EVENTS b7 | CLEARED | The post-game bracket intro: "Welcome back, champion" |
 
+Three seen bits belong to scenes played **off** the bracket, but they use the same table and engine:
+
+- EVENTS b4: the trophy theft, run by START on the lit trophy;
+- EVENTS b6: Mr. Y's unmasking, on the Hall of Fame map after H5;
+- EVENTS2 b4: the SUPER adaptor, after H3.
+
+### 3.7 Game over and RETIRE [new-code] S · Must
+
+**RETIRE** is a new pause-menu row, available in every stage.
+
+- It returns to the bracket (or the fortress map) at once: no life is lost and no scorecard is shown.
+- It clears `IN_MATCH`, so it never counts as an unplug.
+- On an uncleared stage nothing is saved but the death counters already written.
+- The Opening Ceremony has no RETIRE: it is the tutorial, and the bracket does not exist yet.
+
+**GAME OVER** replaces vanilla's password screen.
+
+- Vanilla shows GAME OVER over the password grid, with STAGE SELECT / CONTINUE (`rm6/text.md` §5.4; music `$14`,
+  then `$15`). GP keeps both jingles and the two-choice shape, minus the grid:
+
+  | Choice | Does |
+  |---|---|
+  | **CONTINUE** | Restart this stage from its start: lives = the file's LIVES, E-tanks = max(held, the E-TANK FLOOR) |
+  | **RETIRE** | Back to the bracket or the fortress map. Vanilla's fortress game over offered CONTINUE only, but GP saves per stage, so retiring from a fortress loses nothing |
+
+- GAMEOVERS +1 is saved first (autosave 6).
+- Kalinka gets one line from a rotating table (`story.md`), such as *"He'll be back. They always come back."*
+- There is no E-tank halving (CX) and no other penalty: the cost is the run, and FAIR PLAY's 4 points (§6).
+
+### 3.8 The PIT STOP and garage UI [new-code] M · Must (shop, chips), Should (garage, booth)
+
+`systems.md` §8-§9 own the stock, the prices, the chips and the recipes. This is the screen. It opens with SELECT on
+the bracket: Eddie behind a counter, the bolt total top right, and a row list on the left.
+
+| Row | Contents |
+|---|---|
+| **SHOP** | The stock list: name, price, held / max. A greyed row reads `???` with its unlock (`AFTER 3 WINS`). Buying asks `BUY? NO/YES`; Eddie's line rotates |
+| **CHIPS** | A grid of the 15 chips (owned lit, unowned `?`), with `SLOTS 3/4` at the top. A toggles equip; SELECT shows the help page, 3 lines × 28 (`systems.md` §9.2) |
+| **GARAGE** | Appears once a PART is owned. The four recipes as `SNOW + EMBER → THERMO CORE`, unowned PARTs shown as `???` (`systems.md` §9.3). BUILD consumes both PARTs |
+| **MR. Y'S BOOTH** | After the Semifinal, until TURBO is taken (§3.2) |
+| **CONFIG** | The file's difficulty page (§11.2) |
+| **SAVE & QUIT** | Commits, then returns to the title |
+
+Leaving the pit stop is autosave 5. The same screen serves 1993 files with SHOP, GARAGE and the booth hidden
+(`systems.md` §13.3 closes the shop).
+
 ---
 
 ## 4. The judges' debrief
+
+### 4.0 The results screen (SYS-SC-2's presentation) [new-code] M · Must, [new-art] S · Should
+
+`systems.md` §6 owns the numbers; this is the screen. It is a black-backed **judges' desk** drawn in the top third:
+
+- Cossack (head judge) in the centre and Kalinka (commentary) at the left;
+- at the right, the **SPONSOR'S CHAIR**, where a cardboard Mr. Y cut-out always holds up a "1". After the unmasking
+  (EVENTS b6) the chair is empty and carries a `RESERVED` sign. It is one sprite: a running gag on every clear.
+
+The sequence (about 6 s, A skips each step):
+
+| Step | What appears | Frames |
+|---|---|---|
+| 1 | `MATCH RESULT: WIND MAN` and the stage time | 20 |
+| 2 | Five rows slide in from the right, one by one: `TIME 14/20`, `DAMAGE 11/20`, `VARIETY 25/25`, `SECRETS 5/20`, `STYLE 6/15`, each with a tick SFX | 5 × 16 |
+| 3 | The TOTAL counts up | 30 |
+| 4 | The **medal stamp** (or none), with the C/N/H/93 preset badge and, with Y-TURBO equipped, the `*` | 20 |
+| 5 | `PRIZE  +81 BOLTS`. On a replay: `IMPROVEMENT  +12` or `NO IMPROVEMENT` (`systems.md` §6.6) | 20 |
+| 6 | Secret icons for this stage: exit, room, item, plate and envelope; found ones lit, this run's new ones flashing | 20 |
+| 7 | The debrief hint types into the box below (§4.1) | text |
+
+Then autosave 4 runs, and the bracket returns.
 
 ### 4.1 How it plays [new-code] M · Must
 
@@ -591,7 +659,7 @@ One record per meta stage (22 records × 20 B = 440 B, in a data bank):
 ### 4.3 The venue predicate table [new-code + text] S · Must
 
 **One rule for every stage: predicates run in descending `systems.md` SECRETS weight** (exit 3, room 2, item 2,
-plate 1; §6.2), then **Gold**, then **Platinum**. So each hint points at the biggest gain still on the table. Room
+plate 1; `systems.md` §6.2), then **Gold**, then **Platinum**. So each hint points at the biggest gain still on the table. Room
 comes before item on the tie, as both venue docs do.
 
 The two venue docs proposed different orders: `venues_a.md` room → item → exit, `venues_b.md` exit → room → chip.
@@ -992,7 +1060,7 @@ The menu is a list (vanilla font) with the achievement plates in a strip at the 
 The engine reads only RULESET:
 
 - damage multiplier, drops, criticals, HARD;
-- lives policy, E-tank floor, safety net;
+- lives policy, E-tank floor, GUARDS, refill on respawn;
 - allowed weapons, forms and tag;
 - chips on/off;
 - checkpoints on/off, max HP, refill at pause;
@@ -1152,7 +1220,7 @@ A bit-grid editor over a 24-byte setup, 4MI's MY ARENA (`r4mi/modes.md` §3.5):
 |---|---|---|
 | +0..+5 | FIGHTS | 48-bit mask by fight id (they always run in run order, shuffled by SHUFFLE) |
 | +6 | WEAPONS A | b0-7 = the 8 champion weapons |
-| +7 | WEAPONS B | b0 BUSTER; b1 POWER; b2 JET; b3 SUPER; b4 TAG; b5 BEAT; b6-7 extra weapons |
+| +7 | WEAPONS B | b0 BUSTER; b1 POWER; b2 JET; b3 SUPER; b4 TAG (Break Man); b5 M.BEAM (slot 9); b6 BEAT RESCUE (`systems.md` §10); b7 reserved |
 | +8 | GIFTS | lobby bits (§9.2.2); 0 = no lobby |
 | +9 | SHUFFLE | 0 fixed, 1 all, 2 all but the finale block, 3 within blocks |
 | +10 | TANKS | low nibble E-tanks 0-9, high nibble W-tanks |
@@ -1160,7 +1228,8 @@ A bit-grid editor over a 24-byte setup, 4MI's MY ARENA (`r4mi/modes.md` §3.5):
 | +12 | LIVES | 0-9 (0 = one life) |
 | +13 | DIFF | b0 HARD; b1 reserved (criticals are always OFF in GP Rush, `systems.md` §14); b2-3 DAMAGE; b4 SHORT I-FRAMES (cap 30); b5 REFILL AT PAUSE; b6 CHIPS ON; b7 reserved |
 | +14..+15 | RULES | Exhibition Rules mask (§9.3) |
-| +16..+19 | CHIPS | the chip set used when CHIPS ON (owned-chip bit order) |
+| +16..+17 | CHIPS | the chip set used when CHIPS ON (16 bits, `systems.md` §9.2 order); slot limits are ignored here |
+| +18..+19 | reserved | |
 | +20 | ORIGIN | the preset it was loaded from |
 | +21..+23 | reserved | |
 
@@ -1252,9 +1321,9 @@ one help line per field. GP does the same, in hex and bit grids.
 |---|---|
 | WHERE | STAGE (meta 0-23 → stage id) · CP (checkpoint 0-7, from the stage's checkpoint table) · SCREEN (raw `$0684` override, `FF` = use CP) |
 | PROGRESS | CLEAR (24-bit STAGE_CLEAR) · STORY · EVENTS · EVENTS2 · FORMS `TAG SUP JET POW` |
-| SECRETS | 24 × 4-bit grid `PLT ITM RM EX`, one row per meta stage |
-| LOADOUT | WPN `CEN KNI TOM YAM FLA PLA WIN BLI` · WPN2 · E-TANK · W-TANK · LIVES · BOLTS · CHIPS (32-bit) · EQUIP (6 slots) |
-| RULES | DIFF preset · DIFF A · DIFF B · RULES mask (§9.3) |
+| SECRETS | 24 × 5-bit grid `ENV PLT ITM RM EX`, one row per meta stage |
+| LOADOUT | WPN `CEN KNI TOM YAM FLA PLA WIN BLI` · WPN2 `M.BEAM` · E-TANK · W-TANK · LIVES · BOLTS · CHIPS (16-bit owned) · EQUIP (16-bit equipped) · PARTS / PARTS USED · METALLS · RATEFLAGS `DOVE KO RIV CARD DOPE` |
+| RULES | DIFF preset · DIFF A · DIFF B · DIFF C · RULES mask (§9.3) |
 | CHEATS | LIVES LOCK · REFILL AT PAUSE · GOD (HP pinned, pits and spikes respawn you in place) · BOSS HP 1 · RNG LOCK (seed 16-bit) |
 | DEBUG | LAG BAR (PPUMASK grey bit on while the main thread runs, so lag is visible as a bar) · OBJ COUNT (live objects in the corner) · FRAME STEP (SELECT+START freezes; SELECT steps one frame) · HITBOXES (Could) |
 
@@ -1440,7 +1509,7 @@ handful of **menus**. Dialogue and hints stay ENGLISH, so nothing becomes unread
 | Bracket | POSTPONED | POSTPONE |
 | Bracket | EXHIBITIONS | EXHIBITON MATCH |
 | Weapon get | YOU GET | YOU GOT A |
-| Weapon names | C.FLASH | C.FLRSH |
+| Pause-menu weapon name | C.FLASH | C.FLRSH (the YOU GET card already keeps vanilla's C.FLRSH in every language, `systems.md` §3.9) |
 | Scorecard | MEDAL / PLATINUM / BOLTS | METAL / PLATINAM / BORTS |
 | Shop | WELCOME! | ALL YOUR BOLTS ARE BELONG TO EDDIE |
 | Pause | CALL / RETIRE | CALL HIM / GIVE UP |
@@ -1474,7 +1543,10 @@ Rule for the text pass: ENGRISH is affectionate, never mocking, and never in sto
 | Riot intro animation | [new-code][new-art] | S | Should |
 | Bracket event queue | [new-code] | S | Must |
 | Fortress map BACK TO BRACKET | [new-code] | S | Should |
+| Results screen: judges' desk, slide-in rows, medal stamp, prize line | [new-code][new-art] | M | Must (the sponsor's-chair gag: Should) |
 | Judges' debrief engine + predicate tables + hint text (EN/JP) | [new-code] | M | Must |
+| PIT STOP UI: shop, chips grid, garage, booth, file CONFIG | [new-code][new-art] | M | Must (shop, chips) / Should |
+| Game over screen + pause RETIRE | [new-code] | S | Must |
 | Medal derivation + HoF points | [new-code] | S | Must |
 | Championship rating + Break Man debrief | [new-code][new-art] | M | Must |
 | Doping hooks: DOPED flag, BREAK MAN WALKS event, asterisks | [new-code] | S | Should (with `systems.md` SYS-CHP-4) |
@@ -1537,13 +1609,13 @@ Rule for the text pass: ENGRISH is affectionate, never mocking, and never in sto
 
 | Doc | Must agree on |
 |---|---|
-| `systems.md` | The scorecard rows, maxima and medal thresholds 40/60/80/95 (medals derive from the best score). Kill attribution (PACIFIST, VARIETY hints). The chip id order (CHIPS_OWNED bits), a chip-source attribute per chip (shop / garage / venue / TURBO) so rating T6 can count Eddie's chips. **The moral trade-off is `systems.md`'s doping (SYS-CHP-4: TURBO from Mr. Y's booth; Break Man refuses; records get an asterisk)**: this doc scores it (T1, T7) and stores RATEFLAGS.DOPED. The PART inventory, the garage and TURBO's effect are `systems.md`'s. Removing vanilla's no-rematch beam-out. W-tanks and consumables (FILE `$033-$037`). The RULESET fields it reads. Criticals shipping or not |
+| `systems.md` | **Adopted from it:** SELECT opens the pit stop from the bracket (§1.5 there); medal points B1/S2/G3/P4; best PAY and the C/N/H/93 badge per stage (STAGEREC +1/+2); the per-stage TURBO asterisk; Time Attack and GP Rush with criticals OFF and drops NONE; its save list (§15.1 there) is all in the FILE block (§1.6). **Amended here:** its §13.1 puts every setting in the system block, but this doc keeps the difficulty group **per file** (§11). The scorecard rows, maxima and medal thresholds 40/60/80/95 (medals derive from the best score). Kill attribution (PACIFIST, VARIETY hints). The chip id order (CHIPS_OWNED bits), a chip-source attribute per chip (shop / garage / venue / TURBO) so rating T6 can count Eddie's chips. **The moral trade-off is `systems.md`'s doping (SYS-CHP-4: TURBO from Mr. Y's booth; Break Man refuses; records get an asterisk)**: this doc scores it (T1, T7) and stores RATEFLAGS.DOPED. The PART inventory, the garage and TURBO's effect are `systems.md`'s. Removing vanilla's no-rematch beam-out. W-tanks and consumables (FILE `$033-$037`). The RULESET fields it reads. Criticals shipping or not |
 | `story.md` | STORY_BEAT values. Break Man's join condition (event b5) and his debrief voice. Kalinka as the judges' speaker. The Riot intro lines. Roll's adaptor hand-off lines. The trophy theft. The post-game bracket intro. ENTRANT FILES panel data for new bosses. The Mr. X Returns premise. Bass Mode line swaps. The attract crawl |
 | `venues_a.md` / `venues_b.md` | Their secrets are used as written (§4.3-§4.4). Their hints are tier B **verbatim**, and the tier A riddles must be re-checked if they change. **The debrief order is this doc's weight rule** (exit → room → item → plate, then Gold, Platinum), not the per-doc orders they proposed. venues_b to add tier B lines for Yamato and Centaur. Plates: A and B ride on the secret exits (venues_a), E and T are JET predicates (venues_b). Each venue's one **mini-record** (Wind's SHOOTING DOWN %, Tomahawk's quick-draw time, and one per other venue if wanted) goes in SYS `VENUE_REC`. Mid-boss fight ids `$08-$17` with arena screens (CONGA, AYACO, the Daruma, …). Bass solutions for adaptor gates (Could) |
 | Exhibition owner (venues or fortress) | **Pairs: E1 Wind + Knight, E2 Tomahawk + Plant, E3 Blizzard + Flame, E4 Yamato + Centaur** (PLAN §3.3). Guest fight ids `$18-$1B` |
 | `fortress.md` | The Hall of Fame and Castle maps get BACK TO BRACKET. Saves per wing. **Mr. X's business card**: one pickup somewhere in H1-H5, setting RATEFLAGS.MRX_CARD. The SECRETS bits of non-venue stages. Fight ids `$1C-$25` and their arenas. The `???` finale. Mr. X Returns' chair fight. Whether the W2 refight hub reuses vanilla Wily 3's tables (GP Rush can share the hub art) |
 | `tech.md` | PRG-RAM size and the NES 2.0 NVRAM declaration. Page 0 reserved for the save (`$6000-$7A1F`). Work-RAM placement. The meta column in the stage-attribute table. Stage ids for the fight table. Keeping vanilla Mr. X 1's layout and tileset in ROM (Mr. X Returns). The text engine's language hook (ENGRISH override table). The DEV build flag. Mailbox handling in RESET |
-| `art_audio.md` | The title logo, bracket nametable, badges, medal ribbons, POSTPONED stamp, Bass β and trophy portraits, the cracked frame, the file cards, the participation ribbon, the lobby tunnel (from the Opening tileset), achievement plates, Museum booth meters, and the GP fanfare |
+| `art_audio.md` | The title logo, bracket nametable, badges, medal ribbons, POSTPONED stamp, Bass β and trophy portraits, the cracked frame, the file cards, the judges' desk with the Mr. Y cut-out on the sponsor's chair, Eddie's pit-stop counter, the Mr. Y booth sprite, the participation ribbon, the lobby tunnel (from the Opening tileset), achievement plates, Museum booth meters, and the GP fanfare |
 | Opening Ceremony owner | One extra **lobby screen** (players' tunnel) in the stadium tileset for GP Rush |
 
 ## 16. Risks
@@ -1556,9 +1628,9 @@ Rule for the text pass: ENGRISH is affectionate, never mocking, and never in sto
 2. **PRG-RAM shared with work RAM.** The write gate cannot protect the save then. The ping-pong copies and the commit
    marker are designed for exactly this case, but **power-cycle testing on real hardware** (EverDrive) is needed
    before release.
-3. **Save size growth.** The FILE block has 190 reserved bytes and the system block 210. If `systems.md` needs more
-   (per-row scorecard bests take 120 B), the FILE block can grow to 1 KB by moving the copies, but only before v1.0:
-   after release, only migrations.
+3. **Save size growth.** The FILE block keeps about 150 reserved bytes and the system block about 200, after taking
+   in everything `systems.md` §15.1 asks for. If more is needed (per-row scorecard bests would take 120 B), the FILE
+   block can grow to 1 KB by moving the copies, but only before v1.0: after release, only migrations.
 4. **Rating balance.**
    - The 3-hour T11 limit and SPEED KING's 1:30 are guesses; tune them against playtest saves (the RECORDS totals
      exist for this).
@@ -1578,16 +1650,17 @@ Rule for the text pass: ENGRISH is affectionate, never mocking, and never in sto
    - EXTRA CONFIG and the mailbox;
    - RECORDS 1-3;
    - Time Attack.
-8. **The `1993` preset's promise** ("vanilla damage tables, forms that can't fire") needs `systems.md` to keep the
-   vanilla tables reachable. If not, 1993 shrinks to "no chips, no shop, no tag, classic lives".
+8. **The `1993` preset's promise** (vanilla damage tables, forms that can't fire) rests on `systems.md` §13.3's
+   generated "1993" row set (a Should). If it slips, 1993 shrinks to "no chips, no shop, no tag, classic lives", and
+   the 1993 achievement's text must say so.
 
 ## 17. Open questions
 
 1. Should the Semifinal be **forced at once** after the 4th win (a tighter story) instead of the POSTPONED lock (which
    lets the player shop and replay first)? This doc picks the lock.
 2. Should **RETIRE** from an uncleared stage cost a life? This doc says no. RETIRE is free and is not an unplug.
-3. Is **Kalinka** the right per-stage debrief speaker, or should the judges be separate characters (PLAN's three judge
-   portraits), for example with Mr. Y's sponsor chair always holding up "1"? Art cost against the gag.
+3. Is **Kalinka** the right per-stage debrief speaker, or should Cossack, as head judge, speak the hints? This doc
+   picks Kalinka: she is the one who "hears things", and Cossack already owns the scorecard.
 4. Does Time Attack's regulation loadout include **Break Man's call** from his join point? This doc says no, to keep
    records pure.
 5. Should **unlocks** be per file instead of global (4MI is global)? Global is simpler and kinder.

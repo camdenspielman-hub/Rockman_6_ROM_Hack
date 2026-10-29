@@ -86,7 +86,7 @@ Built once, owned by `tech.md`. My working labels (prefix **X-** so they don't c
 | **X-LABEL** | A 4-8 letter room label drawn with sprites under the life bar (4MI Pharaoh's curse words) | Centaur ZONE cards, Yamato PASS n/3 | `[new-code S · Should]` |
 | **X-EXWP** | A set-piece weapon that replaces the buster for a stretch and is dropped at a stand (4MI EXWP: Quint's pogo) | Yamato pogo | `[new-code M · Must]` |
 | **X-FLOOR** | New floor types through the group remap (`$3E:$DB03/$DB13`): *ski snow* (forced slide), *hot spring* (slow heal), *nightingale* (chirps) | Blizzard, Centaur, Yamato | `[new-code S each · Should]` |
-| **X-GPOBJ** | One generic "GP object" type with a sub-id and a per-sub-id code bank (4MI's `$5E` pattern). Only 30-32 type ids are free in the whole ROM; these four venues alone add about 45 object kinds | all four | `[new-code M · Must]` |
+| **X-GPOBJ** | One generic "GP object" type with a sub-id and a per-sub-id code bank (4MI's `$5E` pattern). Only 30-32 type ids are free in the whole ROM; these four venues alone add about 46 object kinds | all four | `[new-code M · Must]` |
 | Stage-attribute table | BRIEF §7.2; lets the ship (chain 1), tide (chain `$14`) and spike ceiling (chain `$11`) run in any stage | Yamato ceiling; tide in Centaur's boss rooms | `[new-code M · Must]` (tech.md) |
 | Commentator pop-up | T2 text window, 1-2 lines, toggleable (BRIEF §5.5) | all hooks in this doc | owned by meta/tech |
 
@@ -117,6 +117,16 @@ instead of damage, once per fight, worth a STYLE point if `meta.md` agrees).
   the icebreaker is the *MR. Y MARU*; a vizier with a familiar moustache watches from the palace balcony; an Atlantean
   mural of a bald man with a moustache labelled "THE Y-MAN SHALL COME"; an Edo **WANTED** poster: `MR. Y - 1,000,000 RYO`.
 - The champions are good-natured rivals (BRIEF §2): they trash-talk, they don't hate you.
+
+### 0.7 What changed from PLAN §3.2
+
+| Venue | Kept from PLAN | Changed, and why |
+|---|---|---|
+| Blizzard | the vertical ascent; Topi-bots pushing ice into holes; the condor secret exit; the skiing boss who makes snowballs | ice ceilings break to a **head-bonk**, not "shoot or Power-punch upward" (Ice Climber's verb, no adaptor, and the BRIEF says destructible ceilings are new tech, so they get one clear rule); the **downhill autoscroll** becomes a forced-slide floor (no T1 needed); the rocking ship, which PLAN dropped, is back (BRIEF §6 keeps it) |
+| Flame | plates and timed gates; loose floors; chompers; igniting oil; the mirror room's Shadow Rock; "don't fight your shadow" | the merge rule is **"don't fire for 5 s, then touch it"**, not "walk in with the buster unequipped": unequipping is not a PoP verb, and because the shadow copies you, holding fire is self-teaching; the oil gets a **player choice** (chandeliers) instead of being only a boss pattern |
+| Centaur | numbered zones linked by doors, warp and fake doors; the tide; the galloping boss; C.FLASH's time stop | the secret exit is **ZONE 100 at low tide**, not a "ZONE 1 → ZONE 9" door (a door you can only open by reading the tide uses the vanilla set piece); "walls that crack under a Power punch" are dropped (no secret here needs an adaptor); the tide is **confirmed vanilla** (chain `$14`) and gets a dwell |
+| Yamato | rooftop ninjas; sliding-door secret passages; falling-ceiling traps; the Daruma Otoshi mini-boss; the helmet that flies off at half HP; the DuckTales pogo as Y.SPEAR's Power synergy | "press UP at one hanging scroll" had no tell, so scrolls became a **mechanic with a tell** (they flutter) and the secret exit became **Goemon's three passes**; the pogo is also an **in-stage set piece** (EXWP) so the venue itself is DuckTales, not only the weapon you win |
+| All | homage set pieces | PLAN reused each vanilla tileset; BRIEF §4 gives **every venue a new tileset slot**, vanilla CHR kept and extended |
 
 ---
 
@@ -175,7 +185,7 @@ Peak objects in brackets. CHR and palette are named by vanilla id where kept.
 | **07** | Stern. E-tank on the aft deck (vanilla v12 had one). Disembark right onto the ice shelf | rider x1 [4] | | exit right: CHR `$82`+new set, palette `$1C`; ship thread off (vanilla screen-13 script) |
 | **08** | **CHECKPOINT 1** at the foot of the mountain. A wooden sign: `↑ SUMMIT 2,000 M / USE YOUR HEAD` | none [1] | | Checkpoint 1 (08). The climb starts with an up exit at the top right |
 | **09** | **Climb 1** (5 floors, 48 px apart: Rockman's jump rises 52 px, measured, so 4 px of clearance). Floor 1 already has a hole; floor 2 has a single breakable cell: **bonk it** (Cossack: "Use your head! Literally."). Floors 3-5 mix breakable blue cells and unbreakable brown rock | Toppy x1 [4] | first wrap: floor 4's only gap is across the screen edge | X-BONK, T6, X-WRAP, X-UPEXIT. Commentator BLZ-05 |
-| **0A** | **Climb 2**: two Toppies patch holes 300 f after you make them, so you have to commit to a column | Toppy x2, Nitpicky x1 [6] | Nitpicky dives (tell: hover 20 f + screech) | first Toppy you **shoot** triggers BLZ-07 (the SNOW CHAINS tell) |
+| **0A** | **Climb 2**: two Toppies patch holes 300 f after you make them, so you have to commit to a column | Toppy x2, Nitpicky x1 [6] | Nitpicky dives (tell: hover 20 f + screech) | the first Toppy you **hit** triggers BLZ-07 (the SNOW CHAINS tell), before any can be destroyed |
 | **0B** | **Climb 3**: a wide gap on floor 3 crossed on **two drifting clouds**. *(CHECKPOINT 2 on arrival at the camp ledge on floor 1)* | clouds x2, Nitpicky x1, Toppy x1 [7] | falling from floor 1 is a pit; higher floors fall onto lower floors (safe) | Checkpoint 2 (0B) |
 | **0C** | **Climb 4**: slippery-ice floors (type 5): bonking while sliding carries you past the hole. Icicles hang under floor 5 | Toppy x1, icicles x3 [6] | slippery floors + bonk = the venue's skill test | |
 | **0D** | **Climb 5**: the **no-wrap floor** (floor 3, see §1.5.2) | Toppy x2 (one walks floor 3), Nitpicky x1 [6] | | the hidden room's tell |
@@ -222,8 +232,8 @@ before dying is still there (and so is any hole a Toppy patched).
 
 #### 1.5.2 Hidden room: the Vegetable Cellar (1E) `[engine-ok + X-WRAP opt-out · Must]`
 
-- **Gate:** on screen 0D, **floor 3 does not wrap**. Walk off its left edge and a left exit (type 6, explicit target
-  `$1F`, so it lands on 1E) takes you into a one-screen ice cave.
+- **Gate:** on screen 0D, **floor 3 does not wrap**. Walk off its left edge and X-WRAP's per-row opt-out runs a left
+  exit instead (type 6 with the explicit target `$1F`, which lands on 1E): a one-screen ice cave.
 - **Tell:** the Toppy that patrols floor 3 walks off the left edge and **does not come back** on the right (every other
   Toppy in the climb visibly wraps). The left wall of floor 3 has a darker, cracked doorframe in the ice.
 - **Contents:** a frozen **giant eggplant** statue (Ice Climber's bonus vegetable), an E-tank, two large weapon
@@ -237,8 +247,9 @@ before dying is still there (and so is any hole a Toppy patched).
   allowed; destroying voids the chip for this visit.
 - **Why it is a trade-off** (4MI lesson 3): Toppies patch the holes you need, so sparing them costs time (the
   scorecard's TIME) and patience. The tidy solution, the charged shot, is exactly what voids the chip.
-- **Tell:** BLZ-07 on the first Toppy you shoot ("Don't hurt the seals! They're union workers!"). A spared Toppy
-  bows as you pass it on a higher floor. The debrief hint (§1.12).
+- **Tell:** BLZ-07 on the first Toppy you hit, even a harmless shove ("Don't hurt the seals! They're union
+  workers!"), and BLZ-15 on the first one destroyed. A spared Toppy bows as you pass it on a higher floor. The debrief
+  hint (§1.12).
 - **Award:** the **Toppy foreman** waits in the shutter corridor (15 on the main route, 19 on the secret route) and
   hands over the chip if no Toppy was destroyed (a sad-seal sprite otherwise). The chip goes to `meta.md`'s list.
 - **Proposed effect:** SNOW CHAINS: no ice slide (momentum off on types 5/`$15`), and falling icicles bounce off your
@@ -348,7 +359,7 @@ Drafts for `story.md` (K = Kalinka, C = Cossack; ≤ 2 lines each). Ids are stab
 | BLZ-04 | MR. Y MARU banner on screen | K: "Sponsored by Mr. Y." C: "It's Wily." K: "It's definitely Wily." |
 | BLZ-05 | first bonk breaks a cell | C: "Use your head! Literally!" |
 | BLZ-06 | first Toppy refill | K: "Hey! It filled the hole back in!" |
-| BLZ-07 | first Toppy destroyed | K: "Don't hurt the seals! They're union workers!" |
+| BLZ-07 | first Toppy hit (shoved or destroyed) | K: "Don't hurt the seals! They're union workers!" |
 | BLZ-08 | Shirokuma on screen | C: "Is that... a polar bear in sunglasses?" K: "He looks cool." |
 | BLZ-09 | ski run starts | K: "He's skiing! Does he even have skis?" |
 | BLZ-10 | condor first appears | K: "The condor! Jump for its feet!" |
@@ -356,6 +367,7 @@ Drafts for `story.md` (K = Kalinka, C = Cossack; ≤ 2 lines each). Ids are stab
 | BLZ-12 | first F.BLAST hit on Blizzard Man | K: "He's melting!" C: "That's what you get for skiing on solar power." |
 | BLZ-13 | snowman built | C: "He built a snowman. Mid-match. The judges love it." |
 | BLZ-14 | pinch (yodel) | K: "Is he... yodelling?" C: "AVALANCHE!" |
+| BLZ-15 | first Toppy destroyed | K: "You broke a seal!" C: "The union will hear about this." |
 
 **Death lines** (rotate, BRIEF §5.5):
 
@@ -389,7 +401,7 @@ First missed secret, in this order (BRIEF §5.4: real hints, never WIP text):
 - F.BLAST melts the `$D` ice walls on 0C and 18 (two pockets: a large energy and a 1-up), as vanilla's E-tank at v09.
 - Y.SPEAR wall spears reach the high ledge on 05 (bolts).
 - KNIGHT.C and SILVER.T clear Nitpickies from below (their arcs reach diving birds).
-- B.ATTACK's Jet bombs break ice cells from above, so a revisit can open holes ahead of time: a faster climb for Time
+- F.BLAST's upward column (its alternate) melts the ice cell above you without a bonk: a faster climb for Time
   Attack.
 - **Tag partner** (Could): Break Man's shield blocks the icicle rain on the ship if you jump through it; the optional
   shortcut is a stern-deck ledge only his double knockback reaches.
@@ -413,7 +425,7 @@ with Flame Man.
 |---|---|---|
 | Raise/drop plates and portcullises; the gate that closes as you roll under it | **T3 plates + gates**, a timed gate you slide under | `[new-code M · Must]` (T3) |
 | Loose floor tiles that shake, fall, crush guards and land on plates | **Loose tile** object | `[new-code S · Must]` |
-| Spikes that spring up; stepping carefully | **Spike traps**; the slide is the careful step | `[new-code S · Must]` |
+| Spikes that spring up as you pass | **Spike traps**: bait them, then cross while they re-arm | `[new-code S · Must]` |
 | Chompers (slicers) | **Chomper** doors | `[new-code S · Must]` |
 | Sword guards who parry | **Palace guard-bots** on the vanilla class-3 shield rule (frontal shots reflect) | `[engine-ok]` rule + `[new-code S · Must]` AI |
 | The skeleton that reassembles | **Skeleton-bot** | `[new-code S · Should]` |
@@ -445,12 +457,12 @@ Screens used: main 00-16 (23), secret 17-1A (4), hidden room 1C (1) = **28 of 32
 | **03** | **The palace gate.** A portcullis and a raise plate in front of it: step on the plate and the gate rises (60 f) and stays up 300 f. Teaches plates | DANGER drums (scenery) [2] | | T3. Exit right loads the palace CHR set (new) and the dungeon palette. FLM-03 |
 | **04** | Inside the gate the floor ends: **drop into the dungeon** (PoP starts in the dungeon). Torches | none [1] | | down exit; torch palette cycle (a bank-`$3B` cycler, data only) |
 | **05** | **Loose-floor puzzle.** The right gate is shut. Its plate is on the lower floor, under a loose tile of the upper floor. Walk over the loose tile: it shakes 20 f, falls, **lands on the plate**, and the gate stays open (the tile's weight holds it). A Metall below gets crushed if it is under the tile | Metall x1, loose tiles x3 [5] | loose tiles | the classic PoP move, taught with no damage at stake. FLM-04 |
-| **06** | **Spike corridor.** Three spike traps rise 12 f after you come within 24 px and stay up 60 f. **Slide** past (2.5 px/f clears a trap in 13 f): the slide is PoP's careful step | spike traps x3 [4] | spikes = 6 dmg | Jet hovers over; Power waits for the retract. FLM-05 |
+| **06** | **Spike corridor.** Three spike traps spring 12 f after you come within 24 px, stay up 60 f, then stay down 40 f while they re-arm. **Bait one, step back, and cross while it re-arms** (walking clears a trap in about 25 f, a slide in 13 f) | spike traps x3 [4] | spikes = 6 dmg | Jet hovers over them. FLM-05 |
 | **07** | **First guard duel.** A palace guard-bot: frontal shots reflect (vanilla class-3 shield), he advances and slashes. Shoot him during the 16-f wind-up of his slash, jump behind him, or use a charged punch (always hits class 3) | guard x1 [3] | | FLM-06 |
-| **08** | **The timed gate.** A raise plate on the left opens the right gate for 240 f; it lowers during the last 60 f. While its bottom is still 16 px above the floor you can **slide under it** (PoP's roll) | spike trap x1 [3] | gate closes (blocks; no damage) | T3 timed. The plate can be pressed again |
+| **08** | **The timed gate.** A raise plate on the left opens the right gate for 240 f; it lowers during the last 60 f. While its bottom is still above the slide's height (tune to the slide hit box, `$059A` id 3) you can **slide under it** (PoP's roll) | spike trap x1 [3] | gate closes (blocks; no damage) | T3 timed. The plate can be pressed again |
 | **09** | **CHECKPOINT 1.** A palace hall: carpets, columns, a window onto the oil field | none [1] | | Checkpoint 1 (09) |
 | **0A** | **Chomper hall.** Three chompers in doorways, each closed for 8 f every 90 f, offset by 30 f. Tell: a glint and a "shing" 12 f before they close | chompers x3, Fire Telly x1 [5] | chomper 8 dmg | C.FLASH's time stop freezes them (revisit) |
-| **0B** | **THE OIL GALLERY** (the oil twist, §2.5.3). Three oil pools on the floor, each with a guard standing in it and a **chandelier** on a chain above it. Shoot a chain: the chandelier falls, **that pool ignites** (its own metatile id), and its guard burns. The pool is now deadly for the rest of the visit, so you take the **upper balcony** over it instead (harder jumps, a Fire Telly). Or don't, and fight the guards in slow oil | guards x3, chandeliers x3, Fire Telly x1 [8] | the choice per pool; the Telly can ignite a pool itself | each pool uses a **distinct oil metatile id** so they ignite separately (vanilla's per-id rule). FLM-07 |
+| **0B** | **THE OIL GALLERY** (the oil twist; it is also where FIREPROOF is usually lost, §2.5.3). Three oil pools on the floor, each with a guard standing in it and a **chandelier** on a chain above it. Shoot a chain: the chandelier falls, **that pool ignites** (its own metatile id), and its guard burns. The pool is now deadly for the rest of the visit, so you take the **upper balcony** over it instead (harder jumps, a Fire Telly). Or don't, and fight the guards in slow oil | guards x3, chandeliers x3, Fire Telly x1 [8] | the choice per pool; the Telly can ignite a pool itself | each pool uses a **distinct oil metatile id** so they ignite separately (vanilla's per-id rule). FLM-07 |
 | **0C** | **The balcony.** A window with the **vizier**: turban, Wily's moustache, waving. Fire Tellies over a last oil channel | Fire Telly x2 [4] | | FLM-08 (the Mr. Y gag) |
 | **0D** | **The skeleton.** A skeleton-bot: at 0 HP it collapses into bones for 120 f, then rises with full HP. It is destroyed for good if it falls into the pit in the middle of the room (a **charged shot knocks it back 16 px**), if a loose tile falls on its bones, or if it stands in burning oil. Or just run past while it is bones | skeleton x1, loose tile x1 [4] | pit | |
 | **0E** | **THE MIRROR ROOM** (§2.5.1). A tall mirror on the right wall. When you reach the middle of the room, **Shadow Rock** steps out of the glass | Shadow Rock [3] | | FLM-09. T7 |
@@ -547,7 +559,7 @@ per-position flags, like vanilla breakables), so a death never undoes a puzzle y
 | **Skeleton-bot** | new | 4, then bones 120 f, then full HP | slow walk, slash; destroyed for good by a pit, a loose tile or burning oil; a charged shot knocks it back 16 px | `[new-code S · Should]` |
 | **Raise plate / gate / timed gate** | new (T3) | - | plate (metatile, alternate set when pressed) + gate (16x48 sprite, solid, rises/lowers 1 px/f) | `[new-code M · Must]` |
 | **Loose tile** | new | - | a floor cell (T6 bit) until stood on: it shakes 20 f, then the cell clears and a falling-tile object spawns (so only falling tiles cost an object slot); breaks on landing; 4 dmg to what it lands on; weighs down plates | `[new-code S · Must]` |
-| **Spike trap** | new | - | rises 12 f after the player comes within 24 px, up 60 f, down 12 f; 6 dmg | `[new-code S · Must]` |
+| **Spike trap** | new | - | springs 12 f after the player comes within 24 px, up 60 f, then down and disarmed 40 f; 6 dmg | `[new-code S · Must]` |
 | **Chomper** | new | - | 8 f closed every 90 f, offset param; tell 12 f; 8 dmg | `[new-code S · Must]` |
 | **Chandelier** | new | 1 (the chain) | falls, ignites the pool below (calls the vanilla ignite on that pool's id), 6 dmg if it lands on you | `[new-code S · Must]` |
 | **Shadow Rock** | new (T7) | 12 | §2.5.1 | `[new-code M · Must]` |
@@ -603,7 +615,7 @@ an all-oil floor: slow walk, low jump. `[engine-ok]`)
 | Section | Poke | Kind |
 |---|---|---|
 | Ignition lesson 01 | the Telly hovers 60 f instead of 120 f | AI param |
-| Dungeon 06 | spikes rise 6 f after you come in range (a slide started early still clears them) | param |
+| Dungeon 06 | spikes re-arm after 25 f instead of 40 f (a slide still clears them) | param |
 | Dungeon 08 | timed gate 240 → 180 f | param |
 | All | loose tiles shake 10 f instead of 20 f | param |
 | Chompers 0A | cycle 90 → 70 f, closed 8 → 12 f | param |
@@ -737,7 +749,7 @@ DOOR IS A PAINTING.` That is the whole rule set, and the tell for every door in 
 | **0A** | 11 | **MAZE 4: THE BLACK ZONE.** The BG palette goes black; only sprites, the doors' glowing plaques and a few glowing wall glyphs show the room. Door `12` (honest). **The `0` door** glows on a high ledge reached from a floating stone (§3.6.2) | piranhas x2, floating stone x1, doors x2 [6] | jumps in the dark | CEN-07. C.FLASH lights it on revisit |
 | **0B** | 12 | **MAZE 5.** Doors `13` (honest) and `99` (**cracked**: lies, back to 07) | seahorse `$C4` x1, doors x2 [4] | | |
 | **0C** | 13 | **CHECKPOINT 2.** **The tide starts** (vanilla chain `$14`, about 60 px of travel). GP adds a **60-f dwell** at both extremes, so "high tide" and "low tide" are states you can read and wait for | seahorse x1 [3] | | Checkpoint 2 (0C); the vanilla tide init (script 5B) moved here, plus the dwell parameter (`tech.md`) |
-| **0D** | 14 | **The tide as a lift.** A ledge with a large energy and the way on sits 80 px up: **only a swim-jump at high tide** reaches it. At low tide you walk under the overhang | seahorses x2 [4] | | CEN-12 |
+| **0D** | 14 | **The tide as a lift.** A ledge with a large energy and the way on sits 80 px up: **only a swim-jump at high tide** reaches it (estimate from the vanilla constants: water gravity `$00.18` up to a surface 60 px high, then `$00.40`, gives about 90 px, against 52 px on land). At low tide you walk under the overhang | seahorses x2 [4] | | CEN-12. Verify the height in the emulator (M4) |
 | **0E** | 15 | **THE SUNKEN DOOR.** On the floor of the room, a barnacled door with the plaque `100` and a painted tide line across it. It opens **only while the tide is at its lowest** (the 60-f dwell plus the slow approach: about 90 f in each 6-s cycle of 244 f of travel plus two dwells). Otherwise UP does nothing and bubbles stream from its frame (§3.6.1) | seahorse x1, piranhas x2 [5] | | the secret exit. CEN-13 |
 | **0F** | 16 | Waterfall room (vanilla v0E-v0F): climb out of the water past dome turrets and a red spearman | dome turret `$2B` x2, spearman `$70` x1 [5] | | up exit; palette `$CA` |
 | **10** | 17 | **Tower base** (Kid Icarus Underworld bricks): a hot spring, a second Nasubi Mage | Nasubi Mage, waterfall enemy `$A5` x1 [4] | | |
@@ -775,6 +787,8 @@ DOOR IS A PAINTING.` That is the whole rule set, and the tell for every door in 
 - **Tell:** the door is in plain sight on the room's floor; a tide line is painted across its frame at exactly the
   open level; while it is shut, bubbles stream from it and UP plays a "locked" thunk. Kalinka (CEN-13) when it first
   opens: "ZONE 100? That's the whole game!" Atlantis players know the legend of warping deep.
+- **Fallback** (if the tide's dwell can't be added while its logic still runs in the IRQ): the door opens in the bottom
+  24 px of the tide's travel instead, about 96 f in each 244-f cycle. `[engine-ok]` tide + `[new-code S]` door.
 - **Effect:** 1A → 1B → the Sunken Throne 1C; the kill sets the secret flag.
 
 #### 3.6.2 Hidden room: ZONE 0 (1D) `[new-code S · Must]`
@@ -1000,7 +1014,7 @@ Screens used: main 00-16 (23, including the bypass 0C-0F), E route 18-1A (3), se
 | **02** | **JUNCTION** (vanilla): ladder up to 03 (main), or a **Power block** in the right wall (charged punch) → the bypass 0C | Jaja-nin x1 [3] | | vanilla breakable ids `$38-$3B` kept. Tell: the venue's standard cracked Power-block art |
 | **03** | Up through the mansion's floors: three thin wooden floors with gaps, ninjas on each; bonk your way up | Jaja-nin x3 [5] | | up exit (ladder at top), CHR `$98` (vanilla interior) |
 | **04** | **The runner ninja**: a ninja holding a paper (**PASS #1**) runs right at 1.5 px/f, hopping gaps; he leaves the screen after about 6 s. Shoot him (3 hits) or bonk-stun him and he drops the pass. The PASS counter appears | runner, samurai `$A2` x1 [4] | | YAM-04, YAM-05. A missed runner is back on the next visit |
-| **05** | **THE NIGHTINGALE FLOOR.** Gold floorboards **chirp** when you walk or land on them (not when you slide); each chirp lowers the **spiked ceiling** 8 px (Knight's chain `$11` handler, §4.5.1); quiet, it rises 1 px every 4 f. The ceiling starts 112 px up: walk the whole floor and it is down to about 32 px, too low to jump the samurai's spears at the far end. **Slide and it never moves** | samurai `$A2` x1 [3] | ceiling spikes (deadly) | YAM-06, YAM-07. Jet hovering is silent too; Power walks and pays for it |
+| **05** | **THE NIGHTINGALE FLOOR.** Gold floorboards **chirp** when you walk or land on them (not when you slide); each chirp lowers the **spiked ceiling** 8 px (Knight's chain `$11` handler, §4.5.1); after 60 f of quiet it rises 1 px every 4 f. The ceiling starts 112 px up: walk the whole floor and it is down to about 32 px, too low to jump the samurai's spears at the far end. **Slide and it never moves** | samurai `$A2` x1 [3] | ceiling spikes (deadly) | YAM-06, YAM-07. Jet hovering is silent too; Power walks and pays for it |
 | **06** | **THE SCROLL ROOM.** Three hanging scrolls. Two **flutter** (a draft behind them): UP in front of one and the wall **spins** (donden-gaeshi, 24 f) and puts you on its other side. Scroll A hides a closet with **PASS #2**; scroll B is a shortcut down to 08. The still scroll: K: "It's just a scroll." | hopping shuriken robot `$69` x2 [4] | | YAM-08, YAM-09 |
 | **07** | Down through a shoji shaft: shuriken robots, a bubble cluster | `$69` x2, `$25` x1 [4] | | down exit |
 | **08** | **Paper walls**: shoji panels (collision `$D` → `$19` in group 2) hide two pockets that **F.BLAST burns open** on a revisit (a 1-up, bolts) | samurai `$A2` x1 [3] | | `[engine-ok]` |
@@ -1047,7 +1061,8 @@ them; leaving the venue resets them (the sekisho wants three in one visit, as Go
   landing, plays a chirp and posts a "chirp" event. A slide (2.5 px/f) never chirps; nor does the Jet in flight.
 - **Ceiling:** Knight's descending spike ceiling (IRQ chain `$11`, handler `$3E:$C337`, logic inside the IRQ; the
   collision offset through `$069C`, `$3E:$DA40`). Vanilla lowers it steadily; here **each chirp lowers it 8 px** (over
-  8 f) and silence raises it 1 px every 4 f. It needs the stage-6 checks generalised (the stage-attribute table).
+  8 f), and after 60 f without a chirp it rises 1 px every 4 f (walking chirps every ~18 f, so a walker never gets
+  that respite). It needs the stage-6 checks generalised (the stage-attribute table).
 - **The lesson:** slide = quiet. Normal Rockman can cross it untouched; Power Rockman can't slide and must hurry;
   Jet Rockman hovers. The fallback if the chain can't be re-homed: the ceiling is a row of sprite spike blocks that
   drop on chirps `[new-code S]`.
@@ -1361,12 +1376,13 @@ DuckTales' pogo.
 - **4. Friends as mechanics:** the Centurions block arrows; Toppies refill the secret arena's floor if you spared them;
   Beat's plates are rewards for the Jet.
 - **5. Behaviour-gated secrets with a hint after the fact:** four chips, 13 debrief hints, all written.
+- **6. Old tools, new jobs:** the charged buster frees the Centurions and knocks skeletons into pits; the slide is
+  the way across the nightingale floor and under the closing gate; the vanilla Fire Telly becomes the ignition lesson.
 - **7. Theme into mechanics:** a fire marshal, a nightingale floor, a revolving stage, a tide you read like a clock,
   a summit bonus round.
 - **8. Map edits by bosses:** Blizzard's snowball breaks the secret arena's floor; the kabuki stage swaps sets.
 - **Pharaoh's curse words** → the ZONE labels; **Quint's pogo** (EXWP) → the spear pogo; **Toad's hidden-room link**
-  → the one-screen detours that return you; **Dust's TEMP gauge** → the bonus timer and the PASS counter in the
-  boss-bar slot; **Toad/Bright reacting to their own weapons** → the self-weapon reactions; **HARD as small data
+  → the one-screen detours that return you; **Dust's TEMP gauge** → the bonus timer in the boss-bar slot; **Toad/Bright reacting to their own weapons** → the self-weapon reactions; **HARD as small data
   pokes** → §1.10, 2.10, 3.10, 4.11.
 
 **Vanilla Rockman 6** (`rm6/SUMMARY.md` §7):
@@ -1393,7 +1409,7 @@ DuckTales' pogo.
    skip the lookup.
 3. **IRQ-resident logic.** The tide (handler `$C3D8`) and the spike ceiling (`$C337`) run game logic inside the IRQ.
    The tide dwell (Centaur) and the chirp-driven ceiling (Yamato) change that logic. Do them after the MMC5 port's
-   generic raster list moves the logic into an effect thread (BRIEF §7.1); fallbacks are given in §3.4 and §4.5.1.
+   generic raster list moves the logic into an effect thread (BRIEF §7.1); fallbacks are given in §3.6.1 and §4.5.1.
 4. **X-UPEXIT is a Could in the BRIEF.** Without it, Blizzard's climb and Centaur's tower use ladder stubs at each screen
    top: playable, but less Ice Climber. I argue it up to Should here.
 5. **Lag** on Flame 0B (the gallery) and Centaur 11-12 (Reaplet alarms): both are capped in the tables, but must be
@@ -1402,7 +1418,7 @@ DuckTales' pogo.
    change there has to replace something.
 7. **Fairness of the behaviour gates.** FIREPROOF can be lost on screen 01 by a first-time player; that is intended
    (a replay goal), but the lesson there must be generous (120-f hover). SNOW CHAINS punishes the charged shot, the
-   natural tool, so its tell (BLZ-07) must fire on the first destroyed Toppy every visit.
+   natural tool, so its tell (BLZ-07) fires on the first *hit*, before any Toppy can be destroyed, every visit.
 8. **Tedium in the climb.** Toppy refills can make the climb slow. CASUAL raises the refill delay to 600 f, and the
    climb has a checkpoint halfway (0B).
 9. **Flashes.** Hanabi, C.FLASH, the merge flash and the black zone's glow must honour the "reduced flashes" option

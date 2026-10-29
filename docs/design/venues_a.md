@@ -49,12 +49,14 @@ moving, invincible player; logs `bossmove_*.json`, sheets `bossmove_*.png`):
 | **Secret exit** | An alternate route that ends in a **second boss room**. Killing the boss there sets the venue's secret-exit flag (new save bit, `meta.md`) and, in Knight and Tomahawk, the plate bit | Vanilla's own plate mechanism: exits with explicit targets into `$18-$1F` plus the boss-screen test `$3F:$F4EB`/`$F518`, moved into the stage-attribute table [engine-ok] S Must |
 | **Hidden room** | Exactly one screen (4MI convention), off any route, with a visible tell | One extra exit with a target, or a door warp (T3) |
 | **Behaviour-gated item** | A chip earned by *how* you play a set piece, never bought | A per-venue counter in work RAM, tested when the reward object spawns |
-| **Plates** | Knight keeps **A**, Tomahawk keeps **B**, both in their vanilla boss rooms (`$1A`, `$1F`). Wind and Plant had none and get none | Unchanged plate logic [engine-ok] |
+| **Plates** | Knight keeps **A**, Tomahawk keeps **B**, in their vanilla boss rooms (`$1A`, `$1F`). Wind and Plant had none and get none | Per `systems.md` §10 a plate is a **pickup object**; here it drops in the secret boss room when the boss dies, so it is always collected with the secret exit (`meta.md` §4.3 counts it with the exit) [new-code] S Must |
 
 Secret exits feed the Exhibitions (BRIEF §3): **Wind + Knight unlock E1**, **Tomahawk + Plant unlock E2**.
 
-Debrief (4MI's predicate table, BRIEF §5.4): each venue lists its predicates in order; the first one missed prints
-its hint. Hints are written below in full (EN draft); none are placeholders.
+Debrief (4MI's predicate table, BRIEF §5.4): `meta.md` orders each venue's predicates by the `systems.md` SECRETS
+weights (exit 3, hidden room 2, behaviour item 2, plate 1), so the order is exit → room → item, and the first one
+missed prints its hint. Hints are written below in full (EN draft; `meta.md` §4.4 uses them as tier B); none are
+placeholders.
 
 ### 0.3 Adaptor and partner rules
 
@@ -113,6 +115,21 @@ binding limit** (256 BG tiles live at once). New art therefore enters as extra *
 the BG table by screen exits** (`$0A00-$0FFF` or `$0000-$01FF`, exactly as vanilla's `$91`/`$95`/`$98` sets do), and
 large set pieces are sprites or one-off BG bosses. Each section lists which CHR state each screen uses.
 
+Capacity was measured, not guessed (`build/design/design-venues-a/swapcap.py`, `planttiles.py`): for each group
+of vanilla screens, the BG tile ids those screens never reference are the room a swapped-in set can take there.
+The runs quoted below (for example "`$B5-$FF` free on Knight 01, 0A-0D, 15") come from that script.
+
+### 0.8 Scoring and economy data (what `systems.md` §6-§9 asks of each venue)
+
+| Venue | Featured enemy family (dies outright to the champion's weakness; the first such kill per save drops the venue PART, `systems.md` §9.3) | VENUE ACT (STYLE, 1 point) | TIME par (tune) | Venue prize bolts (≤ 60, paid once per save) |
+|---|---|---|---|---|
+| Wind | `$34` shield-cars (sortie and 09-0B): C.FLASH ignores the shield and drops them, the same flash that stalls Wind Man | **ACE**: SHOOTING DOWN 100 % | 4:45 (the sortie is a fixed 2:00) | none |
+| Knight | `$6E` lance knights (Trap Hall, encounter 2): Y.SPEAR outreaches their lances and drops them outright, the tell for the boss | **SPELLBREAKER**: interrupt HEALMORE | 4:30 | 20 (the torch-pocket pouch, 08-09) |
+| Tomahawk | `$6C` cowboy gunners (desert, train robbers): PLANT.B's pollen makes them sneeze off their crates, the tell for HAY FEVER | **QUICKEST GUN**: win the high-noon draw | 5:00 (the train is a fixed 0:55) | 60 (bounties 15 / 20 / 25) |
+| Plant | `OBJ_SCORPION` (underground): B.ATTACK freezes a cold-blooded scorpion outright | **VINE KILL**: kill an enemy while hanging on a vine | 4:00 | 60 (treasures 10 / 15 / 15 / 20; a rhinestone pays 0) |
+
+Each hidden room also holds that venue's **sponsor envelope** (30 bolts, once per save, `systems.md` §7).
+
 ---
 
 ## 1. Wind Man: SKY ACE 1943
@@ -133,8 +150,8 @@ and shutter v14; boss `$99`, AI `$31:$8AFC`; weakness C.FLASH (4); W.STORM lande
 |---|---|---|
 | Slot **TS_WIND** | Copy of `$2C:$80` tables; 24 free block ids plus reclaimed ones | [engine-ok] S Must |
 | Kept (vanilla CHR) | `$83` sky, clouds, coral girders, gold pillars, green tower shaft, fans and updraft tiles; `$8C`, `$8D`, `$8E` (dark base) | [engine-ok] |
-| **W-CARRIER** (new third, `$0A00-$0FFF`, ~96 tiles) | Grey steel deck, deck stripes, catapult track, arresting wires, lamp board, elevator rim, the tower's girder landing strip | [new-art] M Must |
-| **W-SEA** (new third, ~64 tiles) | Sea band (512-px loop), distant islands, the destroyer silhouette for the sea band | [new-art] S Must |
+| **W-CARRIER** (new set, ~96 tiles, at ids `$54-$B3`: v00's screens leave `$54-$E9` free) | Grey steel deck, deck stripes, catapult track, arresting wires, lamp board, elevator rim, the tower's girder landing strip | [new-art] M Must |
+| **W-SEA** (new set, ~64 tiles, at ids `$76-$B5`: the open-sky screens v08-0A leave `$76-$E9` free) | Sea band (512-px loop), distant islands, the destroyer silhouette for the sea band | [new-art] S Must |
 | **W-HANGAR** (new third, ~96 tiles) | Hangar interior, parked fighters as BG, bomb racks, the wing's top surface for 1C-1D | [new-art] M Should |
 | AYACO bomber | Must: sprite build (48x24, 4 engine parts). Should: BG art in the sky band (~110 tiles, loaded only during its phase) | [new-art] M Must / L Should |
 | Sprites | Propeller Met fighter (green and red), gold leader, Kite Met, deck crew Met, seagull, POW / 3-WAY / AUTO / YASHICHI icons, LOOP icons "R", lamp icons, windsock, loop pose of Rockman on Rush (4 frames) | [new-art] M Must |
@@ -268,19 +285,20 @@ tornados ride a gust; Kite Mets ride it and fall when it stops. Engine fans (11-
 - Entry: on 0A, one cloud is solid (one metatile with collision 1 and cloud art: CX's "clouds are not floors",
   inverted). A seagull stands on it and squawks every 4 s. A rope ladder's bottom 16 px hangs above it; climbing
   takes the up exit (target `$1D` → 1E).
-- Content: the balloon's gondola: an E-tank, two large weapon energies, a 1-UP (`systems.md` sets the drops).
+- Content: the balloon's gondola: the **sponsor envelope**, an E-tank, two large weapon energies (`systems.md` sets
+  the drops).
 - Exit: ladder down back to 0A.
 - Hint: "A SEAGULL WAS STANDING ON A CLOUD. CLOUDS AREN'T FLOORS... ARE THEY?"
 
 **Behaviour item: the YASHICHI chip** [new-code] S Must.
 - Earned by juggling one POW through 8 hits (§1.3.1). The first time the pinwheel is taken, the chip is granted.
-- Proposed effect (`systems.md` decides): once per stage, a hit that would kill you at 2+ HP leaves 1 HP (the 4MI
-  Skull Amulet idea, in Capcom's oldest secret item).
+- Effect (`systems.md` §9.2): once per stage, the first time HP falls to 4 or less, the pinwheel spins and refills
+  HP to full: Capcom's full-restore item.
 - Tells: the POW visibly changes on the first hit; Kalinka comments on the first change ("It changes when you shoot
   it!"); the pinwheel is a famous Capcom secret.
 - Hint: "SHOOT THE POW. THEN KEEP SHOOTING IT."
 
-Predicate order for the debrief: hidden room → YASHICHI → secret exit.
+Debrief order (`meta.md`, by weight): secret exit (WI0) → hidden room (WI1) → YASHICHI (WI2).
 
 ### 1.7 Boss: Wind Man, "MASTER OF WIND"
 
@@ -309,8 +327,9 @@ the rework adds a **blow** phase and the 1943 pinch.
 
 | Weapon | Effect | Tags |
 |---|---|---|
-| **C.FLASH (weakness)** | **STALL**: his fans stop for 120 f (no push, no tornados, no pinwheels); if airborne he drops; smoke puffs sputter from his propellers; the windsock goes limp. With C.FLASH's time-stop alternate (if `systems.md` keeps PLAN's Up+B), the stall lasts 180 f. Short i-frames per BRIEF §5.1 | [new-code] S Must |
-| **W.STORM** | Special case in code (CX lesson 7): **absorbed**. No damage; his suction gets +50 % for 60 f. This turns vanilla's "W.STORM landed only once" quirk into a rule. K: "He LIKES that!" | [new-code] S Must |
+| **C.FLASH (weakness)** | **STALL**: his fans stop for 120 f (no push, no tornados, no pinwheels); if airborne he drops; smoke puffs sputter from his propellers; the windsock goes limp. With C.FLASH's time-stop alternate (UP+B, `systems.md` §3.9), the stall lasts 180 f. 4 damage, 16-f i-frames (`systems.md` Table 2); the STALL replaces the generic weak freeze (SC9) | [new-code] S Must |
+| **W.STORM** (own) | `systems.md` SC4: the **first** W.STORM hit of the fight is **absorbed**: no damage, his suction +50 % for 60 f (vanilla's "W.STORM landed only once" quirk, on purpose). K: "He LIKES that!" Later hits are the normal own cell (1 / 60 f) | [new-code] S Should (SC4) |
+| Y.SPEAR (good, 3 / 20) | Jams a fan: the push stops for 30 f | [new-code] S Could |
 | Charged Power punch | Knocks him out of B or D (lands him) | [new-code] S Should |
 | Jet form | Headwind halves Jet speed; a tailwind doubles it: a preview of W.STORM's Jet synergy "Tailwind" (PLAN) | Should |
 
@@ -372,6 +391,7 @@ the hangar bomb carts; Y.SPEAR through `$34` shield-cars; SILVER.T's arc vs Kite
 updraft reaches the hidden ladder without the seagull's cloud; charged Power punch opens the 04 pocket.
 
 ---
+
 ## 2. Knight Man: DRAGON QUESTLIKE
 
 **Pitch.** Knight Man's castle is run as a Dragon Quest theme park, "TANTE-GP CASTLE". A King gives you the quest,
@@ -394,7 +414,7 @@ shield = attack class 3 (front shots reflect; only the full punch always hits); 
 |---|---|---|
 | Slot **TS_KNIGHT** | Copy of `$2D:$80` tables (Knight shares bank `$2D` with Centaur in vanilla; the new slot ends that coupling) | [engine-ok] S Must |
 | Kept | `$9E` green stone castle, battlements, purple and red halls, arched windows, chains, spiked ceilings, banners, blue machine hall, gates, ladders; torches `$9F-$A1`; the sunset sky of v00; the revisit palettes | [engine-ok] |
-| **K-DQ** (new third, ~48 tiles, swapped in on 01, 0A-0D, 15) | Two thrones (32x32), stone tablet, inn bed, cracked floor and trapdoor, the hidden-stairs metatiles (the alternate set of the v15 pillar) | [new-art] S Must |
+| **K-DQ** (new set, ~48 tiles at ids `$B5-$E4`, swapped in on 01, 0A-0D and 15, which leave `$B5-$FF` free; the machine hall 12-14 needs `$97-$DF`, so the 12 exit restores them) | Two thrones (32x32), stone tablet, inn bed, cracked floor and trapdoor, the hidden-stairs metatiles (the alternate set of the v15 pillar) | [new-art] S Must |
 | Window frame | The DQ-style white frame on black comes from the T2 text engine's font set (shared with `story.md`) | [new-art] S Must (shared) |
 | Basement | No new tiles: v18-1A keep `$9E` under a black palette with sconce sprites | [engine-ok] |
 | Sprites | King, Sage, Innkeeper, Princess Roll (Roll in a gown), chest (closed/open), Killer Chest, Metslime, Metal Metslime, ceiling winch, sconce flame, MAGIC KEY icon, Roll's Love heart | [new-art] M Must (Princess, Innkeeper: Should) |
@@ -408,7 +428,7 @@ shield = attack class 3 (front shots reflect; only the full punch always hits); 
 | **02** | v02 | Down the shaft; a **locked door** at the bottom eats key 1, then right | `$3D` pod (1, not 3) | "THOU HAST NO KEY." if somehow keyless (the chest is unmissable) | T3 S Must |
 | **03-06** | v03-v06 | **The Trap Hall** (§2.4): fight the ceiling or run under it | `$6E` lance knights (3) | Spike ceiling with 4 winches; palette cycle `$75-$77` kept | [new-code] S Must |
 | **07** | v07 | Up | `$65` skeleton robot | | [engine-ok] Must |
-| **08-09** | v08-v09 | **Tower of torches** (torch CHR animation kept) | `$67` swooper | The green ring blocks (collision `$D`) stay F.BLAST pockets: one holds a large weapon energy, the other 30 bolts in a pouch | [engine-ok] S Must |
+| **08-09** | v08-v09 | **Tower of torches** (torch CHR animation kept) | `$67` swooper | The green ring blocks (collision `$D`) stay F.BLAST pockets: one holds a large weapon energy, the other a 20-bolt prize pouch | [engine-ok] S Must |
 | **0A** | v0A | Tower top; **Princess Roll** at a window (§2.6) | none | "BUT THOU MUST!" | T2 S Should |
 | **0B** | v0B | **Checkpoint 1** = the **INN** (§2.6) | none | Innkeeper YES/NO | T2 S Should (the checkpoint itself Must) |
 | **0C** | v0C | **ENCOUNTER 1** at x `$40` (§2.3) | 3 Metslimes, 1 Killer Chest | Victory chest: MAGIC KEY 2 | VA-ENCOUNTER M Must |
@@ -493,7 +513,7 @@ reveals the stairs down to the real Dragonlord.
 - **Route**: 15 ↓ 18 (dark basement, two locked doors) → 19 → **1A KNIGHTLORD**.
 - **The dark basement** [engine-ok + new-code S]: 18-19 start with the BG palette black (the vanilla dark-room
   precedent: Yamato v0E, Plant's gorilla rooms). **RADIANT**: every shot fired lights the BG for 30 f, then it fades
-  back over 16 f. Two sconces (`OBJ_SCONCE`, HP 1): shoot both and the room stays lit. F.BLAST lights both at once.
+  back over 16 f. Two sconces (`OBJ_SCONCE`, HP 1): shoot both and the room stays lit. F.BLAST lights both at once; C.FLASH lights the whole room for 240 f (`systems.md` §3.9).
 - **Debrief hint**: "THE KNIGHTLORD'S THRONE IS EMPTY. WHY? SEARCH WHERE NO ONE SITS."
 
 ### 2.6 NPCs: King, Sage, Inn, Princess
@@ -511,7 +531,7 @@ reveals the stairs down to the real Dragonlord.
 - Entry: on 0D a floor tile glints for 8 f every 4 s (the only glint in the venue). Search on it: a trapdoor opens
   (alternate metatiles), drop through the down exit (target `$1D` → 1E).
 - Content, after Erdrick's tablet in DQ1: a stone tablet: "I, THOMAS LIGHT, HAVE LEFT THIS FOR MY DESCENDANT. TELL
-  NO ONE. ESPECIALLY NOT WILY." An E-tank and a 1-UP.
+  NO ONE. ESPECIALLY NOT WILY." The sponsor envelope, an E-tank and a 1-UP.
 - Exit: ladder up to 0D.
 - Hint: "SOMETHING GLITTERED ON THE FLOOR OF THE HALL. THOU DIDST NOT SEARCH."
 
@@ -519,14 +539,14 @@ reveals the stairs down to the real Dragonlord.
 - `OBJ_METALMETSLIME` on 12: "A METAL METSLIME APPEARS!". HP 8; **every hit does exactly 1** whatever the weapon
   (visible special case); 2-f i-frames; hops erratically at 2 px/f; flees through the right edge at f240 ("THE
   METAL METSLIME ESCAPED!"). It returns on the next visit to 12 (after a death, or a replay).
-- Killed: "AN EXCELLENT MOVE! ROCK GAINED 1000 EXP." and the chip drops. Proposed effect: PLAN's Critical Chip
-  (1/16 chance of double damage with a chime). `systems.md` owns the numbers.
+- Killed: "AN EXCELLENT MOVE! ROCK GAINED 1000 EXP." and the chip drops. Effect (`systems.md` §9.2): critical
+  chance 1/16, or, with criticals off, a deterministic EXCELLENT MOVE (+2) on every 12th boss hit.
 - Best tools: many small hits, not big ones (B.ATTACK's four flakes, an AUTO-style rapid buster if `systems.md` has
   one, KNIGHT.C's return pass hitting twice).
 - Tells: its own announcement and its escape line; Roll's Love pulses here.
 - Hint: "METAL ONES FLEE FAST. HIT THEM OFTEN, NOT HARD."
 
-Predicate order: hidden room → KAISHIN → secret exit (with plate A).
+Debrief order (`meta.md`, by weight): secret exit with plate A (KN0) → hidden room (KN1) → KAISHIN (KN2).
 
 ### 2.8 Boss: Knight Man, "MASTER OF MACE BALL"
 
@@ -559,10 +579,10 @@ Knight Man gets the first action.
 
 | Weapon | Effect | Tags |
 |---|---|---|
-| **Y.SPEAR (weakness)** | **Pierces the shield**, even from the front during B. The DQ critical chime and "AN EXCELLENT MOVE!", a 24-f stagger with the shield knocked aside. Short i-frames | [new-code] S Must |
-| Fully charged Power punch | The first one that hits the shield from the front: "THE SHIELD BROKE!". The shield is gone for the rest of the fight (no more reflect); his palette loses the shield colour | [new-code] S Must |
-| KNIGHT.C | Mace meets mace: a CLANG spark, both bounce, no damage | [new-code] S Should |
-| C.FLASH | "A SPELL THAT HITS ALL ENEMIES": ordinary damage, but it interrupts HEALMORE from anywhere | Should |
+| **Y.SPEAR (weakness)** | **Pierces the shield**, even from the front during B (needs Y.SPEAR added to SC1's pass-through list; if `systems.md` declines, it stays a back-and-cast-window weapon and only the chime and stagger remain). The DQ critical chime and "AN EXCELLENT MOVE!", a 24-f stagger with the shield knocked aside. 4 / 16 f (Table 2); the stagger replaces the generic freeze (SC9) | [new-code] S Must |
+| PUNCH★, Morning Star, BREAK★ (`systems.md` SC1) | The first one that hits the shield from the front: "THE SHIELD BROKE!". This venue makes it **permanent for the fight** (SC1 lets the venue decide; the systems default is 180 f): no more reflect, and his palette loses the shield colour | [new-code] S Must |
+| KNIGHT.C (own) | SC4, first hit of the fight: mace meets mace, a CLANG spark, both bounce, no damage. Later hits: the own cell (1 / 60 f) | [new-code] S Should (SC4) |
+| C.FLASH (good, 3 / 20: it goes around the shield, as vanilla latches class 3) | "A SPELL THAT HITS ALL ENEMIES": it also interrupts HEALMORE from anywhere | Should |
 
 #### 2.8.4 Secret room 1A: THE KNIGHTLORD
 
@@ -625,6 +645,7 @@ pass double-hits; SILVER.T arcs over the lance knights' shields in the Trap Hall
 floor (they flip and are stunned 60 f); charged Power punch: 01's 1-UP, the throne pillar, the basement doors.
 
 ---
+
 ## 3. Tomahawk Man: GUN.SMOKE FRONTIER
 
 **Pitch.** A frontier town in Tomahawk Man's desert, run as a Capcom western. Three WANTED posters at the trailhead
@@ -649,10 +670,10 @@ Rush Jet from v0A's hanging ladder (column 4, rows `$00-$1F`; E-tank, big WE, bi
 |---|---|---|
 | Slot **TS_TOMAHAWK** | Copy of `$2C:$89` tables (35 free block ids before reclaiming) | [engine-ok] S Must |
 | Kept | `$94` desert, mesas (the parallax strip), cacti, signposts, blue metal pillars, orange pipes, mesh; `$96` cave; `$95` sunset sky and sun disc; `$D7` boss corridor | [engine-ok] |
-| **T-TOWN** (new third, ~96 tiles) | False-front buildings, windows and doors for the gallery, boardwalk, water tower, outhouse, WANTED board with three posters, store signs | [new-art] M Must |
-| **T-SALOON** (new third, ~96) | Bar, bottles, mirror, piano, swinging doors, a skylight (for the sky-bypass drop) | [new-art] M Must |
-| **T-TRAIN** (new third, ~80) | Car roofs and couplings, station platform, rails and ties for the near band (512-px loop), wheels (CHR animation, 4 frames, the torch technique) | [new-art] M Must |
-| **T-BOOTHILL** (new third, ~48) | High-noon mesa top with grave markers for the boss room | [new-art] S Should (fallback: vanilla v17 mesh room) |
+| **T-TOWN** (new set, ≤ 64 tiles at ids `$BD-$FF`, free on the sunset screens v0A-0C; 96 if the town drops vanilla's blue metal ground) | False-front buildings, windows and doors for the gallery, boardwalk, water tower, outhouse, WANTED board with three posters, store signs | [new-art] M Must |
+| **T-SALOON** (new set, 96 at ids `$A0-$FF`, free on v0D) | Bar, bottles, mirror, piano, swinging doors, a skylight (for the sky-bypass drop) | [new-art] M Must |
+| **T-TRAIN** (new set, ~80; the train screens replace v10-v11 entirely, so their ids are chosen fresh) | Car roofs and couplings, station platform, rails and ties for the near band (512-px loop), wheels (CHR animation, 4 frames, the torch technique) | [new-art] M Must |
+| **T-BOOTHILL** (new set, ~48 at ids `$BE-$FF`, free on v17) | High-noon mesa top with grave markers for the boss room | [new-art] S Should (fallback: vanilla v17 mesh room) |
 | Sprites | Tumbleweed, outlaw, pianist, lady with parasol, Eddie behind a store window, Six-Shot Sam, Sheriff, conductor, Sidewinder on a robot horse (32x32, 4-frame gallop), tunnel mouth (32x48), dust devil, bounty stamp, "DRAW!" / "FOUL!" text sprites | [new-art] M Must |
 
 ### 3.2 Screen-by-screen
@@ -687,11 +708,11 @@ checkpoints from any screen script (`LDA #s / JMP $8416`), so the third one is d
 
 ### 3.3 Bounties (Gun.Smoke's posters)
 
-| # | Poster (draft) | Where | Claimed by | Pays (proposal, `systems.md` owns) |
+| # | Poster (draft) | Where | Claimed by | Pays (venue prize, ≤ 60 in all) |
 |---|---|---|---|---|
-| 1 | "WANTED: DOMINGO DOME. CLAIM-JUMPING. 300 BOLTS" | 05, the mine | killing the dispenser | 300 |
-| 2 | "WANTED: SIX-SHOT SAM. CARD SHARP. 500 BOLTS" | 0D, the saloon | winning the best of three | 500 |
-| 3 | "WANTED: SIDEWINDER. TRAIN ROBBERY. 800 BOLTS" | 10-11, the 4:50 | knocking him off the train before the third tunnel | 800 |
+| 1 | "WANTED: DOMINGO DOME. CLAIM-JUMPING. 15 BOLTS" | 05, the mine | killing the dispenser | 15 |
+| 2 | "WANTED: SIX-SHOT SAM. CARD SHARP. 20 BOLTS" | 0D, the saloon | winning the best of three | 20 |
+| 3 | "WANTED: SIDEWINDER. TRAIN ROBBERY. 25 BOLTS" | 10-11, the 4:50 | knocking him off the train before the third tunnel | 25 |
 
 Poster icons with a CLAIMED stamp sit in the pause screen while in this venue. Bounties persist through deaths
 within the stage. A missed Sam or Sidewinder can be retried after a death before checkpoint 2 (both respawn at
@@ -772,22 +793,23 @@ Any weapon counts as a draw; C.FLASH during READY is a FOUL like any other shot.
 **Hidden room 1B "THE OUTHOUSE"** [T3] S Must.
 - Entry: the outhouse at 0C's right end rattles and shows "OCCUPIED". Shoot its door 3 times (Gun.Smoke reveals
   its secrets to gunfire): the sign flips to "VACANT" and the door swings open; UP to enter (door warp → 1B).
-- Inside it is far bigger than outside: "THE GOLD MINE VAULT", a 1-UP, two bolt sacks, a W-tank (`systems.md`).
+- Inside it is far bigger than outside: "THE GOLD MINE VAULT": the sponsor envelope, a 1-UP and a W-tank
+  (`systems.md` §12).
   The door back returns to 0C.
 - Hint: "SOMETHING IN TOWN WAS RATTLING. IN GUN.SMOKE YOU SHOOT WHAT LOOKS ODD."
 
 **Behaviour item: the SHERIFF STAR chip** S Must.
 - Earned by reaching the Sheriff (12) with the civilian counter at 0. He pins it on you: "NOT ONE TOWNSFOLK HURT.
   WEAR THIS, DEPUTY."
-- Proposed effect (`systems.md`): bounty and boss payouts +25 % (a found version of PLAN's Judge's Favor).
+- Effect (`systems.md` §9.2): +20 % on every scorecard payout and on venue prize bolts.
 - Tells: the pianist sign at the gallery's start; the "HEY!" pop on every civilian hit.
 - Hint: "THE SHERIFF SAW YOU SHOOT AT TOWNSFOLK. READ THE SIGN BY THE PIANO."
 - Moral flavour (BRIEF §5.3 asks for one moral trade-off recipe somewhere; `systems.md` owns it): Eddie in the
   store window is the obvious candidate, for example "shooting Eddie drops a big bolt sack but closes the shop's
   discount tier". Proposed only.
 
-Predicate order: hidden room → SHERIFF STAR → secret exit (with plate B). The Energy Balancer is a chip found, not
-a predicate.
+Debrief order (`meta.md`, by weight): secret exit with plate B (TO0) → hidden room (TO1) → SHERIFF STAR (TO2). The
+Energy Balancer is a chip found, not a predicate.
 
 ### 3.8 Boss: Tomahawk Man, "MASTER OF TOMAHAWK"
 
@@ -797,7 +819,8 @@ f, a feather triple about every 550 f, leaps between.
 #### 3.8.1 HIGH NOON (the opening)
 
 Both stand twelve paces apart (Rockman x `$30`, Tomahawk Man x `$D0`). VA-DRAW with the stage's window W:
-- win: a **free hit** (3, per `systems.md`) and he staggers 40 f; "YOU WIN THE DRAW. 0.19";
+- win: a **free hit** of 3 with 30 i-frames, booked as BUSTER for VARIETY (`systems.md` SC8), and he staggers 40 f;
+  "YOU WIN THE DRAW. 0.19";
 - FOUL or late: he throws first: a fast tomahawk at 3 px/f (contact 4).
 
 #### 3.8.2 Patterns
@@ -820,14 +843,14 @@ Both stand twelve paces apart (Rockman x `$30`, Tomahawk Man x `$D0`). VA-DRAW w
 
 | Weapon | Effect | Tags |
 |---|---|---|
-| **PLANT.B (weakness)** | **HAY FEVER**: the petals' pollen makes him sneeze ("ACHOO!", 24-f stagger) and he **drops his tomahawk**, which lands 48 px away; he must walk over and pick it up (no throws for up to 120 f) while sneezing. K: "Bless you!" Short i-frames | [new-code][new-art] S Must |
-| SILVER.T | Special case in code: **he catches it** (no damage) and throws it straight back as a fast tomahawk | [new-code] S Must |
-| W.STORM | Feeds his dust devil: it doubles in size for 120 f | Could |
+| **PLANT.B (weakness)** | **HAY FEVER**: the petals' pollen makes him sneeze ("ACHOO!", 24-f stagger) and he **drops his tomahawk**, which lands 48 px away; he must walk over and pick it up (no throws for up to 120 f) while sneezing. K: "Bless you!" 4 / 16 f (Table 2); SC9 | [new-code][new-art] S Must |
+| SILVER.T (own) | SC4, first hit of the fight: **he catches it** (no damage) and throws it straight back as a fast tomahawk. Later hits: the own cell (1 / 60 f) | [new-code] S Should (SC4) |
+| W.STORM (good, 3 / 20: "a dust devil on a cowboy") | If his dust devil is out, the tornado turns it around and rolls it back into him | [new-code] S Could |
 | Charged Power punch | Knocks his tomahawk out of the air (it clatters to the floor) | Should |
 
 #### 3.8.5 Secret room 1F: THE HIDEOUT
 
-Same AI, pinch at HP 12. On the hideout wall: "WANTED: ROCKMAN. 10,000 BOLTS. SPONSOR: MR. Y." Tomahawk Man, at the
+Same AI, pinch at HP 12. On the hideout wall: "WANTED: ROCKMAN. 999 BOLTS (THE COUNTER'S LIMIT). SPONSOR: MR. Y." Tomahawk Man, at the
 intro: "That poster? Mr. Y put it up. I'm not collecting." (draft). Kill: SILVER.T + BEAT B-PARTS (vanilla script
 `$69`) + secret-exit flag.
 
@@ -888,6 +911,7 @@ robots, and no joke targets his headdress or culture (his weakness gag is a snee
 "totem" walkers `$12` as cactus walkers is suggested (Could).
 
 ---
+
 ## 4. Plant Man: JUNGLE PITFALL
 
 **Pitch.** Plant Man's "Forgotten Area" becomes the jungle of the 2600's most famous explorer. Vines swing over tar
@@ -910,7 +934,7 @@ AI `$31:$95EF`; weakness B.ATTACK (4), F.BLAST 2, PLANT.B 0; a Plant Man hit cos
 |---|---|---|
 | Slot **TS_PLANT** | Copy of `$2E:$92`. Its 255 block ids are full, but the GP layout drops the second gorilla room and half of the lodge, so ids are reclaimed by rebuilding the block table from the GP layout (`levels.py` can list the ids a layout uses) | [engine-ok] S Must |
 | Kept | `$90` canopy, trunks, grass, rock, bamboo floors, curtain-wood lodge and crates; `$91`/`$92` dark-room swap; `$BB`/`$93` flower swamp; palettes `$32-$35` | [engine-ok] |
-| **P-PITFALL** (new third, ~64 tiles) | Vine knots on the canopy, tar pit surface (with alternate "closed" tiles), croc-pond water, ladder-hole rim, Pitfall's layered trunks, the parrot ledge and the hidden rope ladder | [new-art] M Must |
+| **P-PITFALL** (new third `$0A00-$0FFF`, 96 tiles, replacing the canopy) | A **2600-style canopy** in about 40 tiles (a chunkier leaf band than vanilla's 96-tile foliage: the homage is the reason it can be smaller) plus about 56 tiles of set pieces: vine knots, tar pit surface (with alternate "closed" tiles), croc-pond water, ladder-hole rim, layered trunks, the parrot ledge and the hidden rope ladder | [new-art] M Must |
 | **P-UNDER** (new third, ~96) | Underground brick tunnel, brick wall (breakable look), ladders, scorpion nests | [new-art] M Must |
 | **P-CAVERN** (new third, ~96) | Cave walls, the underground river, waterfall, the Lost City gate and garden | [new-art] M Must |
 | **P-RAIN** (8 tiles x 4 frames) | Rain in the canopy gaps on 0B-0E, animated by CHR swaps (the torch technique) | [new-art] S Could |
@@ -922,16 +946,18 @@ arrives in a third that replaces art the screen does not show, through the scree
 
 | Screens | BG CHR state | Replaced |
 |---|---|---|
-| 00-02, 09-0E | `$90` + P-PITFALL | the curtain-wood/crate tiles (only 03-07 need them; the 02 → 03 exit reloads them) |
-| 03-07 | `$90` (vanilla) | |
+| 00-02, 09-0E | `$90` + P-PITFALL | the canopy third (screen 00's init script loads it at stage start; the 02 → 03 exit restores vanilla's canopy with `$92`; the 08 → 09 exit loads P-PITFALL instead of `$92`) |
+| 03-07 | `$90` + `$92` (vanilla) | |
 | 08 | `$90` + `$91` | canopy (vanilla) |
 | 0F-14 | `$90` + `$92` + `$BB`/`$93` | vanilla |
 | 18-1A | `$90` + P-UNDER | canopy (no sky underground) |
-| 1B-1E | `$90` + P-CAVERN | canopy and crates |
-| 1F | `$90` + P-PITFALL | crates |
+| 1B-1E | `$90` + P-CAVERN | canopy |
+| 1F | `$90` + P-PITFALL | canopy |
 
-The exact tile ranges of the crate and curtain art inside `$90` must be measured before P-PITFALL is drawn
-(`text.md` §7's `chrfree3.py` method); see Risks.
+Why the canopy and not the lodge: measured with `planttiles.py`, the vanilla jungle screens use 201 (00-02) and 235
+(09-0D) of the 256 ids, and only two ids (`$56-$57`) are used by the lodge alone: the yellow plank and crate tiles
+are shared with the jungle floors. The only third that can go is the 96-tile foliage at `$A0-$FF`, which vanilla
+already swaps out in the dark rooms (`$91`).
 
 ### 4.2 Screen-by-screen
 
@@ -956,7 +982,7 @@ The exact tile ranges of the crate and curtain art inside `$90` must be measured
 | **15-16** | v15-v16 | Shutters; **checkpoint 2** at 16 | | | [engine-ok] Must |
 | **17** | v17 | **Plant Man** (§4.7) in the green bamboo room, now with two ceiling hooks and an opening floor | | | Must |
 | **18** | new | **Underground, west** (under 0A-0C): from the ladder hole; brick tunnel | 2 scorpions | | [new-art] Must |
-| **19** | new | **Underground hub** (under 0D-0F): the **robot cat** (§4.5); **Treasure 4: DIAMOND RING** in a nook behind a scorpion (§4.4); a **brick wall** at the right end (charged Power punch, or Break Man's charge shot) → 1A; a ladder up → 0F (up exit, target `$10` → 0F) | 2 scorpions | False floor (cat) | [engine-ok] + S Must |
+| **19** | new | **Underground hub** (under 0D-0F): the **robot cat** (§4.5); **Treasure 4: DIAMOND RING** in a nook behind a scorpion (§4.4); a **brick wall** at the right end, marked with Break Man's scarf emblem (charged Power punch, or Break Man's charge shot) → 1A; a ladder up → 0F (up exit, target `$10` → 0F) | 2 scorpions | False floor (cat) | [engine-ok] + S Must |
 | **1A** | new | **Underground, east** (under 10-12): ladder up → 13 (target `$14` → 13) | 1 scorpion | The full 3-for-9 shortcut | Must |
 | **1B** | new | **The Lost Caverns**: fall in through the cat's false floor; a shaft of ledges | 3 bats | | [new-art] Must |
 | **1C** | new | **The underground river**: the **balloon** rises from the bank to the top ledge (§4.5) | eels, bats | River is a pit | [new-code] S Must |
@@ -996,8 +1022,9 @@ PLANT.B's barrier blocks eel leaps; Jet hovers over tar pits (late-game players 
 - **The log counter**: every log hit in the stage (including CONGA's logs) is counted and shown next to the
   treasure pop ("TREASURE 3/4 · LOGS 0").
 - **The ring**: if the log counter is 0 when Rockman reaches the nook in 19, it is the **DIAMOND RING**; otherwise
-  it is a "RHINESTONE RING" worth 10 bolts. With 4/4 and a real diamond, the ring also grants the chip.
-- Chip: PLAN's **AUTO RECOVER** ("found in the Plant underground", kept), effect per `systems.md`.
+  it is a "RHINESTONE RING" worth nothing. With 4/4 and a real diamond, the ring also grants the chip.
+- Chip: PLAN's **AUTO RECOVER** ("found in the Plant underground", kept). Effect (`systems.md` §9.2): after 60 f
+  with no input, +1 HP every 30 f, off while a boss bar is shown.
 - All four treasures are reachable without an adaptor in one run (three before the ladder hole, one in 19).
 - Tells: the counter shown on every treasure; the rhinestone itself; C: "Harry never let a log touch him."
 - Hint: "FOUR TREASURES, ZERO LOGS. THE DIAMOND IS SHY."
@@ -1052,10 +1079,10 @@ leaps of about 130 f.
 
 | Weapon | Effect | Tags |
 |---|---|---|
-| **B.ATTACK (weakness)** | **FROSTBITE**: his petals freeze white, drop and shatter; he cannot raise the barrier for 300 f and shivers for 30 f. K: "He's wilting!" Short i-frames | [new-code][new-art] S Must |
-| PLANT.B | Special case in code: barrier meets barrier, **both pop** in a burst of petals (no damage). Replaces vanilla's silent 0 | [new-code] S Must |
+| **B.ATTACK (weakness)** | **FROSTBITE**: his petals freeze white, drop and shatter; he cannot raise the barrier for 300 f and shivers for 30 f. K: "He's wilting!" 4 / 16 f (Table 2); SC9 | [new-code][new-art] S Must |
+| PLANT.B (own) | SC4, first hit of the fight: barrier meets barrier, **both pop** in a burst of petals (no damage; replaces vanilla's silent 0). Later hits: the own cell (1 / 60 f) | [new-code] S Should (SC4) |
 | F.BLAST (2, vanilla) | During B it **burns his vine**: he drops mid-swing and lies stunned 40 f | [new-code] S Should |
-| C.FLASH | Freezes the tar back to floor for its duration | Could |
+| C.FLASH (resisted) | Freezes the tar back to floor for its duration; `systems.md` SC3's "photosynthesis" (+2 HP on the first flash) also applies | Could |
 
 What the fight teaches: PLANT.B's tap (his barrier), its Up+B petal launch (his throw), its Jet synergy (the bloom
 orbit) and the venue's own vine.
@@ -1081,11 +1108,11 @@ it is one soft 20-f brighten instead. Thunder SFX on every strike. Rain tiles ar
   invisible **except during lightning**, when that palette entry is lit. A parrot on the ledge squawks every 4 s.
   Reach the ledge by releasing the second vine at the far end of its swing; climb the ladder (up exit, target `$1E`
   → 1F).
-- Content: a 1-UP, an E-tank, and a "game cartridge" prop worth bolts (`systems.md`).
+- Content: the sponsor envelope, a 1-UP and an E-tank; a 2600-style game cartridge sits on the shelf as a prop.
 - Exit: ladder down to 0B.
 - Hint: "WHEN THE LIGHTNING STRUCK, A LADDER APPEARED IN THE TREES."
 
-Predicate order: hidden room → PITFALL PERFECT → secret exit.
+Debrief order (`meta.md`, by weight): secret exit (PL0) → hidden room (PL1) → PITFALL PERFECT (PL2).
 
 ### 4.9 HARD pokes
 
@@ -1136,6 +1163,7 @@ but the commentator line.
 10. "That's paste, Rock": the rhinestone ring for anyone a log touched.
 
 ---
+
 ## 5. The four venues side by side
 
 | | SKY ACE 1943 | DRAGON QUESTLIKE | GUN.SMOKE FRONTIER | JUNGLE PITFALL |
@@ -1160,7 +1188,7 @@ Sizes are per item; "shared" items are built once by `tech.md` and counted there
 |---|---|---|---|
 | **Wind** | TS_WIND (S); W-CARRIER (M), W-SEA (S), sprites (M); catapult (S); **SKY ACE mode** (M) + wave director data (M) + POW cycle (S) + LOOP (S) + drain (S) + tally (S); AYACO as a sprite build (M); lamp board + elevator (S); gusts (S); hidden room (S); YASHICHI (S); Wind Man rework (M); room 1D fight (S) | Re-sortie catapult (S); W-HANGAR + bomb carts (M); WING WALKER moving arena (M); Kite Mets (S); AYACO as BG art (L); arena cloud band (S); sortie theme [new-music] (M); Break Man hooks (S) | Paper-plane defeat (S) |
 | **Knight** | TS_KNIGHT (S); K-DQ (S); sprites (M); VA-SEARCH (S); VA-ENCOUNTER (M) + Metslime (S) + Killer Chest (S); keys, doors, chests (T3 data, S); ceiling with HP (S); dark basement + RADIANT (S); Metal Metslime + KAISHIN (S); Knight Man rework with battle log (M); Knightlord offer (S) | Princess Roll + Roll's Love (S); Inn (S); KNIGHT.C clash, C.FLASH interrupt (S); battle theme [new-music] (M); Break Man hooks (S) | EXP and level-ups (S); TRUE FORM (S); inn jingle and level-up fanfare [new-music] (S) |
-| **Tomahawk** | TS_TOMAHAWK (S); T-TOWN, T-SALOON, T-TRAIN (M each); sprites (M); WANTED board (S); gallery (M); VA-DRAW (S); train ride (L); Sidewinder (S); Sheriff gate (S); outhouse room (S); SHERIFF STAR (S); Tomahawk Man rework (M); hideout gag (S); DRAW bell SFX (S) | T-BOOTHILL (S); TNT crates (S); punch knocks tomahawks down (S); duel stinger and train theme [new-music] (M); Break Man hooks (S) | Vulture and cactus re-skins (S); W.STORM dust devil (S); honky-tonk piano arrangement [new-music] (S) |
+| **Tomahawk** | TS_TOMAHAWK (S); T-TOWN, T-SALOON, T-TRAIN (M each); sprites (M); WANTED board (S); gallery (M); VA-DRAW (S); train ride (L); Sidewinder (S); Sheriff gate (S); outhouse room (S); SHERIFF STAR (S); Tomahawk Man rework (M); hideout gag (S); DRAW bell SFX (S) | T-BOOTHILL (S); TNT crates (S); punch knocks tomahawks down (S); train theme [new-music] (M); duel stinger [new-music] (S); Break Man hooks (S) | Vulture and cactus re-skins (S); W.STORM dust devil (S); honky-tonk piano arrangement [new-music] (S) |
 | **Plant** | TS_PLANT (S); P-PITFALL, P-UNDER, P-CAVERN (M each); sprites (M); vines T5 (M); croc heads (S); logs (S); tar pit (S); scorpions, bats (S); balloon (S); treasures + log counter (S); cat + false floor (S); CONGA's logs + checkpoint fix (S); lightning (S); hidden room (S); Plant Man rework (M) | Eels (S); vine burn (S); Lost City night arena (S); Break Man wall shortcut (S) | Rain (S); 20:00 clock (S); C.FLASH freezes tar (S); "Lost Caverns" theme [new-music] (S) |
 
 Each venue is **L** overall. If the schedule needs a cut, cut in this order: Could items; the Should moving arenas
@@ -1169,13 +1197,18 @@ its secret exit, hidden room or behaviour item.
 
 ## 7. Dependencies on other docs
 
-| Doc | What this design needs from it |
+Already agreed in `systems.md` (read on 2026-10-29) and used above: the vanilla weakness cycle; weakness 4 dmg /
+16 f; SC1 (Knight's shield), SC3, SC4 (own weapons), SC8 (the draw's free hit), SC9 (venue weak reactions); the four
+chips' effects (§9.2); prize bolts ≤ 60 per venue and one sponsor envelope per hidden room (§7); plates as pickup
+objects (§10); SECRETS weights (§6.2). `meta.md` has adopted this doc's hints as tier B and orders them by weight.
+
+| Doc | Still needed from it |
 |---|---|
-| `systems.md` | Damage and i-frame rows for the 4 bosses (weakness short i-frames; the special cases listed in §1.7.3, §2.8.3, §3.8.4, §4.7.3); weapon behaviours this doc previews: W.STORM tap tornado and Up+B updraft, C.FLASH Up+B time-stop, KNIGHT.C returning flail and orbit, SILVER.T arc, boomerang and Jet dive throw, PLANT.B barrier, petal launch and Jet "Petal Storm"; whether forms fire weapons in the sortie; the **rental Jet** (forced form without owning Jet); chips YASHICHI, KAISHIN (Critical), SHERIFF STAR (Judge's Favor variant), AUTO RECOVER, Energy Balancer; SECRETS and STYLE rows (100 % tally, draws won, Pitfall perfect); bolt payouts (bounties, treasures, Inn price); the moral trade-off recipe (Eddie in the gallery is offered); the YOU GET text by win count |
-| `story.md` | Every line here (EN drafts) in JP and EN: King, Sage, Innkeeper, Princess Roll, the Knightlord, Sam, the Sheriff, the conductor, posters, battle-log lines, commentator hooks and death tables, debrief hints; Roll's cameo as the princess; Tango's cameo; the "WANTED: ROCKMAN" gag |
-| `meta.md` | Four secret-exit flags (Wind, Knight, Tomahawk, Plant) in save RAM; E1 = Wind + Knight, E2 = Tomahawk + Plant; Records: best quick-draw time, best SHOOTING DOWN %; debrief predicate order per venue (§1.6, §2.7, §3.7, §4.8) |
-| `tech.md` | T1-lite fixed-camera rides and the wave director; T4 raster bands (≥ 4 bands + the window band) on the generic list, with chains C, E/F and 7 as presets; T2 text window with YES/NO and 4-item menus; T3 doors, keys, gates, lifts through exits; T5 pendulum; VA-GUST, VA-TIMED, VA-SEARCH, VA-DRAW, VA-ENCOUNTER; the generic object id + sub-id dispatcher (about 45 new object kinds here alone); four tileset slots and their banks; the stage-attribute fields of §0.1 (secret-boss screen, plate slot, flag index, HARD list); the Knight ceiling's `$069C` logic moved out of IRQ `$11` or given a retract flag |
-| `venues_b.md` | Shared tech with the other four venues (T1 for Blizzard's ski, T3 for Flame's plates and Centaur's doors, the falling ceiling for Yamato); avoid a second train, a second shmup or a second quick-draw; the E1-E4 pairing |
+| `systems.md` | **Y.SPEAR in SC1's pass-through list** (§2.8.3; fallback stated there); weapon behaviours this doc previews (W.STORM's updraft, C.FLASH's time stop, KNIGHT.C's orbit and return, SILVER.T's boomerang and Jet dive, PLANT.B's launch and "Petal Storm"); the **rental Jet** in the sortie (a forced form the player does not own, only in 01 and 1D); the VENUE ACTs and par times of §0.8 into the STYLE and TIME rows; the featured-enemy PARTs of §0.8 |
+| `story.md` | Every line here (EN drafts) in JP and EN: King, Sage, Innkeeper, Princess Roll, the Knightlord, Sam, the Sheriff, the conductor, posters, battle-log lines, commentator hooks and death tables; Roll's cameo as the princess; Tango's cameo as the cat; the "WANTED: ROCKMAN" gag |
+| `meta.md` | Four secret-exit flags (SECRETS b0 for meta 2, 3, 6, 7); E1 = Wind + Knight, E2 = Tomahawk + Plant (already wired); Records: best quick-draw time, best SHOOTING DOWN % |
+| `tech.md` | T1-lite fixed-camera rides and the wave director; T4 raster bands (≥ 4 bands + the window band) on the generic list, with chains C, E/F and 7 as presets; T2 text window with YES/NO and 4-item menus; T3 doors, keys, gates, lifts through exits; T5 pendulum; VA-GUST, VA-TIMED, VA-SEARCH, VA-DRAW, VA-ENCOUNTER; the generic object id + sub-id dispatcher (about 45 new object kinds here alone); four tileset slots and their banks; the stage-attribute fields of §0.1 (secret-boss screen, plate drop, flag index, HARD list); the Knight ceiling's `$069C` logic moved out of IRQ `$11` or given a retract flag |
+| `venues_b.md` | Shared tech with the other four venues (T1 for Blizzard's ski, T3 for Flame's plates and Centaur's doors, the falling ceiling for Yamato); no second train, shmup or quick-draw; the E1-E4 pairing |
 | Exhibitions (E1, E2) | Unlock conditions from these four secret exits |
 
 ## 8. Lessons applied
@@ -1211,9 +1244,9 @@ its secret exit, hidden room or behaviour item.
 
 1. **Screen budget.** Tomahawk and Plant use 32 of 32 screens. Any new idea there costs an existing screen. Fallbacks:
    Plant merges 1B and 1C into one cavern screen; Tomahawk shortens the sky bypass to 2 screens.
-2. **Plant's tiles.** P-PITFALL assumes the lodge's curtain/crate tiles in `$90` form a replaceable block. If they are
-   interleaved with jungle tiles, 00-02 lose the Pitfall art: the tar pit falls back to black tiles plus bubble
-   sprites and the croc water to sprites. Measure before drawing.
+2. **Plant's tiles.** Measured: no part of `$90` but the canopy third can be replaced on the jungle screens (§4.1).
+   P-PITFALL must therefore redraw the canopy in about 40 tiles and still read as a jungle. Fallback: keep
+   vanilla's canopy (`$92`) and build the tar surface and croc water from black tiles plus sprites.
 3. **Raster bands.** The sortie and the train need 3-4 bands plus the commentator window band on the same frame.
    This needs the generic raster list (BRIEF §7.1) and MMC5's scanline IRQ. Fallback: 2 bands (sky fixed, ground
    moving).
@@ -1246,21 +1279,19 @@ its secret exit, hidden room or behaviour item.
 
 1. Does `tech.md` accept T1-lite (fixed camera, scrolling bands) for the sortie and the train, so that true autoscroll
    is only needed where terrain must move (Blizzard's ski, if anywhere)?
-2. Is the rental Jet acceptable, or should the sortie be on a Committee glider that is not Rush at all?
-3. Does `systems.md` keep the vanilla weakness chain (Wind ← C.FLASH, Knight ← Y.SPEAR, Tomahawk ← PLANT.B, Plant ←
-   B.ATTACK)? All four reactions here assume it.
-4. Chip effects and slot costs for YASHICHI, KAISHIN, SHERIFF STAR and AUTO RECOVER; is SHERIFF STAR a found Judge's
-   Favor or a separate chip?
-5. SECRETS row split: hidden room 5 + secret exit 10 + behaviour item 5 is proposed for every venue (the plate rides
-   on the secret exit in Knight and Tomahawk). Does `systems.md` agree?
-6. Do keys (Knight) need a general counter in T3, or a venue-local byte?
-7. Will `story.md` let Roll play the princess and Tango cameo as the cat?
-8. Where does Knight Man's battle log go: the bottom window (shared with the commentators, who stay muted) or a top
+2. Is the rental Jet acceptable to `systems.md` and `story.md`, or should the sortie be flown on a Committee glider
+   that is not Rush at all?
+3. Will `systems.md` add Y.SPEAR to SC1's pass-through list (Knight's "AN EXCELLENT MOVE!" pierce)?
+4. Do keys (Knight) need a general counter in T3, or a venue-local byte?
+5. Will `story.md` let Roll play the princess and Tango cameo as the cat?
+6. Where does Knight Man's battle log go: the bottom window (shared with the commentators, who stay muted) or a top
    line that must dodge the life bars?
-9. Music budget: this doc asks for at most one new track per venue at Should (sortie, DQ battle, train or duel,
-   Lost Caverns). Is that within the sound plan?
-10. If `tech.md` enables MMC5 extended attributes or CHR banking that frees BG tile ids, Plant's art plan can drop
-    its third-swapping; until then, this doc assumes 256 live BG tiles.
-11. Does collision group 1 (Plant) remap `$F`? The tar pits and croc water assume it stays deadly.
-12. Should the secret boss rooms' distinct arenas (WING WALKER, LOST CITY at night, T-BOOTHILL) be promoted to Must so
+7. Music budget: this doc asks for at most one new track per venue at Should (sortie, DQ battle, train), plus short
+   stingers (duel bell, inn, level-up) and a Could track for the Lost Caverns. Is that within the sound plan?
+8. If `tech.md` enables MMC5 extended attributes or CHR banking that frees BG tile ids, Plant's art plan can drop its
+   canopy redraw; until then, this doc assumes 256 live BG tiles.
+9. Does collision group 1 (Plant) remap `$F`? The tar pits and croc water assume it stays deadly.
+10. Should the secret boss rooms' distinct arenas (WING WALKER, LOST CITY at night, T-BOOTHILL) be promoted to Must so
     that secret exits feel like different matches?
+11. `systems.md` §2.4 says normal routes never need a form. The sortie's forced Jet is a vehicle the stage lends, not a
+    form the player must own; does `systems.md` agree that this satisfies the rule?

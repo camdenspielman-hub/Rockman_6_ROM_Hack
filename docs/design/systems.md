@@ -58,10 +58,12 @@ It does not own stage layouts, boss patterns, story text, UI art or the memory m
    - Bolts come only from scorecards (best score per stage, paid once), sponsor envelopes in hidden rooms and a
      handful of fixed prizes.
    - Prices are sized against a measured income model.
-7. **Fifteen chips** (§9): 7 bought, 1 found (the Energy Balancer, now a chip), 2 earned by behaviour, 4 crafted and
-   1 moral trade-off.
+7. **Twenty-one chips** (§9).
+   - Systems owns 13: 7 bought, 4 crafted, 1 found (the Energy Balancer, now a chip) and 1 moral trade-off.
+   - The other 8 are the venues' behaviour-gated prizes: the venue docs own the gates, this doc the effects.
    - **Crafting is RM6-native.** Vanilla's per-class one-shot tables (F.BLAST melts the snow robot) are extended. A
-     venue's featured enemy killed by its *thematic* weapon drops a PART, and Eddie builds chips from pairs of PARTs.
+     venue's featured enemy killed by its champion's weakness weapon drops a PART, and Eddie's garage builds Rush, Beat
+     and tank chips from PART pairs.
    - **The moral trade-off is doping.** Mr. Y buys a PART and gives you the TURBO chip. Break Man then refuses to
      partner you, and your records carry an asterisk.
 8. **Beat** (§10).
@@ -93,7 +95,7 @@ It does not own stage layouts, boss patterns, story text, UI art or the memory m
 | SYS-FRM-4 | Power ice grip | new-code | S | Could |
 | SYS-FRM-5 | Super Adaptor: rocket fist with homing return, jet hop | new-code, new-art | L | Must (with H3) |
 | SYS-FRM-6 | Jet low-fuel pip | new-code, new-art (1 tile) | S | Should |
-| SYS-WPN-1..8 | Eight boss weapons: tap, alt, synergy | new-code (+ new-art per alt) | L total | Must (tap, alt, synergy); Could (own-weapon reactions) |
+| SYS-WPN-1..8 | Eight boss weapons: tap, alt, synergy | new-code (+ new-art per alt) | L total | Must (tap, alt, synergy); Should (the own-weapon hook SC4) |
 | SYS-WPN-9 | MAGNET BEAM (slot 9) | new-code, new-art | M | Must (H1 is Must) |
 | SYS-WPN-10 | Buster charge rules (vanilla thresholds) | engine-ok | S | Must |
 | SYS-CMB-1 | Boss damage + i-frame tables, one lookup | new-code | M | Must |
@@ -104,8 +106,9 @@ It does not own stage layouts, boss patterns, story text, UI art or the memory m
 | SYS-SC-2 | Results screen (judges) | new-code, new-art | M | Must (owner: meta.md) |
 | SYS-SC-3 | Secret tokens on replays | new-code | S | Must |
 | SYS-ECO-1 | Bolts, Eddie's Pit Stop stock and prices | new-code | M | Must |
+| SYS-SC-4 | Special cases SC1-SC9 (shield, Time Stop immunity, own weapons, Gamma, Bass, quick-draw…) | new-code | S each | per row, §4.6 |
 | SYS-CHP-1 | Chip framework (bits, slots, help pages) | new-code | M | Must |
-| SYS-CHP-2 | The 15 chips | new-code | M | 9 Must / 6 Should |
+| SYS-CHP-2 | The 21 chips (13 systems + 8 venue prizes) | new-code | M | 5 Must, 4 Must as venue prizes, the rest Should |
 | SYS-CHP-3 | PARTs and the garage (crafting) | new-code, new-art (8 icons) | M | Should |
 | SYS-CHP-4 | Mr. Y's booth (TURBO) | new-code, text | S | Should |
 | SYS-BT-1 | Plates → slots; Beat pit rescue | new-code | M | Must (slots), Should (rescue) |
@@ -271,7 +274,7 @@ Floor types (`$064B` / latch `$A7`):
 **POWER** (after the 2nd win, SYS-FRM-2):
 
 - Walk, jump and charge as vanilla. The punch keeps its reach and timing.
-- **Punch damage moves to its own class** (§4.1): tap `$22`, half `$23`, full `$24`.
+- **The punch moves to its own shot class** (§6.4): tap `$22`, half `$23`, full `$24`.
   - The punch-only rule (`$3F:$EA99`: Metalls) and the shield rule (`$38:$90A2`) test `$24` instead of `$14`.
   - The cracked-block rule (collision `$B`) accepts `$24`.
   - Normal-enemy damage keeps vanilla's 2 / 3 / 4.
@@ -316,8 +319,8 @@ The design rule from PLAN: weaker than each specialist, no gauge.
 | Fist damage | mooks 3 out / 2 back; bosses: the FIST column (§4) | |
 | Weapons | all, no synergies (the 8 synergies are Power or Jet only, BRIEF §5.1) | |
 
-The homing return lets the fist hit an enemy *behind* Rock on the way back. That is the trick the H3 Gamma fight and
-late fortress rooms can teach.
+The homing return lets the fist hit an enemy *behind* Rock on the way back. That is the trick H4, H5 and Super Wily
+Castle can build rooms around. Super arrives only after H3's Gamma, which is a Power test (SC5).
 
 ### 2.3 SYS-FRM-2: acquisition by win count [new-code] S, Must
 
@@ -421,15 +424,15 @@ kills the fire robots `$2A/$2C` outright (thematic table). It is Plant Man's wea
 | | Input | Behaviour | Cost | Mook dmg |
 |---|---|---|---|---|
 | Tap | B | 4-flake spread (vanilla) | **2** (vanilla 3) | 2 per flake |
-| Alt: **Cold Snap** | UP+B | One slow snowflake (2 px/f). The first normal enemy it touches is **frozen for 150 f**: its AI stops (the frozen tick, SYS-CMB-3), it turns ice-blue, and its class becomes 9 (solid platform), so **Rock can stand on it** and touching it is harmless. It still takes damage. A boss takes 1 and is not frozen. Fire enemies die (vanilla table). Types in NOFREEZE (BG bosses, big parts) just take 1 | 2 | 1, plus the freeze |
+| Alt: **Ice Block** | UP+B | A 32×16 ice block lobbed forward (venues_b's proposal, merged with a freeze). **If it hits a normal enemy**, the enemy is **encased for 150 f**: its AI stops (the frozen tick, SYS-CMB-3), it turns ice-blue, and its class becomes 9 (solid platform), so **Rock can stand on it** and touching it is harmless. It still takes damage. **Otherwise it lands** as a solid block with a slippery top for 240 f. **On burning oil** it freezes the fire into an ice floor for 300 f (Flame revisit). A boss takes 1 and is not frozen. Fire enemies die (vanilla table). NOFREEZE types (BG bosses, big parts) just take 1 | 2 | 1, plus the freeze |
 | Synergy: **Snow Bomb** (Jet) | B in flight | The 4 flakes fall straight down in a 32-px spread at 3 px/f | 2 | 2 per flake |
 
 The cost cut from 3 to 2 is because the flakes no longer stack on bosses: i-frames eat the extra flakes. The weapon is
 judged by its crowd value.
 
-Tags: Cold Snap [new-code] M (freeze + class swap), [new-art] ice palette only. Snow Bomb [new-code] S. Must.
+Tags: Ice Block [new-code] M (freeze, class swap, block object), [new-art] 4 tiles + ice palette. Snow Bomb [new-code] S. Must.
 
-> B.ATTACK - "UP+B: one careful snowflake. Whatever it touches holds still and holds you up. Please wipe your feet."
+> B.ATTACK - "UP+B: an ice block. Whatever it lands on holds still and holds you up. Please wipe your feet."
 
 ### 3.5 F.BLAST (Flame, slot 4, class 8)
 
@@ -500,7 +503,7 @@ does 0 to every boss but Wind Man (4).
 
 | | Input | Behaviour | Cost | Mook dmg |
 |---|---|---|---|---|
-| Tap | B | Screen flash (vanilla). Bosses take their C.FLASH cell. With **REDUCED FLASHES** on, a 2-step palette darken replaces the white | 4 | 4 to all on screen |
+| Tap | B | Screen flash (vanilla). Bosses take their C.FLASH cell. **It lights a dark room for 240 f** (Yamato's dark room, Centaur's black zone; venues_b). With **REDUCED FLASHES** on, a 2-step palette darken replaces the white | 4 | 4 to all on screen |
 | Alt: **Time Stop** (Flash Man nod, RM2) | UP+B | For 90 f every enemy object (slots 8-`$15`) and enemy bullet freezes; the frozen tick still applies damage. **Bosses freeze for at most 45 f**, then ignore Time Stop for 120 f. **Centaur Man is immune** (visible special case). Darker palette; the music keeps playing | 7 | - |
 | Synergy: **Time Fist** (Power) | B in Power form | A 60-f Time Stop in which **B is always the punch and every punch is a full punch** (`$24`: 4 to mooks, breaks `$B`) | 6 | 4 per punch |
 
@@ -540,7 +543,7 @@ His design brief: no forms, a different body, buster only.
 | **Break Shot** | hold B 60 f → a big shot, `$E4`: 4 to mooks, flies on through what it kills, **breaks cracked blocks (`$B`)** | full charge 90 f, 3 |
 | **Shield** | while airborne and not shooting, enemy bullets (class 4) that touch the front half of his box are deleted (the PLANT.B bullet-delete path); bodies still hurt | - |
 | **Double knockback** | knockback 28 px over 30 f (Rock: 14 px). Same 60 f of blink afterwards | 14 px |
-| Weapons, forms, chips | none. Body chips (Spike Guard, Shock Absorber, Iron Helmet, Last Stand) apply to Rock only. Economy chips (Balancer, Exchanger, Judge's Favor) still work | |
+| Weapons, forms, chips | none. Body chips (Shock Absorber, Spike Guard, Afterimage, Iron Helmet, Yashichi, Snow Chains, Fireproof, Centurion, Daruma) apply to Rock only. Economy chips (Balancer, Exchanger, Sheriff Star) still work | |
 
 Why buster only:
 
@@ -567,7 +570,7 @@ Why buster only:
     other weapon also 1,680 f.
 - **Fortress bosses** [seen, ds `iframes2.py`: Mr. X 2, Mr. X 4, Wily 2]: **32 frames** after every hit (`$05DF`),
   damage from `$3F:$EFE4`. The full punch does 4 there (the class-1 low-nibble rule).
-- **Normal enemies** [seen, ds]: **no i-frames**. A buster fired every 4 frames into a HP-15 enemy hit every 4 frames.
+- **Normal enemies** [seen, ds `enemy_iframes.py`]: **no i-frames**. A buster fired every 4 frames into a HP-15 enemy hit every 4 frames.
   The shot vanishes unless it kills (`$38:$9067`).
 - **Rock** [seen, ds]: 30 f of knockback (14 px), then 60 f of blinking. Contact damage = the enemy's low nibble.
 
@@ -585,7 +588,7 @@ and in the readme. Damage stays 1-4. The weakness lives mostly in the i-frames.
 | **G**ood | 3 / 20 | a second, thematic answer | short blink |
 | **N**eutral | 2 / 30 | "any special weapon fights decently" (4MI) | |
 | **R**esisted | 1 / 45 | worse than a charged buster | after 3 in a row the announcer hints |
-| **O**wn weapon | 1 / 60 | only in refights | Could: own reaction (§4.6) |
+| **O**wn weapon | first hit 0, then 1 / 60 | only in refights | the champion's joke reaction (SC4) |
 | **BUSTER** | 1 / 60 | vanilla feel, unchanged | the long blink *is* the information |
 | **CHARGE** | 3 / 60 | vanilla | |
 | **PUNCH** tap/half | 2 / 40 | Power's free option | |
@@ -612,7 +615,7 @@ weapon got better, so the carrot is in the weapons, not a stick on the buster. T
 | Weak (4/16) | 112 | 1.9 | 420 |
 | Good (3/20) | 200 | 3.3 | 1,680 |
 | Neutral (2/30) | 420 | 7.0 | 1,680 |
-| PUNCH★ (3/30, 45-f charge) | 450 | 7.5 | 1,260 (vanilla 2 / 60, charge 45) |
+| PUNCH★ (3/30, 45-f charge) | 450 | 7.5 | 840 (vanilla: 2 / 60, tap or charged) |
 | PUNCH tap (2/40, 32-f fist) | 560 | 9.3 | 840 |
 | FIST (3/40, 45-f charge + flight) | ≈ 600 | 10 | - |
 | CHARGE (3/60, 90-f charge) | 900 | 15 | 900 |
@@ -621,8 +624,8 @@ weapon got better, so the carrot is in the weapons, not a stick on the buster. T
 
 Energy is the real limit on the good options:
 
-- Neutral needs 14 hits: half a bar of a cost-1 weapon, more than a bar of B.ATTACK, and *impossible* with C.FLASH
-  (cost 4).
+- Neutral needs 14 hits: half a bar of a cost-1 weapon, a whole bar of B.ATTACK (cost 2), and *impossible* with
+  C.FLASH (cost 4).
 - The weakness needs 7 hits: a quarter bar.
 
 So mixing weapons is both the fastest and the cheapest way to fight. That is the premise.
@@ -735,18 +738,22 @@ Notes:
   Mecha Dragon to a thrown, returning weapon (KNIGHT.C) [guess on the MM2 fact; fortress.md checks]; Gamma's head to a
   body blow (punches, the Top Spin nod).
 - The W2 bracket rush refights the champions with Table 1/2, own-weapon cells included.
+- "-" in Grand Pi-kun's column means the player cannot own that source in a first run of the Opening. On replays the
+  mid-boss default column applies.
 
 ### 4.6 Special cases, in visible code (CX lesson 7: never by table fall-through)
 
 | Id | Case | Rule | Tags | Tier |
 |---|---|---|---|---|
-| SC1 | Knight Man's shield (class 3, `$38:$90A2`) | Frontal shots reflect, except PUNCH★, Morning Star, Time Fist, PARRY reflections, BREAK★ and C.FLASH (latched directly, as in vanilla). A PUNCH★, Morning Star or BREAK★ hit on the shield **breaks his guard for 180 f** (tune); venues owns the animation | new-code S | Must |
+| SC1 | Knight Man's shield (class 3, `$38:$90A2`) | Frontal shots reflect, except PUNCH★, Morning Star, Time Fist, PARRY reflections, BREAK★ and C.FLASH (latched directly, as in vanilla). A PUNCH★, Morning Star or BREAK★ hit on the shield **breaks the shield**. Systems' default is 180 f (tune); venues_a's rework makes it permanent for the fight ("THE SHIELD BROKE!"), and the venue decides | new-code S | Must |
 | SC2 | Centaur Man vs Time Stop | Immune to Time Stop and Time Fist's stop; announcer "He galloped right through it!" | new-code S | Should |
 | SC3 | Plant Man vs C.FLASH | "Photosynthesis": the first C.FLASH of each fight **heals him 2** (the bar rises, with a "?!" pop). After that, R 1/45 | new-code S | Could |
-| SC4 | Own weapons (refights only) | Each champion's own weapon: 1/60 plus a reaction. Blizzard reflects the flakes; Wind is spun faster (vanilla's "one hit only" W.STORM quirk, now on purpose); Plant grows; Flame absorbs (+2); Yamato parries; Tomahawk catches the axe and throws it back; Knight catches the mace; Centaur ignores the flash | new-code M | Could |
-| SC5 | Gamma MK-VI phase 2 | Only PUNCH★, Time Fist punches (4/12) and Morning Star (3/20) hurt the head. Everything else dinks (`$27`). A telegraphed Top Spin nod: the plaque says "THE HEAD RESPECTS ONLY A FIST" | new-code S | Must (H3 is Must) |
+| SC4 | Own weapons (refights, and any fight where the player already owns it) | The **first** own-weapon hit per fight does **0 damage** and plays the champion's joke reaction (≤ 60 f). After that it is a normal O cell (1/60). The OWN MOVE style act. Examples: Blizzard reflects the flakes; Wind is spun faster (vanilla's "one hit only" W.STORM quirk, now on purpose); Plant grows; Flame absorbs it; Yamato parries; Tomahawk catches the axe and throws it back; Knight catches the mace; Centaur ignores the flash. venues_b defines its four reactions; venues_a defines the others | new-code M | Should (the hook); the reactions belong to the venue docs |
+| SC5 | Gamma MK-VI phase 2 | Only fists hurt the head: the tap punch (2/30), PUNCH★ and Time Fist punches (4/12), Morning Star (3/20) and, on replays, the Super fist (3/20). Everything else dinks (`$27`). A telegraphed Top Spin nod: the plaque says "THE HEAD RESPECTS ONLY A FIST" | new-code S | Must (H3 is Must) |
 | SC6 | Bass β adaptive armour | The 3rd consecutive damaging hit from the same column makes that column 1/45 until a *different* column hits him. Announcer: "He's adapting!". In W2 the armour starts adapted to the column the player used most in the Semifinal duel (1 saved byte). The rival literally punishes a one-weapon player: the premise in one rule | new-code S | Must |
 | SC7 | Yellow Devil MK-VI "SELECT trick" | A nod to RM1's famous pause bug: a weapon swap within 2 frames of a WEAK hit clears the eye's i-frames, once per eye opening. Hinted in the H1 plaque only ("SOME TRICKS ARE A SELECT FEW") | new-code S | Could |
+| SC8 | Tomahawk Man's quick-draw (venues_a §3) | A won draw deals a **free hit of 3** with 30 i-frames, whatever is equipped. It is booked as class 1 (BUSTER) for VARIETY | new-code S | Must (with the venue) |
+| SC9 | Venue-defined weak reactions | A venue's WEAK reaction (Wind's STALL 120 f, Tomahawk's HAY FEVER, Blizzard's MELT 40 f…) **replaces** the generic 10-f freeze of §5. It is an AI state, not a freeze, so damage keeps working. The 90-f re-trigger rule and the 16-f i-frames still apply. Venue proposals of 8 f weakness i-frames (venues_b) are overridden by the 16 f of Table 2, so the chart stays uniform | data | Must |
 
 ### 4.7 SYS-CMB-2: normal enemies [engine-ok] + [new-code] S, Must
 
@@ -780,7 +787,7 @@ Notes:
   - Size: 18 columns × about 26 rows ≈ 470 bytes.
 - **The chart is generated from the source data** (CX lesson 7) by a build script (`tools/build/dmgchart.py`, tech.md)
   that prints the tables of this section. This doc's tables are the seed data.
-- **The frozen tick (SYS-CMB-3).** Time Stop, Cold Snap and the WEAK stagger stop an object's AI.
+- **The frozen tick (SYS-CMB-3).** Time Stop, the Ice Block and the WEAK stagger stop an object's AI.
   - Damage is applied victim-side, inside the AI (vanilla), so a frozen object would never process its hit latch.
   - The object loop (`$3F:$E438`) therefore calls, for each frozen slot, only that type's damage routine. The routine
     comes from a new 256-entry type → damage-routine table, seeded from engine.md's `dmgmap.json`: `$E9D7`, `$EA20`,
@@ -875,8 +882,11 @@ Calibration [guess, checked by playtest at M4]:
 - The par `P` is a per-stage field in the stage-attribute table (BRIEF §7.2).
 - **Rule for setting it**: P = 1.25 × the golden-movie reference route (normal exit, no deaths, a competent player),
   rounded up to 10 s. The golden movies exist from M0 (BRIEF §7.3), so pars are measured, not guessed.
-- Placeholder pars until the routes exist **(tune)**: Opening 120 s, each venue 180 s, Semifinal 150 s, each
-  Hall-of-Fame wing 200 s, W1 200 s, W2 300 s, W3 240 s, each Exhibition 90 s.
+- Placeholder pars until the routes exist **(tune)**: Opening 120 s, Semifinal 150 s, each Hall-of-Fame wing 200 s,
+  W1 200 s, W2 300 s, W3 240 s, each Exhibition 90 s.
+- Venue pars are the venue docs' proposals: venues_b gives Blizzard 330 s (including its 40-s bonus round), Flame
+  300 s, Centaur 300 s, Yamato 330 s. A bonus round or a set piece with a fixed length is part of the par, so
+  it never costs TIME.
 - VARIETY's par is Pv (above). DAMAGE has no par. The SECRETS par is "all".
 
 ### 6.4 Attribution: the shot class in the hit latch
@@ -892,7 +902,7 @@ Worse, `$13` is both the full buster and the half punch. GP therefore:
    |---|---|---|
    | 1 | BUSTER | `$11` tap, `$12` half, `$13` full, Jet `$11` |
    | 2 | PUNCH | `$22`/`$23`/`$24` Power; `$22` Super tap; `$23` Super fist and parry reflections |
-   | 4 | HAZARD | `$4x`: enemies killed by oil the player ignited, or crushed under a frozen enemy |
+   | 4 | HAZARD | `$4x`: enemies killed by oil the player ignited, or by a venue trap the player set off (a dropped chandelier, a detonated bomb cart); the venue doc books its traps here |
    | 5-C | the 8 weapons | unchanged class nibble. Alts and synergies keep their weapon's class |
    | D | M.BEAM | `$D0`; no damage, so never scores |
    | E | BREAK MAN | `$E1` tap, `$E4` Break Shot |
@@ -915,7 +925,7 @@ Worse, `$13` is both the full buster and the half punch. GP therefore:
    - Custom deaths (the gorilla tank, the Mr. X 1 riders `$3B:$827A`, new GP enemies) must call the same hook.
      tech.md audits them with shadow6 coverage.
 4. **Boss hits count too.** `GP_BOSSHIT` ORs the class into `CATS` on every damaging hit. Mixing weapons in the
-   boss fight is exactly what the judges like, and it lets a pacifist (DOVE BADGE, §9) still score some VARIETY.
+   boss fight is exactly what the judges like, and it lets a pacifist (meta.md's PACIFIST rule, or a SNOW CHAINS run) still score some VARIETY.
 
 `CATS` is a set, so farming a respawning enemy with one weapon earns nothing extra. Vanilla's kill bitfield `$0650+`
 already stops list enemies from respawning.
@@ -927,7 +937,7 @@ already stops list enemies from respawning.
 | WEAK FINISH | 4 | The killing hit on the stage's scoring boss (a stage-attribute field) is a WEAK cell, **or** a synergy shot (a "form finish") |
 | BOSS NO-HIT | 4 | No HP lost from the boss bar filling until the kill (Break Man included) |
 | NO TANKS | 2 | No E-tank or W-tank used in the run |
-| Style acts | 1 each, max 5 | PARRY (≥ 1 parry) · SYNERGY KILL · MULTI-KILL (2 kills by the same class within 8 f) · FROZEN STEP (stood on a frozen enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · TAG TEAM (Break Man scored a kill or a boss hit) · CRITICAL (if criticals ship) · VENUE ACT (one per venue, named by its doc: e.g. "won the quick-draw") |
+| Style acts | 1 each, max 5 | PARRY (≥ 1 parry) · SYNERGY KILL · MULTI-KILL (2 kills by the same class within 8 f) · FROZEN STEP (stood on an encased enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · TAG TEAM (Break Man scored a kill or a boss hit) · OWN MOVE (a champion hit by his own weapon, SC4) · CRITICAL or EXCELLENT MOVE · VENUE ACT (one per venue, named by its doc: "won the quick-draw", "a perfect daruma"…) |
 
 ### 6.6 Medals and pay
 
@@ -964,6 +974,7 @@ economy grind-proof.
 | Exhibition first clear | 100 (tune) | owner: the Exhibitions doc |
 | 1UP picked up at 9 lives | 10 ("fan tip") | no dead pickups |
 | E-tank picked up while holding 4 | 20 | |
+| Venue prizes (bounties, bonus-round vegetables, treasure, bolt sacks, props) | set by the venue docs | **paid once per save per placed prize**, at most **60 per venue (tune)**. A replay shows them as tokens (§6.7). This keeps venues_a's bounties and treasure and venues_b's vegetables without opening a farm |
 
 The counter caps at 999.
 
@@ -971,11 +982,21 @@ Income model (the prices in §8 are sized against it):
 
 | Player | After 4 venues | After 8 venues | Full game (22 stages + 4 Exhibitions) |
 |---|---|---|---|
-| Typical (≈ 62 + Silver per stage, half the envelopes) | ≈ 390 | ≈ 780 | ≈ 2,200 |
-| Completionist (Platinum everywhere) | ≈ 700 | ≈ 1,400 | ≈ 4,160 |
+| Typical (≈ 62 + Silver per stage, half the envelopes, half the venue prizes) | ≈ 590 | ≈ 1,180 | ≈ 2,560 |
+| Completionist (Platinum everywhere, every prize) | ≈ 1,160 | ≈ 2,320 | ≈ 4,640 |
 
-The 7 shop chips cost 1,090 in all. A typical player can afford 2-3 chips plus tanks by mid-game and the whole
-catalogue around the Hall of Fame. Slots (2-6), not money, are the real limit late on.
+The arithmetic:
+
+- A typical clear pays 62 + 20 = 82; envelopes and prizes add about 45 per venue.
+- A completionist clear pays 160; envelopes and prizes add 30 + 60 per venue.
+- "After 4 venues" includes the Opening. "After 8" includes the Opening and the Semifinal. The full game is 22
+  stages + 4 Exhibitions × 100.
+
+- The 7 shop chips cost 1,010 in all.
+- A typical player can afford 2-3 chips plus tanks by mid-game, and the whole catalogue around the Hall of Fame.
+- Slots (2-6), not money, are the real limit late on.
+- The late-game sink is cosmetic: **RACING COLOURS**, 4 alternative Rock palettes at 150 each (§8). They are palette
+  data only.
 
 ---
 
@@ -993,18 +1014,19 @@ Reached from the bracket screen (meta.md owns the UI). Stock unlocks by WINS, so
 | CHARGE KIT (chip) | 120 | - | start |
 | W-TANK (new: refills every weapon) | 50 | 2 | 3 wins |
 | EXCHANGER (chip) | 100 | - | 3 wins |
-| JUDGE'S FAVOR (chip) | 200 | - | 3 wins |
+| AFTERIMAGE (chip) | 120 | - | 3 wins |
 | JET TUNER (chip) | 150 | - | 4 wins (Jet owned; shown as "???" before) |
 | ENERGY SAVER (chip, 2 slots) | 250 | - | 6 wins |
+| RACING COLOURS (×4 palettes) [engine-ok data + new-code S, Could] | 150 each | - | 8 wins |
 | GARAGE tab (crafting, §9.3) | free | - | the first PART owned |
 
 - Prices do not change with difficulty. Difficulty lives in combat, not in the till. The 1993 preset closes the shop.
 - **Why these prices:**
   - E-tank 40 ≈ half a Bronze clear.
   - The T0 chips (120-150) ≈ two decent clears each, bought around the 3rd-4th venue.
-  - JUDGE'S FAVOR (200) is an investment that pays back after about 1,000 bolts of later earnings (≈ 12 stages). A
-    real choice.
+  - JET TUNER waits for the Jet itself.
   - ENERGY SAVER (250, 2 slots) is the luxury.
+  - The +20 % bolt chip is a *prize* (SHERIFF STAR), not a purchase, so money can't buy more money.
 
 ---
 
@@ -1012,33 +1034,51 @@ Reached from the bracket screen (meta.md owns the UI). Stock unlocks by WINS, so
 
 ### 9.1 The framework
 
-- Chips are passive, one bit each: 15 chips in a 16-bit `CHIPS_OWNED`, and 16 bits of `CHIPS_EQ`.
+- Chips are passive, one bit each: 21 chips in a 24-bit `CHIPS_OWNED`, and 24 bits of `CHIPS_EQ`.
 - Equip and unequip them at the Pit Stop, or on the pause menu's CHIPS page, at any time. 4MI items are always on;
   GP lets you choose because the slots are limited.
-- Each chip costs 1 slot. ENERGY SAVER and LAST STAND cost 2.
+- Each chip costs 1 slot. ENERGY SAVER and DARUMA cost 2.
 - Each chip has a **help page** (≤ 3 lines × 28 characters, EN below; the JP text pass belongs to story.md). As in
   4MI, **some pages are cryptic on purpose**, marked ◊.
-- Body effects (knockback, spikes, damage reduction, Last Stand) apply to Rock only, never to Break Man.
+- Body effects (knockback, i-frames, spikes, damage reduction, the guts effects) apply to Rock only, never to
+  Break Man.
 
-### 9.2 The fifteen chips
+**Why 21 and not the BRIEF's "about 14":**
+
+- Systems owns 13: 7 bought, 4 crafted, 1 found, 1 moral.
+- The venue docs give every venue a behaviour-gated chip (BRIEF §5.4), which adds 8.
+- The 8 venue chips are prizes for *how* you play, the 4MI lesson 3 family. Their gates are the venue docs'; their
+  effects are fixed here, so no two chips do the same thing.
+- With 2-6 slots, 21 chips means real choices, not more power (Risk 12).
+
+### 9.2 The twenty-one chips
 
 | # | Chip | Exact effect | Source | Slots | Tier |
 |---|---|---|---|---|---|
-| 1 | **ENERGY BALANCER** | A weapon-energy pickup the equipped weapon can't take (buster, punch or Jet buster equipped, the weapon full, or Break Man in) goes to the **owned, non-full weapon with the least energy** (ties: menu order). If all are full, it falls through to the base rule (§12.2). This is the vanilla behaviour as measured by the critic (buster equipped → lowest weapon; big +10, small +2), extended to the "weapon full" case | **Found**: the Tomahawk venue, re-homing vanilla room 1C behind a cracked block (venues doc places it). Vanilla object `$8A` | 1 | Must |
-| 2 | **SHOCK ABSORBER** | No knockback: the 30-f hurt state is skipped and Rock keeps control. The 60 f of blink are unchanged, so total safety per hit drops from 90 f to 60 f (the trade-off) | Shop 120 | 1 | Must |
-| 3 | **SPIKE GUARD** | Once per life, touching spikes at HP ≥ 2 sets HP to 1 instead of killing; 120 i-frames (4MI SHOCK GUARD, which was unlimited) | Shop 150; free and slotless in CASUAL | 1 | Must |
+| 1 | **ENERGY BALANCER** | A weapon-energy pickup the equipped weapon can't take (buster, punch or Jet buster equipped, the weapon full, or Break Man in) goes to the **owned, non-full weapon with the least energy** (ties: menu order). If all are full, it falls through to the base rule (§12.2). This is the vanilla behaviour as measured by the critic (buster equipped → lowest weapon; big +10, small +2), extended to the "weapon full" case | **Found**: Tomahawk room 1C, vanilla object `$8A`, kept (venues_a §3) | 1 | Must |
+| 2 | **SHOCK ABSORBER** | No knockback: the 30-f hurt state is skipped and Rock keeps control. The blink is unchanged, so total safety per hit drops from 90 f to 60 f (the trade-off) | Shop 120 | 1 | Must |
+| 3 | **SPIKE GUARD** | Once per life, touching spikes at HP ≥ 2 sets HP to 1 instead of killing; 120 i-frames (4MI's SHOCK GUARD, which was unlimited) | Shop 150; free and slotless in CASUAL | 1 | Must |
 | 4 | **CHARGE KIT** | Buster charge thresholds 36/90 → 24/60 f. Power, Super and Burning Knuckle 45 → 30 f. Break Man unaffected | Shop 120 | 1 | Must |
 | 5 | **JET TUNER** | Fuel 19 → 27 units (108 f of flight). Regen rate unchanged (+1 per 2 f) | Shop 150 | 1 | Should |
 | 6 | **EXCHANGER** | A life pickup at full HP becomes weapon energy 2:1 (small 1, large 5), routed by §12.2 (4MI's EXCHANGER, credited) | Shop 100 | 1 | Should |
-| 7 | **JUDGE'S FAVOR** | +20 % on every scorecard payout, replay improvements included (rounded down) | Shop 200 | 1 | Should |
+| 7 | **AFTERIMAGE** | The post-hit blink lasts 90 f instead of 60 | Shop 120 | 1 | Should |
 | 8 | **ENERGY SAVER** | Weapon costs halved, rounded with a per-weapon carry bit: a cost-1 weapon charges every other shot; 3 → 2, 1, 2… | Shop 250 | **2** | Must |
-| 9 | **IRON HELMET** | A hit of 2+ is halved (rounded up) on 1 frame in 8 (LFSR), and always at HP ≤ 4 (4MI's METALL'S HELMET, credited) | **Behaviour**: destroy 20 Metalls with full-power blows (§4.7) over the save. The 20th drops the helmet, "the Metall Union surrenders" | 1 | Should |
-| 10 | **DOVE BADGE** | Normal enemies' contact damage −1 (minimum 1). Bosses are unaffected | **Behaviour**: clear any venue without destroying a normal enemy (bosses and mid-bosses excepted; HAZARD kills count as kills; frozen enemies don't). The judges' "sportsmanship" prize. That run's VARIETY can come only from boss hits: the trade-off is in the score | 1 | Should |
-| 11 | **THERMO CORE** | Ice and oil floors behave as normal floor for Rock (no momentum, normal walk and jump). Burning oil still burns | **Craft**: SNOW + EMBER | 1 | Should |
-| 12 | **SEED POD** | After 60 f with no input, +1 HP every 30 f up to max. Off while a boss bar is shown | **Craft**: GUST + SEED | 1 | Should |
-| 13 | **LAST STAND** | Once per life, a hit that would kill at HP ≥ 2 leaves 1 HP. Pits and spikes excluded (4MI's SKULL AMULET, but once per life) | **Craft**: KATANA + CREST | **2** | Should |
-| 14 | **LUCKY DICE** | Critical chance ×4 (§14). ◊ With criticals OFF: each scorecard payout has a 1-in-8 "LUCKY!" that doubles the medal bonus | **Craft**: FEATHER + SHELL | 1 | Should (Could if criticals are cut) |
-| 15 | **Y-TURBO** | +1 damage on every hit against bosses (cap 4) and charges fill 2× faster. **The cost:** see §9.4 | **Moral**: Mr. Y's booth, for any one PART | 1 | Should |
+| 9 | **IRON HELMET** | A hit of 2+ is halved (rounded up) on 1 frame in 8 (LFSR), and always at HP ≤ 4 (4MI's METALL'S HELMET, credited) | **Garage**: KATANA + CREST | 1 | Should |
+| 10 | **THERMOS** | Using an E-tank also adds 10 to every owned weapon, and the tank pours at 1 HP per frame | **Garage**: SNOW + EMBER | 1 | Should |
+| 11 | **BIRD SEED** | Beat's pit rescue costs 2 HP instead of 4 and works from HP ≥ 3 (§10) | **Garage**: SEED + SHELL | 1 | Should |
+| 12 | **GLIDER** | In Jet form, holding A with an empty tank glides: the fall speed is capped at 1 px/f until the tank refills | **Garage**: GUST + FEATHER | 1 | Should |
+| 13 | **YASHICHI** | Once per stage, the first time HP falls to 4 or less (and you survive), the pinwheel spins and **refills HP to full**. The Yashichi was Capcom's full-restore item | **Venue, Wind**: juggle one POW through 8 hits (venues_a §1.6) | 1 | Must (venue) |
+| 14 | **KAISHIN** | Criticals ON: critical chance 1/16 (1/8 at HP ≤ 4) instead of 1/128. Criticals OFF or cut: every 12th damaging hit on a boss is an **EXCELLENT MOVE**, +2 damage with the chime (deterministic, so records stay fair) | **Venue, Knight**: kill the Metal Metslime (venues_a §2.7) | 1 | Must (venue) |
+| 15 | **SHERIFF STAR** | +20 % on every scorecard payout (replay improvements included) and on venue prize bolts, rounded down | **Venue, Tomahawk**: reach the Sheriff with no townsfolk hit (venues_a §3.7) | 1 | Must (venue) |
+| 16 | **AUTO RECOVER** | After 60 f with no input, +1 HP every 30 f up to max. Off while a boss bar is shown | **Venue, Plant**: the PITFALL PERFECT (venues_a §4.4) | 1 | Must (venue) |
+| 17 | **SNOW CHAINS** | Ice floors (types 5/`$15`) grip like normal floor: no momentum. Falling icicles bounce off the helmet harmlessly | **Venue, Blizzard**: never destroy a Toppy (venues_b §1.5.3) | 1 | Should (venue) |
+| 18 | **FIREPROOF** | Burning oil and other fire floors (the ignited collision `$F`) deal 4 with knockback instead of killing. Fire projectiles (a FIRE flag per type) do half, rounded up | **Venue, Flame**: reach the shutter with no oil ignited (venues_b §2.5.3) | 1 | Should (venue) |
+| 19 | **CENTURION** | When a boss bar finishes filling, a Centurion-bot hovers beside Rock and absorbs the first 3 projectiles that would hit him. It is one object (lag budget: boss fights only) | **Venue, Centaur**: free the three statues with full charges (venues_b §3.6.3) | 1 | Should (venue) |
+| 20 | **DARUMA** | Once per life, a hit that would kill at HP ≥ 2 leaves 1 HP. Pits and spikes excluded (4MI's SKULL AMULET, once per life) | **Venue, Yamato**: win the daruma otoshi without touching its head (venues_b §4.6.3) | **2** | Should (venue) |
+| 21 | **Y-TURBO** | +1 damage on every hit against bosses (cap 4) and charges fill 2× faster. **The cost:** see §9.4 | **Moral**: Mr. Y's booth, for any one PART | 1 | Should |
+
+The bit order is the table order (meta.md `CHIPS_OWNED`). The source attribute (shop / garage / venue / found / moral)
+is a per-chip byte that meta.md's rating reads.
 
 Help pages (EN; ◊ = cryptic on purpose):
 
@@ -1055,22 +1095,34 @@ JET TUNER        Bigger tank, same Rush. Do not tell
                  him about the extra weight.
 EXCHANGER        Life you can't use becomes energy you
                  can. Two for one. Eddie's math.
-JUDGE'S FAVOR    The judges have been... persuaded.
-                 +20% prize money. Nobody saw anything.
+AFTERIMAGE       After a hit you stay a blur a little
+                 longer. Enemies hate that.
 ENERGY SAVER     Every weapon sips instead of gulps.
                  Takes two slots. Worth it? Discuss.
-IRON HELMET  ◊   Twenty of them signed it.
-                 They seemed relieved.
-DOVE BADGE   ◊   For a match won without a single
-                 casualty. Some opponents noticed.
-THERMO CORE      Ice holds still. Oil lets go. Your
-                 floors finally behave.
-SEED POD     ◊   Stand still and listen. Something is
+IRON HELMET  ◊   Hammered from a sword and a shield.
+                 Sometimes the blow forgets itself.
+THERMOS          Keeps tanks hot and weapons cold. Or
+                 the other way round. Drink up.
+BIRD SEED    ◊   Beat says thank you. Beat says it
+                 with less pecking.
+GLIDER       ◊   Wind and feathers. When the tank is
+                 dry, keep holding on.
+YASHICHI     ◊   It spins when you need it most.
+                 Once. Then it rests.
+KAISHIN          AN EXCELLENT MOVE! Sometimes a hit
+                 lands harder than it should.
+SHERIFF STAR     Deputies get paid better. That is
+                 the whole point of being a deputy.
+AUTO RECOVER ◊   Stand still and listen. Something is
                  growing back.
-LAST STAND       Once per life, a fatal blow is only
-                 almost fatal. Pits did not sign this.
-LUCKY DICE   ◊   Roll it. If nothing happens,
-                 roll it after the match.
+SNOW CHAINS      Ice holds still under your boots.
+                 The seals taught you this.
+FIREPROOF        Fire hurts. Fire no longer ends the
+                 match. The marshal approves.
+CENTURION        A friend from the ruins waits at every
+                 title fight. Three arrows' worth.
+DARUMA       ◊   Fall seven times, stand up eight.
+                 Well. Once.
 Y-TURBO      ◊   Mr. Y guarantees results.
                  Mr. Y guarantees a lot of things.
 ```
@@ -1105,16 +1157,17 @@ These "thematic kills" are RM6's own crafting hint. GP turns them into recipes:
 | CREST | Knight | lance knight `$6E` | Y.SPEAR |
 | SHELL | Centaur | seahorse `$C4` | KNIGHT.C |
 
-**The garage** (a Pit Stop tab, free to use) builds chips from pairs:
+**The garage** (a Pit Stop tab, free to use) builds chips from pairs. The theme of the four results is RM6's own:
+Rush, Beat and the tanks.
 
 | Recipe | Chip | Why the pair |
 |---|---|---|
-| SNOW + EMBER | THERMO CORE | ice and fire |
-| GUST + SEED | SEED POD | wind carries seeds |
-| KATANA + CREST | LAST STAND | the two warriors' honour |
-| FEATHER + SHELL | LUCKY DICE | a gambler's feather and a lucky shell |
+| KATANA + CREST | IRON HELMET | a sword and a shield, forged into a helmet |
+| SNOW + EMBER | THERMOS | hot and cold, kept apart |
+| SEED + SHELL | BIRD SEED | bird food and grit, for Beat |
+| GUST + FEATHER | GLIDER | flight, for Rush Jet |
 
-Owning one PART of a pair shows the recipe as "SNOW + ???". That is the in-menu hint (4MI: "once you find one by
+Owning one PART of a pair shows the recipe as "KATANA + ???". That is the in-menu hint (4MI: "once you find one by
 accident it hints at the others").
 
 ### 9.4 SYS-CHP-4: Mr. Y's booth and Y-TURBO (the moral trade-off) [new-code] S, Should
@@ -1151,6 +1204,7 @@ tournament**.
   - **Cost**: **4 HP**, then 60 i-frames. No life is lost. No limit while HP ≥ 5.
   - CASUAL lends Beat from the start ("Beat on loan"). 1993: off.
 - The 4MI precedent was 3 HP at HP ≥ 4. GP's 4/5 matches RM6's harsher contact damage (bosses hit for 4-5) **(tune)**.
+- The BIRD SEED chip (garage) lowers it to 2 HP from HP ≥ 3.
 
 ---
 
@@ -1236,7 +1290,7 @@ costs a slot.
 | **Pit-crew refill** (SYS-PU-3) | On respawn after a death: NORMAL gives every owned weapon +max(4, ⌊missing/2⌋) (4MI's ENERGY CHARGER, credited); CASUAL refills them fully; HARD and 1993 give nothing (vanilla) | new-code S | Must |
 | **Game over** | CONTINUE restarts the stage (vanilla) with the preset's lives, full weapons and the E-tank floor. No tank penalty: the lost run is the penalty | new-code S | Must |
 | **E-tank** (SYS-PU-4) | heals +1 HP per **2** f (vanilla 4 f, `$38:$9537`): a full bar in 54 f instead of 108. Hold max 4 (shop cap) | new-code S | Should |
-| **W-tank** (SYS-PU-4) | new pause-menu item beside the E-tank: refills every weapon. Hold max 2. Shop (3 wins) and rare hidden placements | new-code S, new-art 1 icon | Should |
+| **W-tank** (SYS-PU-4) | new pause-menu item beside the E-tank: refills every weapon. Hold max 2. Shop (3 wins) and rare hidden placements (venues_a puts one in a TNT crate and one in the Gold Mine vault). THERMOS (§9.2) makes E-tanks part W-tanks | new-code S, new-art 1 icon | Should |
 | **Overflow** | a 1UP at 9 lives → +10 bolts; an E-tank at 4 held → +20 bolts | new-code S | Should |
 | **Envelopes** | sponsor envelopes (+30 bolts) in hidden rooms (§7) | new-code S, new-art 1 | Must |
 
@@ -1319,7 +1373,7 @@ The 4MI tribute ("pikoon"), with 4MI's own lesson applied: the dice must not be 
 
 - **The roll**, on each damaging hit that would not already kill:
   - it uses the vanilla LFSR (`$3E:$C88D` on `$DF/$E0`);
-  - chance 1/128 normally; ×4 at HP ≤ 4 (1/32); ×4 with LUCKY DICE; 1/8 with both.
+  - chance 1/128 normally; ×4 at HP ≤ 4 (1/32); KAISHIN sets 1/16 (1/8 at HP ≤ 4); the cap is 1/8.
 - **The effect**:
   - on normal enemies, damage ×8 (cap 31: in practice a kill);
   - on bosses, **+2 damage** (cap 6). 4MI's ×3 would break the 1-4 band.
@@ -1327,7 +1381,7 @@ The 4MI tribute ("pikoon"), with 4MI's own lesson applied: the dice must not be 
 - **Feedback**: a "pikoon" SFX, a star spark, and the pop object reading "CRIT!".
 - **Scoring**: the CRITICAL style act.
 - **Where it applies**: forced OFF in Time Attack, GP Rush and 1993. Default per preset (§13.2).
-- The cost of cutting it: LUCKY DICE falls back to its cryptic bolt effect (§9.2).
+- If criticals are cut, KAISHIN keeps its deterministic EXCELLENT MOVE (§9.2), so the Knight venue's prize still works.
 
 ---
 
@@ -1343,7 +1397,7 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
 | Free RAM (hot) | about 10 | SELECT hold timer, SEL_USED, SWAPMASK, LASTW, the form-swap cooldown, the CHR stream position, the Time Stop timer, the stagger timer, the multi-kill timer |
 | WRAM, per object slot (23 each) | 4 × 23 = 92 | LASTHIT, LATCHSRC, REHIT (8-f lingering timer), FREEZE (frozen timer) |
 | WRAM, run block | about 24 | T (3), L (2), K, CATS (2), OWNED (2), SECR, STY, TANKS, the kill count, flags |
-| Save slot | about 140 | BOLTS (2), CHIPS_OWNED (2), CHIPS_EQ (2), PARTS, PARTS_USED, PLATES, W-tanks, E-tanks, the Metall count, WEAKFOUND (4), FORMS_DEBUT, flags (BREAK_JOINED, TURBO, DOVE…), BASS_ADAPT; per stage × 32: best score + preset badge (1), best PAY (1), secrets found (1), asterisk (bit) |
+| Save slot | about 145 | BOLTS (2), CHIPS_OWNED (3), CHIPS_EQ (3), PARTS, PARTS_USED, PLATES, W-tanks, E-tanks, WEAKFOUND (4), FORMS_DEBUT, flags (BREAK_JOINED, TURBO…), BASS_ADAPT, venue prize bits (8 × 1); per stage × 32: best score + preset badge (1), best PAY (1), secrets found (1), asterisk (bit). meta.md's FILE block already holds most of these |
 | System block | about 16 | the §13.1 settings |
 | ROM tables | ≈ 1.2 KB | the boss cell table (≈ 470 B), the type → damage-routine table (256), NOPARRY / NOFREEZE (64 bytes as bitmaps), the 8 thematic tables (8 × 16), the chip and recipe data, help text |
 
@@ -1377,8 +1431,20 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
     entries.
   - **Telegraphs:** tag gates use the scarf emblem and lead to optional content.
   - **HARD:** poke lists and AI branches.
-  - **Weapon uses** they build on: Pogo over spikes, the Wall Spear, the Updraft, Cold Snap platforms, the held mace,
-    Burning Knuckle and Morning Star on cracked blocks.
+  - **Weapon uses** they build on: Pogo over spikes, the Wall Spear, the Updraft, Ice Block platforms and encased
+    enemies, the held mace, Burning Knuckle and Morning Star on cracked blocks, and C.FLASH lighting dark rooms.
+  - **Answers to their questions:**
+    - The vanilla weakness cycle is kept.
+    - Plates are pickups.
+    - The 8 behaviour chips are unique: their effects are fixed in §9.2. YASHICHI changed from "last stand" to a full
+      HP refill, so it no longer duplicates DARUMA.
+    - Weakness i-frames are 16 f, not 8.
+    - Y.SPEAR's tap stays vanilla's single spear plus a pierce. venues_b proposed a 3-spear volley; Yamato Man may
+      still throw volleys himself.
+    - B.ATTACK's alt is venues_b's Ice Block, merged with an encase effect.
+    - Self-weapon reactions are SC4.
+    - Venue prize bolts are paid once per save, at most 60 per venue (§7).
+    - Venue objects that react to "a charged shot" (Centurion statues, skeletons) test for the attack byte `$13`.
 - **fortress.md**:
   - the placeholder rows in §4.5 (they may override them) and the special cases SC5 (Gamma), SC6 (Bass) and SC7 (the
     Yellow Devil SELECT trick);
@@ -1397,7 +1463,14 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
   - records with preset badges and asterisks;
   - Time Attack and GP Rush force criticals OFF and use STABLE-like drops (NONE);
   - the debrief predicate list is the same as SECRETS';
-  - the Exhibition rewards: proposed as fixed prizes (100 bolts + a special), not chips, to keep the chip count at 15.
+  - the Exhibition rewards: proposed as fixed prizes (100 bolts + a special), not chips, so the chip count stays 21;
+  - **deltas from my first draft, which meta.md already cites:**
+    - `CHIPS_OWNED` and `CHIPS_EQ` grow to 24 bits (21 chips, bit order = §9.2's table);
+    - T6's "7 bought + 4 crafted = 11" still holds, with new names (§9.2 rows 2-12);
+    - T5's "8 venue behaviour chips" = §9.2 rows 13-20;
+    - the METALLS counter and the DOVE flag are no longer used: IRON HELMET is crafted and DOVE BADGE is cut;
+  - per-file difficulty bytes (meta.md §11.2's amendment) are accepted;
+  - ANNOUNCER = DEATHS ONLY is accepted.
 - **tech.md**:
   - the VBlank budget for CHR streaming (128 B/frame assumed);
   - whether vanilla reads joypad 2;
@@ -1422,7 +1495,7 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
 | 4MI 2 | Separate the mook and boss rules: no i-frames on mooks, only a lingering-hitbox timer | §4.7 |
 | 4MI 3 | One crafting system plus one moral trade-off: PARTs/garage; Mr. Y's TURBO in the place of eating Eddie | §9.3-§9.4 |
 | 4MI 4 | Friends are mechanics: Beat = pit rescue, Break Man = spare body, Mr. Y's booth costs a friend | §10, §11, §9.4 |
-| 4MI 5 | Behaviour-gated items, plus a predicate list that drives both the score and the debrief | §9.2 (#9, #10), §6.2 SECRETS |
+| 4MI 5 | Behaviour-gated items (the 8 venue prizes, with the effects fixed here), plus a predicate list that drives both the score and the debrief | §9.2 (#13-#20), §6.2 SECRETS |
 | 4MI 6 | Old weapons, new jobs: the full punch remains the fortress weapon (vanilla's 4), Knight's shield yields to it | §4.5, SC1 |
 | 4MI (systems) | Accessibility knobs read at one place; frame-counter RNG avoided for crits; help pages from day one | §13, §14, §3 |
 | CX 4 | A partner as a second body, once per life, with separate HP | §11 |
@@ -1463,10 +1536,14 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
    obvious sleaze, Break Man "watching". And it is optional: TURBO is never needed.
 9. **The 1993 preset doubles the test matrix.** *Mitigation:* Should tier. Its combat table is generated from vanilla
    data, so there is no hand balancing.
-10. **The economy might be too rich.** A typical full game earns ≈ 2,300 bolts against 1,090 of chips. *Mitigation:*
-    slots are the binding limit; prices are one table; the M10 balance pass.
+10. **The economy might be too rich.** A typical full game earns ≈ 2,560 bolts against 1,010 of chips and 600 of
+    colours. *Mitigation:* slots are the binding limit; prices are one table; the M10 balance pass.
 11. **Scope.** Break Man needs a full sprite set (art L). He is a Should, and the scoring, call UI and tag gates
     degrade cleanly without him (the TAG TEAM act and class E simply never fire).
+12. **Chip bloat.** 21 chips against the BRIEF's "about 14": the 8 venue prizes came on top.
+    - *Mitigation:* every effect is distinct; slots cap the loadout at 6.
+    - If playtests find the menu heavy, the first cuts are AFTERIMAGE and GLIDER (systems-owned), not the venue
+      prizes.
 
 ## Open questions
 
@@ -1485,6 +1562,6 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WRAM). Only hot, per-frame by
    doc decides.
 10. The Mr. X 1 riders' charged buster was measured at 1 but the code predicts 3 (rm6 SUMMARY §8). If fortress.md
     reuses the riders, their row must be checked.
-11. Do criticals ship? If not, LUCKY DICE keeps only its cryptic bolt effect.
+11. Do criticals ship? If not, KAISHIN keeps only its deterministic EXCELLENT MOVE.
 12. The weakness-found ★ in the pause menu (§5 item 6) is a Could. Is it too much hand-holding next to the minions'
     tell (§9.3)?
