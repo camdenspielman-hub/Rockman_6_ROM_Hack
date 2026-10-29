@@ -1317,6 +1317,9 @@ First visit (`meta.md` §3.9). In v1.0 W1's door is shut and the route is W2 →
 | S35.10 | C | flavour | POP | K | IT'S WAVING A WHITE FLAG! | しろはた あげてる! |
 | S35.11 | C | plaque | PLQ | — | ROCKMAN 8 (1996) IS ON LOAN / FROM A FUTURE THAT IS NOT / READY YET. PLEASE DO NOT / SCRATCH THE DISC. | ロックマン8 (1996)は まだ / じゅんびの できて いない / みらいからの かしだし。 / ディスクに きずを つけないで ください。 |
 
+S35.7 plays only if the MMC5 voices ship as well (R8.3: they are Could, and the castle adds them); without them W1 skips
+it, since every 2A03 channel already plays in the castle and nothing is added.
+
 #### S36 W2: the Bracket of Doom · Must (the hub, TAG!); Should (the shouts)
 
 `fortress.md` §5.2: the hub is a bracket board; each pair bout runs through tech's fight loader into the champion's own
@@ -1417,8 +1420,9 @@ off without a word, and Rock does not ask.
 #### S41 The arrest; the podium and Bass's vow · Must
 
 Scene 4: two Committee guards (recoloured vanilla robots) lead Wily away, under vanilla's Wily-behind-bars art. **The
-one Mr. Y gag of the ending** (R4.1 step 4), and Act V's. Scene 5: the GP Stadium by day; Rock on the top step holding
-the GP Cup he recovered in W3; the champions applaud below; Bass β beams in at the pitch's edge for his vow (PLAN's
+one Mr. Y gag of the ending** (R4.1 step 4), and Act V's: R8.5 makes it the ending's only alias gag. Scene 5: the GP
+Stadium by day; Rock on the top step holding the GP Cup he recovered in W3; the champions applaud below **in pairs**
+(R8.6: 0 new tiles; the all-eight BG row is Should), so S41's lines name no champion; Bass β beams in at the pitch's edge for his vow (PLAN's
 Rockman 7 nod, A-7.1) and leaves in a multicoloured beam. If the escape's mercy fired, Cossack confesses (4MI's "who
 lowered the output?" in tournament clothes). STORY_BEAT → `$0C`.
 
@@ -1934,7 +1938,7 @@ AYACO is 1943's own boss, a Capcom name. WND.D6: 1942 (Capcom, 1984) gave the pl
 | KNT-08 | M | weak | POP | K | RIGHT THROUGH THE SHIELD! | たてを つらぬいた! |
 | KNT-09 | M | scene | POP | K | PAPA! HE TOOK THE DEAL! HE / PRESSED YES! | パパ! とりひきに のった! / はいを おしちゃった! |
 | KNT-10 | S | flavour | POP | C | MACE MEETS MACE! | てつきゅう たい てつきゅう! |
-| KNT.D1 | M | death | POP | King | O ROCK! TO FALL SO SOON! / ARISE, AND TRY AGAIN! | おお ロックよ! たおれるとは / なさけない! もういちど ゆけ! |
+| KNT.D1 | M | death | POP | King | O ROCK! TO FALL SO SOON! / ARISE, AND TRY AGAIN! | おお ロックよ! もう たおれたのか! / さあ たて! もういちど ゆけ! |
 | KNT.D2 | M | death | POP | C | ROCKMAN WAS DEFEATED. THE / JUDGES ARE NOT PLEASED. | ロックマンは ちからつきた。 / しんさいんは ごきげんななめ。 |
 | KNT.D3 | M | death | POP | C | THE CEILING WON THAT ROUND. | この ラウンドは / てんじょうの かち。 |
 | KNT.D4 | M | death | POP | K | THAT CHEST HAD TEETH! | あの たからばこ はが あった! |
@@ -1942,7 +1946,7 @@ AYACO is 1943's own boss, a Capcom name. WND.D6: 1942 (Capcom, 1984) gave the pl
 | KNT.D6 | S | death | POP | K | THOU ART... OUT OF HP. | HPが・・・ つきた。 |
 
 KNT.D1 is the King's (venues_a §2.11: "the King, 1 + his death line"), in the icon-less pop-up. It nods to the genre's
-famous scolding without quoting it (R3.3). KNT.D4's Killer Chest is a Must enemy (venues_a SET-KN2); KNT.D5 waits for
+famous scolding in new words, in both languages (R3.3, R8.4: round 2's JP kept the original's 「なさけない」; it is gone). KNT.D4's Killer Chest is a Must enemy (venues_a SET-KN2); KNT.D5 waits for
 the Inn (Should).
 
 #### Tomahawk: HIGH NOON FRONTIER (`venues_a.md` §3.11)

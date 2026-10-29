@@ -215,7 +215,7 @@ Could:
 | `$54-$61` | 14 | CHR source: new tiles, BG-boss art, face icons | read by the CHR loader | ≈ 9 banks (70.9 KB, 4,535 tiles; R8.7) | ≈ 15.5 banks (124.2 KB): 14 here plus the vanilla gap reserve | art_audio |
 | `$62-$6E` | 13 | tileset slots: 2 slots + 2 alternate sets + T6 tables per bank (§5.3) | copied to RAM | 7 banks (14 slots) | 13 banks (26 slots) | tech (placement), art_audio (content) |
 | `$6F-$74` | 6 | layouts of the non-venue stages (2 KB sections), the YOU GET room copy, object lists, screen-script overflow, poke lists, stage-local CHR set tables | copied to RAM | ≈ 3 banks | 6 banks | tech (format), stage docs (data) |
-| `$75-$79` | 5 | music and SFX: track table v2, instruments, new songs, companion streams (Could) | `$A000` | 1 bank | 5 banks (≈ 35.9 KB) | art_audio |
+| `$75-$79` | 5 | music and SFX: track table v2, instruments, new songs, companion streams (Could) | `$A000` | 1 bank | `$75-$78` (≈ 29.6 KB, `art_audio.md` §12.8); `$79` spare | art_audio |
 | `$7A-$7D` | 4 | text banks T1-T4: strings, dictionary, the 1-bpp glyph set | `$A000` | 4 banks (≈ 30 KB) | 9 banks with `$0B-$0F` (72 KB) | story (data), tech (format) |
 | | **64** | | | **≈ 42 banks** | **64** | |
 
@@ -1818,9 +1818,10 @@ vanilla fallback (`$0B`, `$18`; R5.2).
 `art_audio.md` owns the one track list and its byte budget (R5.2); tech owns the banks. Music and SFX get **5 banks**,
 `$75-$79` (R1.5; round 1's "16 banks (`$70-$77` + `$0B-$0F`)" was 13, consistency-41). v1.0 needs about one: G00-G04,
 the ending's lights-out arrangement (2A03 stems), a 2-second whistle jingle (R5.2) and the track table v2; the Must SFX
-sit in the `$36` tail. Of `art_audio.md`'s driver items, D1, D2, D4, D6, D9 and D11 are Must (M1-M2); new songs use the
-71 vanilla instruments until D3 (the instrument table moved, Should) lands. The full design (≈ 35.9 KB with the Could
-samples) fills the 5.
+sit in the `$36` tail: **21 new Must SFX in 392 of its 449 B** (`art_audio.md` §12.8; 57 B spare), confirmed, so the SFX
+player needs no new reader. Of `art_audio.md`'s driver items, D1, D2, D4, D6, D9 and D11 are Must (M1-M2); new songs use
+the 71 vanilla instruments until D3 (the instrument table moved, Should) lands. The full design (≈ 29.6 KB, all tiers)
+uses `$75-$78`; **`$79` stays spare**, the donor if text needs a tenth bank (R8.7).
 
 ### 12.5 MMC5 pulses [new-code] M · Could
 

@@ -2261,3 +2261,27 @@ Finding ids refer to `review_feasibility_design.md` and `review_consistency_scop
 | 38 | VA-GUST is Should (venues_a), so no Must use: the magnet pull, the roof gust and the conveyors wait; WILY MACHINE 6.5's drag is its own AI; the ring ropes are knockback | R0.4 |
 | 39 | Round 1's open questions closed (the doped lap partner, the linear Hall, Block Man, the 32-bit room, the `???` fight) | consistency decision 40 |
 | 40 | Mr. X's card text and the doped headline are story's words | consistency decision 10 |
+
+## Changes in round 3
+
+Request ids refer to `reconcile.md`'s "fortress.md" table; R-numbers to `RULINGS.md` §8. No session figure changed: the
+fortress Must stays 70 (M5 8, M6 10, M7 28, M8 24).
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| FORTRESS-01 | applied | §0.5, §2 (pitch), §2.6, §9.4 | Rock's first "Blues?" is at the Riot's 0E reveal (S20), the second at S40; S06 speaks no name; Light says "Blues" once, in S42 (R8.5) |
+| FORTRESS-02 | applied | §4.5.2, §9.4 | Panel names in vanilla's no-space style: `BREAKMAN` / `DEFINITELY BREAKMAN` → `DARKMAN` / `BAD DISGUISES`; the WRONG NOTE types a third record with VENUE `EXPOSED BY A WHISTLE` (R8.5) |
+| FORTRESS-03 | applied | §0.5, §1.7, §4.1.3, §4.3.7, §4.5.3, §5.2.4, §5.4.1, §9.4 | b0 lines and every tell Must; the b1/b2 lines (OPN-08, OPN-12, H1-08/09, H3-11/12, H5-10/11, W2-08/09, W3-09/10) Should, with story's generic lines in v1.0 (R8.6) |
+| FORTRESS-04 | applied | v1.0 scope, §4.5.3, §9.4 | H5's b0 is **ROCKMAN5**: plates R-O-C-K-M-A-N-5 in both languages; hint and CASUAL row renamed (R8.5) |
+| FORTRESS-05 | applied | §0.5, §5.4.1, §9.4 | WK-WM (first SILVER.T hit on WILY MACHINE 6.5) and WK-WC (first KNIGHT.C hit on the Capsule) registered as W3's first-weakness hooks, Must |
+| FORTRESS-06 | applied | v1.0 scope (dependencies), §0.3, §2.4, §9.2, §9.3 | NO-CAPSULE renamed **SOLO RIOT**, RATEFLAGS b4, rating T1 (R8.5); the capsule beat and Mr. X's card (T14) stay Must; the Castle map draws W1 closed beside H2/H4. Stage ids already match tech §4.2 and fight ids meta's table (checked) |
+| FORTRESS-07 | already | §2.4, §9.2; §4.3.5, §8; §4.1 (0B) | Bass β's four pre-drawn weapons are B.ATTACK, F.BLAST, KNIGHT.C, SILVER.T; Gamma's phase-1 row (11) is the chin cannon's hit box (phase 2's row 12 the cockpit); H1's gap is 96 px = one 64-px beam + a 32-px jump, with at most two beams (HARD 112 px) |
+| FORTRESS-08 | applied | §1.2, §6.1 (scene 5), §9.6 | The podium's champions applaud in pairs (SET-PARADE, 0 new tiles); the all-eight BG row is Should (R8.6) |
+| FORTRESS-09 | applied | §1.2, §4.0, §4.4.1, §6.1 (scene 8), §6.3, §9.6 | Eddie is new art (a composite); the rating draws over meta's judges' desk (the lap's photo finish now precedes it); the theft's claw is Must art and H4's Catcher reuses it (R8.6) |
+| FORTRESS-10 | applied | §6.1 (scene 5) | The one v1.0 scene over the cap, the podium (12 occupied slots), is re-cut to [6]; every other v1.0 screen and pattern was rechecked at ≤ 9; Paddle Man (§3.2, Could) was already [9]; this doc has no Reaplet alarm |
+| FORTRESS-11 | applied | v1.0 scope, §0.5, §0.12, §5.0, §5.3.3, §5.4, §6.1, §9.4, Risks | R8.3: W2, W3 and the escape keep all 2A03 channels, the drop is LIGHTS OUT's, MMC5 voices Could; R8.5: the alias gag only at the arrest (S41), no Mr. Y line at the dogeza, the CAPCOM TIMES uses S44.4F; R8.4: story §10.4's counts cited, round 2's ≈ 230 withdrawn |
+| R8.1 | applied | v1.0 scope, §4.6, Risks 1 | "If the budget falls below 440" becomes "if the M4 re-estimate asks for cuts" (the ≈ 450 Must is accepted); this doc's per-milestone share stated for RULINGS §6 |
+| R8.3 | applied | §9.6 | G14 POCKET noted Could, with W1 |
+| R8.6 | applied | Risks 5 | The text risk now leans on the b1/b2 lines being Should and story's trim list as the reserve |
+| R8.3, R8.5 | applied | Open questions | Round 2's questions 1-3 and the NO-CAPSULE half of 4 closed; the rest point at their reconcile.md ids |
+| — | applied | header | Status set to round 3 |

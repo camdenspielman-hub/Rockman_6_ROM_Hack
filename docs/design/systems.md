@@ -1409,7 +1409,7 @@ grind-proof.
 |---|---|---|---|
 | Scorecard, first clear | score + medal bonus (≤ 160) | the 15 v1.0 stages | Must |
 | Scorecard, replay | the improvement only | | Must |
-| **Sponsor envelope** | 30, once per save | **one in every hidden room**: the 8 venue rooms (venues_b's 50-bolt bags and 100-bolt chest become envelopes: R2.7, consistency-10) and each fortress stage's hidden room. Each counts as a secret (SECRETS b4 for venues) | Must |
+| **Sponsor envelope** | 30, once per save | **one in every hidden room**: the 8 venue rooms (venues_b's 50-bolt bags and 100-bolt chest become envelopes: R2.7, consistency-10) and each fortress stage's hidden room, the Opening-lite's dressing room included (fortress §1.5). Each counts as a secret (SECRETS b4 for venues) | Must |
 | **Prizes** (bounties, treasures, vegetables, showpieces, props) | set by the stage docs | paid once per save per placed prize, **≤ 60 per stage, venue or not** (R2.7, consistency-19); a replay shows them as tokens. venues_b re-prices Blizzard's vegetables to ≤ 60 in all (the critic's 5/5/5/10/10/10/15) and fits Y.SPEAR's ledge bolts inside the cap; fortress's 30-bolt showpiece payouts count against it. `meta.md` stores one PRIZES bit per placed prize | Must |
 | 1UP picked up at 9 lives | 10 ("fan tip") | no dead pickups | Should (SYS-PU-4) |
 | E-tank picked up while holding 4 | 20 | | Should |
@@ -1422,12 +1422,14 @@ The counter caps at 999.
 
 | Player | After the Opening + 4 venues | After Round One (Opening, 8 venues, Riot) | Full v1.0 (15 stages) |
 |---|---|---|---|
-| Typical (≈ 62 + Silver per stage, half the envelopes and prizes) | ≈ 590 | ≈ 1,225 | ≈ 1,860 |
-| Completionist (Platinum everywhere, every envelope and prize) | ≈ 1,160 | ≈ 2,410 | ≈ 3,660 |
+| Typical (≈ 62 + Silver per stage, half the envelopes and prizes) | ≈ 635 | ≈ 1,270 | ≈ 1,905 |
+| Completionist (Platinum everywhere, every envelope and prize) | ≈ 1,250 | ≈ 2,500 | ≈ 3,750 |
 
 The arithmetic: a typical clear pays 62 + 20 = 82 and a stage with a hidden room adds (30 + 60) / 2 = 45; a
-completionist clear pays 160 + 90. The Opening-lite has no hidden-room envelope in this model, so 14 of the 15 stages
-add the extras: 5 × 82 + 4 × 45 = 590; 10 × 82 + 9 × 45 = 1,225; 15 × 82 + 14 × 45 = 1,860.
+completionist clear pays 160 + 90. **The Opening-lite keeps its hidden room** (Pi-kun's dressing room, with the first
+envelope, +30) and its two 30-bolt prizes (fortress §1.5), so all 15 stages add the extras: 5 × 82 + 5 × 45 = 635;
+10 × 82 + 10 × 45 = 1,270; 15 × 82 + 15 × 45 = 1,905 (round 2's model left the Opening out: +45 typical, +90
+completionist).
 
 - The 5 v1.0 shop chips cost **740** in all.
 - A typical player can afford 2-3 chips plus tanks by the middle of Round One, and the whole catalogue around the Riot.
@@ -1974,7 +1976,7 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
    bosses (shake only); IRQ-logic bosses test the stall once tech moves their logic out of the IRQ.
 8. **The weapon-change rule** (lingering objects end) may surprise players used to CX. *Mitigation:* the buzz when
    standing on one, the shatter animation, and the help page.
-9. **The v1.0 economy may be rich late** (≈ 1,860 typical against 740 of chips). *Mitigation:* slots bind first; prices
+9. **The v1.0 economy may be rich late** (≈ 1,905 typical against 740 of chips). *Mitigation:* slots bind first; prices
    are one table; the M9 balance pass; the W-tank and colours return as sinks in v1.1.
 10. **Safety nets.** Even after R2.6, a 6-slot loadout of SPIKE GUARD, a second wind, CENTURION and AUTO RECOVER is
     strong. *Mitigation:* the M4/M6 measurement (§13.7).
