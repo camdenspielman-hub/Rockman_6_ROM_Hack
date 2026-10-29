@@ -9,7 +9,8 @@ Update this at the end of every session: what was done, what's next, and anythin
 - **Build:** none yet. Analysis tools live in `tools/analysis/` (see its README); the session ledger in `tools/plan/`.
 - **Scope:** v1.0 = the tight Must, ≈ 451 sessions (`python3 tools/plan/tight.py`). Release ladder (RULINGS R8.1): v0.1 Blizzard slice
   (M4, ~150), v0.5 Round One (M6, ~342), v1.0 Championship (M9, ~451).
-- **Waiting on the user** (none blocks M0): hardware target, pixel artist, JP reviewer, title, pace (`docs/PLAN.md` §9).
+- **User answers** are in `docs/PLAN.md` §9: emulator-only is fine; art and JP review undecided (show a sample sprite
+  early); title ROCKMAN 6 GP, subtitle pun to pick; pace 2-4 sessions a week.
 
 ## Session log
 

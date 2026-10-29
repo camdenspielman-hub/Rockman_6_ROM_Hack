@@ -372,19 +372,19 @@ Each design doc has its own risk list; tech's (14 items) is the longest.
 
 ---
 
-## 9. Questions only the user can answer
+## 9. The user's answers (2026-10-29)
 
-None blocks M0. Each has a default.
-
-1. **Hardware target.** Should GP run on real hardware, and on which cart (EverDrive N8 Pro, another)? This decides how
-   strict the MMC5 spike is. *Default: emulators first (Mesen + FCEUmm), hardware as a goal.*
-2. **Art.** Will a pixel artist join (now, later, never)? *Default: never; Claude's composites are final.*
-3. **Japanese.** Is a native-speaker reviewer available for the JP text, and when? *Default: none yet; it gates v1.0.*
-4. **Title.** *ROCKMAN 6 GP* (default), *Rockman 6: Shijō Saidai no Kaizō!!* ("The Greatest **Hack** in History"), or
-   *Rockman 6 ENCORE*?
-5. **Pace.** Roughly how many sessions per week? The ledger turns that into dates.
-
----
+1. **Hardware:** emulator-only is acceptable; real hardware is a nice-to-have, never a reason for an exotic cart.
+2. **Art:** no artist yet. Commissioning depends on how Claude's sprites look, so a sample sprite or two comes early
+   (an M2 art-pipeline deliverable, shown at the first art gate).
+3. **Japanese review:** same answer as art; decide later. JP text stays draft until then.
+4. **Title:** *ROCKMAN 6 GP* is the main title. The subtitle should be a pun on the original 史上最大の戦い
+   (*Shijō Saidai no Tatakai*). Candidates: 史上最大の**大会** (*Taikai*, "the greatest tournament in history",
+   one sound away from *Tatakai*), 史上最大の**再会** (*Saikai*, "the greatest reunion": the returning champions and the
+   returning villain), 史上最大の**祭典** (*Saiten*, "the greatest festival"). Pick one later.
+5. **Pace:** about 2 sessions a week if sessions are as heavy as the planning one, 3-4 if lighter; build sessions should
+   be lighter. At 3 a week the slice (~150) is about a year and v1.0 (~451) about three, before any gain from better or
+   cheaper models.
 
 ## 10. How the next session starts (copy this checklist)
 
