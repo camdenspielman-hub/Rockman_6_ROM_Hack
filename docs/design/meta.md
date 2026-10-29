@@ -41,7 +41,7 @@ TITLE → GAME START → FILE SELECT (3 files)
 BRACKET (8 venues, any order; SELECT = PIT STOP, B = Exhibition layer)
    2nd win → POWER adaptor event     4th win → JET adaptor event + SEMIFINAL RIOT intro
    SEMIFINAL (M09, centre) must be cleared before the other 4 venues reopen
-   pairs of secret exits light Exhibition badges E1-E4 (SELECT layer)
+   pairs of secret exits light Exhibition badges E1-E4 (the B layer)
    8 wins → centre = TROPHY → theft scene → HALL OF FAME map H1-H5 → unmask → SUPER WILY CASTLE W1-W3
    → ending → playable victory-lap credits → CHAMPIONSHIP RATING + Break Man's debrief → TO BE CONTINUED…
    → title; SPECIAL EVENTS now on the title menu; the file reopens in the post-game bracket
@@ -183,7 +183,7 @@ still loads in v1.1. This matters for a patch that will see bug-fix releases [ne
 **COPY** (Should): copy the source's newest valid copy into the target's LIVE image, set the slot byte and generation
 1, and commit twice so both copies are fresh.
 
-**ERASE:** zero the magic of both copies. It asks for START+A (§2.3).
+**ERASE:** zero the magic of both copies. It asks for START+A (§2.2).
 
 ### 1.5 Autosave points [new-code] S · Must
 
@@ -436,6 +436,11 @@ There are 9 ring nodes and 4 badge nodes. Navigation skips nodes that cannot be 
 | START / A | Selects. A venue → the **match card** (`MATCH: ROCKMAN vs BLIZZARD MAN / VENUE: SUMMIT CLIMBER`, `venues_b.md` §0.6; it is vanilla's typed boss-intro panel, `$3C:$81B1`, extended to new entrants) → the stage. A cleared stage first shows a confirm card: best score, medal, best time, the 4 secret icons, and `REMATCH? NO/YES` |
 | **SELECT** | **PIT STOP**: Eddie's shop, chips, the garage, CONFIG (difficulty group), `SAVE & QUIT` (back to the title). This matches `systems.md` §1.5. SELECT is free outside stages (`rm6/ram.md` "SELECT is free") |
 | **B** | Toggles the **Exhibition layer**: the cursor jumps to the 2×2 grid of badges, and B again returns to the ring. The prompt `B: EXHIBITIONS` shows only once a badge is lit |
+
+**Mr. Y's booth** (`systems.md` §9.4) [new-code][new-art] S · Should. After the Semifinal, a shady booth sprite
+stands at the bracket's bottom-right edge under a sign, `MR. Y PERFORMANCE PARTNERS`. It is not a cursor node: the
+PIT STOP menu gains a last row, `MR. Y'S BOOTH`, which runs the offer. The booth stays until TURBO is taken; then it
+packs up, and Break Man walks (§6.3).
 
 **Rematches are allowed** in GP: medals need replays. The vanilla beam-out on a beaten boss's room must be removed
 (`systems.md` / `tech.md`, §15). A replay pays only the score improvement (BRIEF §5.3).

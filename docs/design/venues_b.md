@@ -43,8 +43,8 @@ medium size, Should tier.
   set plus its *own* alternate set at `$9B-$9F`), because two of these venues swap layouts through the alternate set
   (Blizzard's ice cells, Yamato's kabuki stage) and a shared alternate set would couple them to bank-mates
   (`stages_a.md` lessons).
-- **Lag**: at most 10 live objects per screen, counting the player's shots (`engine.md` §8). Each screen table lists
-  its peak object count where it is close.
+- **Lag**: about 10 live objects fill a frame (`engine.md` §8). The screen tables give each screen's peak count in
+  brackets, the player included and shots excluded; the target is **8 or fewer**, so the player's shots still fit.
 - **Checkpoints**: two mid-stage checkpoints plus the boss shutter (vanilla has one plus the shutter). CASUAL adds the
   ones marked *(CASUAL)*. A checkpoint is the `LDA #s / JMP $8416` routine; every checkpoint screen gets a palette
   program that sets everything it needs (`levels.md` §19: palettes are cumulative deltas).
@@ -64,7 +64,7 @@ adaptor**. Only the plates (Jet, as in vanilla) and Yamato's lower bypass (Power
 
 **Route choices.** In Centaur and Yamato the plate route and the secret exit branch off at different points, so one
 visit takes one or the other (Yamato's Jet route skips the keep, and with it the third pass); a replay takes the other
-(§8, question 3). Blizzard's and Flame's secret routes skip the second half of their main route, hidden room included.
+(§8, question 3). Flame's secret route skips the fire vault, mouse room included; Blizzard's skips only the ski run.
 
 Exhibition pairs (PLAN §3.3): **E3 = Blizzard + Flame**, **E4 = Centaur + Yamato**. Both can open before the first
 adaptor, which spreads the Exhibitions across the game instead of piling them at the end.
@@ -86,7 +86,7 @@ Built once, owned by `tech.md`. My working labels (prefix **X-** so they don't c
 | **X-LABEL** | A 4-8 letter room label drawn with sprites under the life bar (4MI Pharaoh's curse words) | Centaur ZONE cards, Yamato PASS n/3 | `[new-code S · Should]` |
 | **X-EXWP** | A set-piece weapon that replaces the buster for a stretch and is dropped at a stand (4MI EXWP: Quint's pogo) | Yamato pogo | `[new-code M · Must]` |
 | **X-FLOOR** | New floor types through the group remap (`$3E:$DB03/$DB13`): *ski snow* (forced slide), *hot spring* (slow heal), *nightingale* (chirps) | Blizzard, Centaur, Yamato | `[new-code S each · Should]` |
-| **X-GPOBJ** | One generic "GP object" type with a sub-id and a per-sub-id code bank (4MI's `$5E` pattern). Only 30-32 type ids are free in the whole ROM; these four venues alone add about 40 object kinds | all four | `[new-code M · Must]` |
+| **X-GPOBJ** | One generic "GP object" type with a sub-id and a per-sub-id code bank (4MI's `$5E` pattern). Only 30-32 type ids are free in the whole ROM; these four venues alone add about 45 object kinds | all four | `[new-code M · Must]` |
 | Stage-attribute table | BRIEF §7.2; lets the ship (chain 1), tide (chain `$14`) and spike ceiling (chain `$11`) run in any stage | Yamato ceiling; tide in Centaur's boss rooms | `[new-code M · Must]` (tech.md) |
 | Commentator pop-up | T2 text window, 1-2 lines, toggleable (BRIEF §5.5) | all hooks in this doc | owned by meta/tech |
 
@@ -106,7 +106,7 @@ before they own it** (a boss move that *is* the alternate). These are proposals;
 Proposed boss rows (damage / boss i-frames) follow the BRIEF §5.1 shape (weakness 4 dmg and very short i-frames,
 most weapons 2 and mid i-frames, buster 1 and ≈ 60 f). Each boss section lists its row and its **self-weapon
 reaction** (4MI's Toad/Bright lesson: a boss hit by its own weapon does something special; here it is a joke
-with no damage, once per fight, worth a STYLE point if `meta.md` agrees).
+instead of damage, once per fight, worth a STYLE point if `meta.md` agrees).
 
 ### 0.6 Fiction shared by the four venues
 
@@ -458,7 +458,7 @@ Screens used: main 00-16 (23), secret 17-1A (4), hidden room 1C (1) = **28 of 32
 | **10** | **CHECKPOINT 2. The fire vault** (vanilla v0E-v15 art): channels of oil that are **already burning** (placed as the burning variant), small orange platforms | juggler `$2A` x2, mine `$73` x1 [5] | burning channels | Checkpoint 2 (10). Pre-lit oil does not count against FIREPROOF |
 | **11** | **The hourglass gate.** A plate on the left starts a long gate closing over 600 f; a mural hourglass drains (palette cycle). Cross the platforms over burning oil before it shuts. If it shuts, walk back and press the plate again | mine `$73` x2, juggler x1 [5] | | T3 timed. No fail state |
 | **12** | **The mouse alcove.** The main route runs over the top platforms. Below, a short dead end: a shut gate, a **mousehole** beside it, and a plate on the far side of the gate (§2.5.2) | juggler x1 [3] | | the hidden room's entrance |
-| **13** | **Loose bridge.** A bridge of loose tiles across a burning channel: each tile falls 20 f after you step on it. Jugglers throw flames from the far side | jugglers x2, loose tiles x6 [9] | | the busiest screen: keep the jugglers to 2 |
+| **13** | **Loose bridge.** A bridge of loose tiles across a burning channel: each tile falls 20 f after you step on it. Jugglers throw flames from the far side | jugglers x2, loose tiles (cells; at most 2 falling at once) [5] | | loose tiles are T6 cells until they fall |
 | **14** | The antechamber: two guards in front of the throne-room doors | guards x2 [3] | | |
 | **15** | Shutter corridor. **Boss checkpoint.** The **palace fire marshal** stands here (FIREPROOF, §2.5.3) | fire marshal [2] | | shutter checkpoint (`$0684` = 15) |
 | **16** | **Boss room** (§2.8) | Flame Man | | vanilla boss-room art (red pistons, oil-pipe floor) kept, plus two oil strips |
@@ -546,7 +546,7 @@ per-position flags, like vanilla breakables), so a death never undoes a puzzle y
 | **Palace guard-bot** | new | 6 | class-3 shield (frontal shots reflect); advances 0.75 px/f; SLASH: raise 16 f (open to shots), swing 8 f (4 dmg), recover 20 f; in oil it moves at half speed | `[new-code S · Must]` |
 | **Skeleton-bot** | new | 4, then bones 120 f, then full HP | slow walk, slash; destroyed for good by a pit, a loose tile or burning oil; a charged shot knocks it back 16 px | `[new-code S · Should]` |
 | **Raise plate / gate / timed gate** | new (T3) | - | plate (metatile, alternate set when pressed) + gate (16x48 sprite, solid, rises/lowers 1 px/f) | `[new-code M · Must]` |
-| **Loose tile** | new | - | replaces a floor cell (T6 bit); shakes 20 f when stood on, falls with gravity, breaks on landing; 4 dmg to what it lands on; weighs down plates | `[new-code S · Must]` |
+| **Loose tile** | new | - | a floor cell (T6 bit) until stood on: it shakes 20 f, then the cell clears and a falling-tile object spawns (so only falling tiles cost an object slot); breaks on landing; 4 dmg to what it lands on; weighs down plates | `[new-code S · Must]` |
 | **Spike trap** | new | - | rises 12 f after the player comes within 24 px, up 60 f, down 12 f; 6 dmg | `[new-code S · Must]` |
 | **Chomper** | new | - | 8 f closed every 90 f, offset param; tell 12 f; 8 dmg | `[new-code S · Must]` |
 | **Chandelier** | new | 1 (the chain) | falls, ignites the pool below (calls the vanilla ignite on that pool's id), 6 dmg if it lands on you | `[new-code S · Must]` |
@@ -1039,7 +1039,7 @@ Screens used: main 00-16 (23, including the bypass 0C-0F), E route 18-1A (3), se
 Passes, like items, are cleared from the object list once taken (the vanilla kill bitfield `$0650`), so a death keeps
 them; leaving the venue resets them (the sekisho wants three in one visit, as Goemon's checkpoints do).
 
-### 4.5 The two set pieces that carry the venue
+### 4.5 The three set pieces that carry the venue
 
 #### 4.5.1 The nightingale floor (05) `[new-code M · Should]`
 
@@ -1287,10 +1287,10 @@ you." 5. K: "Fall down seven times, stand up eight!"
 | New BG tiles | ~70 | ~90 | ~80 | ~100 | ~340 |
 | New sprite tiles | ~110 | ~100 | ~90 | ~120 | ~420 |
 | Vanilla raster set piece | ship (chain 1) | none (palette cycle) | tide (chain `$14`) | spike ceiling (chain `$11`, re-homed) | |
-| Peak objects on a screen | 8 (screen 10) | 9 (screen 13) | 8 on alarm (screen 12) | 7 (screen 19) | lag cap 10 |
+| Peak objects on a screen (player in, shots out) | 8 (screen 10) | 8 (screen 0B) | 8 on alarm (screen 12) | 7 (screens 11, 19) | target ≤ 8 |
 
-All four respect the 10-object cap at their peak (counting the player); Flame 13 and Centaur 11-12 (Reaplets) are
-the screens to profile first.
+All four stay at or under 8 at their peak, which leaves room for the player's shots under vanilla's ~10. Flame 0B
+(three guards and three chandeliers) and Centaur 11-12 (Reaplet alarms) are the screens to profile first.
 
 ### 5.2 Tiers at a glance
 
@@ -1361,8 +1361,8 @@ DuckTales' pogo.
 - **4. Friends as mechanics:** the Centurions block arrows; Toppies refill the secret arena's floor if you spared them;
   Beat's plates are rewards for the Jet.
 - **5. Behaviour-gated secrets with a hint after the fact:** four chips, 13 debrief hints, all written.
-- **7. Theme into mechanics:** heat-free here, but the same idea: a fire marshal, a nightingale floor, a revolving
-  stage, a tide clock.
+- **7. Theme into mechanics:** a fire marshal, a nightingale floor, a revolving stage, a tide you read like a clock,
+  a summit bonus round.
 - **8. Map edits by bosses:** Blizzard's snowball breaks the secret arena's floor; the kabuki stage swaps sets.
 - **Pharaoh's curse words** → the ZONE labels; **Quint's pogo** (EXWP) → the spear pogo; **Toad's hidden-room link**
   → the one-screen detours that return you; **Dust's TEMP gauge** → the bonus timer and the PASS counter in the
@@ -1396,7 +1396,7 @@ DuckTales' pogo.
    generic raster list moves the logic into an effect thread (BRIEF §7.1); fallbacks are given in §3.4 and §4.5.1.
 4. **X-UPEXIT is a Could in the BRIEF.** Without it, Blizzard's climb and Centaur's tower use ladder stubs at each screen
    top: playable, but less Ice Climber. I argue it up to Should here.
-5. **Lag** on Flame 13 (loose bridge) and Centaur 11-12 (Reaplet alarms): both are capped in the tables, but must be
+5. **Lag** on Flame 0B (the gallery) and Centaur 11-12 (Reaplet alarms): both are capped in the tables, but must be
    profiled with shadow6.
 6. **Screen budgets** are 28-30 of 32. Yamato and Centaur have two spare screens each, so a HARD-only room or a design
    change there has to replace something.
