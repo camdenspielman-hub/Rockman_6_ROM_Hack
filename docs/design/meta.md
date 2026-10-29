@@ -54,7 +54,7 @@ Everything in this table is **Must** and depends only on Must items (R0.4). Mile
 | 1 | Save module (§1) | 3 files + system block, A/B ping-pong copies, trailer and commit marker, load with BROKEN paths, migrations, autosave points 1-9, IN_MATCH and UNPLUGS, the save tests of §1.9 | M2 | 3.5 |
 | 2 | Title and boot (§2.1) | license line, **health notice** (R3.5), title menu (GAME START, CONFIG, SPECIAL EVENTS once unlocked) | M2 | 1.5 |
 | 3 | File select and NEW GAME (§2.2-2.3) | 3 cards, NEW / START / ERASE with the START+A guard, the CASUAL / NORMAL / HARD pick | M2 | 2.5 |
-| 4 | The bracket (§3.1-3.7) | node table, node states, centre logic, rematches (the `$3F:$F951` hook), the HALFTIME RIOT trigger and POSTPONED, the event queue (POWER, JET, the Riot, the theft), game over and RETIRE entry points | M2 1.5, M5 1.5, M6 1 | 4 |
+| 4 | The bracket (§3.1-3.7) | node table, node states, centre logic, rematches (the `H_REMATCH` operand hook at `$3F:$F952`), the HALFTIME RIOT trigger and POSTPONED, the event queue (POWER, JET, the Riot, the theft), game over and RETIRE entry points | M2 1.5, M5 1.5, M6 1 | 4 |
 | 5 | Results screen (§4.0) | the judges' desk, slide-in rows, TOTAL, medal stamp with the preset badge, prize line, secret icons | M2 | 2.5 |
 | 6 | Debrief engine and predicate tables (§4.1-4.6) | the 4MI predicate walk per stage, requirement hints, **tier B only** (tier A is Should, R4.5), the stage counters behind every collect-N secret (R1.10) | M2 | 2 |
 | 7 | Medals, HoF points, unlock bits (§5, §7) | medals derived from the best score, HoF points over the shipped stages, the v1.0 unlocks (RECORDS, EXTRA CONFIG) | M2 | 1 |
@@ -628,7 +628,7 @@ hook (`tech.md` §4.6) carries the test. A replay pays only the score improvemen
 |---|---|---|---|
 | OPEN | The champion's portrait, name | yes | Must |
 | WON | The portrait with a **medal ribbon** sprite (bronze/silver/gold/platinum colour); a ★ on the frame if its secret exit is found; the plate letter B/E/A/T in the frame corner if the plate is held | yes (rematch) | Must |
-| POSTPONED | The portrait under a red **POSTPONED** stamp (sprite overlay) | no: a Kalinka line (story S14) | Must |
+| POSTPONED | The portrait under a red **POSTPONED** stamp (sprite overlay) | no: a Kalinka line (story S09.2) | Must |
 | Badge DARK | A plain rivet | no | Must (drawn) |
 | Badge HALF | One of its two lines lit, the badge dim and showing `?` | no; START names the missing venue (story) | Could |
 | Badge LIT | Blinking badge with the guest's icon | yes | Could |
@@ -717,7 +717,8 @@ b5 stays clear.
   | **RETIRE** | Back to the bracket or the fortress map. Vanilla's fortress game over offered CONTINUE only (`$3C:$805F`'s fortress test, `tech.md` §4.3), but GP saves per stage, so retiring from a fortress loses nothing |
 
 - GAMEOVERS +1 is saved first (autosave 6).
-- Kalinka gets one line from a rotating table (story S16).
+- One line from story S16's table: Kalinka's rotating lines elsewhere, Mr. Y's (S16.4) in H1-H5, Wily's (S16.5) in
+  W2-W3.
 - There is no E-tank halving (CX) and no other penalty: the cost is the run, and FAIR PLAY's 4 points (§6).
 
 ### 3.8 The PIT STOP [new-code] M · Must (v1.0 rows); the bundle rows Could
@@ -867,7 +868,9 @@ their requirement hints R1, R3 and R5 are Should (§4.5, `story.md` §7.3). The 
 predicate names a requirement whose hint string is absent.
 
 **`hint`**: the predicate's local hint index h. The text compiler emits, per stage, a table of 16-bit string ids from
-`HINT_BASE`: entry 2h is tier A, entry 2h + 1 is tier B; `$0000` = absent. Story owns every string (R4.1).
+`HINT_BASE`: entry 2h is tier A, entry 2h + 1 is tier B; `$0000` = absent. Story owns every string (R4.1). The engine
+falls back only from A to B (§4.1), so the release check also fails if a predicate of a stage with a desk (every stage
+but W3, §3.9) names a hint with no tier B string.
 
 ### 4.3 The venue predicate table [new-code + data] S · Must
 
@@ -893,7 +896,7 @@ comes before item on the tie, as both venue docs do. Both venue docs now follow 
 | 6 | Tomahawk: HIGH NOON FRONTIER | `$00`/–/TO0 (plate B with it) · `$01`/–/TO1 · `$02`/–/TO2 · `$13` · `$14` |
 | 7 | Knight: HERO'S QUEST | `$00`/–/KN0 (plate A with it) · `$01`/–/KN1 · `$02`/–/KN2 · `$13` · `$14` |
 | 8 | Centaur: ATLANTIS RUINS | `$00`/–/CE0 · `$01`/–/CE1 · `$02`/–/CE2 · `$03`/JET/CE3 · `$13` · `$14` |
-| 0, 9, 14, 16, 18, 20, 21 | Opening-lite, HALFTIME RIOT, H1, H3, H5, W2, W3 (W3 has no desk, §3.9) | the SECRETS bits each stage's owner defines in `fortress.md` §0.4 (b0 showpiece 3, b1 room 2, b2 prize 2, b3 the Mr. X card 1 in H5), by the same weight rule, then `$13`, `$14`. Their `require` values in v1.0 are none: the TAG rooms are full-charge doors (R4.2), and H4's SUPER-gated prize is Should |
+| 0, 9, 14, 16, 18, 20, 21 | Opening-lite, HALFTIME RIOT, H1, H3, H5, W2, W3 (W3 has no desk, §3.9) | the SECRETS bits each stage's owner defines in `fortress.md` §0.4 (b0 showpiece 3, b1 room 2, b2 prize 2; H5's b3, the Mr. X card, is scored by rating T14 and has no debrief predicate), by the same weight rule, then `$13`, `$14`. Their `require` values in v1.0 are none: the TAG rooms are full-charge doors (R4.2), and H4's SUPER-gated prize is Should |
 
 **No venue secret exit, room or item needs an adaptor** (`venues_a.md` §0.3, `venues_b.md` §0.3, `systems.md` §2.4).
 Only Yamato's E and Centaur's T plates need JET, as in vanilla. Knight's stairs can also be opened by vanilla's
@@ -919,7 +922,7 @@ room, 2 for the item, 3 for the plate.
 | Tomahawk | TO0 / TO1 / TO2 | the back way (+ plate B) / THE OUTHOUSE / SHERIFF STAR | Must | TO1 no longer names a game (venues_a) |
 | Knight | KN0 / KN1 / KN2 | the stairs behind the empty throne (+ plate A) / LIGHT'S TABLET / KAISHIN | Must | |
 | Centaur | CE0 / CE1 / CE2 / CE3 | ZONE 100 / ZONE 0 / CENTURION / plate T | Must | |
-| Opening, Riot, H1, H3, H5, W2 | `OP`, `RI`, `H1`, `H3`, `H5`, `W2` + 0-3 | per `fortress.md` §0.4 | Must where the secret is in v1.0 | |
+| Opening, Riot, H1, H3, H5, W2 | `OP`, `RI`, `H1`, `H3`, `H5`, `W2` + 0-2 (no stage here has a hinted b3: H5's card has no hint, `story.md` §7.2) | per `fortress.md` §0.4 | Must where the secret is in v1.0 | |
 | W3 | `W3` + 0-2 | per `fortress.md` §0.4 | **Should** | W3 has no judges' desk in v1.0 (§3.9), so its three hints wait for a desk (`story.md` §7.2); its SECRETS bits are still set and scored silently (§3.9) |
 
 Round 1's riddle and instruction text moved to `story.md` §7 (which already corrected four riddles' facts); the
@@ -1004,7 +1007,7 @@ ending at the place story's order gives it (R4.1, step 8). Every point comes fro
 | T2 | ROUTE | 1 each, 8 max | secret exits found (SECRETS b0, meta 1-8); the test passes at 8/8 | the 8 venues' secret exits |
 | T4 | ROUTE | **4** | all 8 venue hidden rooms (SECRETS b1, meta 1-8) | the 8 hidden rooms, Flame's mouse room included (Must, R0.4) |
 | T5 | ROUTE | **4** | all 8 venue behaviour chips (CHIPS_OWNED bits 6-13) | the 8 venue chips (R2.5) |
-| T6 | GEAR | **2 each**, 10 max | Eddie's chips owned (`systems.md` source "shop": bits 1-5); the test passes at 5/5 | the v1.0 shop (740 bolts in all; `systems.md` §7 puts a typical player's v1.0 income at ≈ 1,860) |
+| T6 | GEAR | **2 each**, 10 max | Eddie's chips owned (`systems.md` source "shop": bits 1-5); the test passes at 5/5 | the v1.0 shop (740 bolts in all; `systems.md` §7 puts a typical player's v1.0 income at ≈ 1,905) |
 | T8 | MEDALS | 5 | GOLD or better on all 8 venues | the venues |
 | T9 | MEDALS | 4 | at least 3 PLATINUMs (any stages) | any stage |
 | T10 | FAIR PLAY | 4 | GAMEOVERS = 0 | |
@@ -1796,13 +1799,13 @@ Riot's capsule beat and H5's card; the venue docs' secrets, prizes and mini-reco
 | `story.md` | **Owns every word**: hint text (§7, both tiers, with YA0's new riddle and PL0's without the explorer's name), generic debrief lines (§7.3: only the requirement hint R2 is Must, R1, R3 and R5 Should), the fortress stages' hints (§7.2, W3's three Should), Break Man's debrief (S47, with a new T1 SOLO RIOT entry, and the "never called" line pointing at the pause **CALL row with A**, R2.10), rank titles (S46), every menu label, the HARD description that matches v1.0's HARD, the health notice, INPUT LAG and CASUAL help lines, the Riot intro lines (S14), the adaptor hand-offs (S12, S13, S29), the theft (S25), the unmasking (S33), the game-over and unplug lines (S16), the sponsor's-chair signs, ENGRISH's list (§9; the perfect line S47.PE paraphrased, R8.4), the H2/H4 door label `CLOSED FOR RENOVATION` (S26.4). **Kept here as story asked:** STORY_BEAT at FILE `$013` with story's values; COMMFLAGS at FILE `$04A`; the chair's `BACK SOON` from STORY_BEAT `$03` and `RESERVED` from `$09`; `B EXHIBITIONS` without a colon (Could) |
 | `venues_a.md` / `venues_b.md` | SECRETS b0-b4 per venue and the debrief order (§4.3, the weight rule they both now follow); tier B hints verbatim (through story §7); PRIZES indexes (§1.6.1: Blizzard 4, Plant 4, Tomahawk 3, Knight 1); VENUE_REC (§9.4: Wind and Tomahawk Must, Knight Should, Blizzard Could, Plant none); each champion boss reads `RS_PINCH` (the fight record's +10) for its pinch threshold, 0 meaning its own default (W2's SUPER copies, §9.2.1); STAGE_CLEAR read by LAND, EXPRESS and Blizzard's replay-skip door; `CFG_CASUAL` = DIFF A b4; mid-boss fight ids `$08-$10` with their arenas (§9.2.1); the R3.3 venue names (§3.2); every collect-N secret on the stage counters (§4.6), at most one per venue |
 | `fortress.md` | SECRETS b0-b3 for meta 0, 9, 14-21 and their tier B hints; **the Riot's capsule beat (Bass β duel 1: Break Man's whistle and a life capsule below 6 HP) stays Must**, and Bass β's death sets RATEFLAGS b4 SOLO RIOT when the capsule never dropped in that run (and b2 RIVAL as before), since rating T1 reads it (else §6.1's fallback); **Mr. X's card in H5's hidden room stays Must** (T14; else the fallback); RIVAL (no damage from the bar fill to the overdrive); fight ids `$13-$17`, `$1C-$28` and `$29` (Doc Robot MK-VI, Should) and their arenas (`$15` = Kamegoro Maker); the per-fight pinch byte (record +10) for W2's SUPER copies; **no PRIZES bits** (prize bolts key on SECRETS b0/b2, §1.6.1); the HoF and Castle maps' art, with H2, H4 and W1 drawn as closed wings in v1.0 (H2's and H4's doors read `CLOSED FOR RENOVATION`); the GP Rush lobby as Opening screen `$1D` (Could); W2's hub calls `fight_load(id, HUB)` and reads `FIGHT_RESULT`; W3's clear runs the ending without a desk; F-PLAQUE may set SYS PLAQUES bits |
-| `tech.md` | Page 0 map (§1.2) at page offsets `$0000-$1A1F`, LIVE images in WORK at `$7400`/`$7600`, write protection by isolation; `save_commit` refuses the scratch magic and NO_SAVE; RULESET at `$6270` with `RS_DIFF` as the macros' source and `bits.inc` generated from §1.6; the stage counters (2 B) in the run block; the mailbox at page 0 `$1A00` with §9.6's format and the fight command through the loader (return kind 4); the rematch hook `H_REMATCH` at `$3F:$F951` and the replay test in the `$F9A0` hook (skip YOU GET); the A/B SWAP edit at `$3E:$C732` inside the joypad hook; return kind 6 for Time Attack (Should); the 11-byte fight record, with `fight_load` copying +10 into `RS_PINCH`; the stage record v0 from M2.1 for the slice's `SA.META` and `FLAGS1.REMATCH` reads (R8.2); the language hook at `$3C:$8636`; the DEV entry points of §9.6; meta's thread code in banks `$42-$43` |
+| `tech.md` | Page 0 map (§1.2) at page offsets `$0000-$1A1F`, LIVE images in WORK at `$7400`/`$7600`, write protection by isolation; `save_commit` refuses the scratch magic and NO_SAVE; RULESET at `$6270` with `RS_DIFF` as the macros' source and `bits.inc` generated from §1.6; the stage counters (2 B) in the run block; the mailbox at page 0 `$1A00` with §9.6's format and the fight command through the loader (return kind 4); the rematch hook `H_REMATCH` at `$3F:$F952` (the operand of `JSR $F527` at `$F951`) and the replay test in the `$F9A0` hook (skip YOU GET); the A/B SWAP edit at `$3E:$C732` inside the joypad hook; return kind 6 for Time Attack (Should); the 11-byte fight record, with `fight_load` copying +10 into `RS_PINCH`; the stage record v0 from M2.1 for the slice's `SA.META` and `FLAGS1.REMATCH` reads (R8.2); the language hook at `$3C:$8636`; the DEV entry points of §9.6; meta's thread code in banks `$42-$43` |
 | `art_audio.md` | The title (vanilla logo + GP badge + subtitle), the bracket nametable, medal ribbons, the POSTPONED stamp, the cracked frame, Bass β's portrait, the trophy states, the file cards, the judges' desk with face icons (the rating screen draws over it, R8.6), the pit-stop counter with Eddie (new art, a composite, R8.6), the fortress maps (with closed wings), the participation ribbon; Could: badges, the booth sprite, the lobby tunnel, achievement plates, Eddie's SAVING icon (Should), the sponsor's-chair cut-out (Should) |
 
 ## 16. Risks
 
 1. **The slice is overloaded.** Meta's M2-M3 share is 23 sessions (items 1-12). RULINGS §6, re-baselined by R8.1 from
-   each doc's own figures, now gives about 53 sessions for all of M2 (26 → 79) and about 44 for all of M3 (79 → ~123);
+   each doc's own figures, now gives about 53 sessions for all of M2 (26 → 79) and about 46 for all of M3 (79 → ~124);
    tech's M2 is 31.5 and systems' slice about 28 (R8.2 moved the form swap and the adaptors to M5). Round 1's 45 and
    25 had under-counted the slice. Mitigation: file-select-lite and bracket-lite in M2 (one node, no centre logic), the
    title as a plain text menu until M5's pattern-table split, RECORDS at M6; the M4 re-estimate decides the rest.
@@ -1902,3 +1905,7 @@ tiering or a clarification.
 | R8.6 | applied | §11.2, §3.8, §15 art_audio row | CASUAL's reflex ×2 excepts the quick-draw, which is 40 f (§11.1 already said 24 / 18 / 40 f); Eddie at the pit stop is new art, a composite; the rating screen draws over the judges' desk (§6.1 already) |
 | R8.3, R8.5 (names), R8.7 | already | §11.1, §8, §9.2.1 | MMC5 AUDIO and ARRANGEMENTS were already Could with the MMC5 pulse driver (no SUPER-colour audio, no channel drop here); no panel strings, alias gag, S06 name or plates in this doc; INPUT LAG was already 0-6 f |
 | — | applied | §4.5 heading, §15 story row | Cross-reference fixed: the generic lines are `story.md` §7.3 (§7.2 is the fortress stages' hints) |
+| verify 1 | applied | v1.0 scope row 4, §15 tech row | `H_REMATCH` is the operand hook at `$3F:$F952` (the operand of `JSR $F527` at `$F951`), as §3.2 and `tech.md` §14.2 say; the two places that gave `$F951` are fixed |
+| verify 2, verify 5 | applied | §6.1 T6 | Systems' typical v1.0 income is ≈ 1,905 (`systems.md` §7, with the Opening's extras), was ≈ 1,860 |
+| verify 3 | applied | §4.2, §4.3, §4.4 | H5's b3 (Mr. X's card) has no debrief predicate or hint (`story.md` §7.2, `fortress.md` §4.5.3: T14's hint is Break Man's); the fortress hint ids are + 0-2; the release check also fails on a desk stage's predicate whose hint has no tier B string (the engine falls back only from A to B) |
+| verify 4 | applied | §3.3, §3.7 | The POSTPONED node's line is story S09.2 (S14 is the Riot intro); game over's line follows S16's table: Kalinka's rotation, Mr. Y's S16.4 in H1-H5, Wily's S16.5 in W2-W3 |

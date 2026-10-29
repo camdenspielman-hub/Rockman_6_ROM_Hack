@@ -16,7 +16,9 @@ next session starts. The detail lives in the design docs it indexes (§11). Read
 v1 of this plan was written from the hacks' readme files. v2 comes after a deep teardown: the three games were
 disassembled, played headlessly, cheated through and mapped (about 16,000 lines of research with screenshots and full
 stage maps). Eight design docs were then written, reviewed by four critics (feasibility, design quality, consistency,
-scope) and revised against [`RULINGS.md`](design/RULINGS.md). [`STATUS.md`](STATUS.md) is the hand-off log.
+scope) and revised against [`RULINGS.md`](design/RULINGS.md). A third round settled the revisers' open questions
+(RULINGS §8), applied their 59 cross-doc requests ([`reconcile.md`](design/reconcile.md)) and ran four cross-doc
+consistency critics, whose 84 findings were verified and fixed. [`STATUS.md`](STATUS.md) is the hand-off log.
 
 ---
 
@@ -33,7 +35,7 @@ scope) and revised against [`RULINGS.md`](design/RULINGS.md). [`STATUS.md`](STAT
   debrief hints at the first one you missed (4MI's predicate table).
 - **The size:** v1.0 is 8 reworked venues, the Opening, a mid-game riot with the rival, 3 museum wings, 2 castle
   stages, an escape and the ending. That is about **450 focused work sessions** (the ledger, §4), delivered as three
-  playable releases: **v0.1** (one venue, end to end, at about 148), **v0.5** (all 8 venues, about 342) and **v1.0**.
+  playable releases: **v0.1** (one venue, end to end, at about 150), **v0.5** (all 8 venues, about 342) and **v1.0**.
 - **The platform:** MMC5, 1 MB PRG, 8 KB CHR-RAM, 32 KB battery PRG-RAM. First job: a **go/no-go spike on Mesen** (§7).
 - **The rule that keeps it finishable:** a Must item may depend only on Must items, and the ledger, not enthusiasm,
   decides scope.
@@ -113,7 +115,7 @@ with one use of the Mr. Y / Mr. Z gag → the podium and Bass's vow → the CAPC
 engine with GP text and the champions' cards → the championship rating and Break Man's debrief → **LIGHTS OUT** → the
 sixth-wing plaque → TO BE CONTINUED.
 
-Text in v1.0: about 400 Must strings in EN and JP (R4.5 and R8.4). The Opening is capped at about 15 scene pages (R4.4)
+Text in v1.0: 397 Must strings in EN and JP (R4.5 and R8.4). The Opening is capped at about 15 scene pages (R4.4)
 and uses 12.5.
 Details: [`design/story.md`](design/story.md).
 
@@ -145,7 +147,7 @@ boss rework. Its second set piece and secret-arena twist are v1.1.
 |---|---|---|---|---|---|
 | **SUMMIT CLIMBER** (Blizzard) · v0.1 slice | the mountain-climbing arcade game | rocking ship with falling icicles; head-bonk ice climb with seals refilling the holes; a 40-s vegetable bonus summit | the **condor** over the bonus summit | the Vegetable Cellar | **SNOW CHAINS**: grip on ice (never destroy a Toppy) |
 | **SKY ACE** (Wind) | the WWII shooter (Capcom's own 1943) | catapult launch; a 2-minute sortie on the free-flight vehicle state: LOOP, POW cycling, red squadrons, the AYACO | the lamp board and the ACES ONLY elevator | WEATHER BALLOON | **YASHICHI**: one full refill at low HP (juggle a POW through 8 hits) |
-| **HERO'S QUEST** (Knight) | the 1986 console RPG | talk and search verbs, MAGIC KEYS, two ENCOUNTER! command windows, a spike ceiling with HP | the stairs behind the empty throne (key check) | LIGHT'S TABLET | **KAISHIN**: every 12th boss hit is an EXCELLENT MOVE (+2) (beat the Metal Metslime) |
+| **HERO'S QUEST** (Knight) | the 1986 console RPG | talk and search verbs, MAGIC KEYS, two ENCOUNTER! command windows, a spike ceiling with HP | the stairs behind the empty throne (key check) | LIGHT'S TABLET | **KAISHIN**: every 12th boss hit is a SPLENDID STRIKE (+2) (beat the Metal Metslime) |
 | **HIGH NOON FRONTIER** (Tomahawk) | the Capcom western (Gun.Smoke) | WANTED board and bounties; an alley shooting gallery; a judged quick-draw (24/18/40 f); the 4:50 train with Sidewinder | the Sheriff's back way | THE OUTHOUSE | **SHERIFF STAR**: +20 % prize money (no townsfolk hit) |
 | **LOST JUNGLE** (Plant) | the 1982 jungle run | vines, croc heads, rolling logs, a breathing tar pit; the underground where 3 screens cover 9 | the robot cat, the Lost Caverns and the balloon | TREETOP HUT | **AUTO RECOVER**: slow HP regen when idle (the PITFALL PERFECT) |
 | **PERSIAN PALACE** (Flame) | the 1989 rotoscoped platformer | plates, portcullises, loose tiles; palace guards with a spacing parry; chandeliers over oil | merge with **Shadow Rock** | the mouse room | **FIREPROOF**: fire floors hurt instead of kill (no oil ignited) |
@@ -215,17 +217,17 @@ Claude work session. It is re-estimated from actual counts after the slice (M4) 
 
 | Area | v1.0 Must (sessions) | Owner doc |
 |---|---|---|
-| Engine and platform | 102 | `tech.md` |
+| Engine and platform | 102.5 | `tech.md` |
 | Systems | 49.5 | `systems.md` |
 | Meta | 31 | `meta.md` |
 | The 8 venues | 109 (56 + 53) | `venues_a.md`, `venues_b.md` |
 | Opening, Riot, fortress, ending | 70 | `fortress.md` |
 | Release overhead (balance, tests, hardware matrix) | 16 | ledger |
-| **Code total** | **377.5** | |
+| **Code total** | **378** | |
 | Art (no pixel artist; R5.1) | ≈ 51.6 | `art_audio.md` |
 | Music and SFX | ≈ 9 | `art_audio.md` |
-| Text (EN + JP, compiled and fitted) | ≈ 12 | `story.md` |
-| **v1.0 total** | **≈ 450** | |
+| Text (397 Must strings, EN + JP, compiled and fitted) | ≈ 12 | `story.md` |
+| **v1.0 total** | **≈ 451** | |
 
 The full design (Must + Should + Could) is about 581 code sessions plus art, music and text. CX took about 5 years and
 4MI about 8; v1.0 at about 450 sessions is a long project even with AI help, which is why every rung of the ladder is a
@@ -235,9 +237,9 @@ playable, shareable build (R0.5).
 
 | Release | Contents | ≈ sessions (cumulative) |
 |---|---|---|
-| **v0.1 "Blizzard slice"** (M4) | new game → bracket → SUMMIT CLIMBER end to end (secret exit, hidden room, SNOW CHAINS, the Ice Block, the boss) → judges → save, reload, replay. A new file owns no forms, so the form swap comes at M5 | ~148 |
+| **v0.1 "Blizzard slice"** (M4) | new game → bracket → SUMMIT CLIMBER end to end (secret exit, hidden room, SNOW CHAINS, the Ice Block, the boss) → judges → save, reload, replay. A new file owns no forms, so the form swap comes at M5 | ~150 |
 | **v0.5 "Round One"** (M6) | Opening-lite, all 8 venues, HALFTIME RIOT; the forms; the scope checkpoint | ~342 |
-| **v1.0 "Championship"** (M9) | + H1, H3, H5, W2, W3, the ending; native-JP review; BPS release | ~450 |
+| **v1.0 "Championship"** (M9) | + H1, H3, H5, W2, W3, the ending; native-JP review; BPS release | ~451 |
 | v1.1+ | the cut line below, re-added from the top | - |
 
 ### 4.3 The cut line (out of v1.0; comes back in this order)
@@ -315,16 +317,16 @@ green test suites, `STATUS.md` updated, the bank ledger printed and art-acceptan
 | **M0** | Workbench: scaffold, build, BPS, hook registry, allocator, test runner, vanilla golden suite, ledgers; reassemblable fixed banks and sound driver; round trips and censuses. **MMC5 go/no-go spike on Mesen** | [13] |
 | **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, test mailbox | [26] |
 | **M2** | Slice engine: families and sub-ids; WRAM layouts and the map-edit service; CHR set table v2 and the minimal art tools; level pipeline; raster list; **text v1a**; track table and MML; save, file-select-lite, bracket-lite, results, debrief, EXTRA CONFIG | [79] |
-| **M3** | Slice systems: SELECT (weapons); taps; the boss tables, WEAK!, the frozen tick, the Ice Block; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; the commentator bus; the attach state's core (the condor) | [~123] |
-| **M4** ⛳⛳ | **SUMMIT CLIMBER end to end (v0.1)**. Re-estimate the ledger | [~148] |
-| **M5** | Stage-attribute table; the form swap, forms firing taps, adaptors by win count; Opening-lite; PERSIAN PALACE, LOST JUNGLE, ATLANTIS RUINS, EDO NINJA ROW | [~254] |
+| **M3** | Slice systems: SELECT (weapons); taps; the boss tables, WEAK!, the frozen tick, the Ice Block; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; the commentator bus; the attach state's core (the condor) | [~124] |
+| **M4** ⛳⛳ | **SUMMIT CLIMBER end to end (v0.1)**. Re-estimate the ledger | [~150] |
+| **M5** | Stage-attribute table; the form swap, forms firing taps, adaptors by win count; Opening-lite; PERSIAN PALACE, LOST JUNGLE, ATLANTIS RUINS, EDO NINJA ROW | [~258] |
 | **M6** ⛳ | Text v1b; T1-lite; HERO'S QUEST, HIGH NOON FRONTIER, SKY ACE; HALFTIME RIOT (**v0.5 "Round One"**) | [~342] |
 | **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~398] |
-| **M8** ⛳ | W2, W3, the ending | [~433] |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~450] |
+| **M8** ⛳ | W2, W3, the ending | [~434] |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~451] |
 
 The cumulative figures add up each design doc's own per-milestone estimates (RULINGS R8.1). Round 1 had put the slice
-at about 115; counted honestly it is about 148, because the slice builds most of the engine, the whole scorecard and
+at about 115; counted honestly it is about 150, because the slice builds most of the engine, the whole scorecard and
 economy, and the art and music pipeline before the first venue.
 
 **M0 in detail** (tech §16.3; 12.5 sessions):
@@ -357,7 +359,7 @@ re-recorded only at gates; test overhead about 10 % of code sessions.
 |---|---|---|
 | 1 | **Scale.** ≈ 450 sessions is years of part-time work | The release ladder makes every rung shareable; the ledger is re-estimated at M4 and every gate; the cut line is pre-ordered |
 | 2 | **MMC5 on real hardware and flash carts** is unverified; FCEUmm is too forgiving (64 KB PRG-RAM, CHR wrap, timing) | The Mesen spike before any port work; every gate checked on Mesen; the MMC3 fallback |
-| 3 | **The slice is big** (~148 sessions before the first playable venue) | Forms moved out of the slice (R8.2); the M4 re-estimate calibrates everything after it |
+| 3 | **The slice is big** (~150 sessions before the first playable venue) | Forms moved out of the slice (R8.2); the M4 re-estimate calibrates everything after it |
 | 4 | **Lag.** Set pieces sit at the 9-slot cap | Count every occupied slot; M3's OAM-builder work may raise the cap; artcheck enforces it |
 | 5 | **Text space.** Dense screens (Plant: 0 free BG tiles) defer pop-ups; Must strings run over ~350 | Glyph cache with ROM restore; story's trim order |
 | 6 | **IRQ timing** differs between emulators and hardware (the 8-band floor, the train) | Per-band timing tests on both emulators; the floor is decoration, collision is not raster-based |

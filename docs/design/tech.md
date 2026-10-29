@@ -2210,13 +2210,13 @@ counts are tech's share from the ledger; the cumulative column is RULINGS §6's 
 | **M0** | Workbench; **the MMC5 go/no-go spike on Mesen** | [13] | 12.5 |
 | **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [26] | 13 |
 | **M2** | Slice engine (tech's part below; meta's save, file-select-lite, bracket-lite, results, debrief and EXTRA CONFIG UI are theirs) | [79] | 31.5 |
-| **M3** | Slice systems (tech's part below, with **the attach state's core for the condor**, R8.2; `systems.md`'s SELECT (weapons), the last-weapon toggle, the dispatch table with Normal form's taps and the Ice Block, GP_BOSSHIT, WEAK!, scorecard, bolts and shop are theirs). **No forms in the slice**: a new file owns none (R8.2) | [~123] | 13 |
-| **M4** ⛳⛳ | **BLIZZARD end to end (v0.1)**; re-estimate the ledger | [~148] | support only |
-| **M5** | Stage-attribute table; `systems.md`'s quick form swap, forms firing taps and adaptors by win count (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~254] | 15 |
+| **M3** | Slice systems (tech's part below, with **the attach state's core for the condor**, R8.2; `systems.md`'s SELECT (weapons), the last-weapon toggle, the dispatch table with Normal form's taps and the Ice Block, GP_BOSSHIT, WEAK!, scorecard, bolts and shop are theirs). **No forms in the slice**: a new file owns none (R8.2) | [~124] | 13 |
+| **M4** ⛳⛳ | **BLIZZARD end to end (v0.1)**; re-estimate the ledger | [~150] | support only |
+| **M5** | Stage-attribute table; `systems.md`'s quick form swap, forms firing taps and adaptors by win count (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~258] | 15 |
 | **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT (**v0.5 "Round One"**) | [~342] | 7.5 |
 | **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~398] | 8 |
-| **M8** ⛳ | W2, W3, ending | [~433] | 2 |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~450] | ledger `overhead` |
+| **M8** ⛳ | W2, W3, ending | [~434] | 2 |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~451] | ledger `overhead` |
 | | | | **102.5** |
 
 The cumulative column is RULINGS §6's (R8.1), which adds up every doc's own per-milestone figures; round 1's
@@ -2519,7 +2519,8 @@ Every change, with the ruling or finding that caused it. Finding ids refer to `r
 ## Changes in round 3
 
 Each request routed to this doc in [`reconcile.md`](reconcile.md), then the RULINGS §8 rulings applied where no request
-named them. Session changes: tech 102 → **102.5** (+0.5 at M8, row 44); 1 session moved from M5 to M3 (rows 31a/31b).
+named them. Session changes: tech 102 → **102.5** (+0.5 at M8, row 44); 1 session moved from M5 to M3 (rows 31a/31b);
+the verify pass split row 38 (38a M3 0.5, 38b M5 0.5, 38c M6 0.5: per milestone M3 13, M5 15, M6 7.5, total unchanged).
 
 | Id | Outcome | Section | Note |
 |---|---|---|---|
@@ -2543,3 +2544,24 @@ named them. Session changes: tech 102 → **102.5** (+0.5 at M8, row 44); 1 sess
 | R8.7 (extra) | applied | §5.5 | INPUT LAG 0-6 f through `RS_LAG` |
 | Open questions (extra) | applied | Open questions 3, 4, 6, 8 | closed by meta's DIFF A, systems' caps with R8.7, art's re-run with R8.7, and R8.3 |
 | Risk 12 (extra) | applied | Risks | the bank ledger's spares (`$79`, the 3rd sprite pair) and v1.0 ≈ 42 banks |
+| verify-1 | fixed | §7.9 | `$9B` = 0 normal, 1 Jet, 2 Power (`rm6/ram.md`, systems §2.1); SUPER becomes 3 |
+| verify-2 | fixed | §4.6, §3.4, cross-doc (meta) | meta's fight record is 11 bytes: `fight_load` copies +10 PINCH into RULESET +15 `RS_PINCH` (0 outside a bout); fortress §9.3 still says the 10-byte record has no field, which fortress must update |
+| verify-3 | fixed | §11.5, cross-doc (story) | story's counts (R8.4): 333 + 64 = 397 Must strings; the full design ≈ 850 strings, ≈ 60-70 KB before compression (story §10.4) |
+| verify-4 | fixed | §8.3, cross-doc (fortress) | W3's fight is `RL_FLOOR8` 8 + the machine's NT1 split 1 + 2 window bands = 11 (fortress §0.11) |
+| verify-5 | fixed | §11.8, cross-doc (story) | the face icons are art_audio §9.4's 22, not 7; story's dependency row (its "7 face icons") is story's to change |
+| verify-6 | fixed | §3.4, §11.4, §11.6 | the announcer queue follows story §6.1 (2 entries; higher priority first; P3/P4 dropped after 120 f; a P2 line waits up to 8 s), 8 B; `VISIT_FIRST` (4 B) added to the run block; spare ≈ 91 B |
+| verify-7 | fixed | §3.1 | `SYS_HOT`'s 12 bytes named from systems §15.1 |
+| verify-8 | fixed | §12.1 | 66 SFX (`$23-$65` minus `$39`): 36 + 66 = 102 |
+| verify-9 | fixed | §11.5 | duplicate of verify-3 |
+| verify-10 | fixed | v1.0 scope (rows 38a-c), §8.5, §16.2, §16.6 (M3.8), §16.8 (M5.9), §16.9 (M6.4), cross-doc (systems) | the flash service was M6 but the slice's C.FLASH/WEAK flash (systems SYS-FX-1, v0.1) and the M5 dark rooms need it: core at M3, lighting at M5, the Riot's blackout at M6; `gp_flash_ok()` on `FLASH_GATE` added. `tight.py`'s single 'M6: palette-flash' row (1.5) should be relabelled or split the same way (total unchanged); RULINGS §6's cumulative column moves by +0.5 at M3 and M5, −1 at M6 (reported to the director) |
+| verify-11 | fixed | v1.0 scope (Not in v1.0), §9.1, §16.3, §16.12, cross-doc (venues_b) | X-FLOOR moves from Could to Should, with cut-line item 4 (its only users, the ski run, the hot spring and the nightingale floor, are item 4's); the `GRP_ROW` remap stays Must. `tally.py`'s X-FLOOR tier 'C' → 'S' and venues_b §0.4's "(tech §4.5, Could)" are theirs to change |
+| verify-12 | fixed | v1.0 scope (row 31b), §7.9 | no v1.0 user of the attach state after M5: H5's Super Arrow rides the vanilla lift contact (fortress §0.7); H4's claw is Should |
+| verify-13 | fixed | §7.9 | the NPC Break Man is M5 (the Opening's S06), its sub-id code costed in fortress's Opening and Riot rows; fortress's v1.0 scope must drop it from the pieces "counted under tech" |
+| verify-14 | fixed | v1.0 scope | `tight.py` holds 102.5 (CODE 378, about 451); PLAN §4.1 (102, 377.5) and `tally.py`'s comment ("sum to 102") are theirs to update |
+| verify-15 | fixed | §7.12 | the Ice Block is a utility in 4-7 (`util_spawn`), not a shot in 1-3; art_audio §3.5's Blizzard count should read 9 + the block or 4th flake = 10, measured by G7 (venues_b §0.2, R8.6) |
+| verify-16 | fixed | §15.1 | the "written at 10-13" list replaced: owners re-cut their set pieces in round 3 (venues_a §0.5, venues_b §0.2, fortress §0.8; Paddle Man, Could, is [9]; no Reaplet alarm in v1.0) |
+| verify-17 | fixed | §7.7 | `FRZ_KIND` 4: the boss stall runs in GP_BOSSHIT's exit (systems §4.8), no change to the boss AIs |
+| verify-18 | fixed | §8.5, §3.1 | `gp_flash_ok()` = `FLASH_GATE` ≥ 20 f, a flash inside the window is skipped; each flash's REDUCED form is its owner's (systems §5.1, fortress §0.9), an 8-frame fade by default. meta §11.1's FLASHES cell should say "its owner's REDUCED form, a fade by default" |
+| verify-19 | fixed | §4.6, §3.4 | duplicate of verify-2 (meta's request) |
+| verify-20 | fixed | §7.12, §9.1, §15.1, cross-doc (venues_a) | the wave director counts the text runner and live utilities and waits (never drops) at 9; `gp_slots_used()` added for boss AIs (Wind Man's squadron, Tomahawk Man's feathers, Knight Man's fireballs) |
+| verify-21 | fixed | §15.1 | duplicate of verify-16 (Flame 0B dropped from the list) |

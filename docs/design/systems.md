@@ -1977,7 +1977,7 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
 ## Risks
 
 1. **Slice schedule.** This doc's slice share is about 28.5 sessions after R8.2 moved the form swap, the Power and Jet
-   dispatch rows and the adaptors to M5 (SC9's hook, which Blizzard's MELT needs at M3, stays in the slice). RULINGS §6 (R8.1) now counts them: M3 is about 44 sessions (79 → ~123) for all
+   dispatch rows and the adaptors to M5 (SC9's hook, which Blizzard's MELT needs at M3, stays in the slice). RULINGS §6 (R8.1) now counts them: M3 is about 46 sessions (79 → ~124) for all
    slice systems, against round 2's 25. *Mitigation:* the scorecard, bolts and chip framework can still share M2's
    results and save work; the M4 re-estimate calibrates the rest (R0.1).
 2. **The CHR stream.** 2 KB per form swap is 11-13 stream frames at tech's rates (up to 22 with a column paint every

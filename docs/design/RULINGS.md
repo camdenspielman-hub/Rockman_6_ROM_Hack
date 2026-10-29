@@ -35,9 +35,9 @@ fewer engines, vanilla behaviour kept).
 
 | Release | Contents | ≈ sessions (cumulative) |
 |---|---|---|
-| **v0.1 "Blizzard slice"** | new game → bracket → Blizzard venue end to end → judges → save/reload/replay | ~115 → **~148** (R8.1) |
+| **v0.1 "Blizzard slice"** | new game → bracket → Blizzard venue end to end → judges → save/reload/replay | ~115 → **~150** (R8.1) |
 | **v0.5 "Round One"** | Opening-lite, 8 venues, Halftime Riot; the scope checkpoint | ~285 → **~342** (R8.1) |
-| **v1.0 "Championship"** | + H1/H3/H5, W2, W3, ending | ~440 → **~450** (R8.1) |
+| **v1.0 "Championship"** | + H1/H3/H5, W2, W3, ending | ~440 → **~451** (R8.1) |
 | v1.1+ | the Should list, in the cut-line order below, re-added from the top | — |
 
 **R0.3 — The cut line, in priority order.** These items are out of v1.0, and come back in this order (scope-2):
@@ -402,13 +402,13 @@ Cumulative ≈ sessions in brackets. ⛳ = the user plays it.
 | **M0** | Workbench: build, BPS, hook registry, allocator, test runner, golden recording, ledger. **MMC5 go/no-go spike on Mesen** | [13] |
 | **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [26] |
 | **M2** | Slice engine: families and sub-ids; WRAM layouts and `map_set`; CHR set table v2 and minimal art tools; level pipeline with canvas table; raster list; **text v1a**; track table and MML; save, file-select-lite, bracket-lite, results, debrief, EXTRA CONFIG | [79] |
-| **M3** | Slice systems: SELECT (weapons); taps; GP_BOSSHIT, WEAK!, frozen tick, the Ice Block; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; commentator bus; **the attach state's core (the condor)** (R8.2) | [~123] |
-| **M4** ⛳⛳ | **BLIZZARD end to end** (v0.1): new game, bracket, venue (exit, room, chip, Ice Block, boss), judges, save, reload, replay. **Re-estimate the ledger** | [~148] |
-| **M5** | Stage-attribute table; **the form swap, forms firing taps, adaptors by win count** (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~254] |
+| **M3** | Slice systems: SELECT (weapons); taps; GP_BOSSHIT, WEAK!, frozen tick, the Ice Block; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; commentator bus; **the attach state's core (the condor)** (R8.2) | [~124] |
+| **M4** ⛳⛳ | **BLIZZARD end to end** (v0.1): new game, bracket, venue (exit, room, chip, Ice Block, boss), judges, save, reload, replay. **Re-estimate the ledger** | [~150] |
+| **M5** | Stage-attribute table; **the form swap, forms firing taps, adaptors by win count** (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~258] |
 | **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT. **"Round One" checkpoint (v0.5)** | [~342] |
 | **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~398] |
-| **M8** ⛳ | W2, W3, ending | [~433] |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (v1.0) | [~450] |
+| **M8** ⛳ | W2, W3, ending | [~434] |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (v1.0) | [~451] |
 
 Round 1's cumulative figures (12 / 25 / 70 / 95 / ~115 / ~205 / ~285 / ~340 / ~380 / ~440) are replaced by R8.1's,
 which add up each doc's own per-milestone figures.
@@ -440,12 +440,14 @@ like the rest of this file.
 
 **R8.1 — The ledger and the ladder are re-baselined.**
 
-- The tight Must is **about 450 sessions** (`tools/plan/tight.py`: code 377.5, art 51.6, music 9, text 12). The +10 on
+- The tight Must is **about 450 sessions** (`tools/plan/tight.py`: code 378, art 51.6, music 9, text 12; tech's +0.5 for the ending's engine pieces came in
+  round 3). The +10 on
   R0.2 comes from rulings that promoted content to Must (the venue chips, the mouse room, the fight loader, the OAM
   steps). **It is accepted; R0.3's "cut next" list is not applied now.** The M4 re-estimate decides.
 - §6's cumulative column is recomputed by adding each doc's own per-milestone figures (tech §16.2, meta's and systems'
   v1.0 scope tables, the venue and fortress stage milestones, art_audio's and story's milestone tables; the ledger's
-  release overhead at M9). Round 1 had under-counted the slice: **v0.1 ≈ 148, v0.5 ≈ 342, v1.0 ≈ 450.**
+  release overhead at M9). Round 1 had under-counted the slice: **v0.1 ≈ 150, v0.5 ≈ 342, v1.0 ≈ 451** (after round 3's verification pass,
+  which moved SC9's hook, the flash service's core and the cast's art earlier; the totals did not change).
 - Each milestone's figure is re-estimated at every ⛳ gate; the slice's actual cost calibrates the rest (R0.1).
 
 **R8.2 — What the slice builds.**

@@ -55,8 +55,8 @@ in the Blizzard slice.
 | Flame | **13** | 4 | - | - | +1: the mouse room and FIREPROOF are Must; the chompers drop to Should |
 | Centaur | **13.5** | 5 | 1 | - | +1.5: CENTURION is Must; the tidal shaft replaces the wrap tower at about the same cost |
 | Yamato | **13** | 4.75 | - | 2 | +1: the Daruma and DARUMA are Must; the sekisho, passes and runner leave |
-| Tag-partner shortcuts (4 venues) | - | - | 1 | - | with the partner bundle (R2.5, R4.2) |
-| **Total** | **53** | **17** | **2.75** | **2** | `tools/plan/tally.py` and `tight.py` carry these figures |
+| Tag-partner shortcuts (4 venues) | - | 1 | - | - | Should (cut-line item 2, with the tag partner: R0.3, R4.2) |
+| **Total** | **53** | **18** | **1.75** | **2** | `tools/plan/tally.py` and `tight.py` carry these figures |
 
 The four Must figures are 5 sessions above round 1's tight estimate (48), all from rulings that promoted content to
 Must. Each Should figure includes about one session of v1.1 tests and golden-movie re-records. The per-venue HARD lists
@@ -77,7 +77,7 @@ counts after the slice (R0.1): the Blizzard number becomes the calibration for t
   `EFX_PARAM`, and T3, T7 and T8 arrive with them.
 - **v1.0 "Championship":** unchanged venues, refought in W2 through the fight loader (§5.3).
 - **v1.1+:** the Should rows above, in R0.3's order: alts and synergies (item 1), then the tag partner's shortcuts
-  (item 2, as Could), HARD lists (item 3), then each venue's second set piece and arena twist (item 4).
+  (item 2), HARD lists (item 3), then each venue's second set piece and arena twist (item 4).
 
 ---
 
@@ -183,7 +183,7 @@ Round 1's working labels (X-…) map onto tech's single engines. The engines are
 ### 0.5 Weapons: superseded by systems.md
 
 Round 1's weapon proposals (§0.5) and every "proposed row" of boss damage are **superseded by `systems.md` §3 (weapons)
-and §4 (Tables 1-2, SC1-SC9)** (consistency-33). Weakness i-frames are 16 f, not 8. This doc keeps three things:
+and §4 (Tables 1-2, SC1-SC14)** (consistency-33). Weakness i-frames are 16 f, not 8. This doc keeps three things:
 
 1. **Boss previews.** Each boss performs its weapon's alt or synergy as a boss move before the player owns it. That
    is AI, not player code, so it stays in v1.0 although the player's alts are Should (R2.4).
@@ -196,10 +196,10 @@ and §4 (Tables 1-2, SC1-SC9)** (consistency-33). Weakness i-frames are 16 f, no
 | **B.ATTACK** | the vanilla thematic one-shots on fire robots (Flame's Tellies and jugglers). **The Ice Block, the slice's prototype (R2.4):** encases seals and birds (Blizzard: platforms), stops Blizzard Man's snowball, freezes burning oil into a 300-f floor (Flame 13), encases ninjas into steps (Yamato) | Snow Bomb (Jet) |
 | **F.BLAST** | melts `$D` ice (Blizzard 0C and 18 pockets); burns shoji (Yamato 08); ignites oil through `$3E:$DDFC` (systems OQ1) | Flare melts the ice cell above you (a faster climb); Burning Knuckle |
 | **C.FLASH** | lights a dark room for 240 f (Centaur's black zone, Yamato's dark room) | Time Stop freezes the hourglass gate, the chompers and the tide; Time Fist |
-| **Y.SPEAR** | single spear + one pierce (systems) | Wall Spear reaches high ledges on Blizzard 07, Flame 0D and Centaur 0D; the Pogo synergy crosses Yamato's caltrop hall without the rack |
+| **Y.SPEAR** | the single spear (vanilla; it passes class-3 shields, SC1) | the pierce (Should tap polish, systems §3.2); Wall Spear reaches high ledges on Blizzard 07, Flame 0D and Centaur 0D; the Pogo synergy crosses Yamato's caltrop hall without the rack |
 | **KNIGHT.C, SILVER.T** | their arcs hit diving birds (Blizzard) and a patrolling Reap-bot from behind (Should) | - |
 
-**Featured enemies** (`systems.md` §9.3): the PART drop is cut (R2.5), but the one-shot stays as an in-stage tell for
+**Featured enemies** (`systems.md` §4.7): the PART drop is cut (R2.5), but the one-shot stays as an in-stage tell for
 the champion's weakness: Blizzard's snow robot `$4D` to F.BLAST (vanilla), Flame's Fire Telly `$2C` to W.STORM,
 Centaur's seahorse `$C4` to KNIGHT.C, Yamato's samurai `$A2` to SILVER.T.
 
@@ -217,7 +217,9 @@ Stop and the Ice Block but still takes hits); **boss** = a boss-side frozen stat
 - **Words:** `story.md` owns every word (R4.1). This doc gives each hook a stable id and a trigger; the text lives in
   story §6.3, and the debrief hints in meta §4.4. Text tiers follow R4.5: the first-weakness line, the hooks that are
   the tell of a Must secret, the secret and plate lines, the tier B hints and **4 death lines per venue** are Must;
-  flavour hooks are Should.
+  flavour hooks are Should. **String counts** (R8.4): story §10.4's by-area table is the single source; this doc keeps
+  no estimate of its own. These four venues' Must text is **50 strings and 0 labels** (Blizzard 13, Flame 11, Centaur
+  14, Yamato 12).
 - **Signs** (the summit sign, the Atlantis tablet, notice boards) are BG art with a symbol; their words appear in the
   2 × 28 pop-up (ALL CAPS, R1.4) when Rock presses UP at them.
 - **The Mr. Y gag in every venue** (story §1.2 rule 4), always as cheap BG art (≤ 12 tiles, Must): the icebreaker's
@@ -672,10 +674,11 @@ In meta's weight order (exit, room, item). Unchanged from round 1; set in capita
   to the next floor without bonking.
 - **Alts (v1.1, Should):** Y.SPEAR's Wall Spear reaches a high ledge over the stern (07: a large weapon energy, not
   bolts, so the prize cap stays at 60: consistency-10; round 1 put it on 05, which is full); F.BLAST's Flare melts the cell above you, a faster climb for Time Attack.
-- **Tag partner (Could, with the partner bundle):** Break Man's shield blocks the icicle rain on the ship if he jumps
-  through it; the optional shortcut is a stern-deck ledge only his double knockback reaches.
+- **Tag partner (Should, cut-line item 2, with the tag partner):** Break Man's shield blocks the icicle rain on the
+  ship if he jumps through it; the optional shortcut is a stern-deck ledge only his double knockback reaches.
 - **Par** (placeholder, systems §6.3): 330 s, the 40-s bonus included; measured from G1 at M4. A run that takes the
-  replay skip door has the bonus's 40 s taken off its par (systems §6.3).
+  replay skip door has the bonus's 2,400 f (40 s) added to its `T` when it takes the door, so the par stays 330 s and
+  the skip neither buys nor costs TIME (systems §6.3).
 - **Mini-record** (Could, meta's `VENUE_REC`): the meter's time left at the condor grab.
 
 ---
@@ -1000,8 +1003,8 @@ mechanics as R3.4 asks). Line 5 needs the vizier (Should); line 4 (the hourglass
   channel under the loose bridge.
 - **Alts (v1.1, Should):** Time Stop freezes the hourglass gate (11) and the chompers (0A); Y.SPEAR's Wall Spear climbs
   to 0D's high ledge (a large weapon energy; the mirror room keeps its slots for the shadow).
-- **Tag partner (Could):** Break Man's shield catches the guards' lunges from the front; the optional shortcut is a
-  guard on a ledge over 18's pit that only his double knockback can push off.
+- **Tag partner (Should, cut-line item 2, with the tag partner):** Break Man's shield catches the guards' lunges from
+  the front; the optional shortcut is a guard on a ledge over 18's pit that only his double knockback can push off.
 - **Par** (placeholder): 300 s.
 
 ---
@@ -1105,8 +1108,9 @@ set piece carries its ending as well as its secret.
 
 - **Rooms:** three locked one-screen tide rooms stacked vertically and joined by ladders (vanilla shafts are
   consecutive screens with up/down exits). Each room runs the 0C tide init from its own screen script with a **per-room
-  base level** (one byte; tech's call whether it lives in the script or in `EFX_PARAM`): **the mean water line rises
-  16 px per room**, so the tower floods as you climb and the higher rooms stay wet longer.
+  base level** (one byte, `TIDE_BASE`: each room's screen script writes it, and `EFX_PARAM` keeps the stage's dwell;
+  tech §1.8): **the mean water line rises 16 px per room**, so the tower floods as you climb and the higher rooms stay
+  wet longer.
 - **The climb:** three ledges zig-zag up each room, 80 px apart. A jump from a ledge reaches the next one **only when
   the water covers the lower ledge** (a high-tide swim-jump: 0D's lesson, now a climb). At low tide the jump falls
   short. A miss drops you onto a lower ledge, or out of the bottom of the room into the room below: lost time, not a
@@ -1119,8 +1123,8 @@ set piece carries its ending as well as its secret.
   top ledge and his alarm calls 2 Reaplets; that room drops its piranha and one float, for the lag cap.
 - **Tells:** 0D teaches the lift; each ledge carries a **painted tide line** at the height the water must reach (the
   same mark as the ZONE 100 door), so the rule is readable in every room.
-- **Fallback** if chain `$14` misbehaves across vertical exits: the three rooms join by honest zone doors (`18`, `19`)
-  instead of ladders, which the maze already proves.
+- **Fallback** if chain `$14` misbehaves across vertical exits (tech's check at the start of M5, tech §16.8): the three
+  rooms join by honest zone doors (`18`, `19`) instead of ladders, which the maze already proves.
 
 ### 3.6 Checkpoints
 
@@ -1161,7 +1165,7 @@ set piece carries its ending as well as its secret.
 #### 3.7.3 Behaviour-gated chip: CENTURION `[new-code S · Must]`
 
 - **Gate:** free all three **Centurion statues** (00, 05, 09) in one visit with a **full charge** (systems' FULL flag,
-  `systems.md` §15.2) in Normal form. Other shots "tink" off the stone. A freed statue stretches, salutes and flies off.
+  `systems.md` §6.4) in Normal form. Other shots "tink" off the stone. A freed statue stretches, salutes and flies off.
 - **Why it is behaviour, not geometry:** #2 needs a swim-jump detour, and #3 is in ZONE 10, which door `11` of ZONE 9
   lets you skip. A player in a hurry misses them.
 - **The count:** meta's stage-counter predicate (R1.10); this is the venue's only collect-N secret (R3.1).
@@ -1363,8 +1367,8 @@ In meta's weight order (exit, room, item, plate). Set in capitals at build time;
 - **Alts (v1.1, Should):** Time Stop **freezes the tide** (stop it at low water and walk into ZONE 100 at leisure);
   Y.SPEAR's Wall Spear reaches 0D's ledge and the shaft's ledges at any tide. Proposal for systems: an Ice Block placed
   in water **floats** and rides the tide (a lift at any tide).
-- **Tag partner (Could):** Break Man's shield blocks the Reaplets while jumping; the optional shortcut is a cracked
-  pillar in 0F that only his double knockback topples into a bridge.
+- **Tag partner (Should, cut-line item 2, with the tag partner):** Break Man's shield blocks the Reaplets while
+  jumping; the optional shortcut is a cracked pillar in 0F that only his double knockback topples into a bridge.
 - **Par** (placeholder): 300 s.
 
 ---
@@ -1605,7 +1609,7 @@ Brackets: peak stage objects (≤ 4, §0.2; in the pogo hall, where Rock fires n
 each); while they are up he only RUSHes (lag).
 
 **Damage and i-frames:** `systems.md` Tables 1-2 (Yamato's column: SILVER.T 4 W with 16 f; PLANT.B 3 G; KNIGHT.C 1 R;
-Y.SPEAR his own). He may still throw volleys himself (systems §15.2).
+Y.SPEAR his own). He may still throw volleys himself (systems §15.3).
 
 **WEAK reaction, SNAP** (SC9, Must): a SILVER.T hit chops his spear shaft in two: he stares at the stub for 40 f (no
 attacks, WEAK! pop, YAM-16), then pulls a new spear from his back.
@@ -1709,8 +1713,8 @@ come back with it in v1.1.
 
 ### 4.13 Judges' debrief hints (tier B drafts: meta §4.4 asked this doc for them; story owns the words)
 
-In meta's weight order (exit, room, item, plate). Set in capitals; each fits 4 × 28. **meta's tier A riddle for YA0
-(the sekisho) is stale and needs a new riddle** (§5.3).
+In meta's weight order (exit, room, item, plate). Set in capitals; each fits 4 × 28. YA0's tier A is story's new
+riddle YA0.A (Should; story §7.1, meta §4.4); the sekisho riddle is retired.
 
 1. YA0, exit: "IN THE LAST HALL OF SCROLLS, WATCH THE LANTERN. ITS FLAME POINTS AT THE SCROLL THAT TURNS."
 2. YA1, room: "EDO'S GOLD IS UNDER THE FLOOR. POGO ON THE CREST IN THE CALTROP HALL."
@@ -1736,9 +1740,9 @@ In meta's weight order (exit, room, item, plate). Set in capitals; each fits 4 �
 - **Ice Block (v1.0):** encased Jaja-nin are steps up the mansion floors without bonking.
 - **Alts (v1.1, Should):** Y.SPEAR's **Pogo** synergy (Power) crosses the caltrop hall without the rack and also opens
   the crest; Time Stop freezes the Jaja-nin mid-hop.
-- **Tag partner (Could):** Break Man's shield blocks the shuriken rain on 07 while he jumps; the optional shortcut is a
-  stack of rice bales in the kura (0C) that only his double knockback topples into a step up to a large weapon
-  energy.
+- **Tag partner (Should, cut-line item 2, with the tag partner):** Break Man's shield blocks the shuriken rain on 07
+  while he jumps; the optional shortcut is a stack of rice bales in the kura (0C) that only his double knockback
+  topples into a step up to a large weapon energy.
 - **Par** (placeholder): 300 s (round 1 proposed 330 s; the trim removes about 30 s).
 
 ---
@@ -1798,9 +1802,9 @@ Every Must item and the Must engines it rests on. Nothing on this list needs a S
 | Doc | What this doc needs, or asks it to change |
 |---|---|
 | `systems.md` | (1) The Ice Block ships in the slice (R2.4), built at M3 with the dispatch table and Normal form's taps (R8.2): its code moves out of the Should alt line. (2) The four venue chips of §9.2 are **Must** (R2.5): systems' revision already tiers SNOW CHAINS v0.1 and the other three v0.5. (3) ABSORB's heal of 1 as a named SC4 exception (consistency-33). (4) VENUE ACTs: CONDOR, FIRST PASS; CLEAN DUEL; NO WRONG DOOR; SPEAR DANCER. (5) Placeholder pars: Blizzard 330 s, Flame 300 s, Centaur 300 s, Yamato 300 s (was 330). (6) The bird-bot has 2 HP, so the Ice Block encases it instead of killing it. (7) The Freeze columns of §1.9, §2.7, §3.9 and §4.10 for the NOFREEZE list. (8) Two boss-room lag rules (§0.2): the WEAK! pop spawns only while fewer than 3 boss-side objects are out, and the CENTURION chip's helper (a player-side utility) costs each boss here one projectile per move while it hovers. (10) Prizes: Blizzard's 4 vegetables are 10/10/15/25 = 60; the Y.SPEAR ledge (v1.1) holds an energy, not bolts. (11) Section moves for its cross-references: SNOW CHAINS is now §1.6.3, FIREPROOF §2.5.3, CENTURION §3.7.3, DARUMA §4.6.3. (9) Proposal (v1.1): an Ice Block in water floats and rides the tide |
-| `meta.md` | (1) On-screen name **PERSIAN PALACE** (meta §4.3-§4.4 still print PRINCE OF PERSIA PALACE). (2) Tier B hints for Centaur (§3.14) and Yamato (§4.13); FL0's tier B reworded for the glow (§2.12); **YA0's tier A riddle (the sekisho) must be rewritten** for the draft. (3) PRIZES: 4 bits for Blizzard's vegetables, none for the other three. (4) Mid-boss fight ids for Shadow Rock, GAMARN & GAMADAYU and the Daruma (consistency-44 proposes `$0E`, `$0F`, `$10`). (5) The replay skip door on Blizzard 0F reads the venue's cleared bit. (6) Mini-record (Could): Blizzard's meter time at the condor grab. (7) Tier B hints now sit in §1.14, §2.12, §3.14 and §4.13 |
+| `meta.md` | (1) On-screen name **PERSIAN PALACE** (done in round 3: META-02). (2) Tier B hints for Centaur (§3.14) and Yamato (§4.13); FL0's tier B reworded for the glow (§2.12); YA0's tier A for the draft (done in round 3: meta §4.4 cites these tier B drafts, and YA0's tier A is story's new riddle YA0.A, §7.1; the sekisho riddle is retired). (3) PRIZES: 4 bits for Blizzard's vegetables, none for the other three. (4) Mid-boss fight ids for Shadow Rock, GAMARN & GAMADAYU and the Daruma (consistency-44 proposes `$0E`, `$0F`, `$10`). (5) The replay skip door on Blizzard 0F reads the venue's cleared bit. (6) Mini-record (Could): Blizzard's meter time at the condor grab. (7) Tier B hints now sit in §1.14, §2.12, §3.14 and §4.13 |
 | `story.md` | (1) Words for every hook id; new ids **CEN-21** (Must), **CEN-22**, **YAM-21**; retired ids YAM-04, YAM-05, YAM-14, YAM-20, CEN-16 and YAM-15's firework half. (2) FLM-06's trigger is now "first parried shot", and its line should teach spacing. (3) BLZ-04 needs a varied Wily line (R3.9). (4) Death lines: drop BLZ 6 (the Ice Climbers' names) and CEN 6 (Kid Icarus's hero) (R3.3); the recommended four per venue are in §1.13, §2.11, §3.13 and §4.12. (5) Signs and inscriptions: the summit sign, the Atlantis tablet, ZONE 0's inscription, the vault's loan sign, the fortune slip. (6) The NPC row for Yamato: the sekisho guard's line is retired. (7) The Flame Mr. Y gag is a sponsor tapestry in v1.0 and Wily in costume in v1.1 (R3.4) |
-| `tech.md` | (1) **T7 and T8 are Must** (R0.4; its revision agrees). (2) **The attach state's core at M3**, with the condor as its first user; the vines and the balloon follow at M5 (R8.2; routed as TECH-06). (3) The ship thread's turn event as a registry hook (icicles). (4) A per-room tide base for the tidal shaft, and a check of chain `$14` across vertical exits at the start of M5 (fallback: door-joined rooms). (5) Per-screen door tables read by the screen scripts (Centaur's BG doors). (6) **No stage-`$00` stop-gaps** (R8.2): the slice's GP code reads stage record v0 from M2.1 (`SECRET_SCR`, `PAR`, GP_BOSSHIT's row), and Blizzard's row comes from its `.lvl` header at M4 (routed as TECH-07). (7) The map-edit uses of §0.4. (8) The set-piece player sheet streamed during the pogo rack's 24-f take animation. (9) The Daruma's stack part reads the hitting shot's Y on its latch. (10) The lag report of test G7. (11) The credits room table and the `CREDITS` bit that the four champions' credits mode tests (§1.10, §2.8, §3.10, §4.8; tech §4.6 has them). (12) §15.1's list of set pieces "written at 10-13" can drop Flame 0B: it is 9 occupied slots (§2.3) |
+| `tech.md` | (1) **T7 and T8 are Must** (R0.4; its revision agrees). (2) **The attach state's core at M3**, with the condor as its first user; the vines and the balloon follow at M5 (R8.2; routed as TECH-06). (3) The ship thread's turn event as a registry hook (icicles). (4) A per-room tide base for the tidal shaft, and a check of chain `$14` across vertical exits at the start of M5 (fallback: door-joined rooms) (decided in round 3: each room's screen script writes `TIDE_BASE`, `EFX_PARAM` keeps the dwell; tech §1.8, §16.8). (5) Per-screen door tables read by the screen scripts (Centaur's BG doors). (6) **No stage-`$00` stop-gaps** (R8.2): the slice's GP code reads stage record v0 from M2.1 (`SECRET_SCR`, `PAR`, GP_BOSSHIT's row), and Blizzard's row comes from its `.lvl` header at M4 (routed as TECH-07). (7) The map-edit uses of §0.4. (8) The set-piece player sheet streamed during the pogo rack's 24-f take animation. (9) The Daruma's stack part reads the hitting shot's Y on its latch. (10) The lag report of test G7. (11) The credits room table and the `CREDITS` bit that the four champions' credits mode tests (§1.10, §2.8, §3.10, §4.8; tech §4.6 has them). (12) §15.1's list of set pieces "written at 10-13" can drop Flame 0B: it is 9 occupied slots (§2.3) |
 | `art_audio.md` | (1) The change lists of §1.8, §2.6, §3.8 and §4.7 for the R5.3 re-run (cuts, promotions, moves). (2) The mouse squeak as a Must SFX of about 20 B, or a named vanilla fallback. (3) Unchanged cue tiers: G25 BONUS SUMMIT and G26 KABUKI Should, G30 UNDERWATER and G31 PALACE Could. (4) The Blizzard fight's flicker check: art_audio §3.5 runs FLAKES with an Ice Block out; if it fails, FLAKES throws one flake fewer while the Ice Block exists (R8.6, applied at M4, §1.10) |
 | `fortress.md` | W2's pair bouts load these four arenas through the fight loader. Each arena initialises its own effects (Centaur's tide) and undoes its own map edits (Yamato's wall spears, Flame's timed oil), and each boss reads its pinch threshold from the per-fight byte. The champions' idle frames are their vanilla stand frames; backdrop strips for the victory lap are Could. **The v1.0 credits** (fortress §6.2): each of the four champions runs a credits mode with no Rockman in his own boss room (Blizzard 16, Flame 16, Centaur 17, Yamato 16), given in §1.10, §2.8, §3.10 and §4.8; its cost is in fortress's ending figure (M8); fallback: that champion's card strip only |
 
@@ -1924,8 +1928,8 @@ slot only on motion); **a slice that is a whole venue** (Blizzard proves every l
 - A cleared venue can be replayed for its other exit (meta removes vanilla's beam-out).
 - A secret-arena win awards the weapon (a full clear).
 - The behaviour chips are unique to their venues (systems §9.2).
-- Tag-only shortcuts are Could, shipped with the partner bundle; Break Man is callable in boss rooms after the bar
-  fills, except where NO TAG.
+- Tag-only shortcuts are Should, shipped with the tag partner (cut-line item 2; Could until round 3); Break Man is
+  callable in boss rooms after the bar fills, except where NO TAG.
 - CASUAL uses the standard lever list through `CFG_CASUAL` (R2.9).
 - Jump-up exits are Could (tech; the more conservative of the critics' Should and Could); the climbs ship with ladder
   stubs.
@@ -1934,13 +1938,14 @@ slot only on motion); **a slice that is a whole venue** (Blizzard proves every l
 - The attach state's core is built at M3 with the condor as its first user (R8.2).
 - The four champions can run a no-player credits mode for the v1.0 credits (fortress §6.2's question): §1.10, §2.8,
   §3.10, §4.8.
+- The per-room tide base: each room's screen script writes `TIDE_BASE`, and `EFX_PARAM` keeps the stage's dwell; the
+  tide check across a vertical exit runs at the start of M5 (tech §1.8, §16.8; §3.5).
+- The tier A riddle for Yamato's draft is story's YA0.A (Should; story §7.1, meta §4.4).
 
 **Still open:**
 
-1. Does the per-room tide base live in each room's screen script or in `EFX_PARAM`? (tech)
-2. Should an Ice Block float in water (v1.1)? (systems)
-3. The mouse squeak: a Must SFX, or a vanilla fallback? (art_audio)
-4. The tier A riddle for Yamato's draft. (meta, story)
+1. Should an Ice Block float in water (v1.1)? (systems)
+2. The mouse squeak: a Must SFX, or a vanilla fallback? (art_audio)
 
 ---
 
@@ -1962,7 +1967,8 @@ Each change cites the ruling (R…) and the finding ids it resolves.
 - HARD poke lists and boss branches are Should; every venue fills in the CASUAL standard lever list (R2.9; design-7,
   scope-19, consistency-16).
 - Exhibitions are Could and E4 is Won't (R3.7; scope-9): §0.3's pairing note.
-- The tag-partner shortcuts stay Could, with the partner bundle (R2.5, R4.2; scope-15).
+- The tag-partner shortcuts stay Could, with the partner bundle (R2.5, R4.2; scope-15). *(Round 3: Should, with the
+  tag partner, cut-line item 2; see "Changes in round 3".)*
 
 **Engines, ids and memory**
 
@@ -2046,7 +2052,8 @@ rise 52 px, slide hitbox id). Map crops: `build/design/design-venues-b/*_0.png`,
 ## Changes in round 3
 
 Requests routed to this doc in [`reconcile.md`](reconcile.md), and the [`RULINGS.md`](RULINGS.md) §8 rulings that touch
-it. No session figure changes: the four venues stay at 53 Must (M4 13.5, M5 39.5).
+it. No Must figure changes: the four venues stay at 53 Must (M4 13.5, M5 39.5). The verify pass moves the tag-partner
+shortcuts' 1 session from Could to Should (Should 18, Could 1.75).
 
 | Id | Outcome | Section | Note |
 |---|---|---|---|
@@ -2057,3 +2064,9 @@ it. No session figure changes: the four venues stay at 53 Must (M4 13.5, M5 39.5
 | VENUES_B-05 | applied | v1.0 scope (rungs), §0.2, §0.4, §1.0, §1.10 (forms), §5.2, §5.3 systems and tech, §8 | R8.2: the attach state's core at M3 with the condor; the Ice Block row moves from M4 to M3 with the dispatch table; the stop-gap rows become stage record v0 (M2.1) plus Blizzard's row from its `.lvl` header at M4, tested by the post-kill hook at `$3F:$F9A0` (tech §4.1; was `$F4EB`); no forms in the slice, and Blizzard Man's form reactions arrive at M5. R8.6: the nightingale floor was already Should (§4.1, §4.5.1) |
 | R8.1 | applied | v1.0 scope (session estimates), §7 risk 12 | This doc's per-milestone figures stated for §6's cumulative column (M4 13.5, M5 39.5, unchanged); every ⛳ gate re-estimates them |
 | R8.3, R8.4, R8.5, R8.7 | already | - | Checked: no MMC5 audio, channel drop or POCKET cue; no string-count estimate of its own (story's counts rule); no verbatim quote from another game; no panel string, alias gag, "Blues" line, quick-draw or INPUT LAG figure in this doc |
+| verify 1 | applied | §4.13, §5.3 meta (1)-(2), §8 | The stale requests are closed: meta prints PERSIAN PALACE (META-02), and YA0's tier A is story's new riddle YA0.A (Should; story §7.1, meta §4.4); the sekisho riddle is retired. §8's riddle question moves to the resolved list |
+| verify 2 | applied | v1.0 scope (session table, rungs), §1.16, §2.14, §3.16, §4.15, §8, round 2's scope list | The tag-partner shortcuts are Should with the tag partner (cut-line item 2, R0.3, R4.2), like venues_a's and fortress's partner hooks, not Could with the PARTs bundle (item 9): Should 17 → 18, Could 2.75 → 1.75. `tools/plan/tally.py`'s row "venues_b tag-partner shortcuts" is to move from 'C' to 'S' to match |
+| verify 3, 5 | applied | §1.16 (Par) | Blizzard's skip door adds the bonus's 2,400 f (40 s) to the run's `T` when it is taken, so the par stays 330 s and the skip neither buys nor costs TIME (systems §6.3, SYSTEMS-03); round 2's "taken off its par" is gone |
+| verify 4 | applied | §0.5, §3.7.3, §4.8 | Y.SPEAR's v1.0 job is vanilla's single spear (it passes class-3 shields, SC1); the pierce is Should tap polish (systems §3.2). References fixed: SC1-SC14; featured enemies are systems §4.7; the FULL flag is systems §6.4; Yamato Man's volleys are systems §15.3 |
+| verify 6 | applied | §3.5, §5.3 tech (4), §8 | The per-room tide base is decided: each room's screen script writes `TIDE_BASE`, `EFX_PARAM` keeps the stage's dwell (tech §1.8), and the vertical-exit check runs at the start of M5 (tech §16.8). §8's question 1 moves to the resolved list |
+| verify 7 | applied | §0.6 (Words) | R8.4: cites story §10.4's by-area Must counts: venues_b 50 strings, 0 labels (Blizzard 13, Flame 11, Centaur 14, Yamato 12) |

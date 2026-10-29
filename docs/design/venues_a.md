@@ -26,8 +26,8 @@ size **S / M / L**. **Tiers** (R0.2-R0.4):
 | Tier | Meaning in this doc |
 |---|---|
 | **Must** | ships in **v1.0 "Championship"**. A Must depends only on Musts (R0.4) |
-| **Should** | v1.1+, re-added in the R0.3 cut-line order (HARD lists = item 3; each venue's second set piece and secret-arena twist = item 4; Exhibitions = item 6; the tag partner = item 2) |
-| **Could** | later, if ever |
+| **Should** | v1.1+, re-added in the R0.3 cut-line order (HARD lists = item 3; each venue's second set piece and secret-arena twist = item 4; the tag partner = item 2) |
+| **Could** | later, if ever (the Exhibitions, cut-line item 6, R3.7) |
 | **Won't (v1)** | ruled out for v1 |
 
 **Measurement kept from round 1** (scratch `build/design/design-venues-a/bossmove.py`, 1,440 frames per boss against a
@@ -95,7 +95,7 @@ ending row, not here.
 | tech | The Knight ceiling's logic moved out of IRQ `$11` with a retract parameter (`EFFECTS` b2, `EFX_PARAM`) | Knight Trap Hall |
 | tech | One poke-list format (tech §5.5) with the `CFG_CASUAL` layout tier (R2.9) | every CASUAL list |
 | tech | The credits' room table and `GP_MODE` b0 `CREDITS`, tested by `IFCREDITS` (tech §4.6, M8) | each boss's credits mode (§1.7.2, §2.8.2, §3.8.3, §4.7.2) |
-| systems | SC1 (with **Y.SPEAR in the pass-through list**), SC8 (the draw's free hit), SC9 (weak reactions); chips 13-16 and the Energy Balancer; the frozen handler and NOFREEZE (R2.2); the INPUT LAG setting (0-6 f: R3.5, R8.7) | the bosses, the chips |
+| systems | SC1 (with **Y.SPEAR in the pass-through list**), SC8 (the draw's free hit), SC9 (weak reactions); the chips at §9.2 bits 6-9 (YASHICHI, KAISHIN, SHERIFF STAR, AUTO RECOVER) and the Energy Balancer (bit 0); the frozen handler and NOFREEZE (R2.2); the INPUT LAG setting (0-6 f: R3.5, R8.7) | the bosses, the chips |
 | meta | SECRETS bits by meta index, the PRIZES field, `VENUE_REC`, the debrief (tier B hints), `STAGE_CLEAR` (LAND and EXPRESS appear after the first clear) | all |
 | story | Every word; 4 death lines per venue in v1.0 (R4.5) | all |
 | art_audio | The sets and thirds of §1.1/§2.1/§3.1/§4.1 below; vanilla music fallbacks | all |
@@ -129,7 +129,7 @@ No v1.0 item here needs a Should item. Every place that *could* touch one says w
 | **Secret exit** | An alternate route ending in a **second boss room** (`SECRET_SCR`). The kill there sets the venue's SECRETS b0 (meta) and, in Knight and Tomahawk, drops the plate | Vanilla's own plate mechanism (exits with explicit targets into `$18-$1F`, the boss-screen test `$3F:$F4EB`/`$F518`), generalised into the attribute record by tech | [new-code] (tech, M2.1) + data S · Must |
 | **Secret arena** | v1.0: **the venue's boss room with a new palette**, same AI, pinch at HP 12. v1.1: each venue's distinct arena (the twist) | layout copy + palette | data S · Must; arena twist Should |
 | **Hidden room** | Exactly one screen, off every route, with a visible tell; holds the venue's **sponsor envelope** (30 bolts, systems §7) | an extra exit with a target, or a T3 door warp | S · Must |
-| **Behaviour chip** | Earned by *how* you play a set piece, never bought (systems §9.2 rows 13-16 fix the effects) | a per-venue run counter in WORK, tested when the reward spawns. "Collect N" counts use meta's stage-counter predicate (R1.10); at most one collect-N secret per venue (R3.1) | S · Must |
+| **Behaviour chip** | Earned by *how* you play a set piece, never bought (systems §9.2 bits 6-9 fix the effects) | a per-venue run counter in WORK, tested when the reward spawns. "Collect N" counts use meta's stage-counter predicate (R1.10); at most one collect-N secret per venue (R3.1) | S · Must |
 | **Plates** | Knight keeps **A**, Tomahawk keeps **B**, in their vanilla second boss rooms (`1A`, `1F`). Wind and Plant have none | a pickup object (systems §10) dropped by the kill, so it is always collected with the exit; meta counts it with the exit | [new-code] S · Must |
 
 **Debrief** (meta §4): the order is meta's weight rule (exit 3, room 2, item 2, plate 1): exit → room → item. The
@@ -211,7 +211,8 @@ shots = **5 fixed slots, leaving 4 for the enemy side**. Every set piece below s
 
 - **Pop-ups** (text v1a): 2 × 28 cells, ≤ 24 glyph ids, ALL CAPS EN, kana JP (R1.4). **Default position: the top**
   (consistency-26, tech `EFFECTS` b6). The screen scripts of **Wind 01** and **Tomahawk 10-11** switch the window to
-  the bottom on entry, because their top bands are raster set pieces; tech provides that per-screen switch.
+  the bottom on entry, because their top bands are raster set pieces. The switch is tech's per-screen **`TXT_POS`**
+  (tech §11.3): T1-lite's director sets it for its ride and clears it at `END`; `EFFECTS` b6 stays the stage default.
 - **Dialogue and menus** (text v1b): 4 × 28 (Knight's NPCs, the Knightlord, Tomahawk's Sheriff and conductor).
 - **Commentators** (story §6.1's bus): v1.0 plays, per venue, **4 death lines** (story picks them from its 6), the
   **first-weakness line** and the **secret lines** (R4.5). The flavour hooks are Should. Never during a reaction-time
@@ -483,7 +484,7 @@ room), and the controller lives in the screen script, so a gust deck costs no sl
 **Behaviour chip: YASHICHI** [new-code] S · Must.
 - Earned by juggling one POW through 8 hits within 240 f (§1.3.3). The first take ever grants the chip; on replays the
   capsule is a token (systems §6.7).
-- Effect (systems §9.2 #13): once per stage, the first time HP falls to 4 or less, the pinwheel spins and refills HP.
+- Effect (systems §9.2 bit 6): once per stage, the first time HP falls to 4 or less, the pinwheel spins and refills HP.
   **YASHICHI and DARUMA are one "second wind" family and cannot be equipped together** (R2.6).
 - Tells: the POW visibly changes on the first hit; the pinwheel is a famous Capcom secret; WND-02 (Should) adds
   Kalinka's "It changes when you shoot it!".
@@ -755,7 +756,7 @@ stairs down to the real lord.
   edge at f240 ("THE METAL METSLIME ESCAPED!"). NOFREEZE. It returns on the next visit to 12 (after a death, or on a
   replay). Mid-boss fight id `$09` (meta), arena 12, for GP Rush when it ships.
 - Killed: "A SPLENDID STRIKE! ROCK GAINED 1000 EXP." (KNT.S16) and the chip capsule drops (a token on replays).
-- Effect (systems §9.2 #14, R2.4): criticals are Won't, so KAISHIN is always the deterministic **EXCELLENT MOVE**: +2
+- Effect (systems §9.2 bit 7, R2.4): criticals are Won't, so KAISHIN is always the deterministic **EXCELLENT MOVE**: +2
   on every 12th damaging boss hit, with the chime. "A SPLENDID STRIKE!" (story's paraphrase of the genre's
   critical-hit line, R8.4) is used only for KAISHIN.
 - Best tools: many small hits (B.ATTACK's flakes, KNIGHT.C's return pass hitting twice, a fast buster).
@@ -949,7 +950,7 @@ train only as SET-TM4's local copy (art_audio §4.6).
 | **17** | v17 | **Tomahawk Man, HIGH NOON** (§3.8) on the HIGH NOON MESA | | The flag judge's stand | [new-art] · Must |
 | **18-1A** | v18-v1B (4 → 3) | **The sky bypass** ("VULTURE PASS"), vanilla: Jet up 0A's hanging ladder; lifts `$A0` over spikes, rising bubbles `$08`; the E-tank, big WE and big HP in 1A; 1A drops into 0D through the skylight | | Skips the gallery (and its civilians) | data S · Must |
 | **1B** | new | **Hidden room "THE OUTHOUSE"** (§3.7) | | | T3 S · Must |
-| **1C** | v1C | **Energy Balancer** room, vanilla (`$8A`; the item is the Energy Balancer chip, systems §9.2 #1) | | | [engine-ok] · Must |
+| **1C** | v1C | **Energy Balancer** room, vanilla (`$8A`; the item is the Energy Balancer chip, systems §9.2 bit 0) | | | [engine-ok] · Must |
 | **1D-1E** | v1D-v1E | **The back way**: corridor and shutters (vanilla), **checkpoint 3b** | | | [engine-ok] · Must |
 | **1F** | v1F | **Secret boss room: THE RODEO RING** (§3.8.5); v1.0 is the HIGH NOON MESA at dusk. Kill: SILVER.T + the plate B pickup + SECRETS b0 | | | Must; the ring's fence and stands Should |
 
@@ -1077,14 +1078,15 @@ band-free lines after it. **Should**: a separate sky band with the sun disc and 
 - Entry: the outhouse at 0C's right end rattles (its door flips between two frames every 30 f) under an "OCCUPIED"
   sign. Shoot its door 3 times (a T3 shot-count switch; out west you shoot what looks odd): the sign flips to "VACANT"
   and the door swings open (the per-id flip); UP to enter (a door warp → 1B).
-- Inside it is far bigger than outside: "THE GOLD MINE VAULT": the **sponsor envelope**, a 1-UP and a W-tank (systems
-  §12). The door back returns to 0C.
+- Inside it is far bigger than outside: "THE GOLD MINE VAULT": the **sponsor envelope**, a 1-UP and a large weapon energy
+  (v1.0; a W-tank when the W-tank ships, Should: systems §12). The door back returns to 0C.
 - **Hint (TO1, tier B)**: "SOMETHING IN TOWN WAS RATTLING. OUT WEST, YOU SHOOT WHAT LOOKS ODD."
 
 **Behaviour chip: SHERIFF STAR** S · Must.
 - Earned by reaching the Sheriff (12) with the civilian counter at 0. He pins it on you: "NOT ONE TOWNSFOLK HURT.
   WEAR THIS, DEPUTY."
-- Effect (systems §9.2 #15): +20 % on every scorecard payout and on venue prize bolts.
+- Effect (systems §9.2 bit 8): +20 % on every scorecard payout (replay improvements included) and on prize bolts, rounded
+  down.
 - Tells: the pianist's sign as the gallery starts; the "HEY!" on every civilian hit.
 - **Hint (TO2, tier B)**: "THE SHERIFF SAW YOU SHOOT AT TOWNSFOLK. READ THE SIGN BY THE PIANO."
 
@@ -1141,11 +1143,12 @@ of Rockman. Fallback (fortress's): his card strip only.
 #### 3.8.5 Secret room 1F: THE RODEO RING (R3.4)
 
 - **v1.0**: 17's layout **at dusk** (a new palette), staged as the rodeo ring with the flag judge on his stand.
-  Tomahawk Man's intro pop-up carries the WANTED gag: "THAT POSTER WITH YOUR FACE? MR. Y PUT IT UP. I'M NOT
-  COLLECTING. I'M HERE FOR A FAIR SHOW." (draft; story owns it).
+  Tomahawk Man's intro pop-up is story's TMH.S15 (the rodeo at dusk, wait for the flag): "A RODEO AT DUSK? NOW
+  THAT'S A SHOW! WAIT FOR THE FLAG."
 - Same AI; pinch at HP 12. Kill: the YOU GET card per story S11 (SILVER.T), the **plate B** pickup, SECRETS b0.
 - **Should (the arena twist)**: T-RODEO: the ring's fence and stands, and on the fence the poster "WANTED: ROCKMAN.
-  999 BOLTS (THE COUNTER'S LIMIT). SPONSOR: MR. Y."
+  999 BOLTS (THE COUNTER'S LIMIT). SPONSOR: MR. Y." With the poster, the intro adds the WANTED gag, story's TMH.S16:
+  "MR. Y PUT UP THAT POSTER. I'M NOT COLLECTING."
 - Round 1's "THE HIDEOUT" (the boss as an outlaw under a WANTED poster) is gone (design-11).
 
 ### 3.9 CASUAL levers (R2.9, Must)
@@ -1173,7 +1176,7 @@ of Rockman. Fallback (fortress's): his card strip only.
 
 - **v1.0 text** (R4.5; story §10.4 counts **25 Must strings** and 1 label, the single source: R8.4): the three posters, the pianist's sign, Eddie's "HEY!" line, Sam's loss
   line, the conductor (the count in two forms, ALL ABOARD, the EXPRESS choice), "JUNCTION! ALL OFF!", "SIDEWINDER GOT
-  AWAY!", the Sheriff (3) and the STAR line, the rodeo-ring line, TMH-07 (the gate: a secret line), TMH-10 (first
+  AWAY!", the Sheriff (3) and the STAR line, the rodeo-ring line (TMH.S15), TMH-07 (the gate: a secret line), TMH-10 (first
   PLANT.B: the first-weakness line), 4 death lines, the hints TO0-TO2.
 - **Death lines**: story's "Boot Hill has room for one more." is **dropped** (R3.4). story picks v1.0's 4 from the
   other five ("Too slow on the draw.", "The 4:50 doesn't stop for anyone.", "That was a bad trade, partner.", "The
@@ -1339,7 +1342,7 @@ The 1982 explorer's perfect score needs every treasure and no lost points; logs 
   "LOGS m" for 60 f (HUD widget).
 - **The ring**: if the log counter is 0 when Rockman reaches the nook in 19, it is the **DIAMOND RING**; otherwise it
   is a "RHINESTONE RING" worth nothing. With 4/4 and the real diamond, the ring also grants the chip.
-- Chip: PLAN's **AUTO RECOVER** ("found in the Plant underground", kept). Effect (systems §9.2 #16): after 60 f with no
+- Chip: PLAN's **AUTO RECOVER** ("found in the Plant underground", kept). Effect (systems §9.2 bit 9): after 60 f with no
   input, +1 HP every 30 f up to max; off while a boss bar is shown.
 - All four treasures can be had without an adaptor in one run (three before the ladder hole, one in 19).
 - Tells: the counter on every treasure pop; the rhinestone itself. Should: PLT-06, reworded without the explorer's
@@ -1548,9 +1551,9 @@ venue's homage mechanic, secret exit, hidden room, behaviour chip or boss rework
 
 | Doc (what it owns) | What this doc takes from it, and asks of it |
 |---|---|
-| `systems.md` (combat, economy, chips) | Takes: the vanilla weakness cycle; weakness 4 / 16 f; SC1, SC8, SC9; the SC4 hook (Should); chips #1 and #13-16 and their effects; YASHICHI ⟂ DARUMA (R2.6); prize bolts ≤ 60 per venue and one envelope per hidden room; plates as pickups; SECRETS weights; the mid-boss default column; the 14-chip v1.0 set (R2.5). **Asks**: (1) Y.SPEAR in SC1's pass-through list, piercing without breaking (consistency-35); (2) the vehicle-state clause in §2.4: a stage-lent vehicle is not a form, is NO TAG, works under 1993, books no form VARIETY (consistency-36); (3) the Metal Metslime's "every hit does 1" as a named mid-boss special case; (4) LANDED adds 7,200 f and EXPRESS 3,300 f to `T`; (5) INPUT LAG (0-6 f) added to VA-DRAW's window (R3.5); (6) the VENUE ACTs and pars of §0.8; (7) the freeze classes of §0.11; (8) if PARTs ever ship, rename the FEATHER PART (design-11); (9) v1.1: the Inn's 20-bolt price as a sink |
+| `systems.md` (combat, economy, chips) | Takes: the vanilla weakness cycle; weakness 4 / 16 f; SC1, SC8, SC9; the SC4 hook (Should); chips bit 0 (Energy Balancer) and bits 6-9 (YASHICHI, KAISHIN, SHERIFF STAR, AUTO RECOVER) and their effects; YASHICHI ⟂ DARUMA (R2.6); prize bolts ≤ 60 per venue and one envelope per hidden room; plates as pickups; SECRETS weights; the mid-boss default column; the 14-chip v1.0 set (R2.5). **Asks**: (1) Y.SPEAR in SC1's pass-through list, piercing without breaking (consistency-35); (2) the vehicle-state clause in §2.4: a stage-lent vehicle is not a form, is NO TAG, works under 1993, books no form VARIETY (consistency-36); (3) the Metal Metslime's "every hit does 1" as a named mid-boss special case; (4) LANDED adds 7,200 f and EXPRESS 3,300 f to `T`; (5) INPUT LAG (0-6 f) added to VA-DRAW's window (R3.5); (6) the VENUE ACTs and pars of §0.8; (7) the freeze classes of §0.11; (8) if PARTs ever ship, rename the FEATHER PART (design-11); (9) v1.1: the Inn's 20-bolt price as a sink |
 | `meta.md` (save bytes, bracket, events, debrief) | SECRETS b0-b4 for meta 2, 3, 6, 7; the PRIZES indexes of §0.8 (Knight 1, Tomahawk 3, Plant 4 bits); `VENUE_REC`: Wind's best SHOOTING DOWN % and Tomahawk's best draw in frames (Must), Knight's fastest Metal Metslime kill (proposed, Should); `STAGE_CLEAR`, read by LAND and EXPRESS; the `CFG_CASUAL` bit; the tier B hints verbatim (WI1, TO1 and PL2 wording here is final for round 2; TO1 no longer names a game); mid-boss fight ids `$08` AYACO, `$09` METAL METSLIME, `$0A` DOMINGO DOME, `$0B` SIX-SHOT SAM, `$0C` SIDEWINDER, `$0D` CONGA with arenas 01, 12, 05, 0D, 10-11, 08 (consistency-44; used when GP Rush ships); the E1/E2 pairing (v1.1); the R3.3 venue names on the debrief and panels. When tier A riddles return (Should), PL0's riddle loses the explorer's name (R3.3) |
-| `tech.md` (ids, memory, raster, CHR) | Stage ids `$01`/`$06`/`$05`/`$02`; the 48-byte record (`SECRET_SCR`, `PAR`, `EFFECTS`, the `NO_TAG` mask); the map-edit service; families `$F4`/`$F5`; HUD widgets; the attach and vehicle states; T1-lite with the director in the slot-22 script; T3 with the per-stage key counter; T8; the raster list (24 bands, `RL_PARALLAX`, `RL_SHIMMER` = 2 entries, `RL_BANDS`; budgets: Wind 01 = 4 entries, the train = 5); text v1a/v1b; **a per-screen pop-up position switch the screen script can set** (Wind 01, Tomahawk 10-11); the Knight ceiling out of IRQ `$11` with a retract flag; the lag cap of 9 in artcheck; the poke-list format with the CASUAL tier; four slots in the tileset table (TS_WIND, TS_KNIGHT, TS_TOMAHAWK, TS_PLANT); streaming the set-piece player sheet during the catapult; the LFSR for VA-DRAW; permission to overwrite layout banks `$32`/`$33` after regression (R1.5); the credits' `CREDITS` bit and `IFCREDITS` (§4.6) for the four bosses' credits mode |
+| `tech.md` (ids, memory, raster, CHR) | Stage ids `$01`/`$06`/`$05`/`$02`; the 48-byte record (`SECRET_SCR`, `PAR`, `EFFECTS`, the `NO_TAG` mask); the map-edit service; families `$F4`/`$F5`; HUD widgets; the attach and vehicle states; T1-lite with the director in the slot-22 script; T3 with the per-stage key counter; T8; the raster list (24 bands, `RL_PARALLAX`, `RL_SHIMMER` = 2 entries, `RL_BANDS`; budgets: Wind 01 = 4 entries, the train = 5); text v1a/v1b; **the per-screen pop-up position `TXT_POS`, set by the screen script** (tech §11.3: T1-lite's director sets it for Wind 01 and Tomahawk 10-11 and clears it at `END`; `EFFECTS` b6 stays the stage default); the Knight ceiling out of IRQ `$11` with a retract flag; the lag cap of 9 in artcheck; the poke-list format with the CASUAL tier; four slots in the tileset table (TS_WIND, TS_KNIGHT, TS_TOMAHAWK, TS_PLANT); streaming the set-piece player sheet during the catapult; the LFSR for VA-DRAW; permission to overwrite layout banks `$32`/`$33` after regression (R1.5); the credits' `CREDITS` bit and `IFCREDITS` (§4.6) for the four bosses' credits mode |
 | `story.md` (every word, the ending) | Every line here is a draft. Changes for story: Tomahawk's death line "Boot Hill has room for one more." is dropped and a new sixth is needed (R3.4); PLT-06 and PLT-08 lose "Harry" and "Game Boy" (R3.3); TO1 no longer names a game; Tomahawk Man's §2.10 voice becomes the rodeo showman strict about duel etiquette (R3.4); "A SPLENDID STRIKE!" (KNT.S16) is reserved for KAISHIN, and Y.SPEAR's log line is "THE SPEAR PIERCED THE SHIELD!"; new lines: LAND / "LANDED", the conductor's count and EXPRESS, the stairs check, the Sage's after-death line, the RODEO RING line. HERO'S QUEST's 1986-RPG lines are story's paraphrases, never quotes (R8.4: KNT.D1, S11, S16, S23, S25, K01-K04, and "a fire spell" / "a healing spell" in the log), and this doc's drafts follow them. v1.0 Must text for these venues is **story §10.4's count**, the single source (R8.4): **90 strings and 4 labels** (Wind 10 + 2, Knight 44, Tomahawk 25 + 1, Plant 11 + 1), 4 death lines each (R4.5) |
 | `art_audio.md` (tile, byte and track budgets) | The v1.0 deltas of §1.1, §2.1, §3.1, §4.1: Wind's seagull becomes Must, the windsock moves to BG, the loop poses move to the set-piece player sheet (feasibility-8), the pinch set grows to 24, W-SEA drops the destroyer, SET-WS5 becomes Should; Knight's inn bed, Princess, Innkeeper and heart become Should, the sconce flame Won't; Tomahawk's T-BOOTHILL becomes **T-MESA** (no graves, Must), T-RODEO Should, the cactus walker Must, the flag judge joins SET-TM3, "HEY!" joins SET-TM2; Plant's 12-tile vine weapon-slot set is dropped, its tar bubbles become BG animation, the eel Should. **Music**: no new track for these venues in v1.0 (G22, G23, G24 and the G28 stingers are Should, G29 and G32 Could); the encounter swaps to a vanilla boss theme; the DRAW bell and the ACE fanfare are vanilla SFX |
 | `venues_b.md` | The same rules: secret arenas = boss room + new palette in v1.0; one CASUAL lever list; the lag cap of 9 counted the same way. No second train, shoot-'em-up or quick-draw. Yamato's sekisho is trimmed (R3.1), so the Sheriff is the game's only "guard checks N items" gate; Yamato's nightingale floor (Should, R8.6) reuses the ceiling engine with its own trigger. The E1-E4 pairing |
@@ -1632,7 +1635,8 @@ princess and Tango as the cat are approved; the battle log uses the pop-up windo
 (all Should); Plant's canopy redraw stays; group 1 keeps `$F` deadly; and the distinct secret arenas are Should, with
 the boss room plus a new palette in v1.0. New ones:
 
-1. **tech**: a per-screen pop-up position switch set by the screen script, or `EFFECTS` b6 extended to a screen mask?
+1. *(Answered in round 3: a per-screen switch, tech's `TXT_POS` set by the screen script (tech §11.3). T1-lite's director
+   sets it for Wind 01 and Tomahawk 10-11 and clears it at `END`; `EFFECTS` b6 stays the stage default.)*
 2. **systems**: confirm the `T` additions for LAND (7,200 f) and EXPRESS (3,300 f), and the Metal Metslime special
    case.
 3. **meta**: does Knight want a `VENUE_REC` (fastest Metal Metslime kill) and Plant one at all?
@@ -1641,8 +1645,8 @@ the boss room plus a new palette in v1.0. New ones:
    the flag judge's stand live in BG in their boss rooms?
 6. *(Answered in round 3: R8.6 fixes the CASUAL quick-draw at 40 f; R2.9's ×2 applies to every other reflex window.)*
 
-Questions 1-5 are routed to their owners in [`reconcile.md`](reconcile.md): TECH-05, SYSTEMS-03 and SYSTEMS-04,
-META-01, STORY-02, ART_AUDIO-03.
+Questions 1-5 are routed to their owners in [`reconcile.md`](reconcile.md): TECH-05 (answered, above), SYSTEMS-03 and
+SYSTEMS-04, META-01, STORY-02, ART_AUDIO-03.
 
 ---
 
@@ -1706,3 +1710,8 @@ Against [`RULINGS.md`](RULINGS.md) §8 (R8.1-R8.8) and the venues_a table of [`r
 | R8.6 | applied | §7 (venues_b row) | Yamato's nightingale floor is Should |
 | R8.7 | applied | "What v1.0 depends on", §0.10, §3.5 | INPUT LAG range 0-6 f cited to R8.7 |
 | R8.8 | applied | Risk 14 | The art-acceptance gate is a local HTML page plus PNGs |
+| verify 1, 4 | applied | v1.0 scope (depends-on table), §0.2, §1.6, §2.7, §3.2, §3.7, §4.4, §7 | Chips are cited by systems §9.2's save bits: the Energy Balancer bit 0, YASHICHI 6, KAISHIN 7, SHERIFF STAR 8, AUTO RECOVER 9. The round-1 numbers (#1, #13-16) named other chips' bits (13 is DARUMA, 14-16 the Could bundle). SHERIFF STAR's effect now reads as systems': every scorecard payout (replay improvements included) and prize bolts, rounded down |
+| verify 2 | applied | §3.8.5, §3.11 | The RODEO RING's v1.0 intro pop-up is story's TMH.S15 (the rodeo at dusk, wait for the flag). The WANTED gag is TMH.S16 and moves to the Should arena twist with the fence and its poster |
+| verify 3 | applied | Tier legend | The Exhibitions (cut-line item 6) are Could (R3.7, as §0.2 says), so the legend lists them under Could, not Should |
+| verify 5 | applied | §3.7 | THE OUTHOUSE holds a large weapon energy in v1.0: the W-tank (systems §12.3, meta's W-TANKS byte, art_audio's icon) is Should, and a Must room depends only on Musts (R0.4). The W-tank takes its place when it ships |
+| verify 6 | applied | §0.6, §7, §10 | Open question 1 is answered (tech's TECH-05): the pop-up position is tech's per-screen `TXT_POS`, set by the screen script (tech §11.3). T1-lite's director sets it for Wind 01 and Tomahawk 10-11 and clears it at `END`; `EFFECTS` b6 stays the stage default |

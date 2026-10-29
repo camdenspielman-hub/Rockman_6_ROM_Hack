@@ -4,14 +4,29 @@ Update this at the end of every session: what was done, what's next, and anythin
 
 ## Current state
 
-- **Phase:** design complete (round 2). **Next task: M0.0, the MMC5 go/no-go spike** (`docs/PLAN.md` §7 and §10;
+- **Phase:** design complete (round 3: reconciled and verified). **Next task: M0.0, the MMC5 go/no-go spike** (`docs/PLAN.md` §7 and §10;
   `docs/design/tech.md` §1.10 and §16.3).
 - **Build:** none yet. Analysis tools live in `tools/analysis/` (see its README); the session ledger in `tools/plan/`.
-- **Scope:** v1.0 = the tight Must, ≈ 450 sessions (`python3 tools/plan/tight.py`). Release ladder (RULINGS R8.1): v0.1 Blizzard slice
-  (M4, ~148), v0.5 Round One (M6, ~342), v1.0 Championship (M9, ~450).
+- **Scope:** v1.0 = the tight Must, ≈ 451 sessions (`python3 tools/plan/tight.py`). Release ladder (RULINGS R8.1): v0.1 Blizzard slice
+  (M4, ~150), v0.5 Round One (M6, ~342), v1.0 Championship (M9, ~451).
 - **Waiting on the user** (none blocks M0): hardware target, pixel artist, JP reviewer, title, pace (`docs/PLAN.md` §9).
 
 ## Session log
+
+### 2026-10-29 (later): Design round 3, reconciliation and verification
+
+- **Director's rulings §8** (`design/RULINGS.md`): the ledger and the release ladder re-baselined by adding up each doc's
+  own per-milestone figures (the slice is ≈ 150 sessions, not ≈ 115); forms out of the slice and the attach state's core
+  into it; the channel drop is LIGHTS OUT's alone; 397 Must strings; one alias gag; `BREAKMAN`/`DARKMAN`; `ROCKMAN5`;
+  SPLENDID STRIKE; the podium in pairs; the nightingale floor Should; the pause keeps utilities.
+- **Reconciliation** (`design/reconcile.md`): the 59 cross-doc requests round 2 left were routed to their owner docs;
+  51 applied, 8 already done, 0 declined.
+- **Verification:** four cross-doc critics (ids/memory/numbers, names/words/story, tiers/dependencies/milestones,
+  mechanics/values) plus the reconcilers' 17 follow-ups: 84 findings (17 major, 0 blockers), 82 fixed after each fixer
+  re-checked the text, 1 not a problem. Examples of what it caught: tech had Power and Jet swapped in the `$9B` form
+  byte; systems' run block overlapped tech's fight-loader WORK range; the flash-safety service was scheduled after the
+  slice that needs it; Flame could never reach Platinum because its secret exit bypasses its hidden room.
+- Every design doc ends with a "Changes in round 3" table.
 
 ### 2026-10-29: Deep research, design round 1, review, rulings, round 2
 

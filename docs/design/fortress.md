@@ -50,7 +50,7 @@ SC6, SC11, M.BEAM, the Super Adaptor), and art, music and text in their own ledg
 
 | Stage | Milestone | v1.0 content (the core) | Sessions |
 |---|---|---|---|
-| **Opening-lite** (§1) | M5 | NEW GAME → the players' tunnel; four warm-up lanes whose judges each announce one scorecard row (jump/DAMAGE, limbo/TIME, high striker/STYLE, stands/SECRETS); the scoreboard page; the parade of eight floats with one line each and the high fives; the sabotage; **Grand Pi-kun, one size** (R3.6); Pi-kun's dressing room. ≤ 15 scene pages (R4.4) | 8 |
+| **Opening-lite** (§1) | M5 | NEW GAME → the players' tunnel; four warm-up lanes whose judges each announce one scorecard row (jump/DAMAGE, limbo/TIME, high striker/STYLE, stands/SECRETS); the scoreboard page; the parade of eight floats with S05.0's one parade line and the high fives (the float lines are Should, story S05); the sabotage; **Grand Pi-kun, one size** (R3.6); Pi-kun's dressing room. 12.5 scene pages by story's count, against R4.4's cap of 15 | 8 |
 | **HALFTIME RIOT** (§2) | M6 | The stadium at night overrun by the **rejects** (R4.3): VENDING MAN and CHEER MAN with the audition rule; the one lights-on-a-timer set piece (R3.1) with fuse boxes and the master breaker; the Bass sighting and crumbling floor; NPC Break Man's help (he holds the crowd), block and reveal, with S20's Rule 9 lines played in place at 0E (R4.2); **Bass β duel 1** copying his 4 pre-drawn weapons (R3.6), the β OVERDRIVE finish and the HP < 6 help capsule; the locker room (a full-charge door, R4.2) | 10 |
 | **H1 ROCKMAN** (§4.1) | M7 | Wily 2 remix; the useless SCORE and its 24 score balls; the Magnet Beam case and the 96-px gap; timed appearing blocks; Elec Man's beams; Fire Man's pillars; Big Eye MK-VI; **Yellow Devil MK-VI** on F-PIECES; the archive branch and the box-art storeroom | 9 |
 | **H3 ROCKMAN 3** (§4.3) | M7 | Mr. X 3 remix; the Rush Coil exhibit; the Break Man statue; Needle Man's presses; Gemini Man's laser hall (R3.1); **KAMEGORO MAKER MK-VI**, a re-skinned vanilla mid-boss (R3.6); the no-risk fist-ride practice beat (R2.11); **Gamma MK-VI, head and fists only**, POWER required in phase 2 with its tell (R2.11); the Super Adaptor dock and demo room; the Doc Robot workshop behind an M.BEAM stair (R3.1) | 10 |
@@ -74,7 +74,7 @@ the ending land at M8, after the fight loader (M7) and with `RL_FLOOR8`. Per mil
 
 | v1.0 item | Rests on (all Must) |
 |---|---|
-| Opening-lite | tech: stage record and ids `$10+` (M5), TS_STADIUM slot (§5.3), `RL_FLOOR`, text v1a, the commentator bus; systems: scorecard rows, attack bytes `$11-$14`, GP_BOSSHIT row 8; meta: the first bracket hand-off, the debrief, SECRETS m0; story: S03, S04, S06, S08 within 15 pages; art: TS_STADIUM, the parade set (8 vanilla idle frames), Pi-kun at one size |
+| Opening-lite | tech: stage record and ids `$10+` (M5), TS_STADIUM slot (§5.3), `RL_FLOOR`, text v1a, the commentator bus; systems: scorecard rows, attack bytes `$11-$14`, GP_BOSSHIT row 8; meta: the first bracket hand-off, the debrief, SECRETS m0; story: the Must rows of S03-S08 (12.5 scene pages, cap 15); art: TS_STADIUM, the parade set (8 vanilla idle frames), Pi-kun at one size |
 | HALFTIME RIOT | tech: text v1b, the palette-flash and lighting service (§8.5), `COLL_GROUP` (the crumbling `$1D` group), the NPC Break Man (family `$F7`), the boss panel extension; systems: SC6, LATCHSRC's FULL flag, the help capsule as a pickup; meta: RATEFLAGS b2 RIVAL and b4 SOLO RIOT (rating T1, R8.5); story: S17-S20 for the rejects; art: two rejects, Bass β composited from Rock's sheet with 4 pre-drawn shots, the NPC Break Man composite; music: G04 and the whistle jingle (both Must, R5.2) |
 | H1, H3, H5 | tech: `bgboss.py`, F-PIECES on the map-edit service, `alt_flip`, the HUD widget module, the `$9B` audit before SUPER, the boss panel re-type (the arrow, the fists and the practice fist use the vanilla lift contact); systems: M.BEAM (64 px, max 2), SC5, the Super Adaptor, FORMS.SUPER on the dock, the mid-boss and machine defaults; meta: EVENTS b4/b6, EVENTS2 b4, the Hall of Fame map, RATEFLAGS b1 (the card); story: S25-S33; art: the MUSEUM CHR third and the wing contents |
 | W2 | tech: the fight loader, FIGHT_CTX, the return-to snapshot (M7.2), `RL_PALBAND`; meta: fight records `$00-$07` with a SUPER palette and a pinch byte; venues: each boss reads the per-fight pinch byte (both venue docs accept it); systems: SC6 pre-adapted from BASS_ADAPT |
@@ -98,10 +98,12 @@ list is not applied now), these come first, in this order: merge H5's unmasking 
 Gamma's cockpit; about −2 here and −1 text), make W2 a single-arena Bass final (no pair bouts; −3), and reduce the
 Opening to 3 tutorial screens (lanes 01-03, then Pi-kun; −2).
 
-**Text** (R4.5, R8.4). **story's string counts are the single source** (story §10.4: about **400 Must strings** for the
+**Text** (R4.5, R8.4). **story's string counts are the single source** (story §10.4: **397 Must strings** for the
 whole game, R8.4), and they include every line these stages use (S03-S08, S17-S20, S25-S48 and §6.4's OPN-, RIO-,
-H1-, H3-, H5-, W2- and W3- tables). Round 2's own estimate here (about 230) is withdrawn. Story's §10.4 trim list is the
-reserve, not a plan (R8.4).
+H1-, H3-, H5-, W2- and W3- tables). By area (story §10.4, Must strings + labels): **fortress 201 + 23**: Opening-lite
+33 + 3, HALFTIME RIOT 30 + 0, the Hall's scenes S25-S33 with Mr. Y's heckles 43 + 2, H1 10 + 3, H3 10 + 5, H5 8 + 1,
+W2 and W3 with Wily's heckles 28 + 1, the ending S40-S48 39 + 8. Round 2's own estimate here (about 230) is withdrawn.
+Story's §10.4 trim list is the reserve, not a plan (R8.4).
 
 ---
 
@@ -215,9 +217,9 @@ the debrief and the scorecard treat these stages like venues:
   first at the Riot's 0E reveal, S20, then at S40), and Light says the name once, in S42. Every round-1 "OBVIOUSLY Blues"
   line is deleted. His name is first spoken in-stage at the Riot's 0E reveal, as his answer to Rock's "Blues?"; in the
   Opening he is the masked entrant 10 and **S06 speaks no name** (R8.5).
-- **The Wily gag plays once per act, with varied wording** (R4.4, R3.9): once in the Opening, once at the trophy theft
-  (S25), once at the unmasking (S33, "WE KNOW"). **The Mr. Y / Mr. Z alias gag is used once in the whole ending, at the
-  arrest** (S41, R8.5).
+- **The Wily gag plays once per act, with varied wording** (R4.4, R3.9), on story §1.3's ladder: S08 (the Opening),
+  S14 (the Riot intro), S17 (the Riot), S25 (the theft), S33 (the unmasking, "WE KNOW"), S41 (the arrest) and S44 (the
+  press's "WE KNEW."). **The Mr. Y / Mr. Z alias gag is used once in the whole ending, at the arrest** (S41, R8.5).
 - **Entrant numbering is story's** (R4.3, consistency-29): champions 1-8, Rockman 9, Break Man 10, Bass "entrant β".
 
 ### 0.6 Vanilla fortress tech, reused with one twist each (CX lesson 5)
@@ -252,7 +254,7 @@ NPCs), **CUSTOM** (its own handler). In v1.0 the only freeze is the Ice Block (s
 
 | Piece | What | Used in | Owner, tier |
 |---|---|---|---|
-| **F-PLAQUE** (`$F7`) | A museum plaque: UP with B not held (R2.10) opens a full-screen page (9 × 28, text v1b) | H1, H3, H5, the W2 hub | this doc, [new-code] S, Must |
+| **F-PLAQUE** (`$F7`) | A museum plaque: UP with B not held (R2.10) opens a full-screen page (9 × 28, text v1b) | H1, H3, H5; the W2 hub's (Should) | this doc, [new-code] S, Must |
 | **F-CASE** (`$F6`) | A glass case holding a pickup; touching it shatters the glass. The M.BEAM case plays the weapon-get screen (chain `$17`) | H1 03 | this doc, [new-code] S, Must; NOFREEZE |
 | **F-PIECES** | The BG body that comes apart: a piece that flies off is a `map_set` to empty plus a sprite; a piece that lands is a `map_set` to a piece block | Yellow Devil (H1); Picopico-kun (H2, Should) | **tech §5.6**, Must (M7) |
 | **Clock, counters, letter row** | Round 1's F-CLOCK, H1's SCORE and ball count, the Riot's audition count, H5's letters | §1, §2, §4.1, §4.5, §5.4 | **tech's HUD widget module** (§7.13), Must; this doc gives the widget records |
@@ -270,8 +272,12 @@ directors, shots, utilities (M.BEAM beams), effect objects, the text runner (slo
 it waits when the screen is at the cap). **The cap is 9** until M3 measures the OAM-builder gain. A screen at the cap
 holds the player, the script, 3 shots and **4 more**. Round 1 counted "3 shots + enemies" and wrote caps of 8-10; every
 cap below is recounted by this rule, and the tables show it as **[n]**. Boss rooms follow `venues_b.md`'s rule: the
-boss (1) + boss-side objects ≤ 3. Directors and set-piece controllers fold into the screen script where they can. Two
-recurring fixes:
+boss (1) + boss-side objects ≤ 3. **The CENTURION helper** (systems §9.2 bit 12: a player utility in slots 4-7, out
+only while a boss bar is up) is one more occupied slot, so while it hovers every boss and mid-boss here keeps one
+boss-side object fewer (systems' and `venues_b.md` §0.2's rule): each throttle that waits at 3 live objects waits at 2
+(Bass's shots and the help capsule, Gamma's fists with its shot or rock, the Devil's pieces in flight, Dark Man's shots,
+the Capsule's decoys and rings, Kamegoro's turtles and eggs, the dispenser's Metalls), so each [9] stays 9. Directors
+and set-piece controllers fold into the screen script where they can. Two recurring fixes:
 
 - **One object, custom hit test**: a BG boss's body, valve, chin or cockpit is one controller with a position-tested hit
   box (as venues_a's Plant Man ring), not several reflecting part objects. Pi-kun, Gamma, Dark Man's barrier and
@@ -349,23 +355,25 @@ buster only: no form, no weapon, no RETIRE, no Break Man call.
 
 ### 1.1 Text budget and staging (R4.4, design-4)
 
-- **One intro.** Story's S02 is the attract crawl (Should with meta's crawl); round 1's 55-second in-game intro is
-  withdrawn, and its X→Y repainted Mr. X picture moves to S02's panel 5.
-- **At most 15 scene pages**, the rules folded into the lane judges, the roll call reduced to the float lines, the Wily
-  gag played once:
+- **One intro.** Story's S02 is the attract crawl (Could, with meta's crawl, R0.3 item 12); round 1's 55-second in-game
+  intro is withdrawn, and its X→Y repainted Mr. X picture moves to S02's panel 5.
+- **At most 15 scene pages**, the rules folded into the lane judges, the roll call reduced to the float lines (Should;
+  v1.0 plays one parade line, S05.0), the Wily gag played once:
 
-| Beat | Screen | Story scene | Pages | Engine at M5 |
+| Beat | Screen | Story rows (Must) | Pop-up pages | Engine at M5 |
 |---|---|---|---|---|
-| READY in the tunnel | 00 | S03 | 2 | pop-up sequence under a script lock |
-| Roll on the radio; Eddie's shut stall | 00 | S04 | 2 POPs | pop-up (Roll's face icon; no Roll sprite) |
-| Each lane judge announces his row | 01-04 | OPN-02…05 | 4 POPs | pop-up |
-| The scoreboard: the four cards, VARIETY, medals and bolts (S07 folded) | 05 | S07 | 1 | pop-up sequence under a lock |
-| The float lines (one per champion) | 07-08 | S05 → float lines | 8 POPs | pop-up |
-| Entrants 10 and β | 08 | S06 | 3 | pop-up sequence under a lock |
-| The sabotage and the one Wily gag | 09 | S08 (first half) | 3 | pop-up sequence under a lock |
-| Pi-kun's defeat and the bracket reveal | 0B | S08 (second half) | 2 | pop-up, then the bracket's window |
+| READY in the tunnel | 00 | S03.1-S03.2 | 2 | pop-up sequence under a script lock |
+| Roll on the radio; Eddie's shut stall | 00 | S04.1 (S04.3 Should; S04.2 is the sign) | 1 | pop-up (Roll's face icon; no Roll sprite) |
+| Each lane judge announces his row | 01-04 | S07.1-S07.5 (OPN-02…05; S07.4 or S07.5 plays at 04) | 5 | pop-up |
+| The scoreboard: the four cards, VARIETY, medals and bolts (S07 folded) | 05 | S07.6-S07.9 | 4 | pop-up sequence under a lock |
+| The parade begins | 07 | S05.0 (the 8 float lines S05.1-S05.8 are Should) | 1 | pop-up |
+| Entrants 10 and β | 08 | S06.1-S06.4 | 4 | pop-up sequence under a lock |
+| The sabotage and the one Wily gag | 09 | S08.1-S08.4 | 4 | pop-up sequence under a lock |
+| Break Man's charge tip (after a death) | 0A | S08.5 | 1 | pop-up |
+| Pi-kun's defeat and the bracket reveal | 0B | S08.6-S08.7 | 3 | pop-up, then the bracket's window |
 
-  Scene pages: 2 + 1 + 3 + 3 + 2 = **11** (the 14 POP lines are one line each). The Opening lands at M5, before text
+  Story's count is the single source (R8.4): the Must rows of S03-S08 are **25 pop-up pages = 12.5 scene pages** of
+  4 × 28 (story §4, S08's note; a WIN row counts two), against R4.4's cap of 15. The Opening lands at M5, before text
   v1b, so every scene runs as a **pop-up sequence** (2 × 28 pages, auto-advancing, A to hurry) while the screen script
   holds Rock in his stand pose; when v1b lands (M6), story may move S03, S06 and S08 into the 4 × 28 window.
 - **Break Man's charge tip** (story S08) plays **only after a first death to Pi-kun** (design-2): his whistle, then one
@@ -391,9 +399,9 @@ buster only: no form, no weapon, no RETIRE, no Break Man call.
 | **02** | **LANE 2: SLIDE** (limbo): four 24-px bars under a LIMBO timer (a HUD DIGITS widget). The **TIME judge**: 10 if all four are cleared before the timer (OPN-03). **Hidden-room tell**: after the last bar, a 16-px gap at the foot of the right wall, under `STAFF ONLY - PI-KUN`: slide in (exit to 1C) | none [3] | | [engine-ok] + widget data, Must |
 | **03** | **LANE 3: CHARGE**: the **HIGH STRIKER** (`TEST YOUR BUSTER!`, `HOLD B`). The pad reads the shot's attack byte: `$11` sends the puck a quarter up, `$12` half, **`$13` (the full charge) rings the bell** (DING, confetti), and the bell opens the gate to 04. The **STYLE judge**: 10 if the first full charge rings it (OPN-04). The only required tool in the stage; a full charge always opens the gate | none [1 + 1 + 3 + puck + judge + confetti = 8] | puck object (`$F5`, NOFREEZE) | [new-code] S, Must |
 | **04** | **LANE 4: STANDS**: up the bleachers by four ladders; the up exit (vanilla type 2) into the upper stand. Beach balls bounce down the steps (contact 1, a "boing"). The **SECRETS judge** at the top: a **10 if the dressing room (1C) was found this run**, else a `?` card and OPN-05 ("the judges know every hidden room"). It teaches SECRETS live | ≤ 3 beach balls (NOFREEZE) [9] | crowd tiles cheer | [new-code] S, Must |
-| **05** | **THE UPPER STAND**: the press box (Cossack and Kalinka in the window, BG) and the **scoreboard**: the four cards summed (`WARM-UP 34/40`), then one page for the fifth judge (VARIETY), the medals and the bolts. **The entrant board** (BG text, story's numbering, R4.3): `1 BLIZZARD … 8 YAMATO / 9 ROCKMAN (DR. LIGHT) / 10 ?????? (MASKED) / β BASS (SPONSOR: MR. Y)`. **Checkpoint 1** | none [2] | `map_set` writes the sums | [new-art] S, Must |
+| **05** | **THE UPPER STAND**: the press box (Cossack and Kalinka in the window, BG) and the **scoreboard**: the four cards summed (`WARM-UP 34/40`), then one page for the fifth judge (VARIETY), the medals and the bolts. **The entrant board** (BG text, story's numbering, R4.3): `1 BLIZZARD … 8 YAMATO / 9 ROCKMAN (DR. LIGHT) / 10 ?????? (MASKED) / β BASS β (SPONSOR: MR. Y)` (story BOARD.1). **Checkpoint 1** | none [2] | `map_set` writes the sums | [new-art] S, Must |
 | **06** | Down the players' ramp onto the track: the parade is coming | none [2] | | Must |
-| **07** | **THE PARADE** (§1.4): floats 1-4 roll toward Rock; each champion's line; the high fives. CASUAL checkpoint | float + sparkle [7] | | [new-code] M, Must |
+| **07** | **THE PARADE** (§1.4): floats 1-4 roll toward Rock; S05.0 as the first float arrives (the float lines are Should); the high fives. CASUAL checkpoint | float + sparkle [7] | | [new-code] M, Must |
 | **08** | The parade's second half, over the **fountain moat** (a pit): floats 5-8 roll right and are the only bridge; ride one across. At the far bank the parade ends with **S06**: the last float carries **entrant 10**, the NPC Break Man composite in a dimmed masked palette, whistle first, **no name spoken** (R4.2); then entrant β's late entry: Bass β drops in, shakes the screen and dashes off | float + sparkle [7]; under S06's lock: 2 NPCs [4] | | Must |
 | **09** | **CENTRE STAGE**: Grand Pi-kun dances on the pitch; Mr. Y waves from his skybox. **The sabotage** (S08's first half, ≈ 6 s, controls locked): Mr. Y presses `UPGRADE!`; Pi-kun's eyes turn red; the scoreboard reads `PI-KUN 16-BIT EDITION`; **the Opening's one Wily gag** (story's words, R4.4). The shutter to 0A. **Shutter checkpoint** | Pi-kun's valve sprite [3] | the chairman's speech is cut (R4.4) | [new-code] S, Must |
 | **0A** | **Boss: GRAND PI-KUN** (§1.6). The pitch; the track is the floor strip | | | Must |
@@ -413,7 +421,8 @@ Checkpoints: 05 and the shutter (09); CASUAL adds 07. Screens: 00-0B, 1C (13), p
 - **07**: floats 1-4 roll left at 1.25 px/f toward Rock (about 3.4 s across). **08**: floats 5-8 roll right at
   1.0 px/f over the moat; Rock rides one across.
 - **Platforms**: the deck uses the vanilla lift contact (`$38:$8F96`).
-- **Lines**: as Rock reaches each float, its champion speaks once (POP; story's float lines, R4.4).
+- **Lines**: v1.0 plays S05.0 once as the parade begins (also CROWD FAVOURITE's tell). The per-float lines (S05.1-S05.8:
+  as Rock reaches each float, its champion speaks once, POP; R4.4's roll call) are Should (story S05).
 - **CROWD FAVOURITE (b2)**: each champion holds a white glove up for 90 f as his float passes Rock (a sparkle). Jump into
   it: **HIGH FIVE!** (a clap; the crowd roars). The count is `meta.md`'s stage counter, shown by an ICONROW widget (8
   glove icons, 2 rows of 4). Eight in one run → the scoreboard types `CROWD FAVOURITE` (no flash, §0.9; OPN-08).
@@ -430,7 +439,7 @@ Checkpoints: 05 and the shutter (09); CASUAL adds 07. Screens: 00-0B, 1C (13), p
 **1C, the dressing room**: a mirror with bulbs, three spare Pi-kun heads on stands (one winks), a rack of costumes with a
 **Mr. Y costume** on a hanger (OPN-07), **the first sponsor envelope** (+30) and a 1-UP. Exit: the door back to 02. It
 sets the pattern every later hidden room follows: one screen, a tell visible from the route, a joke, an envelope.
-(Systems' income model left the Opening-lite without an envelope; this one adds 30, §9.2.)
+(Systems §7's income model counts this envelope, +30, and the stage's two prizes.)
 
 ### 1.6 Boss: GRAND PI-KUN, "16-BIT EDITION" (fight `$26`, GP_BOSSHIT row 8) · one size
 
@@ -508,7 +517,7 @@ Deaths (4, story §6.4; drafts): *"It's only a warm-up!"* / *"He got bounced."* 
 ### 1.10 Homage moments (the screenshot list)
 
 1. Ringing the high striker's bell with a full charge.
-2. The entrant board: `10 ?????? (MASKED)` and `β BASS`.
+2. The entrant board: `10 ?????? (MASKED)` and `β BASS β` (story BOARD.1).
 3. High-fiving Knight Man on his float over the fountain moat.
 4. Mr. Y's `UPGRADE!` button, and the scoreboard reading `PI-KUN 16-BIT EDITION`.
 5. A balloon chick zipping around the stadium with its valve open.
@@ -570,7 +579,7 @@ walking, so the slot count does not rise. This is b2's mechanic (§2.5). [new-co
 | **07** | NIGHT | Ladders up into the stands | Cheer 1 on a ledge [6] | | Must |
 | **08** | BLACKOUT | The stands: the floodlights are on 120 f, off 60 f, with a 20-f **dim and buzz** before they go (the tell; §0.9). **Fuse box B** lights this screen for good | Vending 2 [8] | | [new-code] S, Must |
 | **09** | NIGHT | Upper stands: **the cheer rally**. The 1.5× buff makes this the stage's hardest screen; the Cheer stands highest | Cheer 1, Vending 2 [9] | | Must |
-| **0A** | NIGHT | Up the scoreboard scaffold (ladders); the jumbotron shows Bass's face and types taunts (story). **The master breaker** (b0) on a ledge reached by a 40-px jump from a ladder top | none [2] | | Must |
+| **0A** | NIGHT | Up the scoreboard scaffold (ladders); the jumbotron shows Bass's face (no text in v1.0; typed taunts are Should, in story's words when they ship). **The master breaker** (b0) on a ledge reached by a 40-px jump from a ladder top | none [2] | | Must |
 | **0B** | NIGHT | The jumbotron top. **Checkpoint 2** | Vending 1 [7] | | Must |
 | **0C** | NIGHT | The roof gantry: a 16-px catwalk over the stands. Shutter. *v1.1: a gust zone (VA-GUST, Should with `venues_a.md`)* | Cheer 1 [6] | | Must (the gust Should) |
 | **0D** | NIGHT, or LIT after b0 | **Boss: BASS β** (§2.4). The roof: a flat floor and two 48-px gantry ledges at 64 px | | | Must |
@@ -668,7 +677,8 @@ dented one marked **β** (`KEEP OUT`). The sponsor envelope (+30) and an E-tank.
 | **The reveal and Rule 9** | 0E | Bass is gone; Break Man stands at the roof's edge. Kalinka asks who that is; **Rock's first "Blues?"** (S20, R8.5), and he answers **"Break Man."**: the first time the name is spoken (R4.2). Nobody else says Blues. Then **S20's Rule 9 pages 1-2 play in place** (R4.2): the Committee rules that a sponsor's interference invokes Rule 9, and the other four matches resume. He leaves over the roof's edge | S20 pages 1-2 (Must); pages 3-6 (he joins, the CALL row, the banner) are **Should** with the partner and play at this spot. They set FORMS.TAG and EVENTS b5 (`meta.md`) |
 
 In v1.0 nothing sets FORMS.TAG; meta's EVENTS b3 (the stamps peel off) still plays on the next bracket visit. Round
-1's *"That's OBVIOUSLY Blues"* and its `BREAK MAN JOINS!` banner are deleted (R4.2, design-2).
+1's *"That's OBVIOUSLY Blues"* is deleted (R4.2, design-2); the `BREAK MAN JOINS!` banner (story S20.10) is Should,
+with the partner.
 
 ### 2.7 Hooks (story's words; R4.5 tiers)
 
@@ -885,8 +895,8 @@ row lower and bombs 1.5× faster.
 **The story beat** (story S25, EVENTS b4). At the 8th win, START on the lit trophy plays the theft: during the trophy
 ceremony a **UFO-catcher crane** (the Cossack Catcher's claw, a first look at H4) lowers from a saucer with a Y painted
 over its W, grabs the **GP CUP** and carries it off to an island museum, the **HALL OF FAME**. The claw (3 frames) is
-**Must art** for this scene (art_audio §5.3, R8.6); H4's Cossack Catcher (Should) reuses it. The trophy theft is the
-second act of the Wily gag (R4.4).
+**Must art** for this scene (art_audio §5.3, R8.6); H4's Cossack Catcher (Should) reuses it. The trophy theft is
+Act III's Wily gag (story §1.3, R4.4).
 
 **The floor plan** (`meta.md`'s fortress map, story S26): a rotunda and five wing doors marked 1987, 1988, 1990, 1991,
 1992, plus a sixth door, `1993 - UNDER CONSTRUCTION`, greyed out (§4.5.3). The wings are played **in order** (a museum
@@ -897,7 +907,7 @@ tour; consistency decision 40 keeps it linear), which also fixes when M.BEAM and
 
 | Element | Rule |
 |---|---|
-| Plaques | F-PLAQUE full-screen pages (text v1b), 3-5 per wing, reading optional (story S27: Must for H1/H3/H5). Factual and short; folklore is worded as folklore; facts go through story's Appendix A. **Plaques describe and never name third-party games** (R3.3), and **say BLUES** for Rockman 3-5's mysterious robot (R3.9, design-23) |
+| Plaques | F-PLAQUE full-screen pages (text v1b), 3-5 per wing, reading optional (story S27: the plaques it lists as Must for H1/H3/H5; PLQ.H1.13, PLQ.H3.0B and PLQ.H5.12 are Should). Factual and short; folklore is worded as folklore; facts go through story's Appendix A. **Plaques describe and never name third-party games** (R3.3), and **say BLUES** for Rockman 3-5's mysterious robot (R3.9, design-23) |
 | Remixed hazards | 2-3 signature hazards of that game, built on the base layout's own tech where possible |
 | A display case | one exhibit you take: M.BEAM in H1, the Super Adaptor in H3; H5's "case" is the 1993 wing |
 | The MK-VI boss | a legacy boss on a vanilla BG-boss technique with one twist (§0.6) |
@@ -930,7 +940,7 @@ Data on tech's widgets + [new-code] S (the drop), Must.
 | **00** | v00 | Entrance hall: marble, velvet ropes; the wing plaque (the first game: a blue robot, six bosses and a score that counted nothing). READY | none [2] | vanilla's Power-block E-tank pocket kept | [engine-ok], Must |
 | **01-02** | v01-v02 | Right through the "1987 gallery" | walkers `$12`, capped walkers `$1E`, each dropping a score ball [≤ 9] | score balls in awkward spots (b0) | [engine-ok], Must |
 | **03** | v03 | **The Magnet Beam case** (F-CASE): `MAGNET BEAM (1987). HANDLE WITH CARE.` Touch: the glass shatters, **YOU GET MAGNET BEAM** (the weapon-get screen, chain `$17`; systems §3.10; `meta.md` WEAPONS `$031` b0, autosaved on pickup). **Checkpoint 1**. A plaque: in 1987, players who missed this beam could not finish the game; the museum put it on the main path | none [2] | | [new-code] S, Must |
-| **04** | v04 | Up through the **appearing-block hall**: vanilla's 11 block positions over the spike floor, retimed to a 1987 rhythm, are now **BG cells switched by tech's `alt_flip`** in 4 phase groups (4 metatile ids, ≤ 8 cells each; a "pyoo" per switch). Vanilla's 11 `$8F` objects would not fit the cap; the cells cost no slot. The vanilla F.BLAST plug at the upper right leads to the branch 10-12 (one blast opens both plugs: the vanilla quirk, kept) | none [2] | | data on tech's map-edit service, Must |
+| **04** | v04 | Up through the **appearing-block hall**: vanilla's 11 block positions over the spike floor, retimed to a 1987 rhythm, are now **BG cells switched by tech's `alt_flip`** in 4 phase groups stepped by the screen script (tech §5.6; 4 metatile ids, ≤ 8 cells each; a "pyoo" per switch). Vanilla's 11 `$8F` objects would not fit the cap; the cells cost no slot. The vanilla F.BLAST plug at the upper right leads to the branch 10-12 (one blast opens both plugs: the vanilla quirk, kept) | none [2] | | data on tech's map-edit service, Must |
 | **05-06** | v05-v06 | The rider gallery over vanilla's pits. *v1.1: Guts Man's tipping lifts* (§4.1.4) | riders `$C6` throwing balls, 1 per screen [7] | | [engine-ok], Must |
 | **07** | v07 | **Elec Man's beams**: three horizontal beams across a 48-px ladder shaft, each 60 f on, 90 f off, offset; the emitters spark 20 f before firing (the tell); 3 damage per touch. **One controller object** (family `$F5`, NOFREEZE) draws all three (a beam is 6 sprites on its line + Rock's 2) and runs their hit test | 1 rider [8] | | [new-code] S, Must |
 | **08-09** | v08-v09 | Right, then down at 09; the E-tank at 09 (vanilla). *Tag pocket (Should): an emblem shutter at 08 → a closet with a large weapon energy* | 1 rider [7] | | [engine-ok], Must |
@@ -1011,8 +1021,8 @@ PUNCH★ 4/24. SC7, the "SELECT trick", is Could (systems).
 | b1 | **THE BOX ART STOREROOM** (13) | on branch screen 11, one crate in a stack is charred: an F.BLAST tap breaks it (`$D`) and a ladder leads down | the charred crate | envelope + 1-UP | `IN THE ARCHIVE BRANCH, BURN THE CHARRED CRATE WITH F.BLAST.` |
 | b2 | **NEVER WHOLE** | from the second crossing on, the Yellow Devil never re-forms complete | the holes, and the first knock-down's hook (H1-06) | E-tank + 30 | `KNOCK DOWN AT LEAST ONE FLYING PIECE EVERY CROSSING WITH A FULL CHARGE OR A FULL PUNCH.` |
 
-**13, the storeroom**: a crate stencilled `ROCKMAN (1987): OVERSEAS PACKAGING. DO NOT DISPLAY.` and a plaque, `SOME
-EXHIBITS ARE KEPT IN STORAGE FOR EVERYONE'S SAFETY.` The envelope and a 1-UP. *Should: a figure of the stocky "box-art
+**13, the storeroom**: a crate stencilled `ROCKMAN (1987): OVERSEAS PACKAGING. DO NOT DISPLAY.` and a plaque (PLQ.H1.13,
+Should, story S27), `SOME EXHIBITS ARE KEPT IN STORAGE FOR EVERYONE'S SAFETY.` The envelope and a 1-UP. *Should: a figure of the stocky "box-art
 robot" in yellow and blue, holding a pistol, beside the crate (new art).*
 
 **Hooks** (story's words): H1-01 the M.BEAM case (Must: it is a weapon-get line); H1-02 the first score ball (Should);
@@ -1168,7 +1178,8 @@ and floors at 45°**, trailing a 3-segment tail (one object draws head and tail;
 expires after 4 bounces). Each emitter glows 30 f before it fires (the tell); mirror crystals on the walls mark the
 bounce points to learn. **09**: one emitter and a climb. **0A**: two emitters taking turns (one beam alive at a time) and
 crystal ledges. **0B**: a floor plate aims the next beam: stand on it and the beam's path breaks the crystal wall that
-blocks the exit (`map_set`). A plaque (story): Gemini Man's laser bounced. Slots: the laser + 1 bomber = [7]. [new-code] S.
+blocks the exit (`map_set`). A plaque (PLQ.H3.0B, Should, story S27): Gemini Man's laser bounced. Slots: the laser + 1
+bomber = [7]. [new-code] S.
 
 #### 4.3.3 Mid-boss: KAMEGORO MAKER MK-VI (fight `$15`, mid-boss default row) · v1.0
 
@@ -1176,7 +1187,7 @@ blocks the exit (`map_set`). A plaque (story): Gemini Man's laser bounced. Slots
 re-skinned vanilla mid-boss**; this is the **vanilla dome dispenser routine** (`$39:$861B`, which vanilla Wily 4 already
 reuses at its screen 03 through `$39:$8FBC`'s parameters), with its own parameters and art: the dome becomes the turtle
 machine's shell press (HP 20 by the mid-boss default), its walkers become **turtles** (a recolour of vanilla's hard-hat
-walkers with a shell), its rocks become eggs. **The twist** (the 1990 rule, a visible special case): **every turtle
+walkers with a shell), its rocks become eggs. **The twist** (the 1990 rule, systems' visible case **SC13**): **every turtle
 destroyed also costs the machine 2 HP**, so the turtles are the way to win, and the machine itself takes the mid-boss
 default row. [engine-ok routine + data] + [new-code] S (the rule) + [new-art] S (a re-skin), Must. Its `FRZ_KIND` is
 the one the build derives for the vanilla routine (tech §7.7); the turtles are vanilla walkers.
@@ -1199,7 +1210,7 @@ did: **AIR MAN** (round 1's "copy of your worst venue's champion" is withdrawn: 
 room, scope-13). He is reached **only through tech's fight loader**: touching the shutter at 0E calls `fight_load` with
 FIGHT_CTX return kind 5 ("the H3 room") into fight `$29` (meta's spare range), a small arena with Air Man's tornado rows
 and fans, Doc Robot drawn in a grey X-ray palette with a Doc Robot skull overlay; the win returns to 0E. HP 20 on Air
-Man's row (systems adds it with him: PLANT.B 4/12 W, the Leaf Shield homage). Panel: NAME `DOC ROBOT`, SPECIALTY `COPY
+Man's row (systems §4.8 row 22, added with him: PLANT.B 4/12 W, the Leaf Shield homage). Panel: NAME `DOC ROBOT`, SPECIALTY `COPY
 OF AIR MAN` (story §5.1's fields). H3's b2 may then become COPYCAT (finish him with PLANT.B). 2.5 sessions.
 
 #### 4.3.4 The practice beat (10; R2.11, design-3)
@@ -1389,14 +1400,14 @@ room; room 19 loads vanilla's own Mr. X 1 set `$9D`. [new-art] M, Must.
 | GP | From | The player does | Enemies [n] | Hazards and set pieces | Tags |
 |---|---|---|---|---|---|
 | **00** | v00 | Entrance; the wing plaque: Beat, the Super Arrow, and **Blues' castle** (it wasn't his) (R3.9) | spiked ceiling unit `$A1` (vanilla) | big WE (vanilla) | Must |
-| **01-02** | v01-v02 | **STAR MAN'S SPACE**: a starfield room with **low gravity** (floor type 8's gravity `$00.18` with **the bubbles suppressed**: a stage flag, [new-code] S, feasibility-19); long floaty jumps between cannon ledges over spikes | wheel cannons `$C0/$C9` [vanilla] | | [new-code] S, Must |
+| **01-02** | v01-v02 | **STAR MAN'S SPACE**: a starfield room with **low gravity** (floor type 8's gravity `$00.18` with **the bubbles suppressed**: tech's variant column 12 `NOBUBBLE`, tech §4.3, [new-code] S, feasibility-19); long floaty jumps between cannon ledges over spikes | wheel cannons `$C0/$C9` [vanilla] | | [new-code] S, Must |
 | **03-07** | v03-v07 | **GRAVITY MAN'S HALL** (§4.5.1): v1.0 is its **low-gravity form**; letter plates (b0) | X crates `$CB`, cage cylinders `$33` | | [new-code] S, Must (the flips Could) |
 | **08** | v08 | **CRYSTAL MAN'S CRYSTALS**: two ceiling emitters drop crystal orbs in turn (one orb alive at a time, one every 60 f); an orb shatters on the floor into **2** shards (2 damage) | eye cannon `$54` (its shot waits while an orb or shard is alive) [9: the orb or its 2 shards, the cannon, one shot] | | [new-code] S, Must |
 | **09** | v09 | **Checkpoint 1** (vanilla's). The open branch 16-18 starts at the right | walkers `$12` | | Must |
 | **0A-0E** | v0A-v0E | Up and right through the crate halls | ceiling spiders `$3C` | the 1-UP at 0E (vanilla); *tag pocket at 0C (Should)* | [engine-ok], Must |
 | **0F-10** | v0F-v10 | Down; the E-tank at 10 (vanilla) | | | Must |
 | **11** | v11 | **Checkpoint 2** | | | Must |
-| **12-13** | v12-v13 | **THE SUPER ARROW (1992)**: a launcher fires a ridable arrow every 120 f across a 160-px pit (it flies level at 2 px/f, then dips); ride it over. The arrow is a moving platform on the vanilla lift contact (family `$F5`, NOFREEZE); at most 2 alive. A plaque: a weapon you could stand on, and still can | cage cylinders [8] | | [new-code] S, Must |
+| **12-13** | v12-v13 | **THE SUPER ARROW (1992)**: a launcher fires a ridable arrow every 120 f across a 160-px pit (it flies level at 2 px/f, then dips); ride it over. The arrow is a moving platform on the vanilla lift contact (family `$F5`, NOFREEZE); at most 2 alive. A plaque (PLQ.H5.12, Should, story S27): a weapon you could stand on, and still can | cage cylinders [8] | | [new-code] S, Must |
 | **14** | v14 | Shutter corridor. On the left wall, **a sixth door**: `ROCKMAN 6 (1993): WING UNDER CONSTRUCTION. KNOCK.` (b1) | | | Must |
 | **15** | v15 | **Boss: DARK MAN MK-VI** (§4.5.2), in a throne room with a Blues-style emblem; then **the unmasking** (§4.6) | | | Must |
 | **16-18** | v16-v18 | **Branch**: vanilla's open, risky shortcut, kept: floating platforms over the pit, rejoining at 0F and skipping 0A-0E (and the 1-UP). Two letters (b0). *v1.1 (Should): the platforms ride Wave Man's water geysers that rise and fall 32 px on a 120-f cycle* | cowboy gunners `$6C` [vanilla] | | [engine-ok], Must (the geysers Should) |
@@ -1444,7 +1455,7 @@ Phase 1, **DISGUISE** (28 → 14):
 At HP 14: **THE MASK SLIPS** (90 f, invulnerable): the costume pops off and flies away, the orange scarf flutters down,
 the panel re-types, the music changes.
 
-**The WRONG NOTE exposure** (b2; Must; a visible special case beside systems' SC list, systems §4.6). Hit him with a
+**The WRONG NOTE exposure** (b2; Must; systems' visible case **SC14**, systems §4.6). Hit him with a
 **full charge** (LATCHSRC's FULL flag) **while the red note is up**: the real whistle answers from off-screen, in tune
 (the Must jingle), and the disguise falls at once: his HP drops to 14 if it is higher, and the panel re-types a **third
 record**, `DARKMAN` / `BAD DISGUISES` with VENUE `EXPOSED BY A WHISTLE` (story §5.4; tech's re-type supports a third
@@ -1468,7 +1479,7 @@ Phase 2, **DARK MAN** (14 → 0):
 
 | Bit | Secret | How | Tell | Prize | Tier B hint (draft for story, Must) |
 |---|---|---|---|---|---|
-| b0 | **ROCKMAN5** | collect the eight letter plates R-O-C-K-M-A-N-5 (Rockman 5's own letters in the Japanese release, which built Beat; the same plates in both languages, R8.5, story A-5.3): six on screens both routes share (03, 05, 08, 0F, 12, 14) and two on the branch (16-18); an ICONROW widget (2 rows of 4) under the life bar fills in | the letters glow; the first is on the main path at 03 | 30 | `FIND THE EIGHT LETTERS R-O-C-K-M-A-N-5 IN THE 1992 WING. THE SHORTCUT HAS TWO.` |
+| b0 | **ROCKMAN5** | collect the eight letter plates R-O-C-K-M-A-N-5 (Rockman 5's own letters in the Japanese release, which built Beat; the same plates in both languages, R8.5, story A-5.3): six on screens both routes share (03, 05, 08, 0F, 12, 14) and two on the branch (16-18); an ICONROW widget (2 rows of 4) under the life bar fills in | the letters glow; the first is on the main path at 03 | 30 | story's H50.B: `FIND THE EIGHT LETTER PLATES IN THE 1992 WING. THE SHORTCUT HAS TWO.` (it spells no letters) |
 | b1 | **THE 1993 WING** (19) | at 14, knock on the under-construction door: any shot or punch is a knock, and a number (1-6) pops over the door; **six knocks within 6 s** open it (story's line) | the `KNOCK` sign; the first knock gets an answer | envelope | `KNOCK SIX TIMES, FAST, ON THE UNDER-CONSTRUCTION DOOR BEFORE DARK MAN.` |
 | b2 | **WRONG NOTE** | expose the disguise with a full charge on the wrong note (§4.5.2) | the red note and the off-key whistle | 30 | `WHEN THE FAKE BREAK MAN WHISTLES, HIT HIM WITH A FULL CHARGE ON THE WRONG NOTE.` |
 | b3 | **MR. X'S BUSINESS CARD** | on the floor of the 1993 wing | it is the only object on the diorama floor | RATEFLAGS b1 (rating T14) | none: T14's hint is Break Man's (`meta.md` §6.2) |
@@ -1484,14 +1495,15 @@ is the museum's joke about the game you are playing. *Won't (v1): a back door to
 slips (Must, S30); H5-07 the real whistle answers (Must, S30); H5-08 the first F.BLAST hit (the first-weakness line,
 Must); H5-09 b0's secret line (Must); H5-10 and H5-11, the b1 and b2 lines (Should: generic lines in v1.0, R8.6; the
 b1 and b2 tells H5-04 and H5-05 stay Must). Round 1's "That's not Blues!" / "Obviously not Blues." are deleted (R4.2).
-**Respawns**: story §6.5; wing-tagged drafts (Should): *"My Dark Man is a master of disguise."* / *"Blues' castle! It
-was mine all along! Like everything!"*
+**Respawns**: story §6.5; wing-tagged variants (Should): story's HY.H5a and HY.H5b, *"My Dark Man is a master of
+disguise. Like me!"* / *"That castle in 1992? Mine all along! Like everything!"* (worded so Mr. Y never says "Blues",
+R4.2).
 
 **CASUAL levers**:
 
 | Lever | Where | NORMAL | CASUAL | How |
 |---|---|---|---|---|
-| reflex | b2, the red note | 20 f | 40 f | `TIERVAL` |
+| reflex | b2, the red note | 20 f | 40 f | `REFLEX` (`TIERVAL` + INPUT_LAG) |
 | mash | none | — | — | — |
 | timer | b1, the knock window; the arrows' interval | 6 s; 120 f | 9 s; 120 f (the arrow is a ride, not a timer) | `TIERVAL` |
 | checkpoint | 00-09, 0A-11 | 09, 11 | + 05, + 0D | dormant checkpoints |
@@ -1517,7 +1529,7 @@ Must. About 25 s; START skips it after the first viewing (R3.8).
 3. He pulls off the Y mask. Underneath is **the Mr. X face** (the vanilla 1993 sprite): the wrong layer.
 4. He pulls off the X mask: **Dr. Wily**.
 5. Everyone answers at once, one window per face icon (Cossack, Kalinka, Rock; Light and Roll on the radio):
-   **"WE KNOW."** The third and last act of the Wily gag (R4.4).
+   **"WE KNOW."** Act IV's Wily gag (story §1.3, R4.4).
 6. Project SUPER (story's speech, S33). The pod's claw takes the GP Cup, and he flies off along the vanilla path with it.
    The cup turns up again in W3's Trophy Dispenser (§5.3.1).
 7. A black screen, typed like vanilla's `$6E` (story's pun on vanilla's こんどは しんけんしょうぶ だ!!).
@@ -1618,7 +1630,7 @@ copied in for the finishers), SUPER palettes for the moat and hub, the Champions
 |---|---|---|---|---|---|
 | **00-05** | v00-v05 | **The moat**: vanilla's underwater castle (floor type 8 throughout) in **SUPER colour**: richer palettes and one bottom `RL_PALBAND` (§0.11) | piranhas `$C1`, clam capsules `$CA` (vanilla) | spike pits; items as vanilla | [engine-ok] + palette data, Must |
 | **06-07** | v06-v07 | Up past wheel cannons to the teleporter pad (07: collision D → `$1F`, vanilla). Checkpoint 1 at 06 | `$C0/$C9` | | [engine-ok], Must |
-| **08** | v08 | **The bracket hub** (§5.2.1). Checkpoint (vanilla's: the hub is checkpoint 08). A plaque (story) | none | the board | [new-code] M, Must |
+| **08** | v08 | **The bracket hub** (§5.2.1). Checkpoint (vanilla's: the hub is checkpoint 08). A plaque (Should, story's words when it ships) | none | the board | [new-code] M, Must |
 | (arenas) | the venues' boss rooms | **Pair bouts** (§5.2.2) through the fight loader | | | Must |
 | **11** | new | **The Championship Ring**: Bass β, duel 2 (§5.2.3) | | | Must |
 | **12** | new | Walk-out; stage clear | | | Must |
@@ -1660,7 +1672,8 @@ them.
 - **SUPER copies** (the real champions watch from the stands, story S36): each copy runs that champion's v1.0 GP AI and
   systems' Table 1/2 row (own-weapon cells included); the arena in a **SUPER palette** (the fight record's palette byte);
   the panel name in story's style, `BLIZZARD.EXE` (consistency-22); and **pinch at HP 14 instead of 9**, from **the fight
-  record's per-fight pinch byte**, which both venue docs' bosses read.
+  record's per-fight pinch byte** (meta §9.2.1's +10 PINCH, which `fight_load` copies to RULESET's `RS_PINCH`), which
+  both venue docs' bosses read.
 - A death in a bout returns Rock to the hub with that bout reset (both copies at full HP); finished pairs stay finished.
   HP carries from bout 1 to bout 2, so the card's +10 matters.
 - Slots: each arena keeps its venue doc's boss-room cap (the boss + ≤ 3 boss-side objects).
@@ -1698,8 +1711,8 @@ At 0 HP he drops to one knee and teleports (story S37); his vow is saved for the
 | b2 | **UNDEFEATED** | the four bouts and Bass with no death | a `W` streak counter on the board | E-tank + 30 | `CLEAR ALL FOUR BOUTS AND THE FINAL WITHOUT DYING.` |
 
 **13, the losers' bracket**: a lounge with benches where the rejects you ACCEPTED in the Riot sit (all of them with
-TALENT SCOUT; the reject sprites load with the room), a Vending Man who dispenses the E-tank once, a plaque (story's: the
-losers' bracket gives everyone a second chance, except Mr. Y), and the envelope.
+TALENT SCOUT; the reject sprites load with the room), a Vending Man who dispenses the E-tank once, a plaque (Should; story's words
+when it ships: the losers' bracket gives everyone a second chance, except Mr. Y), and the envelope.
 
 **Hooks** (story's words): W2-01 entering the hub (S36, Must); W2-02 each copy's bar fill: the real champion shouts from
 the stands (S36; Should flavour, the first story trim); W2-03 the TAG! card (Must); W2-04 a finished pair (Should);
@@ -1871,7 +1884,8 @@ Man holding the exit door** at 0C are deleted (R4.1: S40 is the catch, and the d
 | b2 | **PURIST** | beat the Capsule without Break Man's gift | the gift's trigger (HP < 6), which the gift scene states | 30 | `BEAT THE WILY CAPSULE WITHOUT FALLING BELOW 6 HP, SO BREAK MAN NEVER STEPS IN.` |
 
 **0D, Wily's trophy room**: a cabinet of participation ribbons from every contest Wily ever lost (`1987: 2ND PLACE (OF
-2)`, `1988: 2ND PLACE (OF 2)`, … `1993: DISQUALIFIED`), a plaque (story's: Dr. Wily's personal bests), the envelope, an
+2)`, `1988: 2ND PLACE (OF 2)`, … `1993: DISQUALIFIED`), a plaque (Should; story's words when it ships: Dr. Wily's
+personal bests), the envelope, an
 E-tank and a 1-UP.
 
 **Hooks** (story's words): W3-01 the arrival (Should); W3-02 the first mortar shadow (Must: its tell); W3-03 the floor
@@ -1887,7 +1901,7 @@ yours?"*
 
 | Lever | Where | NORMAL | CASUAL | How |
 |---|---|---|---|---|
-| reflex | the 16-BIT BLAST's glow; the mortar's shadow | 40 f; 60 f | 80 f; 90 f | `TIERVAL` |
+| reflex | the 16-BIT BLAST's glow; the mortar's shadow | 40 f; 60 f | 80 f; 120 f | `REFLEX` (`TIERVAL` + INPUT_LAG) |
 | mash | none | — | — | — |
 | timer | the escape clock (and its mercy) | 60 s (90 s) | 90 s (120 s) | `TIERVAL` |
 | checkpoint | 00-05 | 04 | + 02 | dormant checkpoint |
@@ -1915,7 +1929,7 @@ minutes plus the credits; START skips each scene after its first viewing (R3.8).
 | 2 | **The castle pixelates** | outside, at the bay: the castle collapses into a skull-shaped cloud (4MI's, credited) that **pixelates**: a cloud in SUPER palettes, then chunky 8-bit blocks, then four greens, then one green pixel, then nothing | 3 small BG pictures + palette steps 8 f apart (no strobe, §0.9) |
 | 3 | **Break Man catches Rock and Wily (S40)** | the whistle over the white; on the grass by the bay, the NPC Break Man sets Rock and Wily down. Rock's second and last *"Blues?"*; *"Break Man."*; he walks away as the whistle fades (story's words). In v1.0 the catch itself happens inside the white-out, and the scene uses the NPC's stand and walk frames; story's carry art is Should | NPC Break Man, Rock, vanilla Wily |
 | 4 | **The arrest (S41)** | two Committee guards (recoloured vanilla robots) lead Wily away; **the ending's one and only use of the Mr. Y / Mr. Z alias gag** (R4.1, R8.5; story's words) | vanilla's Wily-behind-bars art kept |
-| 5 | **The podium and Bass's vow** | the GP Stadium by day (TS_STADIUM): Rock on the top step holding the **GP CUP** he recovered in W3; **the champions applaud in pairs**, one pair at a time beside the podium, about 2 s each (SET-PARADE, two enemy palettes per pair, 0 new tiles; R8.6, art_audio's staging): Rock + a pair + Bass + the script + the text runner = **[6]**. *Should: all eight at once as a BG applause row (SET-PARADE converted to BG).* Bass β beams in at the pitch's edge for his vow (story's words; the "it won't be 8-bit" line may move here from S37), then leaves in a multicoloured beam (a palette cycle on his beam sprite, ≤ 3 changes per second). **If the escape mercy fired**, Cossack confesses the injury time (one POP; 4MI's "who lowered the output?" in tournament clothes). No Break Man on the roof | sprites over the stadium BG |
+| 5 | **The podium and Bass's vow** | the GP Stadium by day (TS_STADIUM): Rock on the top step holding the **GP CUP** he recovered in W3; **the champions applaud in pairs**, one pair at a time beside the podium, about 2 s each (SET-PARADE, two enemy palettes per pair, 0 new tiles; R8.6, art_audio's staging): Rock + a pair + Bass + the script + the text runner = **[6]**. *Should: all eight at once as a BG applause row (SET-PARADE converted to BG).* Bass β beams in at the pitch's edge for his vow (story S41.5), then leaves in a multicoloured beam (a palette cycle on his beam sprite, ≤ 3 changes per second). **If the escape mercy fired**, Cossack confesses the injury time (story S41.8 in the 4 × 28 window; 4MI's "who lowered the output?" in tournament clothes). No Break Man on the roof | sprites over the stadium BG |
 | 6 | **The CAPCOM TIMES (S44)** | vanilla's newspaper driver (`$3B:$A886`) and masthead; the headline art redrawn (story's `ROCKMAN WINS GP!!`); story's pages, with its fallback page **S44.4F** in place of a second alias gag (R8.5), then vanilla's `$95/$96` verbatim. **`$94` (the jailbreak line) is not reprinted** (R4.1): S02 quotes it | vanilla `$92-$96` slots; [new-art] S |
 | 7 | **The credits** (§6.2) | the vanilla staff-roll engine with GP text and the DWNB cards | vanilla |
 | 8 | **The rating (S46) and Break Man's debrief (S47)** | `meta.md` §6's screen, drawn over meta's judges' desk (R8.6; round 2's "stadium at dusk" is withdrawn) | meta |
@@ -1937,8 +1951,10 @@ Vanilla's own credits sequence (`rm6/fortress.md` §10), kept and fed GP data:
    Knight 17, Plant 17, Tomahawk 17, Wind 13, Yamato 16), for about 1,000 frames with no Rockman, then **his DWNB-41..48
    card strip, verbatim** (the boss walks in and the card types `DWNB-41 BLIZZARD-MAN / DESIGNER …`).
    This needs each reworked boss to run a **credits mode**: no player, so no quick-draw, no battle-log text, no grabs;
-   it loops its patterns at an empty spot (a request to the venue docs and tech, §9). **Fallback**: a champion whose AI
-   misbehaves skips his room segment and plays only his card strip. The M8 test runs all eight.
+   it loops its patterns at an empty spot. Tech §4.6 gives the credits' room table and `GP_MODE` b0 `CREDITS`, tested
+   with `IFCREDITS`; the venue docs give every champion's mode (venues_a §1.7.2, §2.8.2, §3.8.3, §4.7.2; venues_b
+   §1.10, §2.8, §3.10, §4.8), costed here (M8). **Fallback**: a champion whose AI misbehaves skips his room segment and
+   plays only his card strip. The M8 test runs all eight.
 2. The scrolling staff roll on the starfield, through the language hook: the GP staff by role (story's), the original
    staff (vanilla's roll `$81-$86`, unchanged, under a `ROCKMAN 6 (1993)` header), special thanks (Rockman CX, Rockman 4
    Minus Infinity, and every fan who mailed Capcom a robot; story's words), and vanilla's `PRESENTED BY CAPCOM` (`$87`)
@@ -1989,16 +2005,16 @@ PUNCH★ 4/24, weapons 2/24; robots: the champion scale; mid-bosses: the mid-bos
 | `$21` | Bass β, duel 1 | Riot | Must | 28 | 9 | - | - | - | SC6; copies his 4 pre-drawn weapons; NO DATA; the overdrive and the help capsule | BOSS | [9] |
 | `$13` | Big Eye MK-VI | H1 | Must | 20 | 16 | - | - | - | | BOSS | [7] |
 | `$1C` | Yellow Devil MK-VI | H1 | Must | 28 | 10 | C.FLASH 4/12 | Y.SPEAR 3/16 | PLANT.B 1/32 | the eye only; full blows knock pieces down; SC7 Could | NOFREEZE | [9] |
-| `$15` | Kamegoro Maker MK-VI | H3 | Must | 20 | 16 | - | - | - | each turtle destroyed costs it 2 | derived | [9] |
+| `$15` | Kamegoro Maker MK-VI | H3 | Must | 20 | 16 | - | - | - | **SC13**: each turtle destroyed costs it 2 | derived | [9] |
 | `$1E` | Gamma MK-VI, phase 1 | H3 | Must | 28 | 11 | W.STORM 4/12 | B.ATTACK 3/16 | C.FLASH 1/32 | the chin cannon only | NOFREEZE | [9] |
 | `$1E` | Gamma MK-VI, phase 2 | H3 | Must | 28 | 12 | - | - | - | **SC5**: fists only (tap 2/30, PUNCH★ 4/12, the Super fist 3/20) | NOFREEZE | [9] |
-| `$20` | Dark Man MK-VI | H5 | Must | 28 | 13 | F.BLAST 4/16 | PLANT.B 3/20 | SILVER.T 1/45 | WRONG NOTE: a full charge on the red note sets HP to min(HP, 14) | BOSS | [9] |
+| `$20` | Dark Man MK-VI | H5 | Must | 28 | 13 | F.BLAST 4/16 | PLANT.B 3/20 | SILVER.T 1/45 | **SC14** WRONG NOTE: a full charge on the red note sets HP to min(HP, 14) | BOSS | [9] |
 | `$00-$07` | the 8 SUPER copies | W2 | Must | 28 | 0-7 | Tables 1/2 | | | pinch at HP 14 (the per-fight byte) | BOSS | venue caps |
 | `$23` | Bass β, duel 2 | W2 | Must | 28 | 9 | - | - | - | SC6 pre-adapted; counter-copy | BOSS | [9] |
 | `$17` | Trophy Dispenser | W3 | Must | 14 | 16 | - | - | - | the vanilla routine | derived | [9] |
 | `$24` | WILY MACHINE 6.5 | W3 | Must | 2 × 28 | 14 | SILVER.T 4/12 | KNIGHT.C 3/16 | Y.SPEAR 1/32 | the cockpit only; drags Rock in phase 2 | NOFREEZE | [8] |
 | `$25` | Wily Capsule SUPER | W3 | Must | 28 | 15 | KNIGHT.C 4/12 | SILVER.T 3/16 | C.FLASH 1/32 | decoys die to one hit; CHAMP.B 4/8 (SC11) | BOSS | [9] |
-| `$29` | Doc Robot MK-VI (AIR MAN copy) | H3 | Should | 20 | new (Air Man's) | PLANT.B 4/12 | | | through the fight loader (FIGHT_CTX kind 5) | BOSS | |
+| `$29` | Doc Robot MK-VI (AIR MAN copy) | H3 | Should | 20 | 22 (Air Man's) | PLANT.B 4/12 | | | through the fight loader (FIGHT_CTX kind 5) | BOSS | |
 | `$14` | Picopico-kun MK-VI | H2 | Should | 10 blocks | 16 | - | - | - | the bar counts blocks | STD | [9] |
 | `$1D` | Mecha Dragon MK-VI | H2 | Should | 28 | 18 | KNIGHT.C 4/12 | SILVER.T 3/16 | F.BLAST 1/32 | the head only | NOFREEZE | [9] |
 | `$1F` | Cossack Catcher MK-VI | H4 | Should | 28 | 19 | Y.SPEAR 4/12 | W.STORM 3/16 | KNIGHT.C 1/32 | the dome only; C.HOPPER 8 HP | NOFREEZE | [9] |
@@ -2010,9 +2026,10 @@ PUNCH★ 4/24, weapons 2/24; robots: the champion scale; mid-bosses: the mid-bos
 | `$28` | Mr. X (the real one) | Mr. X Returns | Won't | | | | | | | | |
 
 **Overrides of systems §4.5**: none of its cells. Additions, each a visible special case in the same list as systems'
-SCs: Pi-kun's reflect outside the valve, Gamma's chin and cockpit boxes, Kamegoro Maker's turtle rule, Dark Man's WRONG
-NOTE, the per-fight pinch byte of the SUPER copies, WILY MACHINE 6.5's drag. Systems tags the H2 and H4 rows "Could, with
-H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
+SCs: Pi-kun's reflect outside the valve, Gamma's chin and cockpit boxes, Kamegoro Maker's turtle rule (systems' **SC13**),
+Dark Man's WRONG NOTE (**SC14**), the per-fight pinch byte of the SUPER copies, WILY MACHINE 6.5's drag. Systems, tech
+and this doc tier the H2 and H4 rows Should; systems' row 22 (Air Man, PLANT.B 4/12 W) arrives with Doc Robot MK-VI.
+Every [9] above stays 9 while the CENTURION helper hovers, by §0.8's throttle rule.
 
 ---
 
@@ -2035,10 +2052,11 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
   `FLAGS1` FORT for the H and W stages and **HUB for W2**; `COLL_GROUP` with the crumbling `$1D` for the Riot and W3 and
   group 0's F.BLAST plug for H1; `FORT_COL` rows 8-15 (systems §4.8); `PAR` (systems' placeholders); `HUD_ID`, `COMM_ID`,
   `CK_TABLE`, `FIGHT_ROW`; `NO_TAG` masks for v1.1 (§0.3); `ERA` and `OWNED` only with W1 and the Exhibitions.
-- **New small requests**: (1) a stage flag that suppresses the water bubbles of floor type 8 (H5's low gravity; a spare
-  `EFFECTS` or `VARIANT` column), [new-code] S; (2) the relocated 8-entry **credits room table** (`$51` + screen per
-  champion, §6.2) and a **CREDITS bit** that the reworked boss AIs test for their no-player mode; (3) the 4-phase
-  `alt_flip` groups for H1's appearing blocks (≤ 8 cells per id per screen, the build check).
+- **Small requests, answered by tech** (TECH-09): (1) **variant column 12 `NOBUBBLE`** (tech §4.3) suppresses the water
+  bubbles of floor type 8 for H5 01-02's low gravity, [new-code] S; (2) **the credits' room table** (8 entries, stage id
+  and screen per champion, §6.2) and **`GP_MODE` b0 `CREDITS`**, which the reworked boss AIs test with **`IFCREDITS`**
+  for their no-player mode (tech §4.6); (3) **`alt_flip` phase groups stepped by the screen script** for H1 04's
+  appearing blocks (tech §5.6; ≤ 8 cells per id per screen, the build check).
 - **FIGHT_CTX kind 5** ("the H3 room") is used only by Doc Robot MK-VI (Should).
 
 ### 9.2 `systems.md` (combat, economy, chips)
@@ -2049,12 +2067,13 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
   flag for the auditions, force beams flagged SPIKE (H2), the RULE column (the Exhibitions, Could).
 - **Answers**: Bass β's four pre-drawn weapons are **B.ATTACK, F.BLAST, KNIGHT.C and SILVER.T** (its open question 3);
   in duel 1 he copies the owned ones and fizzles (`NO DATA`) when none are owned.
-- **Requests**: list beside the SCs, as visible special cases: Kamegoro Maker's "a destroyed turtle costs it 2", Dark
-  Man's WRONG NOTE (a full charge on the red note sets HP to min(HP, 14)), Pi-kun's reflect outside the valve, WILY
-  MACHINE 6.5's grounded drag; the **Opening-lite keeps its hidden room and envelope** (+30 in §7's income model); the
-  fortress prizes are 30 on b0 and 30 on b2 per stage, paid when the SECRETS bit is first set; **Air Man's row** (PLANT.B
-  4/12 W) arrives with Doc Robot MK-VI (Should); tag H2 and H4 rows **Should** (systems says "Could, with H2/H4"; tech
-  and this doc say Should).
+- **Requests, applied by systems** (SYSTEMS-07): Kamegoro Maker's "a destroyed turtle costs it 2" is **SC13** and Dark
+  Man's WRONG NOTE (a full charge on the red note sets HP to min(HP, 14)) is **SC14**; Pi-kun's reflect outside the
+  valve and WILY MACHINE 6.5's grounded drag sit in the same visible list; the **Opening-lite keeps its hidden room and
+  envelope** (+30, counted in §7's income model); the fortress prizes are 30 on b0 and 30 on b2 per stage, paid when the
+  SECRETS bit is first set; **Air Man's row** (§4.8 row 22, PLANT.B 4/12 W) arrives with Doc Robot MK-VI (Should); the
+  H2 and H4 rows are **Should** (systems §4.5 agrees).
+- **The CENTURION helper** (§9.2 bit 12): every fortress boss keeps one boss-side object fewer while it hovers (§0.8).
 - **The rating's partner-free test** (systems §9.5) is meta's T1 **SOLO RIOT**, RATEFLAGS b4: the Riot won without the
   help capsule (§2.4, R8.5).
 
@@ -2071,8 +2090,8 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
   (Could), `$1B` Maze Man (Won't); `$1C` Yellow Devil, `$1D` Mecha Dragon (Should), `$1E` Gamma, `$1F` Cossack Catcher
   (Should), `$20` Dark Man, `$21`/`$23` Bass β, `$22` METALL 16 (Could), `$24` WILY MACHINE 6.5, `$25` the Capsule,
   `$26` Pi-kun, `$27` `???` (legacy `$0F`), `$28` Mr. X (Won't). The venues keep `$08-$12` (consistency-44).
-- **W2's fight records** `$00-$07` need a SUPER palette and **a per-fight pinch byte** (the 10-byte record has no field
-  for it: add one, or use flags b5-7).
+- **W2's fight records** `$00-$07` need a SUPER palette and **a per-fight pinch byte**: meta §9.2.1's record byte **+10
+  PINCH** (14 for the SUPER copies, 0 elsewhere), read through RULESET's `RS_PINCH` (META-03; the flags' b6-7 stay free).
 - **Events**: EVENTS b4 the theft (S25); b6 the unmasking in H5's throne room; EVENTS2 b4 SUPER on the dock (S29 on the
   next map visit); b5 the join only with the partner (Should); b3 the Riot cleared.
 - **Names**: meta index 9 and §3.5 become **HALFTIME RIOT** (R4.3). In v1.0 the Hall of Fame map shows H2 and H4 as
@@ -2081,10 +2100,11 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
 
 ### 9.4 `story.md` (every word, the ending)
 
-- **The Opening** (R4.4): S03, S04 (Roll by radio; Eddie's sign `PIT STOP OPENS AFTER THE CEREMONY`), S06, S08 within
-  15 pages, as pop-up sequences at M5 (§1.1); S05 → the eight float lines; S07 folded into four judge lines and one
-  scoreboard page; **S06 with no name spoken** (R4.2, R8.5), so its "BREAK MAN!" goes and Rock's first "Blues?" moves
-  to the Riot's 0E (S20); S08's Break Man tip only after a death to Pi-kun; the Opening's one Wily gag.
+- **The Opening** (R4.4): S03, S04 (Roll by radio; Eddie's sign `PIT STOP OPENS AFTER THE CEREMONY`; S04.3 Should),
+  S05-S08 at 12.5 scene pages by story's count (cap 15), as pop-up sequences at M5 (§1.1); S05: one Must parade line
+  (S05.0), the float lines Should; S07 folded into the lane judges' lines and the scoreboard's pages; **S06 with no
+  name spoken** (R4.2, R8.5), so its "BREAK MAN!" goes and Rock's first "Blues?" moves to the Riot's 0E (S20); S08's
+  Break Man tip only after a death to Pi-kun; the Opening's one Wily gag.
 - **The Riot**: S17 and S18 for the rejects (R4.3); S18 is merged into 06's help beat; S20 pages 1-2 play in place at 0E
   (Must), pages 3-6 with the partner (Should); Bass's "Who are YOU supposed to be?" / "Entrant number ten." at the block;
   at 0E **Rock's first "Blues?"** and the first in-stage "Break Man." (S20, R8.5).
@@ -2111,16 +2131,22 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
 - **H5's letter plates** spell `ROCKMAN5` in both languages (R8.5, story A-5.3).
 - **Fact checks for Appendix A**: Rockman 3's turtle-dispensing machine and its "destroy the turtles" rule; Doc Robot's
   copies; Gemini Man's bouncing laser; the coin-shortage folklore; Rockman 8 (1996).
-- **Text volume**: story's §10.4 counts are the single source (about 400 Must strings for the whole game, R8.4); this
-  doc keeps no estimate of its own (round 2's ≈ 230 is withdrawn), and story's trim list is the reserve (§v1.0 scope).
+- **Text volume**: story's §10.4 counts are the single source (397 Must strings for the whole game, R8.4); this doc
+  keeps no estimate of its own (round 2's ≈ 230 is withdrawn) and cites §10.4's by area: **fortress 201 strings + 23
+  labels** (Opening 33 + 3, Riot 30, the Hall's scenes 43 + 2, H1 10 + 3, H3 10 + 5, H5 8 + 1, W2/W3 28 + 1, the
+  ending 39 + 8); story's trim list is the reserve (§v1.0 scope). The CAPCOM TIMES' page 4 is S44.4F (no Mr. Z).
+- **No story strings yet** for the Riot jumbotron's taunts, the W2 hub's plaque, the losers' bracket's plaque or Wily's
+  trophy-room plaque: all four are Should here, in story's words when they ship.
 
 ### 9.5 `venues_a.md` / `venues_b.md` (staging, mechanics)
 
 - W2 loads each venue boss room through the fight loader with a per-fight pinch byte; both docs accept it (their arenas
   set up their own effects and undo their own map edits).
-- **New request**: a **credits mode** for each reworked boss (no player: no quick-draw, no battle log, no grabs; loop the
-  patterns at an empty spot), read from tech's CREDITS bit, for the v1.0 credits (§6.2). Without it that champion's
-  credits show is cards only.
+- **Answered**: a **credits mode** for each reworked boss (no player: no quick-draw, no battle log, no grabs; the
+  patterns loop at an empty spot), tested with `IFCREDITS` on tech's `GP_MODE` b0 `CREDITS`, for the v1.0 credits
+  (§6.2): venues_a §1.7.2, §2.8.2, §3.8.3, §4.7.2 (Wind 13, Knight 17, Tomahawk 17, Plant 17) and venues_b §1.10,
+  §2.8, §3.10, §4.8 (Blizzard 16, Flame 16, Centaur 17, Yamato 16), with the card strip as fallback. The cost stays in
+  this doc's ending figure (M8).
 - SET-PARADE (the Opening, the podium) uses each champion's vanilla idle frame (venues_b agrees); the lap's backdrop
   strips are Could.
 - VA-GUST stays Should (venues_a): no Must use here (H3's magnet pull, the Riot's gust and H4's conveyors wait for it).
@@ -2203,12 +2229,13 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
 
 ## Open questions
 
-1. **meta**: the per-fight pinch byte's home in the fight record (routed as META-03).
-2. **venues**: can every reworked champion run a no-player credits mode in M8, or does the v1.0 credits show only cards
-   (routed as VENUES_A-03 and VENUES_B-04)?
-3. **systems**: accept the Opening-lite's envelope (+30), and re-tag the H2/H4 rows Should (routed as SYSTEMS-07)?
-4. **User** (RULINGS §7): a pixel artist would replace the composites (the NPC Break Man, Bass β, Gamma, Dark Man) first;
+1. **User** (RULINGS §7): a pixel artist would replace the composites (the NPC Break Man, Bass β, Gamma, Dark Man) first;
    the hardware target decides how hard the 8-band floor is pushed.
+
+The questions routed in round 3 are answered: the pinch byte is meta §9.2.1's +10 PINCH, read through `RS_PINCH` (META-03);
+every reworked champion has a no-player credits mode on `IFCREDITS` (venues_a §1.7.2, §2.8.2, §3.8.3, §4.7.2;
+venues_b §1.10, §2.8, §3.10, §4.8; VENUES_A-03, VENUES_B-04), with the card strip as fallback; systems counts the
+Opening-lite's envelope in §7 and tiers the H2/H4 rows Should (SYSTEMS-07).
 
 Round 2's questions closed in round 3: the channel drop (R8.3: W2, W3 and the escape keep all 2A03 channels; the drop
 is LIGHTS OUT's), Rock's first "Blues?" (R8.5: the Riot's 0E, S20; S06 speaks no name), the dogeza's Mr. Y line (R8.5:
@@ -2289,3 +2316,20 @@ fortress Must stays 70 (M5 8, M6 10, M7 28, M8 24).
 | R8.6 | applied | Risks 5 | The text risk now leans on the b1/b2 lines being Should and story's trim list as the reserve |
 | R8.3, R8.5 | applied | Open questions | Round 2's questions 1-3 and the NO-CAPSULE half of 4 closed; the rest point at their reconcile.md ids |
 | — | applied | header | Status set to round 3 |
+| verify 1 | fixed | v1.0 scope (row and dependencies), §1.1, §1.3 (07), §1.4, §9.4 | The Opening counted story's way (R8.4): one Must parade line S05.0, the float lines S05.1-S05.8 and S04.3 Should; §1.1's table in story's rows, 25 pop-up pages = 12.5 scene pages (cap 15); the attract crawl is Could with meta's (R0.3 item 12) |
+| verify 2 | fixed | §0.7, §2.3 (0A), §4.0, §4.1.3, §4.3.2, §4.5 (12-13), §5.2 (08), §5.2.4, §5.4.1, §9.4 | Text with no story string is Should: the jumbotron shows Bass's face with no text in v1.0; the W2 hub, losers' bracket and trophy-room plaques Should; PLQ.H1.13, PLQ.H3.0B and PLQ.H5.12 cited as Should (story S27) |
+| verify 3 | fixed | §0.5, §4.0, §4.6 (step 5) | The Wily gag follows story §1.3's ladder (S08, S14, S17, S25, S33, S41, S44); the theft is Act III's, the unmasking Act IV's |
+| verify 4 | fixed | §4.5.3 | H5's wing-tagged heckles are story's HY.H5a/HY.H5b, so Mr. Y never says "Blues" (R4.2) |
+| verify 5 | fixed | §2.6 | The `BREAK MAN JOINS!` banner is story's S20.10, Should with the partner, not deleted |
+| verify 6 | fixed | §6.1 (scene 5) | Bass's vow is story S41.5; Cossack's confession is S41.8 in the 4 × 28 window, not one POP |
+| verify 7 | fixed | §1.3 (05), §1.10, §4.5.3 | The entrant board reads `β BASS β` (story BOARD.1); H5's tier B hint is story's H50.B, which spells no letters |
+| verify 8 | fixed | — | Duplicate of verify 1 |
+| verify 9 | fixed | §8, §9.2 | Systems tiers the H2/H4 rows Should (SYSTEMS-07): the "Could, with H2/H4" remarks dropped |
+| verify 10 | fixed | §0.8, §8, §9.2 | The CENTURION helper (systems §9.2 bit 12) is one more slot: while it hovers every boss-side throttle waits at 2, so each [9] stays 9 |
+| verify 11 | fixed | §4.5.3, §5.4.1 | H5's and W3's reflex rows use `REFLEX` (`TIERVAL` + INPUT_LAG); W3's mortar shadow is ×2 (60 → 120 f) under CASUAL |
+| verify 12 | fixed | §1.5, §8, §9.2 | Duplicate of verify 9 for §8 and §9.2; §1.5 now says systems §7's income model counts the Opening-lite's envelope |
+| verify 13 | fixed | §4.3.3, §4.5.2, §8, §9.2, Open questions | Kamegoro's turtle rule cited as SC13 and WRONG NOTE as SC14; Doc Robot's Air Man row is systems §4.8 row 22; question 3 closed |
+| verify 14 | fixed | §4.1 (04), §4.5 (01-02), §6.2, §9.1 | Tech's names cited: variant column 12 `NOBUBBLE` (tech §4.3), the credits' room table and `GP_MODE` b0 `CREDITS` tested with `IFCREDITS` (tech §4.6), `alt_flip` phase groups stepped by the screen script (tech §5.6) |
+| verify 15 | fixed | §5.2.2, §9.3, Open questions | The pinch byte is meta §9.2.1's +10 PINCH, read through RULESET's `RS_PINCH`; "add one, or use flags b5-7" dropped; question 1 closed |
+| verify 16 | fixed | v1.0 scope (Text), §9.4 | Story §10.4's counts cited by area: fortress 201 Must strings + 23 labels (Opening 33 + 3, Riot 30, Hall scenes 43 + 2, H1 10 + 3, H3 10 + 5, H5 8 + 1, W2/W3 28 + 1, ending 39 + 8); page 4 of the CAPCOM TIMES is S44.4F |
+| verify 17 | fixed | §6.2, §9.5, Open questions | The credits mode is answered: venues_a §1.7.2, §2.8.2, §3.8.3, §4.7.2 and venues_b §1.10, §2.8, §3.10, §4.8 give each champion a no-player mode on `IFCREDITS`, card strip as fallback; the cost stays in this doc's ending figure (M8); question 2 closed |

@@ -13,9 +13,9 @@ def add(area, item, tier, s, prop=None):
     I.append((area, item, tier, s, prop or tier))
 
 # ---------------- TECH FOUNDATIONS (tech.md round 2: "v1.0 scope" and §16) ----------------
-# tech.md round 2: tiers = the round-2 tiers (RULINGS R1.1-R1.14). The Must rows sum to 102, the same as tight.py's
-# tech block (was 98: +2.5 fight loader moved from meta (R1.7), +2 OAM-builder lag steps (R1.8), +1 $9B audit (R1.12),
-# -1.5 F-SIZES to Should (R3.6)).
+# tech.md round 2: tiers = the round-2 tiers (RULINGS R1.1-R1.14). The Must rows sum to 102.5, the same as tight.py's
+# tech block (was 98, then 102: +2.5 fight loader moved from meta (R1.7), +2 OAM-builder lag steps (R1.8), +1 $9B audit
+# (R1.12), -1.5 F-SIZES to Should (R3.6); round 3: attach state split M3/M5 (R8.2), +0.5 ending engine pieces).
 T = 'tech'
 add(T, 'M0 MMC5 go/no-go spike on Mesen (+cart if any) BEFORE M1 (R1.1)', 'M', 1.5)
 add(T, 'M0 scaffold/build/BPS/registry/allocator, bank + WORK ledgers, test runner, golden record', 'M', 4)
@@ -217,9 +217,11 @@ add(F, 'E4 Maze Man (top-down MAZE mode, 4 ghost AIs)', 'W', 9)
 add(F, 'Gemini Rock input-mirror twin (R3.1 keeps the laser)', 'W', 2)
 
 # ---------------- PRODUCTION OVERHEAD ----------------
+# The Must rows sum to 16, the same as tight.py's overhead block and PLAN §4.1 (R8.1's code 377.5 includes it;
+# round 1's 19 was the untrimmed figure).
 O = 'overhead'
-add(O, 'user gates (Mesen runs, feedback rounds) ~1 per milestone x 10', 'M', 10)
-add(O, 'balance pass (pars, prices, tables, presets)', 'M', 5)
+add(O, 'user gates (Mesen runs, feedback rounds) at the gates and milestone reviews', 'M', 8)
+add(O, 'balance pass (pars, prices, tables, presets)', 'M', 4)
 add(O, 'emulator matrix + hardware + release packaging + readme', 'M', 4)
 
 def tot(pred):
@@ -261,7 +263,7 @@ music = {'Must': (7, 3740, 21, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (
 for k, (n, b, sfx, ses) in music.items():
     print(f"music {k:6}: {n} tracks, {b} B, {sfx} new SFX -> ~{ses:.1f} sessions")
 print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 21 new SFX in the $36 tail (392 of 449 B)")
-# text: story.md §10.4 (round 2, counted by build/revise/story/fit.py): translated strings (EN+JP) Must 400
-# (R4.5's kinds 336 + Must mechanics' text 64), Should 359, Could 91, Won't 4; plus 28 Must labels and 18 panel records.
-print("text: Must 400 strings EN+JP at ~40/session + M2 setup + M9 review fixes = ~12 sessions (tight.py); "
-      "Should 359 (short pop-ups, drafted) = ~7; Could 91 = ~3; Won't ~0.5 (+ external native-JP review, gates release)")
+# text: story.md §10.4 (round 3, counted by build/revise/story/fit.py): translated strings (EN+JP) Must 397
+# (R4.5's kinds 333 + Must mechanics' text 64), Should 362, Could 90, Won't 5; plus 28 Must labels and 18 panel records.
+print("text: Must 397 strings EN+JP at ~40/session + M2 setup + M9 review fixes = ~12 sessions (tight.py); "
+      "Should 362 (short pop-ups, drafted) = ~7; Could 90 = ~3; Won't ~0.5 (+ external native-JP review, gates release)")

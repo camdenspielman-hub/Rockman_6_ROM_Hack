@@ -92,9 +92,10 @@ is external (below).
 | Milestone | Text work | Sessions |
 |---|---|---|
 | M2 | The TSV source, house style and compiler fixtures; boot, health notice, menus, CONFIG; the debrief's generic lines; dictionary measurement with tech (consistency-4) | 1.5 |
-| M4 | The Blizzard slice: its card, hooks, deaths, hints; the bracket and pit-stop lines it uses; the slice's help pages | 1 |
-| M5 | Opening-lite (S03-S08 as pop-up sequences on text v1a); Plant, Flame, Centaur, Yamato | 2 |
-| M6 | Knight (≈ 33 mechanic strings on text v1b), Tomahawk, Wind; the HALFTIME RIOT; S12-S14, S24 | 2 |
+| M3 | S10 and S16's game-over lines, for meta's M3 pit stop and game over | 0.25 |
+| M4 | The Blizzard slice: its card (in the slice, vanilla's 9-field BLIZZARDMAN record; VENUE `SUMMIT CLIMBER` and the secret arena's `ABOVE THE CLOUDS` arrive with tech's panel extension at M5), hooks, deaths, hints; the bracket lines it uses; the slice's help pages | 0.75 |
+| M5 | Opening-lite (S03-S08 as pop-up sequences on text v1a); Plant, Flame, Centaur, Yamato; S12-S13, the adaptor hand-offs with meta's M5 events | 2 |
+| M6 | Knight (≈ 33 mechanic strings on text v1b), Tomahawk, Wind; the HALFTIME RIOT; S14, S24 | 2 |
 | M7 | H1, H3, H5: S25-S33, the plaques, the heckles; the Appendix A fact pass on the plaques | 2.5 |
 | M8 | W2, W3, the ending (S40-S48), the credits text, Break Man's debrief | 2 |
 | M9 | Fixes from the native-JP review (fit, glyph splits, register) | 1 |
@@ -879,8 +880,8 @@ the ring's fence and its WANTED: ROCKMAN poster (Should, the arena twist). The d
 |---|---|---|---|---|---|---|
 | BLZ.S01 | M | stage | POP | sign | BONK THE ICE ABOVE YOU. THE / SEALS WILL FIX IT. | うえの こおりを ずつきで わろう。 / アザラシが なおします。 |
 | BLZ.S02 | M | stage | POP | sign | SUMMIT BONUS: 40 SECONDS. / THE CONDOR WAITS FOR NO ONE. | ちょうじょう ボーナス 40びょう。 / コンドルは まって くれない。 |
-| CEN.S01 | M | stage | WIN | tablet | AN HONEST DOOR SAYS WHERE IT / GOES. A CRACKED DOOR LIES. / A PAINTED DOOR IS PAINT. | しょうじきな とびらは いきさきを / しめす。ひびの はいった とびらは / うそを つく。えの とびらは え。 |
-| CEN.S02 | M | stage | WIN | inscription | ZONE 0: THE ZONE BEFORE THE / FIRST. YOU WERE NOT SUPPOSED / TO FIND THIS. | ゾーン0: さいしょの まえの / ゾーン。みつかる はずでは / なかった。 |
+| CEN.S01 | M | stage | POP | tablet | DOORS GO WHERE THEY SAY. / CRACKS LIE. PAINT IS PAINT. | とびらは ばんごうの ゾーンへ。 / ひびは うそ。えは ただの え。 |
+| CEN.S02 | M | stage | POP | inscription | ZONE 0: BEFORE THE FIRST. / YOU WERE NOT SUPPOSED TO. | ゾーン0: さいしょの まえの ゾーン。 / みつかる はずでは なかった。 |
 | YAM.S01 | M | stage | POP | sign | ALL GOLD ON LOAN FROM THE / TOURNAMENT. -THE SPONSOR | この こばんは たいかいからの / かしだし です。スポンサーより |
 | PLT.S01 | M | stage | POP | — | A RHINESTONE RING. THE / JUDGES SAY IT'S WORTHLESS. | イミテーションの ゆびわ。 / しんさいんいわく かちは ゼロ。 |
 | PLT.S02 | M | stage | LBL | — | TREASURE %N% OF 4 - LOGS %M% | |
@@ -889,7 +890,9 @@ the ring's fence and its WANTED: ROCKMAN poster (Should, the arena twist). The d
 | WND.S03 | S | flavour | LBL | — | NO PASSENGERS | |
 
 BLZ.S02 is the condor's sign on 0F (the exit's tell, venues_b §1.6.1); CEN.S01 is the door rules' tablet at 06 (the
-maze's one tell, venues_b §3.3). PLT.S01 is the rhinestone's pop (the AUTO RECOVER tell). WND.S03 needs the partner.
+maze's one tell, venues_b §3.3), naming all three doors (honest, cracked, painted) on one page. Centaur lands at M5,
+before text v1b (M6), so its tablet and ZONE 0's inscription use the v1a pop-up like every other sign (venues_b §0.6),
+never the 4 × 28 window. PLT.S01 is the rhinestone's pop (the AUTO RECOVER tell). WND.S03 needs the partner.
 
 #### S16 Game over, RETIRE and unplug · Must (game over)
 
@@ -1631,7 +1634,8 @@ Vanilla's panel (`rm6/text.md` §4.4): after the frame (script `$13`) and CHR se
 
 GP keeps the record format and its English text **in both languages** (vanilla's panel is English even in the JP game;
 kept as a quirk, rm6 lesson 8). `tech.md` §11.2 builds the extension (M5, 1.5 sessions) and `art_audio.md` §9.2 draws
-it:
+it. The M4 slice comes first, so it types vanilla's 9-field `BLIZZARDMAN` record by `$51`; Blizzard's VENUE
+(`SUMMIT CLIMBER`, and `ABOVE THE CLOUDS` in the secret arena) arrives with the extension at M5:
 
 1. **Records by fight id**, not `$51` (meta's fight table), so the champions, Bass β, the Hall of Fame exhibits and the
    castle bosses all get cards. ENTRANT FILES (`meta.md` §9.5, Should) reuses the same records.
@@ -1703,19 +1707,19 @@ are files (fortress §5.2; consistency-22). Must, with W2.
 | GRAND PI-KUN | 250 | 8 | 10 | 5 | 120 | HOT AIR | GP STADIUM | BEING ADORABLE | OPENING CEREMONY | M |
 | BASS β | 133 | 105 | 199 | 99 | 199 | SPONSOR MONEY | MR.Y LABORATORY | BEATING ROCKMAN | HALFTIME RIOT | M |
 | BASS β | 133 | 105 | 255 | 199 | 255 | SPONSOR MONEY | SUPER WILY CASTLE | FINAL VERSION | CHAMPIONSHIP RING | M |
-| BLOCK MAN | 4 | 4 | 1 | 4 | 1 | GRAVITY | THE WELL | LINE CLEAR | EXHIBITION 1 | C |
-| PADDLE MAN | 8 | 32 | 1 | 999 | 255 | BOUNCING | THE BRICK WALL | RETURNING BALLS | EXHIBITION 2 | C |
-| INVADER MAN | 16 | 16 | 10 | 1 | 8 | 100 YEN COINS | TABLE CABINET | MARCHING DOWN | EXHIBITION 3 | C |
-| MAZE MAN | 16 | 16 | 4 | 1 | 88 | POWER PELLETS | LEVEL 256 | EATING | EXHIBITION 4 | W |
+| BLOCKMAN | 4 | 4 | 1 | 4 | 1 | GRAVITY | THE WELL | LINE CLEAR | EXHIBITION 1 | C |
+| PADDLEMAN | 8 | 32 | 1 | 999 | 255 | BOUNCING | THE BRICK WALL | RETURNING BALLS | EXHIBITION 2 | C |
+| INVADERMAN | 16 | 16 | 10 | 1 | 8 | 100 YEN COINS | TABLE CABINET | MARCHING DOWN | EXHIBITION 3 | C |
+| MAZEMAN | 16 | 16 | 4 | 1 | 88 | POWER PELLETS | LEVEL 256 | EATING | EXHIBITION 4 | W |
 
 - **Grand Pi-kun** (fortress §1.6: one size, 80 px tall, the Mr. X 2 pod technique): an inflatable mascot that weighs
   8 kg. HEIGHT 250 is the costume's claim, not the sprite's.
 - **Bass β**, the Riot (fortress §2.6): one centimetre taller than Rockman's commonly given 132 cm (Appendix A, A-6.5).
-  K: "HE MEASURED WITH HIS HAIR." (S19.2). The SPECIALTY is never true. In W2 (fortress §5.2.3) he typed FINAL VERSION
-  himself; the β stays on the NAME.
-- **The Exhibition guests are Could** (R3.7); Maze Man is Won't (v1). Block Man shares his name with Rockman 11's
-  (2018) Robot Master; Capcom's own name, kept as an in-joke (round 1's open question, closed). Block Man's "well" is
-  the falling-block game's playfield; Invader Man's coins are the folklore R3.9 words as "THEY SAY THIS GAME CAUSED A
+  The SPECIALTY is never true. In W2 (fortress §5.2.3) he typed FINAL VERSION himself; the β stays on the NAME.
+- **The Exhibition guests are Could** (R3.7); Maze Man is Won't (v1). Their panels keep vanilla's no-space style
+  (`BLOCKMAN`, §5.1, R8.5); the dialogue says BLOCK MAN. Block Man shares his name with Rockman 11's (2018) Robot
+  Master; Capcom's own name, kept as an in-joke (round 1's open question, closed). Block Man's "well" is the
+  falling-block game's playfield; Invader Man's coins are the folklore R3.9 words as "THEY SAY THIS GAME CAUSED A
   COIN SHORTAGE" (Appendix A, A-8.12).
 
 ### 5.4 Hall of Fame exhibits and the castle
@@ -1826,7 +1830,7 @@ DOPED, TAG, BASS), EN pointer, JP pointer. Stage tables are byte lists of line i
 banks, dictionary-compressed (R1.4); §10.4 counts them. [new-code] M (the bus, queue and window: tech's M3 item),
 text per milestone.
 
-**Speakers** (face icons, `art_audio.md` §9.4): Cossack (C), Kalinka (K), Mr. Y (Y), Wily (W), Roll (R), Break Man
+**Speakers** (face icons, `art_audio.md` §9.4): Cossack (C), Kalinka (K), Mr. Y (Y), Wily (W), Roll (Ro), Break Man
 (BM), Light (L, a radio frame), Eddie (E), Bass β (B), the champions; NPCs without an icon (the King, the battle log,
 the PA) speak in an icon-less pop-up. Four typing blips (§10.2).
 
@@ -2611,7 +2615,7 @@ H5's b3 (Mr. X's card) has no hint: T14's hint is Break Man's (S47).
 | W31.B | S | hint | WIN | K | AT THE BARRED WINDOW NEAR / THE START, THROW THE SUPER / FIST PAST THE KEYHOLE. IT / HITS ON THE WAY BACK. | スタートちかくの てつごうしの まどで スーパーの / こぶしを かぎあなの むこうへ。 もどりで あたる。 |
 | W32.B | S | hint | WIN | K | BEAT THE WILY CAPSULE / WITHOUT FALLING BELOW 6 HP, / SO BREAK MAN NEVER STEPS IN. | HPを 6より へらさずに ワイリーカプセルを / たおして。 ブレイクマンの でばんは なし。 |
 
-H50 does not spell the plates' letters (§6.4, H5-09; Appendix A, A-5.4). RI0, RI1, W21: "fully charged" is the
+H50 does not spell the plates' letters (§6.4, H5-09; Appendix A, A-5.3). RI0, RI1, W21: "fully charged" is the
 v1.0 key for the partner's doors (R4.2).
 
 ### 7.3 Generic debrief lines (meta §4.5's ids)
@@ -2708,7 +2712,7 @@ come back with it; the three cut chips' pages are kept as Won't notes.
 | HLP.EXCHANGER | M | help | WIN | E | LIFE YOU CAN'T USE BECOMES / ENERGY YOU CAN. TWO FOR ONE. / EDDIE'S MATH. | つかえない ライフを つかえる エネルギーに。 / 2たい1。 エディけいさん。 |
 | HLP.ENERGY_SAVER | M | help | WIN | E | EVERY WEAPON SIPS INSTEAD OF / GULPING. TAKES TWO SLOTS. / WORTH IT? DISCUSS. | どの ぶきも ちびちび のむ。 スロットを 2つ / つかう。 その かちは? ぎろん しよう。 |
 | HLP.YASHICHI | M | help | WIN | E | IT SPINS WHEN YOU NEED IT / MOST. ONCE. THEN IT RESTS / UNTIL THE NEXT STAGE. NOT / WITH DARUMA. | いちばん ひつような ときに まわる。 1どだけ。 / つぎの ステージまで やすむ。 ダルマとは いっしょに / つけられない。 |
-| HLP.KAISHIN | M | help | WIN | E | A SPLENDID STRIKE! EVERY / 12TH HIT ON A CHAMPION LANDS / HARDER. COUNT ALONG AT HOME. | みごとな いちげき! ボスへの 12はつめごとに / いちげきが おもくなる。 いっしょに かぞえよう。 |
+| HLP.KAISHIN | M | help | WIN | E | A SPLENDID STRIKE! EVERY / 12TH HIT ON A BOSS LANDS / HARDER. COUNT ALONG AT HOME. | みごとな いちげき! ボスへの 12はつめごとに / いちげきが おもくなる。 いっしょに かぞえよう。 |
 | HLP.SHERIFF_STAR | M | help | WIN | E | DEPUTIES GET PAID BETTER: / 20% MORE PRIZE MONEY. THAT / IS THE WHOLE POINT OF BEING / A DEPUTY. | ほあんかんは きゅうりょうが いい。 しょうきん 20% / アップ。 ほあんかんに なる りゆうは それだけ。 |
 | HLP.AUTO_RECOVER | M | help | WIN | E | STAND STILL AND LISTEN. / SOMETHING IS GROWING BACK. / THE JUNGLE IS PATIENT. / CHAMPIONS ARE NOT. | じっと して みみを すませて。 なにかが はえて / くる。 ジャングルは きが ながい。 チャンピオンは / みじかい。 |
 | HLP.SNOW_CHAINS | M | help | WIN | E | ICE HOLDS STILL UNDER YOUR / BOOTS. ICICLES BOUNCE OFF. / THE SEALS TAUGHT YOU THIS. | こおりでも すべらない。 つららも はねかえす。 / アザラシたちに おそわった。 |
@@ -2834,8 +2838,10 @@ A pop-up whose screen has fewer than 24 free ids waits in the announcer queue (t
 - no kanji (vanilla's JP text has none; the only kanji in RM6 are the logo's).
 
 **Typewriter.** Speed from CONFIG TEXT SPEED (meta §11). A per-speaker blip (vanilla's mechanism, `$06A6`): v1.0 has
-**4 blips** (art_audio): Cossack low, Kalinka high, Mr. Y / Wily (a cash-register "ching" before S33, a cackle after),
-and a neutral blip for everyone else; Light speaks over radio static and Break Man's pages open on his whistle (the
+**4 blips** (art_audio §12.6): Cossack low, Kalinka high, and Mr. Y's cash-register "ching" (before S33) and Wily's
+cackle (after it), two blip ids that the line record's unmasking flag picks between. Everyone else, the icon-less
+pop-ups included, types with the neutral blip, which is vanilla's own typing blip `$27` (no new sound). Light's "radio
+static" is his face icon's static frame (art_audio §9.4), not a sound; Break Man's pages open on his whistle (the
 whistle jingle, R5.2). Spaces are free.
 
 **Highlight.** `*WORD*` draws in the window's second colour (CX does this, `cx/SUMMARY.md` §4). **Choices**: `▶YES NO`
@@ -3194,9 +3200,9 @@ passes, cut with the sekisho, R3.2), A-8.13 (Maze Man, Won't), A-8.17 (the "ORA 
 ## Changes in round 3
 
 RULINGS §8 (R8.1-R8.8) and the "## story.md" table of `reconcile.md`. `fit.py` re-run: 0 problems; Must 397, Should
-362, Could 90, Won't 5 translated strings; 28 labels and 18 panel records unchanged. Text stays **12 sessions** (no
-milestone figure changes). The "Changes in round 2" table above is history: where it says S44's Mr. Z is Act VI's gag
-or the trim list is −33, this round supersedes it.
+362, Could 90, Won't 5 translated strings; 28 labels and 18 panel records unchanged. Text stays **12 sessions**
+(verify-4 moves 0.25 from M4 to a new M3 row; no other milestone figure changes). The "Changes in round 2" table above
+is history: where it says S44's Mr. Z is Act VI's gag or the trim list is −33, this round supersedes it.
 
 | Request | Outcome | Section | Note |
 |---|---|---|---|
@@ -3213,3 +3219,10 @@ or the trim list is −33, this round supersedes it.
 | R8.6 (extra) | applied | §4 S41 | the champions applaud in pairs (0 new tiles; the all-eight row Should). Already: fortress b1/b2 lines Should, the nightingale floor Should (YAM-06, -07, YAM.D2-D3) |
 | R8.7 (extra) | applied | §10.4; §12 tech row | a 10th text bank, if ever needed, is music's spare `$79`, never CHR |
 | R8.1, R8.2, R8.8 | already | v1.0 scope | no stale ledger total or cumulative figure, slice form, attach-state or stage-`$00` text in this doc; story's milestone table (12 sessions) is one of R8.1's inputs, unchanged |
+| verify-1 | fixed | §5.3 | the Exhibition panels' NAME cells are `BLOCKMAN`, `PADDLEMAN`, `INVADERMAN`, `MAZEMAN` (vanilla's no-space style, §5.1, R8.5); the dialogue keeps BLOCK MAN etc. |
+| verify-2 | fixed | §5.3; §6.1; §7.2 | §5.3's quote of a Kalinka line "(S19.2)" that no row holds is deleted (S19.2 is Rock's); §6.1's speaker list says Roll (Ro), the Who key's code; §7.2 cites A-5.3 (the plate letters), not A-5.4 |
+| verify-3 | fixed | §6.3 "The other venues' words" | CEN.S01 (the tablet) and CEN.S02 (ZONE 0's inscription) move from WIN to POP: Centaur lands at M5, before text v1b (M6), so they use the v1a pop-up like every sign (venues_b §0.6). Each is re-fitted to one 2 × 28 page (the tablet still names all three doors), so the counts are unchanged (`fit.py`: 0 problems, Must 397) |
+| verify-4 | fixed | v1.0 scope (sessions) | the milestone table follows the scene list and meta's milestones: a new M3 row (S10, S16's game-over lines, 0.25) for meta's M3 pit stop and game over, M4 1 → 0.75; S12-S13 move from M6 to M5 with meta's adaptor events; M6 keeps S14 and S24. Total still 12 |
+| verify-5 | fixed | v1.0 scope (sessions, M4); §5.1 | the slice's card is vanilla's 9-field `BLIZZARDMAN` record typed by `$51`; its VENUE `SUMMIT CLIMBER` and the secret arena's `ABOVE THE CLOUDS` arrive with tech's panel extension at M5 (tech row 33) |
+| verify-6 | fixed | §8 HLP.KAISHIN | EN line 2 reads "12TH HIT ON A BOSS LANDS" (systems §9.2 #7, R2.4: every 12th boss hit), matching the JP ボスへの |
+| verify-7 | fixed | §10.2 | art_audio's request: the 4 blips are Cossack, Kalinka, Mr. Y's ching and Wily's cackle (two ids picked by the line record's unmasking flag, art_audio §12.6); the neutral blip is vanilla's typing blip `$27`; Light's "radio static" is his face icon's static frame (art_audio §9.4), not a sound |
