@@ -22,7 +22,7 @@ fewer engines, vanilla behaviour kept).
 - The session ledger (`tools/plan/tally.py`, `tools/plan/tight.py`, seeded by critic-scope) decides scope from now on.
 - It is re-estimated from actual counts after the vertical slice (M4) and at every ⛳ gate.
 
-**R0.2 — v1.0 = the TIGHT MUST, about 440 sessions** (scope-2):
+**R0.2 — v1.0 = the TIGHT MUST, about 440 sessions** (scope-2; about 450 after round 2, R8.1):
 
 - **Engine:** all tech foundations.
 - **Systems:** core systems with **weapon taps only**.
@@ -35,9 +35,9 @@ fewer engines, vanilla behaviour kept).
 
 | Release | Contents | ≈ sessions (cumulative) |
 |---|---|---|
-| **v0.1 "Blizzard slice"** | new game → bracket → Blizzard venue end to end → judges → save/reload/replay | ~115 |
-| **v0.5 "Round One"** | Opening-lite, 8 venues, Halftime Riot; the scope checkpoint | ~285 |
-| **v1.0 "Championship"** | + H1/H3/H5, W2, W3, ending | ~440 |
+| **v0.1 "Blizzard slice"** | new game → bracket → Blizzard venue end to end → judges → save/reload/replay | ~115 → **~148** (R8.1) |
+| **v0.5 "Round One"** | Opening-lite, 8 venues, Halftime Riot; the scope checkpoint | ~285 → **~342** (R8.1) |
+| **v1.0 "Championship"** | + H1/H3/H5, W2, W3, ending | ~440 → **~450** (R8.1) |
 | v1.1+ | the Should list, in the cut-line order below, re-added from the top | — |
 
 **R0.3 — The cut line, in priority order.** These items are out of v1.0, and come back in this order (scope-2):
@@ -397,18 +397,21 @@ Tier A riddles, flavour hooks and heckle variants are Should. **The native-JP re
 
 Cumulative ≈ sessions in brackets. ⛳ = the user plays it.
 
-| M | Contents | ≈ |
+| M | Contents | ≈ (round 3, R8.1) |
 |---|---|---|
-| **M0** | Workbench: build, BPS, hook registry, allocator, test runner, golden recording, ledger. **MMC5 go/no-go spike on Mesen** | [12] |
-| **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [25] |
-| **M2** | Slice engine: families and sub-ids; WRAM layouts and `map_set`; CHR set table v2 and minimal art tools; level pipeline with canvas table; raster list; **text v1a**; track table and MML; save, file-select-lite, bracket-lite, results, debrief, EXTRA CONFIG | [70] |
-| **M3** | Slice systems: SELECT and form swap; taps in all forms; adaptors by win count; GP_BOSSHIT, WEAK!, frozen tick; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; commentator bus | [95] |
-| **M4** ⛳⛳ | **BLIZZARD end to end** (v0.1): new game, bracket, venue (exit, room, chip, Ice Block, boss), judges, save, reload, replay. **Re-estimate the ledger** | [~115] |
-| **M5** | Stage-attribute table; Opening-lite; Flame, Plant, Centaur, Yamato | [~205] |
-| **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT. **"Round One" checkpoint (v0.5)** | [~285] |
-| **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~340] |
-| **M8** ⛳ | W2, W3, ending | [~380] |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (v1.0) | [~440] |
+| **M0** | Workbench: build, BPS, hook registry, allocator, test runner, golden recording, ledger. **MMC5 go/no-go spike on Mesen** | [13] |
+| **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [26] |
+| **M2** | Slice engine: families and sub-ids; WRAM layouts and `map_set`; CHR set table v2 and minimal art tools; level pipeline with canvas table; raster list; **text v1a**; track table and MML; save, file-select-lite, bracket-lite, results, debrief, EXTRA CONFIG | [79] |
+| **M3** | Slice systems: SELECT (weapons); taps; GP_BOSSHIT, WEAK!, frozen tick, the Ice Block; scorecard and bolts; shop (3 chips); T6, X-BONK, X-WRAP; HUD widgets; commentator bus; **the attach state's core (the condor)** (R8.2) | [~123] |
+| **M4** ⛳⛳ | **BLIZZARD end to end** (v0.1): new game, bracket, venue (exit, room, chip, Ice Block, boss), judges, save, reload, replay. **Re-estimate the ledger** | [~148] |
+| **M5** | Stage-attribute table; **the form swap, forms firing taps, adaptors by win count** (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~254] |
+| **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT. **"Round One" checkpoint (v0.5)** | [~342] |
+| **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~398] |
+| **M8** ⛳ | W2, W3, ending | [~433] |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (v1.0) | [~450] |
+
+Round 1's cumulative figures (12 / 25 / 70 / 95 / ~115 / ~205 / ~285 / ~340 / ~380 / ~440) are replaced by R8.1's,
+which add up each doc's own per-milestone figures.
 
 **Testing policy** (scope-26):
 
@@ -426,3 +429,88 @@ Cumulative ≈ sessions in brackets. ⛳ = the user plays it.
 3. **Japanese.** Is a native-speaker reviewer available for the JP text, and when?
 4. **Title.** ROCKMAN 6 GP (default), *Shijō Saidai no Kaizō!!*, or ENCORE?
 5. **Budget pace.** Roughly how many sessions per week? The ledger turns that into dates.
+
+---
+
+## 8. Round-3 rulings (after the round-2 revisions)
+
+The round-2 revisers returned 73 cross-doc requests and director questions. Those addressed to another doc are routed
+in [`reconcile.md`](reconcile.md); the questions only the director can settle are ruled here. These rulings are binding
+like the rest of this file.
+
+**R8.1 — The ledger and the ladder are re-baselined.**
+
+- The tight Must is **about 450 sessions** (`tools/plan/tight.py`: code 377.5, art 51.6, music 9, text 12). The +10 on
+  R0.2 comes from rulings that promoted content to Must (the venue chips, the mouse room, the fight loader, the OAM
+  steps). **It is accepted; R0.3's "cut next" list is not applied now.** The M4 re-estimate decides.
+- §6's cumulative column is recomputed by adding each doc's own per-milestone figures (tech §16.2, meta's and systems'
+  v1.0 scope tables, the venue and fortress stage milestones, art_audio's and story's milestone tables; the ledger's
+  release overhead at M9). Round 1 had under-counted the slice: **v0.1 ≈ 148, v0.5 ≈ 342, v1.0 ≈ 450.**
+- Each milestone's figure is re-estimated at every ⛳ gate; the slice's actual cost calibrates the rest (R0.1).
+
+**R8.2 — What the slice builds.**
+
+- **A new file owns no forms** (Power comes with the 2nd win), so the slice cannot reach them. **The quick form swap
+  (SYS-CTL-4), the Power and Jet rows of the dispatch table (SYS-FRM-1) and adaptors by win count (SYS-FRM-2) move
+  from M3 to M5** (about 5 sessions). The dispatch table itself, with Normal form's tap column and the Ice Block, stays
+  in M3. SELECT + Up/Down (weapons) and the last-weapon toggle stay in the slice.
+- **The attach state's core moves to M3**, with the condor (Blizzard's secret exit) as its first user (about 1
+  session); vines (T5) and the balloon follow at M5 (about 1 session). tech's row 31 splits accordingly.
+- **No stage-`$00` stop-gaps.** The slice's GP code reads the 48-byte stage record v0 from M2.1 (`SECRET_SCR`, `PAR`,
+  GP_BOSSHIT's row); the vanilla `$51` readers are rewritten at M5 as planned.
+
+**R8.3 — SUPER colour and the channel drop** (clarifies R1.3 and R5.2).
+
+- v1.0's SUPER colour in W2, W3 and the escape = richer palettes + parallax and palette bands. The 2A03 music keeps
+  all its channels there.
+- **The channel drop is LIGHTS OUT's** (S42): the D9 mute mask takes G37 LAST MATCH's 2A03 stems away one at a time
+  until pulse 1 plays alone. That is Must.
+- The MMC5 pulse voices are Could. If they ship, the castle adds them and the escape drops only them.
+- **The POCKET arrangements (G14) are Could**, with W1, their only user (corrects R5.2's "Should").
+
+**R8.4 — Text.**
+
+- **v1.0 has about 400 Must strings**: R4.5's six kinds (336) plus the Must mechanics' own text and the system
+  sentences (64). story's reading is accepted; §10.4's trim list there is the reserve, not a plan.
+- story's string counts are the single source; the venue and fortress docs cite them instead of their own estimates.
+- **Quoted lines from other games are paraphrased**, never verbatim, in both languages (R3.3's spirit; the
+  conservative rule). The 1986-RPG jokes keep their rhythm in new words.
+- In JP, Light calls Wily **アルバート** in S42's one use of his first name, if story uses it there.
+
+**R8.5 — The ending's gags and names** (applies R4.1 and R4.2).
+
+- **The Mr. Y / Mr. Z alias gag is used once in the whole ending, at the arrest** (S41). The CAPCOM TIMES uses story's
+  fallback page S44.4F.
+- **S06 speaks no name.** Rock's first "Blues?" is at the Riot's 0E reveal (S20), the second at S40, and Light says
+  "Blues" once, in S42. fortress §0.5 and §2.6 follow story.
+- **Boss-panel names follow vanilla's style, with no space**: `BREAKMAN`, `DARKMAN`. The WRONG NOTE exposure is a third
+  panel record, and tech's panel re-type supports it.
+- **H5's letter plates spell `ROCKMAN5`**, the Japanese release's word (story's A-5.3), in both languages.
+- **The rating's partner-free test is meta's T1 SOLO RIOT, RATEFLAGS b4.** fortress's "NO-CAPSULE" bit is that bit.
+
+**R8.6 — Staging.**
+
+- **The podium** cannot show eight champion sprites at once (12 occupied slots, 8 palettes). The champions applaud **in
+  pairs** with 0 new tiles (art_audio's staging); an all-eight BG row is Should.
+- **Eddie is new art** (a composite), not a vanilla sprite. The rating screen draws over meta's judges' desk.
+- **Fortress secret lines**: b0 and every tell are Must; b1 and b2 are Should, and generic lines play in v1.0 (story's
+  budget call).
+- **Blizzard's FLAKES pattern** throws one flake fewer while an Ice Block is out, if the flicker simulator fails it
+  (venues_b applies it at M4).
+- **Yamato's nightingale floor is Should** (cut-line item 4, with the venue's second set piece). In v1.0 the pogo and the
+  Daruma carry the venue (corrects R3.2's list).
+- **The CASUAL quick-draw window is 40 f** (R3.5 is the more specific ruling; R2.9's ×2 applies everywhere else).
+
+**R8.7 — Engine.**
+
+- **Pause and utilities**: tech patches the pause-close clear at `$38:$9624` so utilities (slots 4-7) survive when the
+  weapon is unchanged (systems §1); deaths still clear slots 1-7 as in vanilla.
+- **The bank ledger**: if text needs a 10th bank, it comes from music's spare bank `$79`, not from CHR. v1.0 needs about
+  9 of the 14 CHR banks and 2 sprite pairs.
+- **The INPUT LAG range is 0-6 f** until the user answers the hardware question (§7 q1).
+
+**R8.8 — User-facing defaults** (the user may change them):
+
+- The art-acceptance gallery is a local HTML page plus PNGs sent to the user at each gate. It is published only if the
+  user asks.
+- EXTRA CONFIG and RECORDS keep meta's unlock points.
