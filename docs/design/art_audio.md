@@ -21,9 +21,9 @@ Tags per BRIEF §8: **[engine-ok]** vanilla as-is or data only; **[new-code]**; 
 | Where does new art live? | In **new CHR source banks** (never over Capcom art, BRIEF §7.4), plus the **1,126 blank tiles** in the gaps of vanilla CHR banks `$00-$0A`, `$10-$1F` (measured, §1.3). Banks `$0B-$0F` are left to `tech.md` for code |
 | How does it reach the screen? | Through vanilla's **CHR set** mechanism (`$37:$8000`, 4 bytes per set), extended to a **v2 set table** that can address banks above `$3F` and gives each stage **28 local set ids** (§2.1) |
 | What limits a venue? | **256 BG tile ids live at once** and a **96-tile sprite "enemy area"** (`$1A00-$1FFF`) per screen. Not ROM space. The rules of §2 ration both |
-| How much new art? | **6,811 tiles** (4,508 BG + 2,303 sprite) and **580 metasprite frames** in total; **Must = 4,863 tiles, 425 frames** (§13). For scale: 4MI added 5,266 new tiles, CX's screens are 70 % new |
-| Who draws it? | A human pixel artist for characters, BG bosses, portraits and the logo (**1,368 BG tiles + 423 frames**); Claude drafts or generates the rest (**3,140 BG tiles + 179 frames**), and a human cleans the drafts (§11) |
-| Music? | Vanilla's 36 tracks stay. **37 new compositions (48 track ids)**: 5 Must, 24 Should, 8 Could, **27.5 KB**; about **50 new SFX (≈1.8 KB)**; MMC5 "16-bit" arrangements for Super Wily Castle (Could, per BRIEF §9). Vanilla has **449 bytes** of free sound space, so new music goes into **5 new 8 KB banks** with a per-track bank byte (§12) |
+| How much new art? | **6,793 tiles** (4,508 BG + 2,285 sprite) and **573 metasprite frames** in total; **Must = 4,851 tiles, 421 frames** (§13). For scale: 4MI added 5,266 new tiles, CX's screens are 70 % new |
+| Who draws it? | A human pixel artist for characters, BG bosses, portraits and the logo (**1,368 BG tiles + 419 frames**, ≈ 890 hours with the cleanup of Claude's drafts); Claude drafts or generates the rest (**3,140 BG tiles + 151 frames**) (§11) |
+| Music? | Vanilla's 36 tracks stay. **37 new compositions (51 track ids)**: 5 Must (3.0 KB), 24 Should, 8 Could (+2 MMC5 layers), **27.5 KB** in all; about **75 new SFX (≈1.8 KB)**; MMC5 "16-bit" arrangements for Super Wily Castle (Could, per BRIEF §9). Vanilla has **449 bytes** of free sound space, so new music goes into **5 new 8 KB banks** with a per-track bank byte (§12) |
 | The one technical bet | **8 KB CHR-RAM is the real budget.** Every in-stage pop-up, boss pinch form and form swap is planned around it (§2). §18 asks whether `tech.md` can measure a 32 KB CHR-RAM option |
 
 ---
@@ -503,7 +503,7 @@ enemy `$A5` (`D0-FF`), dome turret `$2B` (`C0-E7`).
 |---|---|---|---|---|
 | Kept | `$AA` (ruins, water, waterfalls, orange castle), water animation (`$DC-$DF`, `$E8-$EF`) | | all | [engine-ok] |
 | **CT-ZONE** third: zone doors (honest / lying / fake), plaques, the sky temple, hot spring with steam, the sunken throne | ~80 | | 06-1C | [new-art] M Must |
-| **SET-CT1** `B0+32`: zone digits 0-9 (shared with the ZONE card), cloud platform, eggplant | 32 | 4 | 06-18 | [new-art] S Must. Fits beside the piranha, seahorse and pelicans |
+| **SET-CT1** `B0+32`: zone digits 0-9 (shared with the ZONE card), cloud platform, eggplant | 32 | 4 | 06-18 | [new-art] S Must. Fits beside the piranha, seahorse and pelicans; conflicts with the dome turret `$2B` |
 | **SET-CT2** `A0+48`: Centurion statue and freed Centurion (2), Nasubi Mage (float 2, cast) | 48 | 5 | 0E-18 | [new-art] M Should. Conflicts with piranha / seahorse |
 | **SET-CT3** `D0+48`: Grim Reap-bot (patrol 2, look, alarm), Reaplets (2) | 48 | 6 | 11-14 | [new-art] M Should. Conflicts with pelicans, waterfall enemy |
 | Eggplant-Rock (player sheet patch: walk, jump) | 12 | 4 | curse | [new-art] S Could |
@@ -583,8 +583,8 @@ sizes in two halves of that range and shows the near size alone (its swap is the
 burst). Every BG boss gets a 16x16-or-larger **match-card portrait** (§9.3), since the vanilla boss-intro panel shows a
 sprite pose that a BG boss does not have.
 
-**Totals**: 1,000 BG tiles (Must 600: YD, Gamma, MODE-7; Should 380: Dragon, Catcher, AYACO BG... AYACO counted in
-§4.2), 114 sprite tiles of parts, plus Dark Man's 60.
+**Totals**: 870 BG tiles (Must 600: Yellow Devil 60, Gamma 200, MODE-7 Machine 340; Should 270: Mecha Dragon 150,
+Cossack Catcher 120; AYACO's 110 are counted in §4.2), 126 sprite tiles of parts, plus Dark Man's 60.
 
 ---
 
@@ -630,11 +630,11 @@ sprite pose that a BG boss does not have.
 |---|---|---|
 | Venue enemies, NPCs, set pieces (§4) | 996 | 299 |
 | Player sheets and poses | 316 | 96 |
-| Bosses (non-venue) and guests | 520 | 104 |
-| Cast | 88 | 23 |
+| Bosses (non-venue), guests, Opening extras | 626 | 148 |
+| Cast | 70 | 16 |
 | UI sprites (§9) | 250 | 14 |
 | Weapon alt-fire tiles (`systems.md` §3) | 27 | |
-| **All sprites** | **2,303 tiles** (from `budget.py`) | **580** |
+| **All sprites** | **2,285 tiles** (from `budget.py`) | **573** |
 
 ---
 
@@ -1001,12 +1001,12 @@ Sizes are estimated from vanilla (`songsizes.py`): stage theme 617-1,238 B (mean
 | G27, G28 | WHISTLE 110; 8 stingers (duel bell, inn, level-up, POW, LOOP, ACE 100 %, secret found, plate) 600 | 710 | Should | SFX |
 | G29-G33 | LOST CAVERNS 600, UNDERWATER 700, PALACE 700, HONKY-TONK 500, MR. Y 350 | 2,850 | Could | the venue's theme |
 | G34-G36 | 16-BIT WILY STAGE 1,300, 16-BIT WILY MACHINE 900, BASS MODE 800 | 3,000 | Could | `$0B`, `$18`, G04 |
-| | **Total: 39 compositions, ≈ 55 track ids** | **27,530** | Must 2,990; Should 17,640; Could 6,900 | |
+| | **Total: 37 compositions + 2 MMC5 layers, 51 track ids** | **27,530** | Must 2,990; Should 17,640; Could 6,900 | |
 
 ### 12.6 SFX
 
-New SFX are 10-60 B each (vanilla mean 29 B). **Must** (≈ 20, ≈ 450 B, fits the 449-B tail of bank `$36` with D1 not
-even needed): weapon-cycle tick, form-swap whoosh, parry "ting", WEAK crunch, results tick, total roll, medal thunk,
+New SFX are 10-60 B each (vanilla mean 29 B). **Must** (≈ 20, ≈ 440 B: they fit the 449-B tail of bank `$36`, though
+their ids still need D2): weapon-cycle tick, form-swap whoosh, parry "ting", WEAK crunch, results tick, total roll, medal thunk,
 shop buy and deny, chip click, pop-up chime, crowd cheer (a noise swell), crowd "ooh" on a death, bonk, gate rumble,
 plate click, door unlock, chest open, ice-cell break, pogo boing, gunshot.
 
