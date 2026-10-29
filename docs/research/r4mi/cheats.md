@@ -425,9 +425,10 @@ hall in Wily 4.
 | Want | Do |
 |---|---|
 | No damage | `e.freeze(0x3C, 2)` (i-frame timer) or `godmode(e)` |
+| Find any 4MI object | `python3 -I tools/analysis/r4mi/r4mi_objects.py [stage] [--sub 4d,7f]` resolves every script placement (`$08`-`$0B`) to its `$5E` sub-id and AI bank (critic) |
 | Fight any boss / mid-boss | `fight_XX_<stage>.state`, or `arena_fight(e, ids)` from `my_arena_menu.state` (§5b) |
 | Kill Rockman (respawn at checkpoint) | `e.poke(0x30, 7)` |
-| No pit / spike deaths | Equipment `$7839 \|= $70` (SHOCK GUARD + TRAMPOLINE + BEAT). Frozen HP alone does **not** stop pits: Skull cp1 killed a frozen-HP Rockman by falling, and with `$70` he got through [seen] |
+| No pit / spike deaths | Equipment `$7839 \|= $70` (SHOCK GUARD + TRAMPOLINE + BEAT). **(critic) Gotcha:** the BEAT bit makes Beat's rescue code skip itself (`$44:$B5F1`: already owned), so tests of the Beat rescue need `$7839 = $30`. Frozen HP alone does **not** stop pits: Skull cp1 killed a frozen-HP Rockman by falling, and with `$70` he got through [seen] |
 | Infinite lives | `freeze(0xA1, 9)` or EXTRA CONFIG TML ≠ 0 |
 | All weapons | `$B0-$BD = $9C` (`give_all`) |
 | Refill at pause | `$78CA ≠ 0` (C.RFL) |
