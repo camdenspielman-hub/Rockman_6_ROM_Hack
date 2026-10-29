@@ -248,7 +248,7 @@ print()
 # Methods: reuse/recolour R, composite X (both "R" in R5.1's sense), programmatic C, Claude draft D (final; no artist).
 # Session model: D 80 BG tiles or 12 frames, X 150 tiles + 16 frames, R 300 tiles + 24 frames, C 200 tiles per session,
 # +5 % for the fixes the art-acceptance gates ask for. The 240 1-bpp text glyphs (Must) are inside the Must row's sessions.
-art = {'Must': (2557, 1948, 351, 56.5), 'Should': (1684, 538, 117, 31.0), 'Could': (828, 384, 64, 15.0),
+art = {'Must': (2567, 1948, 351, 56.7), 'Should': (1684, 538, 117, 31.0), 'Could': (828, 384, 64, 15.0),
        "Won't": (20, 279, 63, 5.8)}
 for k, (bg, spr, fr, ses) in art.items():
     print(f"art {k:6}: {bg} BG + {spr} spr tiles, {fr} frames -> ~{ses:.1f} Claude sessions")

@@ -73,11 +73,11 @@ for area, items in tight.items():
     print(f'{area:9} {s:6.1f}')
 print(f'{"CODE":9} {total:6.1f}')
 # art_audio round 2 (docs/design/art_audio.md "v1.0 scope", §11, §13; R5.1, R5.3): the re-run ledger
-# build/revise/art_audio/budget_r2.py gives the Must art as 4,505 CHR tiles (2,557 BG + 1,948 sprite; 954 reused,
-# 658 composited, 495 programmatic, 2,398 drawn) + 240 1-bpp glyphs and 351 frames = 56.5 Claude sessions, including
+# build/revise/art_audio/budget_r2.py gives the Must art as 4,515 CHR tiles (2,567 BG + 1,948 sprite; 954 reused,
+# 658 composited, 495 programmatic, 2,408 drawn) + 240 1-bpp glyphs and 351 frames = 56.7 Claude sessions, including
 # +5 % for the fixes the art-acceptance gates ask for. Round 1's formula on R5.1's ~3,900 tiles / 350 frames gave ~50.
 # Music (music_r2.py): G00-G04, G27 WHISTLE and G37 LAST MATCH, 20 new SFX and the fallback wiring = 9 (was ~10).
-art_tiles, art_frames = 4505, 351
-art, music, text = 56.5, 9, 12
+art_tiles, art_frames = 4515, 351
+art, music, text = 56.7, 9, 12
 print(f'art ~{art:.1f}  music ~{music}  text ~{text}')
 print(f'TIGHT MUST TOTAL ~{total+art+music+text:.0f} sessions')
