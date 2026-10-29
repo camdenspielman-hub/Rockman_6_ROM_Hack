@@ -1,7 +1,8 @@
 # Rockman 6 GP: art and audio production plan (art_audio.md)
 
-Owner: design-art-audio. Status: **round 2**, revised against [`RULINGS.md`](RULINGS.md), with every budget re-run
-against the revised venue, fortress, systems, meta and tech docs (R5.3).
+Owner: design-art-audio. Status: **round 3**. Round 2 revised it against [`RULINGS.md`](RULINGS.md), with every budget
+re-run against the revised venue, fortress, systems, meta and tech docs (R5.3); round 3 applies RULINGS §8 (R8.1-R8.8)
+and the requests routed here by [`reconcile.md`](reconcile.md) ("Changes in round 3", at the end).
 
 This doc plans every pixel and every note that GP adds to vanilla Rockman 6: where new art lives in CHR, what each stage
 costs in tiles and frames, who makes it (with **no pixel artist**, R5.1), the style rules, the pipeline's art specs, and
@@ -72,7 +73,7 @@ GP screens **NN**. Stage ids are tech's (R1.2) and venue names are R3.3's.
 - **The audio** (R5.2):
   - **G00-G04**;
   - **G27 WHISTLE**, the 2-second jingle;
-  - **G37 LAST MATCH**, the lights-out arrangement on 2A03 stems;
+  - **G37 LAST MATCH**, the lights-out arrangement on 2A03 stems: the game's only channel drop (R8.3);
   - 21 new SFX in the `$36` tail, plus 15 vanilla SFX reused;
   - the D9 mute mask is Must (tech builds it).
 
@@ -140,11 +141,11 @@ lowers a look, not a feature. In order:
 | New CHR anywhere | tech's CHR set table v2 (M2), `chr.py`, `sprites.py`, `palettes.py`, `artcheck.py` (M2) |
 | BG bosses | `bgboss.py` (M7, before the H wings); `RL_FLOOR`, `RL_FLOOR8`; F-PIECES (tech M7) |
 | Face icons in pop-ups | tech's glyph strip (§11.4: ≤ 24 glyphs + 4 icon tiles); text v1a |
-| Set-piece player sheets, form swaps | tech's CHR stream (M2) and systems' `gp_player_sheet` (M3) |
+| Set-piece player sheets, form swaps | tech's CHR stream (M2) and systems' `gp_player_sheet` and quick form swap (M5, R8.2: the slice has no forms) |
 | The title's menu | `RL_SPLIT_PT` (tech M5); until then a plain text menu (meta) |
-| W2/W3 "SUPER colour" | palettes, `RL_PARALLAX`, `RL_PALBAND`; no ExGrafix (R1.3) |
+| W2/W3 "SUPER colour" | palettes, `RL_PARALLAX`, `RL_PALBAND`; no ExGrafix (R1.3) and no MMC5 audio: the 2A03 music keeps all its channels (R8.3) |
 | Every new track | D1, D2, D4, D6, D11 (tech M2), `mml.py`; every Should track has a vanilla fallback |
-| G37 LAST MATCH | **D9 mute mask** (Must, R5.2, tech §12.6) |
+| G37 LAST MATCH | **D9 mute mask** (Must, R5.2, R8.3, tech §12.6) |
 | Must SFX | the `$36` tail, reserved for SFX (R1.14) |
 
 **Not in v1.0** (kept below, each marked in place):
@@ -152,7 +153,7 @@ lowers a look, not a feature. In order:
 | Tier | Art and audio |
 |---|---|
 | **Should (v1.1+)** | Portraits and match-card portraits (§9.4); Grand Pi-kun's S and L sizes; THE APPROACH's drive-toward-camera sizes; the Break Man playable sheet (with the partner, R0.3 item 2); alt and synergy tiles (item 1); each venue's second-set-piece and arena-twist art (item 4); H2 and H4 with the Mecha Dragon and the Cossack Catcher (item 5); Doc Robot's Air Man; UMBRELLA MAN; the podium's all-eight BG row; G05-G13, G15, G16, G22-G26, G28, G38 RIOT; 35 SFX; D3, D10 |
-| **Could** | W1 (TS_LAB, METALL 16, Enker) with ExGrafix in its locked rooms only (R1.3); the Exhibitions E1-E3 as single arenas (R3.7); the victory lap; the MMC5 voices (D5, D7, D8; G14x, G15x, G37x, G34, G35); G14, G17-G20, G29-G33; the attract crawl's pictures; the PART/booth bundle's icons; achievement plates; Mr. X's portrait |
+| **Could** | W1 (TS_LAB, METALL 16, Enker) with ExGrafix in its locked rooms only (R1.3); the Exhibitions E1-E3 as single arenas (R3.7); the victory lap; the MMC5 voices (D5, D7, D8; G14x, G15x, G37x, G34, G35); G14 (the POCKET arrangements, R8.3), G17-G20, G29-G33; the attract crawl's pictures; the PART/booth bundle's icons; achievement plates; Mr. X's portrait |
 | **Won't (v1)** | E4 Maze art and G21; Bass Mode's player sheet and G36; Mr. X Returns; the Museum's meters; Yamato's sekisho, passes, kites and hanabi (R3.2); DPCM drums (D12) and the PCM announcer (D13); 32 KB CHR-RAM; the extra 4 KB ExGrafix page (R1.3); the mixed-case EN font (R1.4) |
 
 ---
@@ -468,7 +469,8 @@ consistency-1). So:
 - **No ExGrafix in W2, W3 or the escape**, and **no extra 4 KB CHR page**: with 8 KB CHR-RAM the page bits reach only
   the two pattern tables (the feasibility critic's probe `exgfx.nes`).
 - **v1.0's "SUPER colour"** in W2, W3 and the escape is richer per-screen palettes, raster palette and parallax bands
-  (`RL_PALBAND`, `RL_PARALLAX`), and the music (§12).
+  (`RL_PALBAND`, `RL_PARALLAX`). The 2A03 music keeps all its channels there; the game's only channel drop is LIGHTS
+  OUT's (R8.3, §12.9).
 - **ExGrafix is Could**, only in W1's locked, text-free 16-bit rooms and the METALL 16 arena:
   - filled in mode 2 while the screen is blank, then mode 1, with the announcer held (tech §3.3);
   - its data is one extended-attribute byte **per metatile per tileset** (≈ 1 KB for TS_LAB, R1.5), never per screen;
@@ -576,12 +578,12 @@ screen's count and recounted every set piece in round 2. This table re-checks th
 |---|---|---|---|
 | SKY ACE sortie 01 (venues_a) | Rock + script + 3 shots + ≤ 4 enemy-side = **9** | ≤ 3 fighters (2 wide) in any 8-px band + Rock + shots ≤ 10 | AYACO (48 px = 6 sprites) flies with at most one fighter on its lines; explosions use the common row |
 | HIGH NOON train (venues_a) | Rock + script + 3 shots + ≤ 4 enemy-side (1 robber) = **9** | Sidewinder 32 px (4) + Rock + 1 outlaw ≤ 10 | the tunnel wall is a sprite only while it passes; the rails are BG |
-| SUMMIT CLIMBER boss (venues_b's flicker request) | Rock + script + Blizzard Man + ≤ 3 flakes + 3 shots (the Ice Block is one) = **9** | vanilla: 9 on a line in 56 % of frames | FLAKES spaces flakes ≥ 16 px apart in height; the slush puddle (MELT) is BG; the skis-off frames are 24 px wide. The simulator runs FLAKES with an Ice Block out; if it fails the boss budget, FLAKES drops one flake while an Ice Block exists (an AI rule; venues_b decides) |
+| SUMMIT CLIMBER boss (venues_b's flicker request) | Rock + script + Blizzard Man + ≤ 3 flakes + 3 shots (the Ice Block is one) = **9** | vanilla: 9 on a line in 56 % of frames | FLAKES spaces flakes ≥ 16 px apart in height; the slush puddle (MELT) is BG; the skis-off frames are 24 px wide. The simulator runs FLAKES with an Ice Block out; if it fails the boss budget, FLAKES throws one flake fewer while an Ice Block is out (an AI rule, R8.6; venues_b applies it at M4) |
 | HALFTIME RIOT, Bass β duel 1 (fortress) | Rock + script + Bass + ≤ 3 flakes (the B.ATTACK copy) + 3 shots = **9** | Bass 24 px (3) + flakes 8 px | his 4 pre-drawn copies are 8-16 px wide |
 | Grand Pi-kun (BG boss) | Rock + script + the controller + 2 shockwaves or 2 confetti bursts + 3 shots = **8** | the body is BG; valve 16 px | one size: no size streaming |
 | Yellow Devil, Gamma (BG bosses) | Rock + script + the controller + 1 flying piece or 2 fists + 3 shots ≤ **8** | 2 fists (3 wide each) + Rock (2-3) = 8-9 | fists are 24 px; the head and body are BG |
 | The parade (Opening 07-0A) | float + champion + glove + Rock + script + runner + 3 shots = **9** | the 48×16 deck (6) shares its lines only with Rock | one float per screen (fortress), so one champion palette per screen |
-| **The podium** (ending scene 5) | 8 champions + Rock + Bass + script + runner = **12: over the cap**; 8 champion palettes cannot exist (§3.2) | 8 figures in a row ≈ 24 | **Art's recommendation** (a request to fortress, §15): **the champions applaud in pairs**, one pair at a time beside the podium (2 s each; SET-PARADE, two enemy palettes per pair, 0 new tiles): **6 slots**. Should: all eight at once as a **BG applause row** (SET-PARADE converted to BG in 3 BG palettes, 112 tiles) |
+| **The podium** (ending scene 5) | 8 champions + Rock + Bass + script + runner = **12: over the cap**; 8 champion palettes cannot exist (§3.2) | 8 figures in a row ≈ 24 | **Ruled (R8.6)**: **the champions applaud in pairs**, one pair at a time beside the podium (2 s each; SET-PARADE, two enemy palettes per pair, 0 new tiles): **6 slots**. Should: all eight at once as a **BG applause row** (SET-PARADE converted to BG in 3 BG palettes, 112 tiles) |
 | LIGHTS OUT (S42) | Rock, Light, Roll, Rush, Beat + script + runner = **7** | 5 figures: staggered in two rows ≤ 8 | Light in palette 1, Roll and Rush in palette 2, Beat in 3, Rock in 0 |
 | S40 catch, the arrest | 3 figures + script + runner = **5** | 3 × 24 px = 9 if level | stagger by 8 px (Wily kneels: the vanilla kneel pose) |
 | W2's bracket board | 0 (BG) | 0 | face icons and weapon icons are BG copies |
@@ -908,7 +910,7 @@ from RM6's own pages.
 | | **KAMEGORO MAKER MK-VI** (R3.6): the vanilla dome dispenser re-skinned: the shell press, turtles (the hard-hat walkers recoloured with a shell), eggs | 24 | 4 | X | Must |
 | | Doc Robot MK-VI copying AIR MAN (Air Man's set) and Air Man's arena (R3.6) | 60 + 48 BG | 12 | D | Should |
 | **H5** (bank `$67` slot 1, Mr. X 4's base) | A starfield, crystal emitters, the Super Arrow launcher, the throne room and its pedestal; room 19 loads vanilla's own Mr. X 1 set `$9D` | 60 (8 + 52) | | C + D | Must |
-| | The MEGAMAN V letter plates (from the font), the Super Arrow (16×8, 2) | 18 | 3 | C | Must |
+| | The `ROCKMAN5` letter plates (from the font; the Japanese release's word, in both languages, R8.5), the Super Arrow (16×8, 2) | 18 | 3 | C | Must |
 | | **Dark Man's disguise**: a 40-tile enemy-area set made from the NPC Break Man with **the scarf orange instead of yellow**, the one visual tell (feasibility-14, consistency-8) | 40 | 6 | R | Must |
 | | **Dark Man MK-VI**, the true form (≤ 16 frames, composited first) | 64 | 12 | D | Must |
 | | The unmasking: Mr. Y's pod (the vanilla Mr. X pod recoloured, with a Y emblem), the **GP CUP** (16×24; also in W3, the podium and the sixth wing). The Mr. X face and Wily are vanilla; the castle picture's green → NES → SUPER ramp is palette data | 10 | 2 | R | Must |
@@ -919,8 +921,8 @@ from RM6's own pages.
 
 ### 5.4 Super Wily Castle: W2, W3 and the escape (`$1C`, `$1D`) · Must, M8; W1 Could
 
-**"SUPER colour" in v1.0** (R1.3) is palettes, raster bands and the music, never ExGrafix (§2.7). It costs palette data,
-not tiles.
+**"SUPER colour" in v1.0** (R1.3, R8.3) is richer palettes plus parallax and palette bands, never ExGrafix (§2.7). It
+costs palette data, not tiles. The 2A03 music keeps all its channels in W2, W3 and the escape (§12.9).
 
 | Stage | Item | Tiles | Frames | Method | Tier |
 |---|---|---|---|---|---|
@@ -1047,7 +1049,7 @@ parts (Pi-kun's parts are in §5.1's sprites). Round 1's 600 Must BG-boss tiles 
 | Who | Size | Tiles | Frames | Notes | Method | Tier |
 |---|---|---|---|---|---|---|
 | **The NPC Break Man** | 16×24 | 40 | 10 | §5.2: the Opening (masked), the Riot, H5, W3, the ending | R + D | Must |
-| **Eddie** | 16×24 | 12 | 3 (idle, hop, open lid) | **New art: Eddie is not in vanilla RM6** (fortress §1.2 lists him as vanilla; a request, §15). The Opening's stall, Tomahawk's window, the pit stop (as BG) | D | Must |
+| **Eddie** | 16×24 | 12 | 3 (idle, hop, open lid) | **New art, a composite** (R8.6): Eddie is not in vanilla RM6, so vanilla RM6 parts get a new box body and lid. The Opening's stall, Tomahawk's window, the pit stop (as BG) | X (the ledger still prices him as a D draft: ≈ 0.1 session of margin) | Must |
 | **Roll** | 16×24 | 14 | 3 (idle, wave, refill) | composited from Rock's sheet (hair, dress, palette). LIGHTS OUT, the pit crew | X | Must |
 | **Dr. Light** | 16×32 | 12 | 2 | LIGHTS OUT | D | Must |
 | **Mr. Y** | as Mr. X | 6 | 3 | **vanilla Mr. X's sprite with a fake moustache and a "Y" pin**: the disguise changed one letter | R | Must |
@@ -1116,7 +1118,7 @@ meta owns what each menu screen shows and does; story owns every word on it; thi
 | **Bracket centre: Bass β** | a 32×32 Bass β in a cracked frame, **composited from vanilla's centre Rockman portrait** (fins, palette, cracks; R5.1). Rockman's face on the trophy is vanilla | 20 BG | X |
 | **Bracket sprites** | the medal ribbon (1 shape, 4 palettes), the POSTPONED stamp (32×16), ★, the participation ribbon; plate letters B/E/A/T and the cursor are vanilla | 18 sprite | C |
 | Exhibition badges (4 rings that blink by palette) | | 16 sprite | Could, with the Exhibitions |
-| **Boss panels** (vanilla `$3C:$81B1`, extended by tech §11.2) | a sprite boss shows its own pose, as vanilla; **a BG boss's panel shows its 16×16 face icon** (§9.4). The bold set gains `- ? ! ' β` and the panel frame gains a VENUE strip (story's ask) | 10 BG | D |
+| **Boss panels** (vanilla `$3C:$81B1`, extended by tech §11.2) | a sprite boss shows its own pose, as vanilla; **a BG boss's panel shows its 16×16 face icon** (§9.4). The bold set gains `- ? ! ' β` and the panel frame gains a VENUE strip (story's ask). Names follow vanilla's style with no space (`BREAKMAN`, `DARKMAN`, R8.5); the WRONG NOTE's third record re-types in the same art | 10 BG | D |
 | Match-card portraits for the BG bosses | | 64 BG | **Should** (R5.1) |
 
 ### 9.3 Judges' desk, scorecard, rating screen [new-art] M · Must (meta §4.0, §6)
@@ -1132,9 +1134,9 @@ meta owns what each menu screen shows and does; story owns every word on it; thi
   the **secret icons** (exit, room, item, plate, envelope), 5 × 16×16, lit or dim by palette and shared with the file
   cards and the pause menu. Together 40 sprite tiles (D). The `93` badge and the TURBO `*` are Could (1993 RULES and the
   bundle).
-- **The rating screen** (meta §6.1): in v1.0 it draws over the judges' desk (meta's choice; fortress's "stadium at dusk"
-  is withdrawn here in meta's favour), with the rating meter and the title plates (GRAND CHAMPION … PARTICIPANT): 40 BG
-  tiles (D). The participation ribbon is in §9.2's sprites. The PHOTO FINISH background comes with the lap (Could).
+- **The rating screen** (meta §6.1): in v1.0 it draws over meta's judges' desk (R8.6; not the stadium at dusk), with
+  the rating meter and the title plates (GRAND CHAMPION … PARTICIPANT): 40 BG tiles (D). The participation ribbon is
+  in §9.2's sprites. The PHOTO FINISH background comes with the lap (Could).
 
 ### 9.4 Face icons instead of portraits [new-art] S · Must (R5.1)
 
@@ -1144,9 +1146,11 @@ meta owns what each menu screen shows and does; story owns every word on it; thi
   tiles = 28 ids (tech §11.3-§11.4). It needs no sprite tiles, so it works in boss rooms whose enemy area is full. That
   answers the first-weakness line (consistency-14, consistency decision 29).
 - A screen with 24-27 free ids shows the name label without the icon; with fewer than 24 the line waits (tech §11.4).
+- **Speakers with no icon** (story §6.1): the King, the battle log and the PA speak in an **icon-less pop-up**, with no
+  icon tiles, so their lines need 24 free ids, not 28.
 - On menu screens the same CHR loads as a sprite set where a sprite is easier (the file cards).
 
-The set (consistency-40: story's POP speakers, plus the faces the screens need):
+The set (consistency-40: story's POP speakers, plus Rock and the faces the screens need; it matches story §6.1's list):
 
 | Icons | Used by | Tiles | Method |
 |---|---|---|---|
@@ -1385,9 +1389,9 @@ doc are written for the Claude-only plan.
 | Code | Method | What it covers | Why |
 |---|---|---|---|
 | **R** | Reuse: copy, recolour, crop, repack | SET-PARADE; Bass β's and the NPC Break Man's recoloured frames; Dark Man's disguise; Shadow Rock; Metal Metslime; Mr. Y; the champions' face icons; W2's board copies; re-sourced parts of thirds (decks, bricks, caves, water, mesas, torches, moon); the glyph conversion; the Committee guards | pure data work on Capcom's own pixels; the house style comes for free |
-| **X** | Composite: vanilla parts plus new pixels per frame | the seal-bot, Met fighters, the King and Sage, Metslimes, outlaws and townsfolk, Sam and the Sheriff, the scorpion and cat, the guard-bot, Jaja-nin and ashigaru, the rejects, Big Eye, the Kamegoro Maker, the Trophy Dispenser, Roll, the Super Rock sheet, the two set-piece sheets, the cactus walkers | starts from Capcom's silhouettes and outlines; the new pixels are the joke |
+| **X** | Composite: vanilla parts plus new pixels per frame | the seal-bot, Met fighters, the King and Sage, Metslimes, outlaws and townsfolk, Sam and the Sheriff, the scorpion and cat, the guard-bot, Jaja-nin and ashigaru, the rejects, Big Eye, the Kamegoro Maker, the Trophy Dispenser, Roll, Eddie (R8.6), the Super Rock sheet, the two set-piece sheets, the cactus walkers | starts from Capcom's silhouettes and outlines; the new pixels are the joke |
 | **C** | Programmatic (a generator script) | the 2600 canopy, W-SEA, rails and wheels, the crowd tiles, the pitch stripes, bracket lines, signs and words from the font, HUD labels, the checker floor, the pixelation downsamples, the BG-boss face icons, the new glyphs | exact and repeatable; the script is the source |
-| **D** | A Claude draft, final | the venue thirds' new parts (carrier deck, saloon, town, palace, Edo street, caverns), the stadium, the MUSEUM third, the BG bosses' bodies (Pi-kun, the Yellow Devil, Gamma), Dark Man, Sidewinder, the Daruma, the champions' pinch sets, Eddie, Light, the UI screens (desk, pit stop, maps, title kana, GP badge), chip icons | Claude can lay out tiles that read at 16×16 and keep palettes legal; R5.1 accepts the result as final |
+| **D** | A Claude draft, final | the venue thirds' new parts (carrier deck, saloon, town, palace, Edo street, caverns), the stadium, the MUSEUM third, the BG bosses' bodies (Pi-kun, the Yellow Devil, Gamma), Dark Man, Sidewinder, the Daruma, the champions' pinch sets, Light, the UI screens (desk, pit stop, maps, title kana, GP badge), chip icons | Claude can lay out tiles that read at 16×16 and keep palettes legal; R5.1 accepts the result as final |
 
 ### 11.4 Workload (`budget_r2.py`)
 
@@ -1426,7 +1430,8 @@ At **every milestone** (and at the ⛳ gates M4, M6 and M8 with the user playing
    "judges' desk" command (meta §9.6) adds every debrief.
 2. artcheck's novelty census adds the **ghost frames** (vanilla dithered, new art in colour) and the ledger's built
    counts per stage against `budget_r2.py`.
-3. The results go into **one gallery page for the user** (a published artifact or a local HTML file).
+3. The results go into **one gallery for the user**: a local HTML page plus the PNGs, sent to the user at each gate. It
+   is published only if the user asks (R8.8).
 4. The user marks each picture **FINE**, **FIX** (a named problem) or **REDRAW**.
 5. FIX and REDRAW items go into the next milestone's art sessions (the +5 %); REDRAW is rare by design, since every asset
    was a placeholder with the final size first.
@@ -1518,7 +1523,8 @@ new music `$66-$9F`, new SFX `$A0-$EF`.
 | A commentator pop-up | the pop-up chime (SFX) | G06 KALINKA! (Should) |
 | **HALFTIME RIOT** | **G04 BETA, stage entry** | G38 RIOT (Should: a G04 remix with the rejects' crowd chant; fallback G04, then `$0B`) |
 | **Bass duels 1 and 2, the W2 final** | **G04 BETA, duel entry** | |
-| **The NPC Break Man's beats** (the Riot's help and reveal, H3's music box at the statue, S40 over the white, the Opening's tip after a death to Pi-kun) | **G27 WHISTLE** (2 s) | |
+| **The NPC Break Man's beats** (the Opening's last float, S06, whistle first and no name spoken, R8.5; the Opening's tip after a death to Pi-kun; the Riot's help and reveal; H3's music box at the statue; S40 over the white; his debrief pages, story §10.2) | **G27 WHISTLE** (2 s) | |
+| **H5's WRONG NOTE** (fortress §4.5.2, story S30) | the fake whistles **G27's off-key take** (one note wrong, under the red note sprite); the real **G27** answers in tune from off screen | |
 | The Hall of Fame map | vanilla `$11` | G07 HALL OF FAME (Should) |
 | H1, H3, H5 | vanilla `$09` | G08, G10, G12 tributes (Should) |
 | H2, H4 (Should) | vanilla `$09` | G09, G11 (Should) |
@@ -1573,7 +1579,7 @@ boss 633, the Wily Machine 575, jingles 116-260, ending scenes 349-546. MMC5 com
 | G02 | THE JUDGES | 420 | **Must** | `$15` |
 | G03 | MEDAL STAMP (4 ids) | 190 | **Must** | `$13` |
 | G04 | BETA (stage and duel entries) | 1,050 | **Must** | `$0B` |
-| G27 | WHISTLE (2 s) | 110 | **Must** (R5.2; round 1: Should) | silence |
+| G27 | WHISTLE (2 s), plus its off-key take for H5's WRONG NOTE (a 40-B copy of the melody stream with one note changed, entered by D11; round 3, not yet in `music_r2.py`) | 150 (110 + 40) | **Must** (R5.2; round 1: Should) | silence |
 | G37 | **LAST MATCH** (4 stems, §12.9) | 600 | **Must** (R5.2, consistency-13) | `$08` with no channel drop |
 | G05-G07 | PIT STOP 520, KALINKA! 90, HALL OF FAME 520 | 1,130 | Should | `$15`, the chime, `$11` |
 | G08-G12 | the five tributes, 900 each (G09 and G11 ship with H2 and H4) | 4,500 | Should | `$09` |
@@ -1583,14 +1589,14 @@ boss 633, the Wily Machine 575, jingles 116-260, ending scenes 349-546. MMC5 com
 | G38 | RIOT | 900 | Should | G04, then `$0B` |
 | G22-G26 | SORTIE 1,000, ENCOUNTER 600, TRAIN 900, BONUS 400, KABUKI 800 | 3,700 | Should | the venue's theme or `$0C` |
 | G28 | 8 stingers (duel bell, POW, LOOP, ACE 100 %, secret found, plate, inn, level-up) | 600 | Should | vanilla SFX |
-| G14 / G14x | UPGRADE LAB 1,100 / its MMC5 voices 550 | 1,650 | Could (with W1; R5.2 lists the POCKET arrangements as Should, but they have no user until W1, which is Could) | `$0B` |
+| G14 / G14x | UPGRADE LAB 1,100 / its MMC5 voices 550 | 1,650 | Could, with W1, the POCKET arrangements' only user (R8.3 corrects R5.2's "Should") | `$0B` |
 | G15x, G37x | MMC5 voices for G15 and G37 | 800 | Could | the 2A03 track |
 | G17 | VICTORY LAP (one lap) | 1,100 | Could | `$0A` |
 | G18-G20 | the Exhibition themes (750, 700, 500) | 1,950 | Could | `$0C` |
 | G29-G33 | LOST CAVERNS 600, UNDERWATER 700, PALACE 700, HONKY-TONK 500, MR. Y 350 | 2,850 | Could | the venue's theme, `$09` |
 | G34, G35 | 16-BIT WILY STAGE 1,300, 16-BIT WILY MACHINE 900 (MMC5) | 2,200 | Could | `$0B`, `$18` |
 | G21, G36 | CHASE (E4), BASS MODE | 1,500 | **Won't (v1)** | |
-| | **Total** | **Must 3,700 (7); Should 13,180 (18); Could 10,550 (15)** | | |
+| | **Total** | **Must 3,740 (7); Should 13,180 (18); Could 10,550 (15)** | | |
 
 ### 12.6 SFX
 
@@ -1602,10 +1608,15 @@ priority ≥ the current one, `rm6/engine.md` §5.2): UI and crowd SFX get low p
     `ACCEPTED!`), shop buy, shop deny, the chip click, the pop-up chime;
   - combat: the form-swap whoosh, the WEAK! crunch, the EXCELLENT MOVE chime (KAISHIN);
   - the crowd: a cheer (a noise swell) and an "ooh" on a death;
-  - the stages: the head bonk and the ice-cell break (Blizzard), the **mouse squeak** (Flame's Must hidden room,
-    venues_b), the **referee's whistle** (the escape clock), the high striker's DING and the HIGH FIVE slap (the
-    Opening), the pogo boing (Yamato);
-  - **the speaker blips**: 4 pitch variants of vanilla's typing blip (`$06A6`'s mechanism, story's per-speaker blips).
+  - the stages: the head bonk and the ice-cell break (Blizzard), the **mouse squeak** (16 B; the tell of Flame's Must
+    hidden room, venues_b; until it is written, a vanilla id picked at M2 with the reused ones below stands in, so the
+    room never waits on it), the **referee's whistle** (the escape clock), the high striker's DING and the HIGH FIVE
+    slap (the Opening), the pogo boing (Yamato);
+  - **the speaker blips** (story §10.2's 4 blips; 4 × 8 B), set per line through vanilla's typing-blip mechanism
+    (`$06A6`, `rm6/text.md`): **Cossack** low, **Kalinka** high, **Mr. Y**'s cash-register "ching" (before S33) and
+    **Wily**'s cackle (after it; the line record's unmasking flag picks the id). Everyone else, the icon-less pop-ups
+    included, types with the **neutral blip**, vanilla's own typing blip `$27` (the dink below, 0 B). Light's "radio
+    static" is his icon's frame (§9.4), not a sound; Break Man's pages open on G27 (§12.3).
 - **Must, vanilla ids reused (15, 0 B)**: gate rumble, plate click, door unlock, chest open, the gunshot, the DRAW bell,
   the ACE fanfare, thunder, knock, the press shake, the rocket-fist launch and return, the jet hop, the M.BEAM build,
   the dink (`$27`), the heal tick (`$31`). Each id is picked at M2 from `songdec.py`'s list.
@@ -1639,14 +1650,14 @@ vanilla tracks**. art_audio writes in it:
 |---|---|---|
 | Vanilla music + SFX (kept) | 20,728 | `$34-$36` (unchanged) |
 | **Must SFX** (21 new) | **392** | the `$36` tail (449 B; 57 spare) |
-| **Must music** (7 tracks) + the track table v2 (240 × 3 B) | **3,700 + 720** | bank `$75` |
+| **Must music** (7 tracks) + the track table v2 (240 × 3 B) | **3,740 + 720** | bank `$75` |
 | Should music + SFX | 13,180 + 864 | the rest of `$75`, `$76`, the start of `$77` |
 | Could music + SFX | 10,550 + 184 | `$77-$78` |
-| **Total new, all tiers** | **≈ 29.6 KB** | **4 of tech's 5 banks `$75-$79`**; v1.0 fills about 4.4 KB of `$75` |
+| **Total new, all tiers** | **≈ 29.6 KB** | **4 of tech's 5 banks `$75-$79`**; v1.0 fills about 4.5 KB of `$75` |
 
 For scale: vanilla RM6 has 18.8 KB of music; CX added 38 songs in 3 banks; 4MI 47 songs in 36 banks of gaps.
 
-### 12.9 LIGHTS OUT: G37 LAST MATCH [new-music] S · Must (R4.1, R5.2; story S42, fortress §6.1 scene 9)
+### 12.9 LIGHTS OUT: G37 LAST MATCH [new-music] S · Must (R4.1, R5.2, R8.3; story S42, fortress §6.1 scene 9)
 
 **What it is.** The GP's own march, G00, the first thing the tournament played, slowed to half tempo and re-voiced as
 **four stems, one per 2A03 channel**: the melody on pulse 1, the harmony on pulse 2, the bass on the triangle, the
@@ -1665,11 +1676,17 @@ farewell is to this very game.
 5. **The last sound is pulse 1 alone** (R4.1). D9 does not mask SFX, so the scene plays **no SFX after the first tower
    goes dark**, the sixth wing that follows is silent, and TO BE CONTINUED types without blips (fortress §6.1).
 
+**Story's S42 cue table follows this order** (confirmed): cue 0, the two MMC5 towers (only with G37x and the MMC5
+voices on); cue 1, noise, as S42.3 opens; cue 2, triangle, as S42.4 opens; cue 3, pulse 2, as S42.6 opens; cue 4,
+pulse 1 alone after S42.7, the last tower dark on its last note. Without MMC5 audio cue 0 does not exist and the scene
+starts with four towers lit.
+
 **Fallback** (never shipped, but keeps the ending playable while G37 is written): vanilla `$08` with no channel drop.
 
-**Reading R1.3's "music channel drop"** for W2, W3 and the escape: in v1.0 the console's channels are **kept** for LIGHTS
-OUT, so its gag is not spent early. The escape drops only the MMC5 voices, at 09 and 0A, if they ship (Could; fortress
-§5.4; tech §12.5 reads R1.3 the same way). This is the conservative reading; §18 asks the director to confirm it.
+**The channel drop is LIGHTS OUT's alone** (R8.3, which settles R1.3's "music channel drop"; Must). W2, W3 and the
+escape keep every 2A03 channel, so the gag is not spent early; their SUPER colour is palettes, parallax and palette
+bands (§5.4). The MMC5 voices are Could: if they ship, the castle adds them and the escape drops only them, at 09 and
+0A (fortress §5.4; tech §12.5). They are the only sound "already silenced when the castle fell" in S42.
 
 ---
 
@@ -1702,10 +1719,10 @@ chips and tells).
 
 | Ledger row | v1.0 | All tiers | Note for tech |
 |---|---|---|---|
-| CHR source `$54-$61` (14 banks, 112 KB) | **≈ 9 banks** (70.9 KB) | ≈ 15.5 banks (124.2 KB) | the full design overflows by ≈ 780 tiles; **the vanilla gap reserve** (§1.3: 1,126 blank tiles outside Capcom's sets; filling blanks overwrites no art, BRIEF §7.4) absorbs it. So **no CHR bank can leave this row** for text; text's possible 10th bank should come from the music row (below) |
-| Sprite bank pairs `$4E-$53` (3 pairs) | 1 pair is enough for 354 frames; use 2 (venue objects; bosses, player, cast, UI) | 2 pairs (532 frames, ≤ 512 per pair) | the 3rd pair is spare |
+| CHR source `$54-$61` (14 banks, 112 KB) | **≈ 9 banks** (70.9 KB) | ≈ 15.5 banks (124.2 KB) | the full design overflows by ≈ 780 tiles; **the vanilla gap reserve** (§1.3: 1,126 blank tiles outside Capcom's sets; filling blanks overwrites no art, BRIEF §7.4) absorbs it. So **no CHR bank can leave this row** for text: text's possible 10th bank comes from the music row (below), as R8.7 rules (v1.0 needs about 9 of the 14 CHR banks) |
+| Sprite bank pairs `$4E-$53` (3 pairs) | 1 pair is enough for 354 frames; use 2 (venue objects; bosses, player, cast, UI; R8.7) | 2 pairs (532 frames, ≤ 512 per pair) | the 3rd pair is spare |
 | Tileset slots `$62-$6E` (13 banks) | 14 slots in 7 banks | 26 slots in 13 | as tech §5.3 |
-| Music `$75-$79` (5 banks) | ≈ 0.55 bank (4.4 KB) | ≈ 3.6 banks (29.6 KB) | **`$79` stays spare in the full design**: the natural donor if text needs a 10th bank |
+| Music `$75-$79` (5 banks) | ≈ 0.55 bank (4.5 KB) | ≈ 3.6 banks (29.6 KB) | **`$79` stays spare in the full design**: if text needs a 10th bank, it comes from here (R8.7) |
 | `$36` tail (449 B, SFX only) | 392 B | 392 B | 57 B spare |
 | Text banks (glyphs) | ≈ 2 KB of 1-bpp glyphs in T1 | | the glyph set is art; the format is tech's |
 
@@ -1713,7 +1730,7 @@ chips and tells).
 
 | Tier | Tracks | Music bytes | New SFX | SFX bytes | Sessions |
 |---|---|---|---|---|---|
-| **Must** | **7** (G00-G04, G27, G37) | **3,700** | **21** (+ 15 vanilla ids) | **392** | **9** |
+| **Must** | **7** (G00-G04, G27, G37) | **3,740** | **21** (+ 15 vanilla ids) | **392** | **9** |
 | Should | 18 | 13,180 | 35 | 864 | 26.4 |
 | Could | 15 | 10,550 | 7 | 184 | 19.1 |
 | Won't | 2 (G21, G36) | 1,500 | | | |
@@ -1785,13 +1802,13 @@ chips and tells).
 
 | Doc (what it owns) | What this doc takes from it, and asks of it |
 |---|---|
-| `tech.md` (ids, memory, raster, CHR, tilesets, the bank ledger) | **Takes**: the stage ids (R1.2); the tileset-slot table (§5.3), which §2.2 regenerates; the CHR set table v2 (§7.6); the stream rates (§15.3); the glyph strip (§11.4: ≤ 24 glyphs + 4 icon tiles); `RL_FLOOR`, `RL_FLOOR8`, `RL_PALBAND`, `RL_SPLIT_PT` (§8.3); the HUD widget limits (§7.13); the lag cap and its count (§15.1); ExRAM in mode 0 (§3.3); the driver extension (§12). **Asks**: (1) **confirm the CHR row**: v1.0 ≈ 9 of 14 banks, the full design ≈ 15.5 with the vanilla gap reserve, so text's possible 10th bank comes from music's spare `$79`, not from CHR (§13.1; tech open question 6 asked for this re-run); (2) 2 sprite pairs suffice (the 3rd is spare); 14 / 26 tileset slots confirmed; (3) `sprites.py` overlay composites (§10.4); (4) artcheck's new checks 8-13 (§10.5) and the gallery for the art gate (§11.5); (5) G37's sync marker: command `04`'s flag or a frame table (§12.9); (6) the SFX player reads through the same reader as music, or the 21 Must SFX must stay in the `$36` tail (they do: 392 of 449 B) |
+| `tech.md` (ids, memory, raster, CHR, tilesets, the bank ledger) | **Takes**: the stage ids (R1.2); the tileset-slot table (§5.3), which §2.2 regenerates; the CHR set table v2 (§7.6); the stream rates (§15.3); the glyph strip (§11.4: ≤ 24 glyphs + 4 icon tiles); `RL_FLOOR`, `RL_FLOOR8`, `RL_PALBAND`, `RL_SPLIT_PT` (§8.3); the HUD widget limits (§7.13); the lag cap and its count (§15.1); ExRAM in mode 0 (§3.3); the driver extension (§12). **Ruled** (R8.7): (1) the CHR row: v1.0 ≈ 9 of 14 banks and 2 sprite pairs (the 3rd is spare), the full design ≈ 15.5 with the vanilla gap reserve, and text's possible 10th bank comes from music's spare `$79`, not from CHR (§13.1); tech's ledger carries it (reconcile TECH-10). **Asks**: (2) 14 / 26 tileset slots confirmed; (3) `sprites.py` overlay composites (§10.4); (4) artcheck's new checks 8-13 (§10.5) and the gallery for the art gate, a local HTML page plus PNGs (§11.5, R8.8); (5) G37's sync marker: command `04`'s flag or a frame table (§12.9); (6) the SFX player reads through the same reader as music, or the 21 Must SFX must stay in the `$36` tail (they do: 392 of 449 B) |
 | `systems.md` (combat, economy, chips) | **Takes**: the per-form `$71-$7F` map and the weapon sets' sizes (§1.4); `gp_player_sheet` (§1.4); the 16-f swap (§1.3); the 14 chips (§9.2); WEAK! (§5) via tech's family `$FD`. **Gives**: GP-COMMON's 6 tiles (W, K, !, the swap flash, CENTURION, a spare); no CRIT! tiles; `?!` with SC3 (Could); the Ice Block's 4 tiles; M.BEAM's set ≤ 15; the Super sheet (Must with H3, its slot tiles ≤ 15); the 14 chip icons and the envelope icon (W-tank Should, PART icons with the bundle); the Must SFX it asked (the cycle tick, the WEAK! crunch, the KAISHIN chime; the parry ting is Could); **G27 WHISTLE is Must** (R5.2) |
-| `meta.md` (save bytes, bracket, events, debrief) | **Takes**: every screen's contents and order. **Gives**: the title plan (the GP badge, the subtitle, the split menu at M5, a plain menu before); the file cards with face icons; the bracket with vanilla portraits and Bass β composited in the cracked frame; the desk with Cossack's and Kalinka's face icons and name labels (desk portraits Should); the sponsor's chair (Should); **the rating screen over the desk** in v1.0 (meta §6.1); the participation ribbon; the maps with H2, H4 and W1 drawn closed; the lobby screen on TS_STADIUM (Could, no slot); G01 for the title and rating (vanilla `$19` until then); MMC5 AUDIO defaults ON when D8 ships (Could) |
+| `meta.md` (save bytes, bracket, events, debrief) | **Takes**: every screen's contents and order. **Gives**: the title plan (the GP badge, the subtitle, the split menu at M5, a plain menu before); the file cards with face icons; the bracket with vanilla portraits and Bass β composited in the cracked frame; the desk with Cossack's and Kalinka's face icons and name labels (desk portraits Should); the sponsor's chair (Should); **the rating screen over the desk** in v1.0 (meta §6.1, R8.6); the participation ribbon; the maps with H2, H4 and W1 drawn closed; the lobby screen on TS_STADIUM (Could, no slot); G01 for the title and rating (vanilla `$19` until then); MMC5 AUDIO defaults ON when D8 ships (Could) |
 | `venues_a.md` (Wind, Knight, Tomahawk, Plant staging) | **Adopted**: every v1.0 delta of its §1.1/§2.1/§3.1/§4.1: the seagull is Must; the windsock is BG; the loop poses go into the sortie's set-piece sheet; Wind's pinch set is 24; W-SEA drops the destroyer (Should); SET-WS5 is Should; Knight's inn bed, Princess, Innkeeper and heart are Should and the sconce is Won't; **T-MESA** replaces T-BOOTHILL (Must); T-RODEO is Should; the cactus walker is Must; the flag judge joins SET-TM3 and "HEY!" joins SET-TM2; Plant's 12-tile vine set is dropped; the tar bubbles are BG; the eel is Should. **Music**: no new venue track in v1.0; the encounter plays `$0C`; the DRAW bell and the ACE fanfare are vanilla SFX |
-| `venues_b.md` (Blizzard, Flame, Centaur, Yamato staging) | **Adopted**: the change lists of §1.8, §2.6, §3.8 and §4.7 (hanging icicles as BG, the condor on ladder poses, the snowman and snowball Should, the mouse and the marshal Must, 2 chandeliers, no minarets or crescent, the plaque digits as BG, the Centurions Must, the Daruma and the pogo rack Must, the pogo poses in a set-piece sheet, Yamato's cut cast Won't). **The mouse squeak is a Must SFX** (16 B). Cue tiers as asked: G25, G26 Should; G30, G31 Could. **The Blizzard fight's flicker check** is §3.5's row, with an AI fallback that venues_b decides |
-| `fortress.md` (non-venue staging, boss techniques) | **Adopted**: every asset and technique of its §9.6 and §1-§6 (§5-§6 here), the orange scarf, one size per BG boss, the vanilla Wily Machine 6 retint. **Asks**: (1) **Eddie is new art**, not a vanilla sprite (its §1.2 lists him under vanilla sprites); (2) **the podium cannot show eight champion sprites at once**: 12 occupied slots against the cap of 9, and 8 palettes against 2 (§3.5). Art recommends the champions applauding **in pairs** (0 new tiles); the all-eight BG row is Should; (3) the rating screen draws over meta's desk (its §6.1 scene 8 says the stadium at dusk; meta owns the screen); (4) G37's sync is driven by the music (§12.9); (5) the SFX it asked: the DING, HIGH FIVE and the referee's whistle are new Must SFX, the knocks and the press shake are vanilla ids, the bell scale and the claw's ding-ding are Should with H4; (6) the trophy theft's claw is Must art here and H4's Catcher reuses it; (7) if THE APPROACH returns, its L pose is ≤ 150 tiles with the background blanked and no glyph window (feasibility-16) |
-| `story.md` (every word, the ending) | **Gives**: face icons for its 7 POP speakers (Light as a radio frame) plus Rock, Bass β, Eddie and the champions; portraits are Should (Mr. X Could); the boss panel's bold `- ? ! ' β` and the VENUE strip; the plaque frame is the window frame (no art; the wing emblems are Should); the trophy theft's claw on Mr. Y's pod; **one** CAPCOM TIMES headline in v1.0 (the doped one is Could); 4 speaker blips; **G37 LAST MATCH** with one stem per channel; **no mixed-case EN set** (its §10.3); no DPCM cue. The attract crawl's three pictures are Could (R0.3 item 12). **Asks**: the S42 cue table follows §12.9's order (MMC5 first if on, then noise, triangle, pulse 2, pulse 1); S42's "already silenced when the castle fell" applies only to the MMC5 voices |
+| `venues_b.md` (Blizzard, Flame, Centaur, Yamato staging) | **Adopted**: the change lists of §1.8, §2.6, §3.8 and §4.7 (hanging icicles as BG, the condor on ladder poses, the snowman and snowball Should, the mouse and the marshal Must, 2 chandeliers, no minarets or crescent, the plaque digits as BG, the Centurions Must, the Daruma and the pogo rack Must, the pogo poses in a set-piece sheet, Yamato's cut cast Won't). **The mouse squeak is a Must SFX** (16 B, one of the 21; a vanilla id stands in until it is written, §12.6). Cue tiers as asked: G25, G26 Should; G30, G31 Could. **The Blizzard fight's flicker check** is §3.5's row, with R8.6's AI fallback: FLAKES throws one flake fewer while an Ice Block is out if the simulator fails it (venues_b applies it at M4) |
+| `fortress.md` (non-venue staging, boss techniques) | **Adopted**: every asset and technique of its §9.6 and §1-§6 (§5-§6 here), the orange scarf, one size per BG boss, the vanilla Wily Machine 6 retint. **Ruled** (R8.6; reconcile FORTRESS-08, FORTRESS-09): (1) **Eddie is new art** (a composite), not a vanilla sprite; (2) **the podium cannot show eight champion sprites at once** (12 occupied slots against the cap of 9, 8 palettes against 2; §3.5), so the champions applaud **in pairs** (0 new tiles) and the all-eight BG row is Should; (3) the rating screen draws over meta's judges' desk, not the stadium at dusk. **Asks**: (4) G37's sync is driven by the music (§12.9); (5) the SFX it asked: the DING, HIGH FIVE and the referee's whistle are new Must SFX, the knocks and the press shake are vanilla ids, the bell scale and the claw's ding-ding are Should with H4; (6) the trophy theft's claw is Must art here and H4's Catcher reuses it; (7) if THE APPROACH returns, its L pose is ≤ 150 tiles with the background blanked and no glyph window (feasibility-16) |
+| `story.md` (every word, the ending) | **Gives**: face icons for its 7 POP speakers (Light as a radio frame) plus Rock, Bass β, Eddie and the champions; portraits are Should (Mr. X Could); the boss panel's bold `- ? ! ' β` and the VENUE strip; the plaque frame is the window frame (no art; the wing emblems are Should); the trophy theft's claw on Mr. Y's pod; **one** CAPCOM TIMES headline in v1.0 (the doped one is Could); 4 speaker blips (§12.6's mapping); the icon-less pop-up for the King, the battle log and the PA (§9.4); G27 at Break Man's beats and H5's WRONG NOTE, with its off-key take (§12.3); **G37 LAST MATCH** with one stem per channel; **no mixed-case EN set** (its §10.3); no DPCM cue. The attract crawl's three pictures are Could (R0.3 item 12). **Asks** (R8.3; reconcile STORY-04): the S42 cue table follows §12.9's order (MMC5 first if on, then noise, triangle, pulse 2, pulse 1); S42's "already silenced when the castle fell" applies only to the MMC5 voices. Story's S42 now does both |
 
 ---
 
@@ -1846,7 +1863,7 @@ chips and tells).
 6. **Sprite-set conflicts** are tight in SUMMIT CLIMBER, PERSIAN PALACE and HIGH NOON FRONTIER (§4): a late layout change
    can break a screen. artcheck runs from the first venue build (M4).
 7. **Multi-character scenes** hit two limits at once: 2 enemy palettes and 9 slots (§3.5).
-   - The podium is the case found so far.
+   - The podium is the case found so far; R8.6 rules the pairs (0 new tiles), with the all-eight BG row Should.
    - *Mitigation*: pairs, staggering, BG rows; artcheck's slot and palette checks run on cutscenes too.
 8. **The CHR ledger is full in the full design** (≈ 15.5 of 14 banks).
    - *Mitigation*: the vanilla gap reserve; the Should and Could rows are re-totalled at every ⛳ gate (R0.1).
@@ -1868,18 +1885,20 @@ chips and tells).
 
 1. **(User, R5.1, RULINGS §7 Q2)** Will a pixel artist join (now, later or never)? This plan assumes never. The gallery
    of §11.5 shows where a human pass would pay most.
-2. **(Director)** R1.3's "the music channel drop" in W2, W3 and the escape: confirm the conservative reading (§12.9). The
-   console's channels are kept for LIGHTS OUT; only the MMC5 voices drop at the escape, and only if they ship. fortress
-   and tech read it the same way.
-3. **(Director)** R5.2 lists "the POCKET arrangements" as Should, but their only user is W1, which is Could. This doc
-   tiers G14 Could with W1; confirm.
-4. **(fortress)** The podium in pairs (recommended), or the all-eight BG row promoted from Should?
-5. **(tech)** The CHR row (§13.1): confirm 9 banks for v1.0, the gap reserve for the full design, and music's `$79` (not
-   CHR) as text's spare.
-6. **(tech)** G37's sync: the `04` flags command, or a frame-count table?
-7. **(User)** The art gate's gallery: a published page (private by default) or a local HTML file per milestone?
-8. **(tech, Could)** Which emulator and hardware matrix decides "MMC5 audio works", for D8's default? (It defaults ON,
+2. **(tech)** G37's sync: the `04` flags command, or a frame-count table? (reconcile TECH-11)
+3. **(tech, Could)** Which emulator and hardware matrix decides "MMC5 audio works", for D8's default? (It defaults ON,
    since every track is complete without it; consistency decision 36.)
+
+**Resolved in round 3** (RULINGS §8):
+
+- The channel drop is LIGHTS OUT's alone; W2, W3 and the escape keep every 2A03 channel, and the escape drops only the
+  MMC5 voices if they ship (R8.3; §12.9).
+- G14, the POCKET arrangements, is Could with W1 (R8.3).
+- The podium shows the champions in pairs; the all-eight BG row is Should (R8.6).
+- Eddie is new art, a composite; the rating screen draws over meta's desk (R8.6).
+- The CHR row: v1.0 ≈ 9 of 14 CHR banks and 2 sprite pairs; text's possible 10th bank comes from music's `$79` (R8.7).
+- The art gate's gallery is a local HTML page plus PNGs sent to the user at each gate, published only if the user asks
+  (R8.8; the user may change it).
 
 **Resolved since round 1** (consistency decision 36 and the rulings):
 
@@ -1931,3 +1950,23 @@ Finding ids are those of [`review_feasibility_design.md`](review_feasibility_des
 | 29 | The ledger fed: `tools/plan/tight.py` (art 51.6, was a formula giving ≈ 50; music 9, was ≈ 10) and `tools/plan/tally.py` (all four tiers of art and music) | R0.1; scope-1 |
 | 30 | Open questions resolved by consistency decision 36 (32 KB CHR-RAM, DPCM, deferral, the bracket theme, the enemy-area placements, MMC5 default ON); new questions for the director, tech, fortress and the user (§18) | consistency decision 36 |
 | 31 | Small rulings with art: the mirror's glow palette is Shadow Rock's merge tell (FL-PALACE); plaques say BLUES and use the window frame (story's words); SUPER's sheet waits for tech's `$9B` audit | R3.9, R1.12; design-17, design-23, feasibility-14 |
+
+---
+
+## Changes in round 3
+
+Request ids are those of [`reconcile.md`](reconcile.md)'s "art_audio.md" table; R-numbers are
+[`RULINGS.md`](RULINGS.md) §8's. No session figure changed: art stays **51.6**, music **9**, and the milestone table
+is unchanged (R8.1's re-baseline already adds it up).
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| ART_AUDIO-01 | applied | §9.4, §12.3, §12.5, §12.6, §12.9, §15 | The 4 blips are spelled out: Cossack low, Kalinka high, Mr. Y's "ching" before S33 and Wily's cackle after (the unmasking flag picks the id), and vanilla's `$27` as the neutral blip (still 4 × 8 B). The King, the battle log and the PA speak in an icon-less pop-up (24 free ids). G37's drop order was already §12.9's; story's S42 cue table (cues 0-4) is confirmed against it. Story's row also names the whistle at the WRONG NOTE: G27 gains its off-key take (+40 B, Must music 3,740 B) |
+| ART_AUDIO-02 | applied | §12.6, §15 | The mouse squeak was already one of the 21 Must SFX (16 B); added that a vanilla id, picked at M2, stands in until it is written |
+| ART_AUDIO-03 | already | §2.4, §4.2, §4.3, §4.6, §4.7, §7.1, §15 | Every venues_a delta is in the budgets and in `budget_r2.py`'s rows: the seagull Must, the windsock and the flag judge's stand as BG (T-MESA), the loop poses on the sortie sheet, Wind's 24-tile pinch set, T-MESA Must, T-RODEO Should, the cactus walker Must, the vine weapon-slot set dropped, the sconce flame Won't |
+| ART_AUDIO-04 | applied | v1.0 scope, §2.7, §3.5, §5.4, §7.3, §9.3, §11.3, §11.5, §12.5, §12.9, §15, §17, §18 | R8.3: SUPER colour is palettes, parallax and bands, with all 2A03 channels kept in W2, W3 and the escape; the channel drop is LIGHTS OUT's (Must); G14 Could. R8.6: the podium pairs are ruled; Eddie is new art, a composite (method X; the ledger still prices him as a draft, about 0.1 session of margin); the rating screen draws over meta's desk. R8.8: the gallery is a local HTML page plus PNGs. The asks these settle are moved to §18's resolved list |
+| R8.2 | applied | v1.0 scope (dependency table) | Form swaps rest on systems' quick form swap and `gp_player_sheet` at M5; the slice has no forms |
+| R8.5 | applied | §5.3, §9.2, §12.3 | H5's letter plates spell `ROCKMAN5` in both languages (same 18 tiles); panel names have no space (`BREAKMAN`, `DARKMAN`) and the WRONG NOTE's third record re-types in the same art; S06 speaks no name |
+| R8.6 | applied | §3.5, §15 | FLAKES throws one flake fewer while an Ice Block is out if the flicker simulator fails it (venues_b applies it at M4) |
+| R8.7 | applied | §13.1, §15 | The CHR row is ruled: v1.0 ≈ 9 of 14 CHR banks and 2 sprite pairs; text's possible 10th bank comes from music's `$79` |
+| R8.1 | already | §13.3 | The tight Must is about 450; this doc's totals and milestone figures need no change |

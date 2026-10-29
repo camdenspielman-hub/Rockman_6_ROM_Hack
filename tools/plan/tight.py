@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """critic-scope: the proposed TIGHT Must (v1.0) with reduced-scope session estimates per item."""
 tight = {
- 'tech': [  # round 2: docs/design/tech.md "v1.0 scope" (43 items by milestone, RULINGS R1.1-R1.14); was 98, now 102:
+ 'tech': [  # round 3: docs/design/tech.md "v1.0 scope" (RULINGS R1.1-R1.14, R8.2); was 98, then 102, now 102.5:
             # +2.5 fight loader (moved here from meta, R1.7), +2 OAM-builder lag steps (R1.8), +1 $9B audit (R1.12),
-            # -1.5 F-SIZES (Should, R3.6)
+            # -1.5 F-SIZES (Should, R3.6); round 3: attach state split M3/M5 (R8.2), +0.5 ending engine pieces
   ('M0: MMC5 go/no-go spike on Mesen', 1.5), ('M0: workbench, registry, bank/WORK ledgers, test runner, golden record', 4),
   ('M0: reassemblable fixed banks + sound driver', 3), ('M0: round trips + censuses ($51/$063D/$9B, damage steps) + stagetab', 4),
   ('M1: insertion, header, RESET, stubs, re-entrant CW, FAR', 2.5), ('M1: helpers (vanilla A), sound service, mirroring', 2),
@@ -18,13 +18,15 @@ tight = {
   ('M2: CHR stream (ROM copier, staging) + lag steps 1, 5', 1.5),
   ('M3: LATCHSRC + frozen handlers + LFSR + death audit', 1.5), ('M3: T6 + X-BONK', 2.5), ('M3: player states + X-WRAP', 1),
   ('M3: HUD widget module', 2), ('M3: commentator bus', 2.5), ('M3: OAM-builder lag steps 3-4 + cap re-measure (R1.8)', 2),
+  ('M3: attach state core + the condor (R8.2)', 1),
   ('M5: attribute-table readers + ids $10-$21', 3), ('M5: T3', 2.5), ('M5: T7', 2), ('M5: T8', 2),
-  ('M5: attach state (T5 vines, balloon, condor)', 2), ('M5: X-EXWP', 1.5), ('M5: boss panel ext', 1.5),
+  ('M5: attach state: T5 vines, balloon (R8.2)', 1), ('M5: X-EXWP', 1.5), ('M5: boss panel ext', 1.5),
   ('M5: pattern-table split', 1),
   ('M6: text v1b (dialogue, ROM restore, choices, NPC menus)', 2.5), ('M6: T1-lite', 3), ('M6: vehicle state', 1.5),
   ('M6: palette-flash / lighting service', 1.5),
   ('M7: bgboss.py', 2), ('M7: fight loader + FIGHT_CTX + return-to snapshot (from meta, R1.7)', 2.5), ('M7: F-PIECES', 2.5),
   ('M7: $9B tables with a 4th row (R1.12)', 1), ('M8: 8-band floor (W3)', 1.5),
+  ('M8: ending engine pieces: CAPCOM TIMES GP pages, credits room table + CREDITS bit (round 3)', 0.5),
  ],
  'systems': [  # round 2: docs/design/systems.md "v1.0 scope" (RULINGS R2.1-R2.11); was 46.5, now 49.5
   ('SELECT + toggle + input rules', 2), ('quick form swap + slot-set map', 3), ('forms fire taps', 2), ('adaptors by wins', 1),
@@ -78,6 +80,6 @@ print(f'{"CODE":9} {total:6.1f}')
 # +5 % for the fixes the art-acceptance gates ask for. Round 1's formula on R5.1's ~3,900 tiles / 350 frames gave ~50.
 # Music (music_r2.py): G00-G04, G27 WHISTLE and G37 LAST MATCH, 21 new SFX and the fallback wiring = 9 (was ~10).
 art_tiles, art_frames = 4535, 354
-art, music, text = 51.6, 9, 12  # text: story.md §10.4, 400 Must strings EN+JP (round 2)
+art, music, text = 51.6, 9, 12  # text: story.md §10.4, 397 Must strings EN+JP (round 3)
 print(f'art ~{art:.1f}  music ~{music}  text ~{text}')
 print(f'TIGHT MUST TOTAL ~{total+art+music+text:.0f} sessions')

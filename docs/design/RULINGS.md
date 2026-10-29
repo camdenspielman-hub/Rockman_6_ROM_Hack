@@ -470,12 +470,14 @@ like the rest of this file.
 
 **R8.4 — Text.**
 
-- **v1.0 has about 400 Must strings**: R4.5's six kinds (336) plus the Must mechanics' own text and the system
-  sentences (64). story's reading is accepted; §10.4's trim list there is the reserve, not a plan.
+- **v1.0 has about 400 Must strings** (397 after round 3): R4.5's six kinds plus the Must mechanics' own text and the
+  system sentences. story's reading is accepted; §10.4's trim list there is the reserve, not a plan.
 - story's string counts are the single source; the venue and fortress docs cite them instead of their own estimates.
 - **Quoted lines from other games are paraphrased**, never verbatim, in both languages (R3.3's spirit; the
   conservative rule). The 1986-RPG jokes keep their rhythm in new words.
-- In JP, Light calls Wily **アルバート** in S42's one use of his first name, if story uses it there.
+- In JP, Light calls Wily **アルバート** in his one use of Wily's first name (story S33.7).
+- **KAISHIN's on-screen name is SPLENDID STRIKE** (story's paraphrase; "EXCELLENT MOVE" is the 1986 RPG's own line).
+  The internal design label may stay EXCELLENT MOVE; nothing on screen says it. R2.4's mechanics are unchanged.
 
 **R8.5 — The ending's gags and names** (applies R4.1 and R4.2).
 

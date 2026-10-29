@@ -47,7 +47,9 @@ add(T, 'M5 stage-attribute table: 45+11 readers, relocated tables, ids $10-$21, 
 add(T, 'M5 T3 switch->target', 'M', 2.5)
 add(T, 'M5 T7 input mirror (pad history; Shadow Rock)', 'M', 2)
 add(T, 'M5 T8 multi-part boss library (AYACO, Daruma kept by R3.2)', 'M', 2)
-add(T, 'M5 attach state: T5 vines/pendulum, balloon, condor, claw, arrow (one state, R1.10)', 'M', 2)
+add(T, 'M3 attach state core + the condor (one state, R1.10; slice per R8.2)', 'M', 1)
+add(T, 'M5 attach state users: T5 vines/pendulum, balloon (R8.2); claw, arrow ride on the core', 'M', 1)
+add(T, 'M8 ending engine pieces: CAPCOM TIMES GP pages via the new engine, credits room table + CREDITS bit (round 3)', 'M', 0.5)
 add(T, 'M5 X-EXWP set-piece weapon (pogo)', 'M', 1.5)
 add(T, 'M5 boss panel extension (fight-id records, 10th field, re-type)', 'M', 1.5)
 add(T, 'M5 pattern-table split for menus', 'M', 1)
@@ -255,7 +257,7 @@ for k, (bg, spr, fr, ses) in art.items():
 art_msc = sum(v[3] for k, v in art.items() if k != "Won't")
 print(f"art M+S+C : ~{art_msc:.1f} sessions (no human hours: R5.1's baseline has no pixel artist; a human pass is optional polish)")
 # music (R5.2: art_audio owns the one track list): tracks, bytes, new SFX, sessions (full 1.5, loop 1, jingle 0.5, 12 SFX/session)
-music = {'Must': (7, 3700, 21, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (15, 10550, 7, 19.1), "Won't": (2, 1500, 0, 3.0)}
+music = {'Must': (7, 3740, 21, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (15, 10550, 7, 19.1), "Won't": (2, 1500, 0, 3.0)}
 for k, (n, b, sfx, ses) in music.items():
     print(f"music {k:6}: {n} tracks, {b} B, {sfx} new SFX -> ~{ses:.1f} sessions")
 print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 21 new SFX in the $36 tail (392 of 449 B)")
