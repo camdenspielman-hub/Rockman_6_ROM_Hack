@@ -44,7 +44,7 @@ Lessons applied - Risks - Open questions - Cross-doc dependencies.
 | D4 | **The "C-window"**: GP service code runs in the `$C000` window (switched by a `$7F` stub), so a hook never disturbs the `$8000/$A000` banks of the vanilla code that called it. NMI and IRQ vectors move to `$7F` stubs that force `$7E` back into `$C000` | MMC5 can switch `$C000` (MMC3 could not); vanilla code banks `$38`, `$3E` have 0 bytes of fill and `$39`/`$3B` have under 100 (§1.9) | [new-code] M Must |
 | D5 | **32 KB battery PRG-RAM** (EWROM shape), 4 pages: 0 SAVE, 1 WORK (always at `$6000`), 2 LAYOUT, 3 TILES | §2 | [new-code] S Must |
 | D6 | **8 KB CHR-RAM, no CHR banking beyond 8 KB, no ExGrafix in scrolling stages** | the bundled FCEUmm wraps MMC5 CHR-RAM at 8 KB whatever the header says [seen: `probe/chr_*.nes`]; ExRAM extended attributes are shared by both nametables, which breaks a scrolling stage | constraint |
-| D7 | **ExRAM in mode 0** = a spare nametable for text windows and panels, switched in mid-frame with `$5105` | §3.3, §11 | [new-code] S Must |
+| D7 | **ExRAM in mode 0** = a spare nametable for text windows and panels, switched in mid-frame with `$5105` | works on FCEUmm: ExRAM shown from exactly the IRQ line [seen: `probe/exnt2.nes`]; §3.3, §11 | [new-code] S Must |
 | D8 | **Stage ids 0-31** with a 32-byte **stage-attribute record** per id, copied to WORK RAM at stage init; all 45 `$51` readers rewritten (§4) | BRIEF §7.2 | [new-code] M Must |
 | D9 | **WRAM-resident layouts, adopted in the "RAM image" form**: the stage's layout and tileset are copied raw into RAM pages laid out exactly like the ROM banks; vanilla painters and collision read them unchanged through D3 (§5) | gives map edits, T6, HARD poke lists and up to 4 sections × 32 screens per stage for one copy at stage start | [new-code] M Must (sections Should) |
 | D10 | **IRQ: literal port first, raster list second.** M1 ports the 27 chains one-for-one (relative latch → absolute line). M2 replaces them with a **generic double-buffered raster list** and moves the 4 logic-in-IRQ handlers out of the interrupt | BRIEF §7.1, 4MI lesson 11; a literal port is the only change that golden movies can prove | [new-code] M + M Must |
@@ -79,8 +79,8 @@ Vanilla: `4E 45 53 1A 20 00 40 08 00 00 00 07 00 00 00 01` (mapper 4, 512 KB, no
 
 4MI's header declared PRG-RAM size 0 (`r4mi/engine.md` §1.1, lesson 12); GP declares the real size. **The test emulator
 cannot catch a header mistake**: the bundled FCEUmm gave 8 distinct PRG-RAM pages (64 KB) for every byte-10 value tried
-(`$90`, `$A0`, `$70`, `$09`, `$00`) [seen: `probe/probe_*.nes`]. Mesen honours the header, so the header is checked on Mesen
-at every user gate (§14.6), and the boot code probes the RAM size itself (§2.3).
+(`$90`, `$A0`, `$70`, `$09`, `$00`) [seen: `probe/probe_*.nes`]. Mesen sizes PRG-RAM from the NES 2.0 header (to be confirmed in M1.6), so the header is
+checked on Mesen at every user gate (§14.6), and the boot code probes the RAM size itself (§2.3).
 
 ### 1.2 The insertion layout [new-code] M · Must
 
@@ -105,7 +105,7 @@ pool. Bank roles in the new space (proposal; the allocator in §14.2 places data
 | `$4A-$51` | new object AIs (4 pairs), assembled for `$8000/$A000` like vanilla AIs | `$8000/$A000` |
 | `$52-$59` | new sprite bank pairs (metasprite tables, vanilla format, §7.5) | `$8000/$A000` |
 | `$5A-$63` | new CHR source data (80 KB = 5,120 tiles) | read by the CHR loader |
-| `$64-$6B` | tileset slots (2 per bank, each with its own alternate set, §5.3) | copied to RAM |
+| `$64-$6B` | tileset slots (2 per bank, each with its own alternate set, §5.2) | copied to RAM |
 | `$6C-$6F` | layouts (4 × 2 KB sections per bank), object lists, screen scripts, poke lists | copied to RAM |
 | `$70-$77` | music and SFX (per-track bank byte, §12) | `$A000` (driver reader) |
 | `$78-$7B` | big-boss BG art packs, portraits | read by the CHR loader |
@@ -130,17 +130,16 @@ GP RESET (in `$7F`):
 | Register | Value | Meaning |
 |---|---|---|
 | `$5100` | `$03` | PRG mode 3: four 8 KB windows |
-| `$5101` | `$03` | CHR mode 3 (1 KB); all eight slots set to the identity below, so 8 KB of CHR-RAM behaves as unbanked |
+| `$5101` | `$00` | CHR mode 0 (one 8 KB page), as 4MI. Not the 1 KB mode: with 8×8 sprites MMC5 uses whichever register set (`$5120-$5127` or `$5128-$512B`) was written last for *all* fetches, so a stray B-set write would remap the sprite half. (1 KB banking inside the 8 KB works on FCEUmm [seen: `probe/chr_*.nes`], but nothing needs it) |
 | `$5102` / `$5103` | `$02` / `$01` | PRG-RAM writes enabled (stays enabled: MMC5's gate is global, §2.2) |
 | `$5104` | `$00` | ExRAM as an extra nametable (D7). It is written to only during rendering (§3.3) |
 | `$5105` | `$50` | horizontal mirroring (vanilla `$FB` = 1 at boot; MMC3 `$A000` = 1 is horizontal) |
 | `$5106` / `$5107` | `$00` / `$00` | fill tile / attribute (fill mode only used by the window border, §11.3) |
 | `$5113` | `$01` | **WORK page at `$6000`** (§2.2) |
-| `$5114` / `$5115` | `$80|$3C` / `$80|$3D` | as vanilla leaves them after boot (text banks); shadows `$4A`/`$4B` |
+| `$5114` / `$5115` | `$80|$3C` / `$80|$3D` | any valid ROM pair (MMC5 does not define them at power-on, so they are set before the first vanilla code runs); shadows `$4A`/`$4B` = `$3C`/`$3D` |
 | `$5116` | `$FE` | `$7E` at `$C000` |
 | `$5117` | `$FF` | `$7F` at `$E000` (power-on value; written anyway) |
-| `$5120-$5127` | `0-7` | CHR identity (vanilla `$FF50` = `00 02 04 05 06 07` is MMC3's identity) |
-| `$5128-$512B` | `0-3` | |
+| `$5120-$512B` | `$00` | in 8 KB mode only `$5127` and `$512B` matter: page 0 = the identity (vanilla's `$FF50` = `00 02 04 05 06 07` is MMC3's identity). Nothing writes them again |
 | `$5130` | `$00` | |
 | `$5200` | `$00` | vertical split off |
 | `$5204` | `$00` | IRQ off |
@@ -206,6 +205,9 @@ handler.
 | handler `STA $C000` (A = L) | `JSR irq_next`: `SEC / ADC IRQ_LINE / STA IRQ_LINE / STA $5203 / RTS` (next = current + L + 1). **Moved to the end of each handler**, after its PPU writes, so the extra cycles never shift a split |
 | handler `STA $E000` | `JSR irq_off`: `PHA / LDA #0 / STA $5204 / PLA / RTS` |
 | entry `STA $E000 / STA $E001` (`$C151/$C154`) | `LDA $5204` (reading acknowledges) + 3 NOPs (A was pushed at `$C14C`) |
+
+The fixed banks are rebuilt from the reassemblable source of M0.4, so the handlers are edited in that source (sizes may
+change; the registry records each edit for review) rather than byte-patched in place.
 
 `K` is a calibration constant (expected 0 or 1; 4MI's MMC5 build feeds the same variable to `$5203` that its MMC3 build
 feeds to `$C000`, `r4mi/engine.md` §2.1). MMC3 asserts its IRQ near dot 260 of the line before the split and MMC5 near the
@@ -320,6 +322,7 @@ Rules:
 | 8 KB battery + 8 KB volatile (ETROM) | save isolated | MMC5 selects the second chip with bank bit 2; emulator support for mixed sizes is uneven; still no room for D9 | no |
 | **32 KB battery (EWROM shape)** | 4 pages: SAVE / WORK / LAYOUT / TILES; one chip; a common MMC5 configuration | the `.sav` file is 32 KB; the work pages are battery-backed (harmless: they are rebuilt at boot and stage start) | **yes** |
 | 64 KB | room for 4 more pages | MMC5's two-chip split again; nothing in the design needs it | no |
+| 8 KB battery + 24 KB volatile (NES 2.0 allows declaring both) | only the save is battery-backed | no MMC5 board has that shape, and which page number reaches the battery chip is not defined across emulators, so the save could land in volatile RAM | no |
 
 ### 2.2 Pages and the write gate
 
@@ -363,9 +366,9 @@ in interrupts or every frame by hot vanilla-side hooks live here; everything els
 | `$06B7` | `RL_FLAGS` | tech | b7 staging dirty; b6 sound-in-IRQ; b0-3 chain id for `irq_logic_tick` |
 | `$06B8` | `SECTION` | tech | current layout section 0-3 (§5.4) |
 | `$06B9` | `CK_SECTION` | tech | checkpoint section (beside `$0684-$0686`) |
-| `$06BA` | `GP_HOT` | tech | b0 window open, b1 world frozen, b2 autoscroll on, b3 T6 repaint pending, b4 DEV, b5 text owns NMI CHR slot |
+| `$06BA` | `GP_HOT` | tech | b0 window open, b1 world frozen, b2 autoscroll on, b3 T6 repaint pending, b4 DEV, b5 text owns NMI CHR slot, b6 new-stage entry (set by `$CD3B`/`$CD43`, read by the stage-init hook, §4.5) |
 | `$06BB-$06BC` | `LFSR` | tech | 16-bit Galois LFSR (§7.8) |
-| `$06BD-$06C8` | `SYS_HOT` | systems.md | its ~10 hot bytes (SELECT hold, SEL_USED, SWAPMASK, LASTW, swap cooldown, CHR stream position, Time Stop, stagger, multi-kill), 12 reserved |
+| `$06BD-$06C8` | `SYS_HOT` | systems.md | 12 bytes for its ~10 hot values (SELECT hold, SEL_USED, SWAPMASK, LASTW, swap cooldown, CHR stream position, Time Stop, stagger, multi-kill) |
 | `$06C9-$06D0` | `SND_BANK[8]` | tech | per-stream data bank for the sound reader (§12.2) |
 | `$06D1-$06D8` | `TXT_HOT` | tech | text engine: state, delay counter, blip id, cursor, canvas slot, flags |
 | `$06D9-$06DC` | `ASCROLL` | tech | autoscroll speed (8.8), sub-pixel, flags (§9) |
@@ -385,11 +388,15 @@ Mode 0 for the whole game (D7): ExRAM is a nametable that `$5105` can place in a
 **while the PPU is rendering** (in modes 0/1 MMC5 stores `$00` otherwise), and the CPU cannot read it back, so:
 
 - `$5C00-$5FBF` hold the window and panel tile map (30 rows × 32), `$5FC0-$5FFF` its attribute table;
-- the text engine keeps a WORK-RAM mirror and writes ExRAM from the main thread after polling `$5204` bit 6 ("in frame");
+- the text engine keeps a WORK-RAM mirror and a small write queue (≤ 32 bytes per frame); the queue is flushed by a
+  raster-list band routine at line 8 (`OPS` b6), i.e. **inside an IRQ, so always during rendering**. The `$5204` bit 6
+  "in frame" flag is **not** used: FCEUmm does not implement it (a probe that polled it never left its loop) [seen];
 - nothing else is stored in ExRAM.
 
-The probe confirmed ExRAM in mode 2 behaves as RAM on FCEUmm [seen]; mode 0 as a nametable with mid-frame `$5105` switches
-is an M1 spike (§16, M1.9).
+Probes for this doc [seen, `probe/exnt2.nes`, `exnt2.png`]: ExRAM writes timed after the NMI (past vblank) landed; with
+`$5203 = 120` and an IRQ that writes `$5105 = $AA`, scanlines 0-119 showed the CIRAM nametable and **scanlines 120+ showed
+ExRAM**, on exactly line 120. A control build without the IRQ showed CIRAM only. ExRAM in mode 2 also behaves as RAM. Mesen
+is checked in M1.6.
 
 ### 3.4 WORK page (page 1 at `$6000-$7FFF`)
 
@@ -397,7 +404,8 @@ is an M1 spike (§16, M1.9).
 |---|---|---|---|
 | `$6000-$61FF` | 512 B | **per-slot extension arrays**, 32-byte stride, slots 0-22: `$6000` GP_SUBID, `$6020` GP_ARG, `$6040` GP_OFLAGS, `$6060` LASTHIT, `$6080` LATCHSRC, `$60A0` REHIT, `$60C0` FREEZE, `$60E0-$61FF` 9 more AI variables (GPV0-GPV8) | tech / systems |
 | `$6200-$621F` | 32 B | `SA_CUR`: the current stage-attribute record (§4.4) | tech |
-| `$6220-$62FF` | 224 B | stage run block: systems' run block (~24 B), scorecard counters, announcer queue (16 entries × 2), T6 state | systems / meta |
+| `$6220-$624F` | 48 B | stage loader state: `GRP_ROW` (16, the collision remap row), the `VARIANT` row (16), `RAM_ID` (id whose images are resident), `LIST_N` / `LIST_PTR` (the 3 bytes `$3A:$8032` now reads), section residency bits | tech |
+| `$6250-$62FF` | 176 B | stage run block: systems' run block (~24 B), scorecard counters, announcer queue (16 entries × 2), T6 state | systems / meta |
 | `$6300-$63FF` | 256 B | raster list, 2 × 16 bands (§8.1) | tech |
 | `$6400-$69FF` | 1.5 KB | **object-list copy** (6 arrays × 255 + sentinels, §7.3) | tech |
 | `$6A00-$6DFF` | 1 KB | text: glyph canvas buffer (48 tiles × 16 B), ExRAM mirror of the window rows, line buffer, choice state | tech |
@@ -439,7 +447,7 @@ All 32 ids are taken. If `fortress.md` needs more, the legacy block `$09-$0F` is
 arena only for bosses it actually lists. Nothing in the new code assumes ids < 32 except table sizes; the field widths allow
 64.
 
-### 4.3 The 45 `$51` readers and their replacements
+### 4.3 The 45 `$51` readers and their replacements [new-code] M · Must (part of D8)
 
 `SA.x` = a field of the current stage-attribute record (`SA_CUR`, §4.4). "Retired" = the routine is replaced as a whole by
 a GP screen owned by meta.md / fortress.md and no longer runs.
@@ -503,7 +511,7 @@ into a column of a **variant row** (`SA.VARIANT` selects a row; rows 0-15 reprod
 | `$3B:$BB82`, `$BBC2`, `$BBD6`, `$BBE4` | fortress-map dot positions (`$BC5D`, `$BC86`) | retired (fortress map) |
 
 **E. The 11 readers of `$063D`** (`stage & 7`, executed): `$31:$98B7/$98C1/$9930` (intro tables), `$31:$98F6` (`$9B82`),
-`$31:$993D` (boss type `$9D43`), `$31:$99D9` (weakness row `$9A35`), `$31:$9A1A` (Centaur's death), `$39:$8E8C/$8E9A/$8F42`
+`$31:$993D` (boss type `$9D43`), `$31:$99D9` (table `$9A35`, next to the weakness table `$9A45`), `$31:$9A1A` (Centaur's death), `$39:$8E8C/$8E9A/$8F42`
 (Wily 3 refight room, palette, alcove), `$3F:$FA66` (boss sprite CHR `$FA5B`). They keep working if `$063D` holds the
 **Robot Master slot** 0-7: init writes `SA.RM_SLOT` there instead of `stage & 7`, and the Wily-3-style rush overwrites it
 per fight, as vanilla does.
@@ -555,8 +563,10 @@ The two new-stage entries also set `GP_HOT`'s "new stage" bit, so the hook knows
 
 1. `$51` = id; copy the record to `SA_CUR`; `$063D = SA.RM_SLOT`; copy the 16-byte collision row to `GRP_ROW`; load
    `VARIANT` row into WORK.
-2. **New stage only:** build the RAM images (§5.2), apply the poke lists, copy the object list to WORK (§7.3), clear the T6
-   log.
+2. **New stage, or an image that is not resident** (`RAM_ID` ≠ id): build the RAM images (§5.2), apply the poke lists,
+   copy the object list to WORK (§7.3), clear the T6 log, set `RAM_ID`. The second condition matters: the YOU GET room
+   calls `$DBDB` with A = 5 to borrow Tomahawk's data (`$3B:$BD20`), and meta.md's fight table enters arenas through the
+   respawn warp (`$F0 = 2`), so neither goes through the new-stage entries. A plain respawn keeps the image (and its edits).
 3. Set the zero-page level pointers exactly as `$DBFB-$DC17` did, but from RAM ids: `$6E = $83`, `$6F = $82`, `$52 = 0`,
    `$53 = $A0 + 8*SECTION`, `$63 = $80` (or `$89` for slot B), `$67 = $63 + 5`; `$064E = SA.CHR_BASE`; palette
    (`$C9EF` via `CALL7E`), music to `$DC`, HP `$1B`.
@@ -594,8 +604,9 @@ With D3, GP copies the data **into RAM pages laid out exactly like the ROM banks
   maps `$6E` with `$CB91` and `$6F` with `$CBDA`, then reads `($54),Y` and `($68),Y` [code]) all run on RAM.
 - Each venue's tileset can now have **its own alternate set** (venues_b's request) without wasting a whole 8 KB ROM bank:
   the loader copies slot pages and the alternate set from two independent sources, so two venues share one ROM bank.
-- Cost: about 7.7 KB copied at a new stage start (2 KB layout section 0, 4.25 KB tiles, 1.25 KB alternate set; sections
-  1-3 on demand) with an unrolled copy, ≈ 70,000 cycles ≈ 2.4 frames, while the screen is already off for the 30-row paint.
+- Cost: about 5.5 KB copied at a new stage start (2 KB layout section 0, 2.25 KB tileset slot, 1.25 KB alternate set;
+  sections 1-3 and slot B on demand) with an unrolled copy, ≈ 50,000 cycles ≈ 1.7 frames, while the screen is already off
+  for the 30-row paint.
 
 ### 5.3 Pros and cons
 
@@ -606,10 +617,10 @@ With D3, GP copies the data **into RAM pages laid out exactly like the ROM banks
 | Sections > 32 screens | 4 sections in one page; switch = change `$53` | possible too, by switching `$6F`/`$53` |
 | Per-venue alternate set | free | needs a full ROM bank per venue |
 | Hidden rooms and links | exits with explicit targets (already data in RM6) | same |
-| Load cost | ~2.4 frames at stage start | none |
+| Load cost | ~1.7 frames at stage start | none |
 | Persistence | layout survives deaths unless the stage asks to reset (vanilla's breakables do the same: `$0340` survives deaths) | n/a |
 | Risk | a stray write corrupts the current stage only; 16 KB of RAM | none |
-| Emulator dependence | needs 32 KB PRG-RAM and RAM in `$8000-$BFFF` (both confirmed on FCEUmm; Mesen supports both) | none |
+| Emulator dependence | needs 32 KB PRG-RAM and RAM in `$8000-$BFFF` (both confirmed on FCEUmm [seen]; Mesen expected, checked in M1.6) | none |
 
 ### 5.4 Recommendation
 
@@ -620,9 +631,9 @@ venues_b: 2-4 spare each). **LZ compression: Won't (v1)**: 1 MB leaves room for 
 KB ≈ 60 KB).
 
 Section mechanics (Should): an exit target byte `$A0-$FF` (bit 7 = explicit target, as vanilla, plus bits 5-6 = section) means
-"section `(t >> 5) & 3`, screen `t & $1F`". The exit handler hook (`$D6F5` path, `rm6/levels.md` §9) copies the section's
-layout if it is not resident, sets `SECTION`, `$53`, the object list (§7.3) and the screen-script set, then runs the vanilla
-transition. Checkpoints store `CK_SECTION` beside `$0684-$0686`. Note that vanilla targets already use bit 7 with screens
+"section `(t >> 5) & 3`, screen `t & $1F`". Inside a script, any byte ≥ `$80` after an exit's palette byte is read as its
+target and exit types are 1-6, so these bytes cannot be mistaken for a list terminator. The exit handler hook (`$D6F5` path, `rm6/levels.md` §9) copies the section's layout if it is not
+resident, sets `SECTION`, `$53` and the section's object list (§7.3), then runs the vanilla transition. Checkpoints store `CK_SECTION` beside `$0684-$0686`. Note that vanilla targets already use bit 7 with screens
 `$00-$1F` (bits 5-6 clear), so every vanilla exit keeps its meaning.
 
 ### 5.5 Poke lists [new-code] S · Must
@@ -738,10 +749,13 @@ room (BRIEF §5.4) is one `link` line plus one screen. **[engine-ok]** for singl
 ### 6.6 Screen scripts
 
 Vanilla has 128 script ids (`$39:$82EB/$836B`), 968 bytes of bodies, and the interpreter runs with banks `$39/$3A`
-mapped. GP relocates the pointer table to 256 entries in `$3A`'s free space (`$3A:$95D4-$9FFF`, 2,604 B, freed because the
-object lists move, §7.3), patches the two `LDA $82EB,Y / LDA $836B,Y` operands, and puts new script bodies there too (one
-script ≈ 6-12 bytes). Script init and per-frame routines written for GP point at `$7F` trampolines (`CW` targets), since
-the interpreter calls them with `$39/$3A` mapped.
+mapped. GP relocates the pointer table to 256 entries in `$3A`'s free space (`$3A:$95D4-$9FFF`, 2,604 B of fill after the
+vanilla object lists; GP's new lists go to GP banks instead, §7.3), patches the two `LDA $82EB,Y / LDA $836B,Y` operands, and
+puts new script bodies there too (one script ≈ 6-12 bytes, so ~2 KB holds ~200 scripts). GP init and per-frame routines
+that return at once point at `$7F` trampolines (`CW` targets), since the interpreter calls them with `$39/$3A` mapped.
+Routines that wait with yields (Plant's `$39:$8551` pattern: spawn a mid-boss, loop until slot 8 is empty, then
+`JMP $827C` back into the interpreter) run as object code instead: they switch slot 22's own bank pair (`$0441`) to a GP AI
+bank, and map `$39` back before `JMP $827C`.
 
 ---
 
@@ -857,3 +871,643 @@ and new enemies must replace, not add.
 Vanilla's RNG `$DF-$E1` is advanced every NMI (`$C88D`) [code], so it depends on lag. GP's **LFSR** (16-bit Galois, taps
 `$B400`, in `LFSR`) advances only when called, is seeded at stage start from a per-stage constant (Time Attack fairness:
 venues_a's quick-draw delay) and in normal play is mixed with the frame counter at the first input of the stage.
+
+### 7.9 Player extensions [new-code] S each · Must unless marked
+
+Rockman is slot 0's coroutine (AI `$38:$802D`; resume points stand `$8055`, tiptoe `$808A`, walk `$80AF`, air `$810B`, pit
+death `$8F13`, HP death `$8E7F`, `rm6/ram.md`). So:
+
+- **GP player states** need no dispatch hook: GP code takes slot 0 over by writing `$0441` (its bank pair) and
+  `$0413/$042A` (its routine), sets `$94` to a GP value (`$10+`), and hands back by writing the vanilla air or stand resume
+  address. Used by T5 (hang on a vine or pendulum, venues_a), X-EXWP (Yamato's pogo, venues_b), and systems.md's set pieces.
+- **Exit type 7** (X-UPEXIT, Should): the exit handler table is 7 entries, `$39:$9A88` (lo) / `$9A8F` (hi), type 0 unused,
+  handlers `$D587 $D612 $D540 $D5D1 $D653 $D6B3`, read at `$A290/$A295` (bank `$3A` mapped at `$A000`) [code]; the shutter
+  tables follow at `$9A96`, so the table is relocated to `$3A`'s free space with room for types 7-9 and the two operands are
+  patched. Type 7 fires when the player is rising, `Y < $0B`, and the cells above are open; it reuses the type-2 scroll-in
+  (`$D82D`) with a small upward boost.
+- **X-WRAP** (venues_b): a post-move hook on slot 0 (and on objects whose `GP_OFLAGS` has WRAP): in a locked room, X < `$08`
+  becomes `$F0` and back, unless the row is flagged as an exit.
+- **Pad history** (T7, Should): a 64-frame ring of `$40` in WORK, written by a 4-byte hook at the end of the joypad read
+  `$3E:$C711`; the mirror object replays it with LEFT/RIGHT swapped.
+- **Ceiling probe callback** (X-BONK for T6): a hook where the player's upward collision stops the jump, passing the cell's
+  collision type and position.
+
+### 7.10 T3: switch → target [new-code] M · Must
+
+Family `$F5`, two kinds of sub-id joined by a **channel** (the placement's `arg`, 0-15). WORK holds `CHAN[16]` (state bytes)
+in the run block; channels that must persist across deaths are flagged in the stage data and saved in the map-edit log.
+
+| Switch kinds | Target kinds |
+|---|---|
+| shot (any class, or one weapon class), touch, plate (standing on it, the vanilla class-2/5/9 platform contact `$38:$8F96`), key (consumes a per-stage key counter in the run block: venues_a's question 6), timer, all-of-N (counts channel hits) | door (UP to enter → exit with an explicit target), gate (a solid object, class 2/5/9, that slides away), wall (`map_set` + repaint, §5.6), warp (`$39:$89F5`), lift (rides through a down exit), spawner, palette/music change (CX's object `$40` idea) |
+
+A target reacts on the frame its channel changes; every link is checked by the level build (§6.3).
+
+### 7.11 T8: multi-part bosses [new-code] M · Should
+
+The vanilla pattern (the gorilla tank `$50-$53`, the Wily Machine's `$E9` boxes, `rm6/engine.md` §1.4) as a library: the
+controller (family `$F8`) sits in slot 8 and owns the boss bar (`$0642`); parts (family `$F9`) are glued each frame at
+`controller + offset` (per-part offset tables), use class 0 hit boxes (shots pass through and latch, `$38:$9021`), and
+forward their latch to the controller with a per-part multiplier, so systems.md's damage and i-frame tables still decide.
+`part_spawn(offset, sub)`, `parts_glue()`, `parts_kill()`. Used by venues_a's AYACO bomber and venues_b's Daruma.
+
+---
+
+## 8. The generic raster list [new-code] M · Must
+
+### 8.1 Format
+
+Double-buffered, 16 bands per buffer, struct-of-arrays in WORK (`$6300-$63FF`); buffer A = index 0-15, buffer B = 16-31.
+Game code builds the **staging** buffer at any time; the NMI swaps buffers (no copying) when `RL_FLAGS` b7 is set, the
+4MI commit rule (`r4mi/engine.md` §4.2) without 4MI's copy loop.
+
+| Array | Field | Meaning |
+|---|---|---|
+| `$6300,X` | `LINE` | absolute scanline 1-239 at which this band starts; `$FF` ends the list |
+| `$6320,X` | `OPS` | b0 write PPUADDR (`$2006` hi/lo), b1 write scroll (with b0: the 4-write `$2006/$2005/$2005/$2006` split that sets X, Y and nametable), b2 PPUCTRL, b3 PPUMASK, b4 `$5105` (nametable mapping: window bands), b5 call the sound update after this band, b6 call a band routine (`ARG` = routine index), b7 palette swap (rendering off, 4 BG colours, rendering on: **only allowed in the last band**, §8.4) |
+| `$6340,X` / `$6360,X` | `HI` / `LO` | PPUADDR, or the two precomputed `$2006` bytes of a scroll split |
+| `$6380,X` | `SX` | fine/coarse X |
+| `$63A0,X` | `SY` | Y for scroll splits |
+| `$63C0,X` | `CTRL` | PPUCTRL value |
+| `$63E0,X` | `MASK` | PPUMASK value (4MI's water tint and sprite-free bars, CX's effect 8) |
+| (shared) | `ARG`, `MAP5105`, palette set | 3 small arrays in `$7A00+` or folded into `HI/LO` by op; fixed in M2 |
+
+### 8.2 The walker
+
+In `$7F` (fast, no C-window switch). NMI: if the staging flag is set, flip `RL_BASE`; `RL_CUR = RL_BASE`; `$5203 =
+LINE[RL_CUR]`; `$5204 = $80` (or 0 for an empty list). IRQ: `LDA $5204` (ack), load band `RL_CUR`, do its ops in the order
+CTRL → `$5105` → PPUADDR/scroll → MASK (the order 4MI and CX use), increment the cursor, arm the next `LINE` or disable,
+run the band's sound/routine flags, RTI. ~70-90 cycles per band; a per-line effect (shimmer, wobble) is a run of bands or a
+band routine that re-arms itself (`OPS` b6), like vanilla handlers 9 and F.
+
+### 8.3 Presets that replace the 27 chains (M2)
+
+| Preset | Bands | Replaces | Used by |
+|---|---|---|---|
+| `RL_FLOOR(line, addr, scroll)` | 1 | 7, 1A, 19 (with drift in `irq_logic_tick`) | Plant 0E, Mr. X 2/3, Wily 2, Wily Machine; BG bosses (H wings) |
+| `RL_SHIP(...)` | 3 | 1-2-3 | Blizzard ship (venues_b keeps it) |
+| `RL_PARALLAX(line, divisor)` | 2 | C-D | Tomahawk, venues_a T4 |
+| `RL_SHIMMER(line, n)` | 1 + n | E-F-10 | Tomahawk sunset |
+| `RL_CEILING(h)` / `RL_TIDE(h)` | 2 | 11-12 / 14-15 (logic in `irq_logic_tick`, §1.8) | Knight, Centaur; Yamato (venues_b) |
+| `RL_MULTI(...)` | 2 | 16-13 | Mr. X 4 machine, reveal |
+| `RL_WEAPONGET` | 2 | 17-18 | YOU GET |
+| `RL_MENUSLIDE` | 2 | 4-5 | adaptor change (systems.md's quick path skips it) |
+| `RL_STORY` | n | 8-9, A-B | opening (replaced by the GP attract, meta.md §2.1) |
+| `RL_WINDOW(top, rows, pal)` | 1-2 | new | text windows and pop-ups (§11) |
+| `RL_BANDS(list)` | ≤ 6 | new | venues_a T4: "≥ 4 bands + the window band"; T1-lite |
+
+A **band compositor** merges the stage's preset, the window band and any director-object bands by line, drops the lowest
+priority band if more than 16 are asked for, and writes the staging buffer once per frame. CX's trick of an invisible
+object whose position gives a band's line and height (`cx/engine.md` §8) is family `$F5` sub `BAND`.
+
+### 8.4 Rules
+
+1. **Rendering-off writes end the list.** MMC5 counts scanlines only while the PPU renders; a palette swap (rendering off)
+   resets its counter, so no IRQ can follow in that frame. Palette-swap bands are therefore last (the bottom dialogue
+   window); a top pop-up uses one of the stage's own BG palettes.
+2. **Sound in the IRQ**: vanilla's rule is kept generically: if the first band's line is below `$70`, the NMI skips the
+   sound update and the first band with `OPS` b5 (or band 0) runs it.
+3. Lag frames re-arm the same list (vanilla's lag path `$C0C4` does the same for chains).
+4. Line budget: a band's writes must land in h-blank; the walker is calibrated once against vanilla splits (§14.4).
+
+---
+
+## 9. Autoscroll (T1)
+
+### 9.1 T1-lite: fixed-camera rides [new-code] M · Must
+
+Accepting venues_a's proposal (its §0.4 and open question 1): **the camera is locked** (screen-script mode 0, vanilla),
+**raster bands scroll by time** (and by camera for parallax) through `RL_BANDS`, and a **wave director** (`$F5` sub
+`WAVES`) spawns enemies from a list `[frame, family, sub, x, y, path, arg]`, counted from the screen lock so every run is
+identical (golden movies, Time Attack). Nothing solid moves, so collision, spawning and exits stay vanilla. The ride ends at
+the list's `END` entry, which unlocks the screen (mode 1).
+
+- In a locked room the director may switch `$FB` to vertical mirroring (two nametables side by side) so band art loops
+  every 512 px instead of 256; the exit restores it.
+- Cap: 6 director-spawned objects alive (the lag budget, §15).
+- Used by: Wind's sortie (01) and wing arena (1D), Tomahawk's train (10-11) (venues_a). venues_b's ski run needs none (a
+  forced-slide floor type, X-FLOOR).
+
+### 9.2 T1-full: forced horizontal scroll [new-code] M · Could
+
+Only if a venue needs terrain that moves. Design:
+
+- `ASCROLL` (speed 8.8, flags) is set by a script init; the camera-follow step in the horizontal scroll routines
+  (`$3E:$DCE2` right / `$DD42` left, `rm6/levels.md` §5) uses `camera += speed` instead of following the player; the
+  column painter runs unchanged as the camera crosses 8-px boundaries.
+- The player is pushed by the existing left clamp `$A8` (camera-relative, `$10`, `$38:$8F31`) and stopped by a new right
+  clamp (`camera + $F0`). **Crush**: pushed by the clamp while a wall blocks him on the left → the pit-death path
+  (`$38:$8F13`).
+- Every screen in the run is mode 3 (free); the last screen's script clears `ASCROLL`.
+- Vertical autoscroll: **Won't (v1)**; vanilla scrolls vertically only during scripted transitions.
+
+---
+
+## 10. Per-position destructible tiles (T6) [new-code] M · Must
+
+Vanilla breakables are **one bit per metatile id** in `$0340` (all blocks sharing the id open together; only the full punch
+`$14` or F.BLAST), so they cannot break one cell of an ice floor (`rm6/SUMMARY.md` §1.6, lesson 6).
+
+**Design: rewrite the RAM layout with authored variant blocks.**
+
+1. **Mark**: metatile attribute **bit 2** = DESTRUCT (bits 2-3 are 0 in every metatile of every vanilla stage [code]).
+   Collision ignores the bit.
+2. **Author**: the tileset tool expands every block that contains DESTRUCT metatiles into its **variants** (each subset
+   of those quadrants replaced by the tileset's RUBBLE metatile, usually air): 2^k − 1 extra block ids for k breakable
+   quadrants, plus a **transition table** `(block, quadrant) → block` in the TILES page (`$9200-$9AFF`). A floor block
+   with 2 breakable cells costs 3 ids; the build reports the total against the 256-block budget.
+3. **Break**: a trigger calls `t6_break(x, y)`: venues_b's head-bonk X-BONK (a callback on the player's ceiling probe),
+   a weapon class hit, or the punch. It finds the layout byte and quadrant, looks up the transition, writes the new block
+   id into the LAYOUT page, logs the old byte (map-edit log, §5.6), spawns debris (family `$FD`), and queues the repaint.
+   **Collision changes on the next probe**, because `$DA6C` reads the RAM layout.
+4. **Repaint**: the oil-ignition pattern (`$3E:$DE03-$DE5C`): two 8-px columns through `$D8AF/$D904/$D1FF`, one per
+   frame. At most one break starts per frame; more are queued.
+5. **Refill** (venues_b's Ice Climber floors): `t6_refill()` writes the logged byte back and repaints.
+6. **Persistence**: broken cells survive deaths and reset at the next stage start (vanilla breakables' rule); a stage flag
+   can refill on respawn instead.
+
+**Alternative kept as fallback**: a 1-bit-per-16×16-cell bitmap (1 KB per section), checked for bit-2 metatiles inside
+`$DA6C` and both painters, as 4MI's `$7E:$D5A7` does for its type-`$E` cells. It costs no block ids but patches the three
+hottest level routines (collision alone is 7 % of the frame, `rm6/engine.md` §8); use it only if a venue runs out of block
+ids.
+
+---
+
+## 11. Text and dialogue engine (T2) [new-code] L · Must
+
+### 11.1 Three layers
+
+| Layer | When | Engine |
+|---|---|---|
+| Full-screen text | attract, story cards, ending, CAPCOM TIMES, staff roll | **vanilla PPU scripts** (`$3C:$8631`, 168 scripts, typewriter via `$069F/$06AC/$06A6`), with a language hook |
+| **Dialogue window** | story beats, NPCs, shop, debrief, choices; the world is frozen | new: bottom window, 3 lines, portrait, choices |
+| **Pop-up** | commentators (BRIEF §5.5), live, ≤ 2 lines, toggleable | new: top band (or bottom per screen), no freeze |
+
+### 11.2 Full-screen text and the language hook [new-code] S · Must
+
+One hook in the interpreter at `$3C:$8636` (where it reads the pointer from `$8787/$882F`, `rm6/text.md` §8) picks the
+pointer table by `LANG`. EN scripts live in a GP text bank, so the interpreter (~370 bytes) is copied into that bank pair and
+reached through `FAR`; the far-call slot table `$CB5F` (4 slots, all used) is not touched. EN text uses the vanilla capitals
+(A-Z, 0-9, `. ? ! ' : ,` are in every main-font scene, `rm6/text.md` §7) or a language-specific font set loaded instead of
+`$81/$D2` when mixed case is wanted. Line breaks are command addresses, so EN layouts are re-flowed by the encoder
+(`rm6_ppuscript.py` already encodes `row, col, "text"`).
+
+### 11.3 Window display
+
+- **Nametable**: the window's tiles live in **ExRAM** (D7). The window band sets `$5105 = $AA` (all four nametable slots →
+  ExRAM) and points `$2006` at the window rows; the NMI writes the stage's mapping back every frame (§1.5). No vanilla
+  nametable byte is touched, so the playfield never needs repainting.
+- **Palette**: the bottom dialogue window swaps BG palette 3 in its band (rendering off for 1-2 lines at the border, the
+  CX effect-10 trick, `cx/engine.md` §3.2); the NMI restores it from the `$0360` buffer while a window is open. The top
+  pop-up cannot swap (§8.4) and uses the stage BG palette the build picks for contrast (§11.4).
+- **Sprites**: the dialogue band turns sprites off (PPUMASK); a pop-up band keeps them on so the life bars stay visible.
+
+### 11.4 Glyph canvas and where its CHR comes from
+
+Measured constraints: the BG table is nearly full on most stages (Plant has 0 free ids over all its CHR configs; 12 of 16
+vanilla stages have ≤ 11 free, `rm6/SUMMARY.md` §2), and **the sprite table shows 245 of 256 ids in play** (73 scenes,
+`sprtiles.py`). CHR-RAM is 8 KB and cannot be banked further on the test emulator (D6). So the engine draws text into
+**borrowed BG tile ids**:
+
+- The level build computes, per screen, the BG tile ids that neither that screen nor its scroll neighbours reference
+  (the method of venues_a's `swapcap.py`), and stores per screen up to two runs of 16 canvas ids, their CHR source
+  (bank, offset) for restoring, and the best BG palette for text.
+- **Pop-up**: 2 lines × 16 tiles (32 ids) from the free runs; with one run it becomes a 1-line ticker; with none, the
+  line waits in the announcer queue (max age 8 s) until a screen with room, a death/respawn, or a boss intro.
+- **Dialogue**: the world is frozen (scheduler threads 1-2 suspended, as the pause menu does, `rm6/ram.md`), so it may also
+  borrow ids in use: it reads their 16 bytes back through `$2007` into WORK during vblank while the box opens (8 tiles per
+  frame), and writes them back while it closes. Budget: 3 lines × 26 columns of glyphs need ≤ 64 canvas ids with tile reuse
+  per line (a VWF line packs ~1.4 characters per tile) + 16 for a 32×32 portrait.
+- **Rendering**: 1bpp fonts in PRG, 8 px tall. **EN uses a VWF** (a width table; each glyph row shifted into the 16-byte
+  tile buffer with `LSR/ROR`, CX `$26:$8490`), with a highlight colour from bitplane 1 (CX). **JP** is 8 px fixed-width,
+  kana with dakuten composed into one glyph (vanilla spends a cell on each mark), plus a small **kanji** set (Should): with a
+  canvas, a kanji costs 8 PRG bytes and no CHR, so the build only reports which kanji the script uses. ENGRISH uses EN
+  glyphs.
+- Each finished tile goes through the CHR stream queue (16 B, §15.3); typewriter speed and per-speaker blip use the
+  vanilla variables' pattern (`$06AC`, `$06A6`).
+
+### 11.5 Script format
+
+Source: `assets/text/{ja,en,engrish}.yaml` (ENGRISH holds only overrides; missing ids fall back to EN, meta.md's request).
+Encoded by `tools/build/text.py` into per-language banks with a 16-bit string id table. Control codes (CX's opcode set,
+`cx/text.md` §1.1, adapted):
+
+| Code | Meaning |
+|---|---|
+| `END`, `NL`, `CLEAR`, `CLOSE` | flow |
+| `WAIT` | wait for A/START (START skips the rest of a window, venues_a risk 11) |
+| `PAUSE n`, `SPEED n` | timing |
+| `SPEAKER id` | name line + blip + portrait default |
+| `PORTRAIT id` | 32×32 portrait (dialogue only) |
+| `HL` / `HL_OFF` | highlight colour |
+| `NUM var` | print a decimal (CX's spike counter) |
+| `CHOICE n, ids…` | 2-4 options; result in A and carry; `SKIPIF n` branches on it (CX `0C`) |
+| `CALL bank:addr` | run a routine (CX `09`): give an item, start a fight, set a flag |
+| `IFFLAG f, skip` | branch on a LIVE FILE flag |
+
+Text calls from code: `TELL id` (pop-up, queued, honours the ANNOUNCER config) and `TALK id` (dialogue, blocking). The
+debrief and commentator tables (meta.md, story.md) are lists of string ids.
+
+---
+
+## 12. Sound
+
+### 12.1 What exists [done by research]
+
+Requests through `$DC` into the ring `$B0-$BF`, serviced at `$3E:$C8C1` (`$8003` play, `$8000` update); 102-entry big-endian
+table `$34:$8A40` (36 music, 65 SFX, commands `$F0-$F7`); data in a 24 KB sound space (`$34`, `$35`, and `$36` through the
+reader `$34:$803A`); the channel command set `$00-$18` decoded (`rm6/engine.md` §5.3); `songdec.py` decodes any track. Free:
+449 B at the end of `$36`; ids `$1A` (empty stub) and SFX `$3D/$3E/$4D/$51` (never requested) can be recycled.
+
+### 12.2 Driver extension [new-code] M · Must
+
+1. **Track table v2**: ids `$00-$EF` (240; `$F0-$F7` stay commands), a relocated 240-entry pointer table and a **bank byte
+   per track** (4MI's `$1E:$8E51` pattern, CX's `$18:$97B7`): bank `$00` = vanilla sound space, any other = the song's own
+   bank. Ids < `$66` keep their vanilla entries.
+2. **Reader**: the `$803A` reader's address test gains a fourth range: pointers `$E000-$FFFF` mean "the stream's own bank",
+   mapped at `$A000` for the read (`LDA SND_BANK,x / ORA #$80 / STA $5115`) and `$35` mapped back, exactly how `$36` is
+   handled today. Per-stream bank bytes live in hot RAM (`SND_BANK`, 8 entries). Which call sites read stream data, and with
+   which stream index in X, is mapped in M0 with shadow6's data-read log (only 3 literal `JSR $803A` exist, at `$34:$8126`
+   (header byte), `$8192`, `$81A2` (channel pointers); the channel interpreter `$83CC` reads through another path).
+3. **Hardware multiply**: the 8×8 loop `$34:$8006`, the hottest loop of the driver, becomes `$5205/$5206` (4MI did the same,
+   20 cycles instead of ~150-200). **The multiplier belongs to the sound driver**: game code never touches `$5205/$5206`,
+   because the sound update can run inside the IRQ (§8.4) and interrupt any main-thread code.
+4. **Play-time clock** in the `$C8C1` wrapper (it runs once per frame, lag frames included; 4MI ticks it in the driver),
+   counted outside the LIVE images (meta.md §1.2).
+
+### 12.3 New-song pipeline [new-code] M · Must; [new-music] per song
+
+`tools/build/mml.py` compiles an MML dialect 1:1 onto the decoded command set:
+
+| MML | Command | Notes |
+|---|---|---|
+| `c d e f g a b r`, `+ -`, length `1 2 4 8 16 32 64` | note byte: length index 7..1 (192, 96, 48, 24, 12, 6, 3 ticks), pitch 1-31 above the octave base (0 = rest) | the compiler emits octave changes when a pitch leaves the 31-semitone window |
+| `.` | `02` dot | |
+| `{ }` | `00` triplet toggle (lengths 2, 4, 8 … 128) | |
+| `&` | `01` tie | |
+| `^` | `03` octave+ toggle | |
+| `F n` | `04` flags | |
+| `t n` | `05` tempo (16-bit tick increment per frame) | |
+| `q n` | `06` gate | |
+| `v n` | `07` volume | |
+| `@ n` | `08` instrument (8-byte entries at the table `$34:$8A41` points to; GP appends a relocated table) | |
+| `o n` | `09` octave | |
+| `K n` / `k n` | `0A` global transpose / `0B` transpose | |
+| `D n` / `s n` | `0C` detune / `0D` slide | |
+| `[ … \| … ]n` | `0E-11` loop 1-4 / `12-15` break 1-4 | 4 nesting levels |
+| `L` | `16` jump (loop point) | |
+| `!` | `17` end | |
+| `w n` | `18` duty | |
+
+Sound effects keep vanilla's format (priority byte + register stream, player `$34:$8251`) and are written as YAML register
+frames. **Round trip test**: `mml.py decompile` turns all 36 vanilla music ids into MML and `compile` must give the same
+bytes; it gates the compiler (M0). New stages reuse vanilla tracks until their songs exist (PLAN §6.5, kept).
+
+### 12.4 Budget
+
+Vanilla's 36 songs fit in about 21 KB. GP plans ≤ 1 new track per venue at Should (venues_a §10 q9), fortress and W
+tracks, stingers and ~30 SFX: 16 banks (128 KB) are reserved (`$70-$77` + the `$0B-$0F` pool).
+
+### 12.5 MMC5 pulses [new-code] M · Could
+
+A **second driver instance** for the two MMC5 pulses: the M0 disassembly of `$34:$8000-$8A3F` (2.6 KB) becomes Ophis source
+with symbolic RAM and register bases, assembled twice: once in place (4 channels, `$4000`, vanilla RAM `$0700-$07EF`) and once
+in a GP bank (2 channels, `$5000-$5007`, state in WORK `$6F00`). A `COMPANION[id]` table names the 2-channel stream that
+starts with a track when CONFIG "MMC5 AUDIO" is on; both instances tick in the same update call with identical tempo
+commands, so they cannot drift. `$5015` is set only when the config is on (BRIEF §5.7: MMC5 audio on/off; music must stand on
+the 5 core channels). Should, if time allows: 4MI's charge-shot loop on MMC5 pulse 1 so the charge never steals a music
+channel (`r4mi/engine.md` §9.2).
+
+---
+
+## 13. Saves (implementation; the format is meta.md's) [new-code] S · Must
+
+- **Where**: page 0 (SAVE), meta.md's map at page offsets `$0000-$1A1F` (SYS-A/B, FILE1-3 A/B, test mailbox `$1A00`).
+  **Changed from meta.md's table**: the LIVE FILE and LIVE SYS images sit in **page 1 (WORK)** at the same CPU addresses meta
+  gives (`$7400-$75FF`, `$7600-$79FF`), because WORK is the page mapped at `$6000` during play; page 0 offsets
+  `$1400-$19FF` become reserve.
+- **How**: `save_commit(block)` runs in the C-window (core bank `$3E`): it maps page 0 at `$A000` (`$5115 = $00`, shadow
+  `$4B = $80`), so an NMI's sound service restores the same page through the shadow; copies the LIVE image into the older
+  copy, writes the checksum and commit marker last (meta.md §1.3), and maps `$A000` back. ~10,000 cycles for a file block:
+  done at meta.md's commit points (stage clear, bracket, settings), never mid-action.
+- **Load**: verify both copies, take the newest valid one, fall back gracefully (meta.md §1.1: never the 4MI black-screen
+  loop).
+- **RESET**: maps page 0 at `$A000` briefly to read the test mailbox (§14.5), and clears WORK; it never clears page 0.
+- **Passwords**: vanilla's codec `$3F:$F3D0` stays callable for meta.md's hidden PASS WORD gag.
+
+---
+
+## 14. Dev tooling and tests
+
+### 14.1 Build [new-code] M · Must
+
+`tools/build/build.py --config {release,dev}`: verify the base ROM (MD5 `d9a4eed8b3c13a6bd74b2e9d20385afb`) → expand to 1 MB
+(§1.2) → assemble `src/` with Ophis → apply hooks from the registry → place segments with the allocator → write levels,
+text, sound, sprites, CHR → header → `build/r6gp.nes` + `build/r6gp.bps` + `build/r6gp.map` (symbols) + a per-bank usage
+report.
+
+### 14.2 Hook registry and allocator [new-code] S · Must
+
+`src/hooks.yaml`, one entry per patched vanilla address:
+
+```yaml
+- id: H_STAGEINIT
+  site: 3E:DBDB          # vanilla numbering
+  orig: "48 A8 85 51 29 07 8D 3D 06"   # must match the base ROM
+  kind: cw               # cw | jsr | inline | operand | data
+  target: stage_init     # symbol
+  owner: tech.md §4.5
+  tests: [vanilla_all_stages, sa_rows]
+```
+
+The build fails if `orig` does not match, if two hooks overlap, if a patch starts inside an instruction (checked against the
+disassembly and shadow6 coverage), or if a free-space segment overflows. The coverage report lists hooks the test suite never
+executed. Allocator seeds: banks `$0B-$0F`; `$3F:$FAC0-$FF1F` minus `$FFE0-$FFEF` (§1.3); `$3A:$95D4-$9FFF`; text-bank holes
+`$3C:$9D16-$9FE1`, `$3D:$BA8D-$BCFF`, `$3D:$BF42-$BFFF`; `$36:$BE3F-$BFFF`; tileset slots `$2B:$9200`, `$2D:$9200`; sprite-bank
+fill; after M2, `$3E:$C163-$C51D` (retired IRQ handlers); and the new banks.
+
+### 14.3 BPS [new-code] S · Must
+
+`tools/build/bps.py`: SourceRead / TargetRead / SourceCopy / TargetCopy with source, target and patch CRC32. The release is
+the BPS against the vanilla ROM; no Capcom bytes ship (BRIEF §7.4). Tested by applying with the tool itself and with Rom
+Patcher JS / Floating IPS at M10.
+
+### 14.4 Golden movies and shadow6 [new-code] M · Must
+
+- **Movies** are `frame:buttons` text plus checkpoints (RAM asserts, frame hashes, screenshots), run headless on FCEUmm
+  (`tools/analysis/emu.py`).
+- **M1 gate, vanilla equivalence**: the same input on vanilla and on the GP build in port-only configuration must give
+  identical CPU RAM every frame, except the new hot bytes (`$06AF-$06FF`, `$07FA-$07FF`, `$0698`) which are masked, and
+  identical frames. Suites: boot → title → each of the 16 stages for 600 frames; every IRQ state of `rm6/engine.md` §4.2
+  (Blizzard ship, Plant 0E, Tomahawk 00 and 0A, Knight 03, Centaur 0A, Mr. X 2/3/4, Wily 2, Wily 4, YOU GET, the adaptor
+  slide, the opening); a death, a game over, a boss kill.
+- **Split calibration**: for each split state, the first differing scanline between vanilla and port frames is reported;
+  `K` and the per-handler delays are tuned until it is none, on FCEUmm and once on Mesen (user gate).
+- **shadow6 for MMC5**: `tools/analysis/rm6/shadow6.py` re-executes frames with MMC3 banking and the MMC3 IRQ counter;
+  M1 adds PRG mode 3, RAM pages in every window, `$5203/$5204`, the multiplier, and ExRAM. Then the same tool gives coverage
+  (hooks executed), the cycle profile per build (§15), and the "RAM matches the emulator" fidelity check it already has.
+
+### 14.5 Test mailbox and warps [new-code] S · Must
+
+- **Warp** (vanilla, `rm6/cheats.md`): write `$51`, `$0684-$0686`, set `$F0 = 2`. GP adds `CK_SECTION`. In DEV builds
+  SELECT + START held 1 s = "kill and respawn here" (4MI lesson 10's one-byte respawn).
+- **Mailbox** (meta.md §9.6, page 0 offset `$1A00`, 32 B): RESET reads a command (`BOOT_TO stage, section, checkpoint,
+  preset, flags…`), clears it, and builds that state without menus. Tests write the mailbox into the `.sav` before boot,
+  replacing savestates (vanilla states cannot load into the MMC5 build).
+
+### 14.6 EXTRA CONFIG and the DEV build [new-code] M · Must
+
+meta.md designs the screen (WHERE / STAGE / CP / SCREEN / ENTER STAGE, a RAM editor in the 4MI pattern: a table of RAM
+pointers and help strings). Tech: code in bank `$7C`; entered only when the build has `DEV = 1` (a byte in the header-adjacent
+version block) or after meta.md's unlock; any use sets `DEV_FLAGS` and meta.md's FILEFLAGS.EDITED; the DEV ring buffer at
+`$7200` logs hooks, warps and saves. User gates (⛳) always include a Mesen run, to catch header and timing issues FCEUmm
+forgives (§1.1, D6).
+
+### 14.7 CI-like runs [new-code] S · Must
+
+`tools/build/check.py`:
+
+| Suite | Contents | When | Time |
+|---|---|---|---|
+| static | hook registry, allocator, header, `$FFE0-$FFEF` guard, stage-attribute vanilla rows, level checks (§6.3), sprite CHR conflicts | every build | seconds |
+| unit | `levels` round trip (bank + text format), MML round trip, PPU-script selftest (168/168), text encoder, BPS round trip | every build | < 1 min |
+| smoke | boot, title, file select, 3 venues × 600 frames, one save/load | every commit | ~2 min |
+| full | all of §14.4 + every venue route movie that exists + lag report | milestone gates | ~15 min |
+
+Every session ends green, committed, with `docs/STATUS.md` updated (PLAN §10 kept).
+
+---
+
+## 15. Lag plan
+
+### 15.1 Baseline [done by research]
+
+~21,000 of 29,780 CPU cycles per frame are busy in play; a lag frame needs ~29,000. OAM builder 23 % (4,800), sound driver
+18 % (3,700-3,900, the multiply loop hottest), bank switching 12-13 % (2,700), terrain collision 7 %, object loop 7 %,
+hit-box overlap 5-8 %, object scan 4 %, player 4 %, NMI + PPU 7 %; each extra live object costs ~1,760 cycles, so ~10 live
+objects fill a frame; enemy AI itself is under 1 %. Music keeps tempo during lag (`rm6/engine.md` §8).
+
+### 15.2 Savings, in order of cost
+
+| Step | Where | Expected | Tier |
+|---|---|---|---|
+| 1 | hardware multiply in the sound driver (§12.2) | −1,000 to −1,500 cycles [guess, 4MI's factor] | Must (M2) |
+| 2 | MMC5 helpers (§1.4) | −10 cycles per `$CBC0`, more per `$CB91` path | Must (M1) |
+| 3 | drop the placeholder `LDA #$7E / JSR $CB91` pair at `$E204`/`$E430` if shadow6 confirms nothing reads the window (critic: nothing does) | one `$CB91` round trip per object per pass [guess: ~1,000 cycles at 10 objects] | Should (M3) |
+| 4 | OAM builder: unflipped fast path, early off-screen cull, unrolled pair writes | −20-25 % of 4,800 | Should (M3) |
+| 5 | unrolled VRAM copy in WORK (4MI `$7B70`: 8-9 instead of 15-16 cycles per byte) | vblank headroom for streams | Must (M2) |
+
+Target: **+3 live objects at vanilla lag**; until measured, designers keep the vanilla budget (~10 live objects, 8 + shots,
+BRIEF §6). Each step is measured with the shadow6 profiler on the same input; the full suite fails a stage whose lag frames
+rise by more than 2 points.
+
+### 15.3 VBlank budget (systems.md asks)
+
+NTSC vblank ≈ 2,273 CPU cycles. The NMI spends ~550 on OAM DMA and setup, and runs **one** of: the VRAM buffer + column paint
+chain (`$C69E/$C6D7/$C7DE`), or the CHR-set copy `$C79C`, which vanilla runs only when nothing else is pending and which moves
+16/32/48/64 bytes per frame (`$C7D6` = `40 10 20 30`) at ~16 cycles per byte [code, read for this doc]. A column paint costs
+~600-700 cycles.
+
+**GP's CHR stream** (form swaps, canvas glyphs, T6 debris, CHR thirds swapped by exits) uses an unrolled copier in WORK and is
+allowed on every frame:
+
+| Frame has | Stream budget |
+|---|---|
+| no column paint, no VRAM buffer | **128 B** |
+| a column paint | **64 B** |
+| a full VRAM buffer (menus, text) | 32 B |
+
+So systems.md's form swap (≤ 1 KB) takes 8-16 frames (its 12-frame target holds when the camera is still). A larger budget
+needs a blanked top band (rendering enabled late), which is a Could.
+
+### 15.4 Joypad 2 (systems.md asks)
+
+Vanilla reads **both** pads every frame (`$3E:$C711`, X = 1 then 0, `AND #$03` so Famicom expansion pads count) into
+`$41/$43`, but **no executed instruction reads `$41` or `$43`** outside that loop in the 139,200-frame coverage set [code +
+coverage, checked for this doc]. Controller 2 is free for systems.md's pseudo L/R.
+
+---
+
+## 16. Milestones M0-M3, rewritten
+
+Each milestone ends with a playable build, the test suites green, and `docs/STATUS.md` updated. **S** < 1 session, **M** 1-2,
+**L** 3+. ⛳ = the user plays the build (always in Mesen as well as FCEUmm). M4 onward keep PLAN §8's order with the BRIEF §9
+tiers; their engine prerequisites are all in M2-M3 below.
+
+### 16.1 What the research already finished (PLAN's M0, done)
+
+| PLAN M0 task | Status | Where |
+|---|---|---|
+| M0.3 RAM map v0 | **done** (+ critic corrections, free RAM proven over 232,722 frames) | `rm6/ram.md` |
+| M0.4 disassembler, free-space confirmation | **mostly done**: py65 tools, linear disassemblies of every bank, shadow6 coverage of 139,200 frames, free ROM confirmed by execution; *missing*: reassemblable source | `rm6/engine.md` §6, `tools/analysis/rm6/shadow6.py` |
+| M0.5 stage tables | **done** | `rm6/levels.md` §1 |
+| M0.6 level extractor, renderer, round trip | **done** (byte-exact, JSON, edited ROM played, 16 full maps) | `tools/analysis/rm6/levels.py`, `img/maps/` |
+| M0.7 object / AI / damage tables | **done** (type tables, AI header, damage routines, weakness tables) | `rm6/engine.md` §1-2 |
+| M0.8 sound driver | **done** for decoding (table, command set, `songdec.py`); *missing*: the compiler | `rm6/engine.md` §5 |
+| M0.9 text | **done** (168 scripts, interpreter, 11 tables, EN proof of concept) | `rm6/text.md` |
+| (new) metasprite format | **done** (118/118) | `rm6/engine.md` §1.5 |
+| (new) IRQ chain map, MMC5 port list, 45 stage-id readers | **done**, re-read here | §1.7, §4.3 |
+| (new) warps, godmode, password codec, 87 savestates | **done** | `rm6/cheats.md`, `build/research/rm6/states/` |
+| (new) MMC5 hardware probes (RAM pages, RAM in `$8000-$DFFF`, CHR-RAM size, multiplier, ExRAM mode 2, ExRAM as a nametable from a mid-frame `$5105` write, no in-frame flag) | **done** for FCEUmm | `build/design/design-tech/probe/` |
+
+### 16.2 M0 — Workbench (what remains)
+
+1. **M0.1 (S)** Repo scaffold (`src/`, `assets/`, `tools/build/`, `tests/`); `build.py` no-op path (vanilla in → vanilla out,
+   MD5 check) and `bps.py` with a round-trip test.
+2. **M0.2 (S)** Hook registry and allocator skeleton (§14.2), seeded with the verified free ranges; static checks, including
+   the `$FFE0-$FFEF` guard.
+3. **M0.3 (S)** `tests/run.py` on `emu.py`: movies = inputs **plus scripted RAM pokes** (so a warp at frame N runs identically
+   on vanilla and on later MMC5 builds, which cannot load vanilla savestates); record the vanilla golden suite (§14.4).
+4. **M0.4 (M)** Reassemblable Ophis source of the fixed banks `$3E/$3F` (16 KB) and the sound driver `$34:$8000-$8A3F`,
+   byte-identical when assembled; code/data split from shadow6 coverage. Needed by the IRQ port, the raster walker and the
+   second driver instance.
+5. **M0.5 (S)** `.lvl` text format: decompile and rebuild all 16 stages byte-identically (§6.2).
+6. **M0.6 (S)** `mml.py` decompile/compile round trip of the 36 vanilla songs (§12.3).
+7. **M0.7 (S)** shadow6 censuses: every instruction that reads sound stream data (for §12.2), and a static scan of all code
+   banks for `$51`/`$063D` reads to catch readers the tour did not execute; decode the player's floor-handler table (the
+   type → handler dispatch near `$38:$875A`) for X-FLOOR.
+8. **M0.8 (S)** `stagetab.py`: stage-attribute rows 0-15 and variant rows from the vanilla tables, with a test that they
+   reproduce every vanilla value.
+
+**Exit**: vanilla round-trips through `build.py`; unit suite green (levels, MML, PPU scripts 168/168, BPS); vanilla golden
+suite recorded.
+
+### 16.3 M1 — Big Cartridge (MMC5)
+
+1. **M1.1 (M)** 1 MB insertion (§1.2), header (§1.1), RESET and `mmc5_init` (§1.3), vectors to `$7F` stubs, the C-window
+   dispatcher, `CALL7E` and `FAR` (§1.9).
+2. **M1.2 (M)** Bank helpers, sound service, NMI CHR-copy bank, sound reader (§1.4); `$E204/$E430` operands (§1.6);
+   mirroring (§1.5).
+3. **M1.3 (M)** IRQ literal port: the two NMI arm paths, the entry, the 15 latch and 12 disable writes, `$FF96` (§1.7);
+   calibrate `K` and the per-handler delays against vanilla frames.
+4. **M1.4 (M)** shadow6 MMC5 support (§14.4); golden equivalence green (RAM + frames); coverage shows every ported site
+   executed.
+5. **M1.5 (S)** PRG-RAM: pages, `ram_probe`, WORK clear, page 0 never cleared; save module skeleton (A/B commit, checksum,
+   load fallback) on a test block; test mailbox read at RESET.
+6. **M1.6 (S)** Spike ROMs (like this doc's probes, which already pass on FCEUmm): ExRAM mode 0 as a window nametable with
+   mid-frame `$5105`; MMC5 IRQ line timing vs MMC3; a bottom band with a palette swap; RAM pages in `$8000/$A000`; all on
+   Mesen, plus the IRQ timing and palette band on FCEUmm.
+7. **M1.7 (S)** Lag baseline of the port equals vanilla's within 2 % (shadow6 profile).
+
+**Exit**: golden equivalence green; ⛳ the user spot-checks in Mesen (header sizes, saves, every split). **Contingency**: if
+ExRAM-as-nametable fails on Mesen, the window falls back to a nametable row reserved per screen by the level build (costs
+layout rows in window screens); if MMC5 itself fails on the user's target, BRIEF §7.1 has to be revisited (risk 1).
+
+### 16.4 M2 — Engine foundations
+
+1. **M2.1 (M)** Stage-attribute table and 32 ids (§4): the 45 `$51` readers, the 11 `$063D` readers, relocated tables, the
+   stage-init hook. Gate: every vanilla id still plays its golden movie identically.
+2. **M2.2 (M)** WRAM-resident layouts (§5): RAM images, poke lists, map-edit API and log. Gate: vanilla stages from RAM are
+   identical in the golden suite.
+3. **M2.3 (M)** Object lists in WORK, list format v2, families `$F4-$FF`, init and spawn hooks, `gp_spawn`, the sprite-CHR
+   hook (§7.2-7.3, §7.6); one test object per family.
+4. **M2.4 (M)** Raster list and presets; all chains migrated; logic out of the IRQ (§8, §1.8); the old handler space freed.
+   Gate: golden equivalence except Knight/Centaur, which pass behaviour-equivalence.
+5. **M2.5 (L)** Text engine v1 (§11): window band on ExRAM, canvas and VWF, JP font, dialogue with freeze and
+   borrow/restore, pop-ups with the per-screen canvas table, choices, the PPU-script language hook, `text.py`. Samples in JP
+   and EN.
+6. **M2.6 (M)** Sound (§12.2-12.3): track table v2, bank bytes, reader range, hardware multiply, play-time clock, `mml.py`
+   compile; the first new song plays in a vanilla stage.
+7. **M2.7 (M)** Level pipeline (§6): `.lvl` build in `build.py`, all checks of §6.3, the canvas table, maps; one test
+   section authored in text and played.
+8. **M2.8 (S)** DEV build: EXTRA CONFIG (meta.md's UI), warps, respawn-here, the DEV ring buffer (§14.5-14.6).
+9. **M2.9 (S)** Lag steps 1 and 5; the CHR stream with the budgets of §15.3 (systems.md's form swap is its first user).
+10. **M2.10 (S)** For systems.md: death-hook audit, latch source, frozen tick, LFSR (§7.7-7.8).
+
+**Exit**: vanilla content runs on the new engine (attribute table, RAM layouts, raster list) and passes the suite; a
+dialogue and a pop-up play inside a vanilla stage in JP and EN; a new song plays. ⛳
+
+### 16.5 M3 — Systems and shared mechanics (engine side)
+
+1. **M3.1 (M)** Saves, file select and config plumbing on meta.md's format (§13); difficulty bytes read by `IFHARD` and the
+   poke lists.
+2. **M3.2 (M)** systems.md's hook set (its §15.1): SELECT quick swap with the form CHR stream, weapon alt/synergy dispatch,
+   damage and i-frame tables, adaptor by win count (`$38:$931D`, `$3B:$BA3F`), WEAK! pop, commentator events.
+3. **M3.3 (M)** T3 switch → target (family `$F5`): doors, keys, gates, lifts through exits, timed toggles (VA-TIMED).
+4. **M3.4 (M)** T6 (§10) with X-BONK; a test climb with break and refill.
+5. **M3.5 (M)** T1-lite (§9.1): wave director and band rides; a test sortie.
+6. **M3.6 (S)** Player extensions (§7.9): GP player states (T5 grab, X-EXWP), X-WRAP, exit type 7 (X-UPEXIT, Should), pad
+   history (T7, Should).
+7. **M3.7 (S)** Scorecard counters and results hooks (meta.md, systems.md); the announcer queue feeding pop-ups.
+8. **M3.8 (S)** Lag steps 3-4; measure how many objects were gained and publish the new budget.
+
+**Exit**: the full loop (score, bolts, chips, saves, commentators) runs on vanilla stages; T1-lite, T3 and T6 demo rooms pass
+their movies. ⛳ Then M4 (vertical slice) can start on real venue data.
+
+---
+
+## Lessons applied
+
+- **CX 8** (engine): a bank byte beside every pointer table (tracks, lists, sections, families); raster effects behind one
+  stub with their parameters in dedicated RAM (§8); interrupt-safe banking through shadows (§1.4, §1.9); old entry points
+  kept by rewriting the helpers in place (§1.4). **CX 9**: test harness from day one (mailbox, warps, dialogue injection
+  through `TALK id`, damage sweeps via EXTRA CONFIG). CX's text lessons: an opcode set with `CALL` and `SKIPIF`, scripts
+  started from object data, a VWF for English with a highlight plane, text kept out of code banks (§11).
+- **4MI 8**: level data in RAM, connectivity as data, HARD as poke lists (§5). **4MI 11**: a generic double-buffered raster
+  list (§8). **4MI 12**: an accurate target and a correct NES 2.0 PRG-RAM size, plus a boot probe (§1.1, §2.3). **4MI 13**:
+  resolve placements statically (§6.3, §7.6). 4MI engine lessons: PPUMASK as an effects register (§8.1), spare attribute
+  bits instead of new formats (T6's bit 2), shared hardware guarded in NMI (the multiplier belongs to the sound driver),
+  an unrolled VBlank copy (§15).
+- **RM6 1**: ids past 15 only after the 45 readers are rewritten, and the packed tables relocated (§4). **RM6 2**: the block
+  table as the art budget (T6 variants are reported in block ids; venue tilesets get their own alternate set). **RM6 3**:
+  the 89 free bytes for hot hooks only (§3.1). **RM6 4**: the corrected porting checklist, completed here (§1.4-1.7).
+  **RM6 5**: new enemies as families with the 6-byte header and a CHR-conflict check (§7). **RM6 6**: per-position
+  destruction (§10). **RM6 7**: adaptor acquisition hooks listed (§16.5). **RM6 8**: quirks kept (oil ignition's repaint
+  reused, the `$FFE0` check respected, C.FLRSH and TO BE CONTINUED untouched by the text hook).
+
+## Risks
+
+1. **Hardware and flash-cart support** for MMC5 + 8 KB CHR-RAM + 32 KB PRG-RAM is unverified; 4MI's MMC5 build is the
+   existence proof only for emulators. Mitigation: the boot probe's clear message; Mesen at every gate; ask the user which
+   cart matters (open question 5).
+2. **FCEUmm forgives too much**: it always gives 64 KB of PRG-RAM and wraps CHR-RAM at 8 KB [seen], and its MMC5 timing
+   may differ from Mesen's. Bugs that only Mesen shows reach the user late. Mitigation: Mesen in every ⛳, and a headless
+   Mesen in CI if one can be installed (open question 4).
+3. **IRQ calibration** may not hit h-blank identically on both emulators; bands may shimmer by a line. Mitigation: per-band
+   timing tests on both; prefer PPUMASK/PPUCTRL bands (less sensitive than `$2006`) where a design allows.
+4. **ExRAM writes count only while rendering**, and FCEUmm lacks the in-frame flag. Mitigation: all ExRAM writes go through
+   a queue flushed inside a line-8 IRQ band (§3.3); the window cannot change on rendering-off screens, so full-screen text
+   stays on the PPU-script engine.
+5. **Canvas CHR**: dense screens have no free BG ids (Plant), so pop-ups wait; a bug in the dialogue's borrow/restore would
+   corrupt visible tiles. Mitigation: every dialogue screen gets a movie with a frame hash after the window closes.
+6. **Moving the logic out of IRQs** changes Knight's and Centaur's timing by part of a frame: exact golden equality is lost
+   there (behaviour tests instead).
+7. **WRAM layouts**: a stray write corrupts the current stage. Mitigation: DEV builds compare the LAYOUT page with the ROM
+   image plus the map-edit log at every screen exit.
+8. **T6 block-id cost** on full tilesets; fallback: the bitmap variant (§10).
+9. **Unexecuted `$51` readers** may exist outside the 139,200-frame tour; M0.7's static scan closes the gap.
+10. **Sound driver reassembly** for the second instance is delicate; that is why MMC5 audio stays Could.
+11. **Text engine size (L)**: Knight's venue depends on it (venues_a risk 5). It starts in M2, before any venue.
+12. **Cartridge space**: 4MI filled 1 MB to 97 %; GP plans ~45 % of the new space for code and data and reports usage per
+    bank on every build.
+13. **Vanilla savestates cannot load into MMC5 builds**: all tests must boot and warp (mailbox, scripted pokes); recording
+    them is an M0 task, not an afterthought.
+
+## Open questions
+
+1. **fortress.md**: does it need engine ids beyond `$16-$1D` and `$1F` (separate arenas for the Bass duels, multi-stage
+   wings)? Which legacy ids `$09-$0F` may be reclaimed?
+2. **meta.md**: accept the LIVE FILE / LIVE SYS images in page 1 at meta's CPU addresses (§13)?
+3. **Pop-up position**: top band by default (keeps floors and pits visible) or bottom (venues_a/b assumed the bottom)? A
+   per-stage flag exists either way.
+4. Can a headless Mesen run in this environment for CI, or is Mesen a user-gate tool only?
+5. Which hardware target matters (Everdrive N8 Pro, PowerPak, none)? It decides how far to trust MMC5 CHR-RAM and 32 KB
+   PRG-RAM.
+6. **art_audio.md**: tiles per form for the quick swap; portrait count (16 canvas tiles each, dialogue only).
+7. Does any venue need T1-full (terrain moving with a forced camera)? Today none does.
+8. **story.md**: kanji in JP dialogue (cheap with the canvas: about 1.6 KB of PRG for 200 glyphs), or kana only as vanilla?
+9. Do any stages need more than 32 screens (H wings, W stages)? That decides whether sections move from Should to Must.
+10. Should the legacy ids 8-15 keep vanilla fortress rules (CONTINUE-only game over, no weapon get) when the fight table
+    loads them?
+
+## Cross-doc dependencies
+
+| Doc | Must agree with |
+|---|---|
+| `meta.md` | PRG-RAM page 0 map unchanged, LIVE images moved to page 1 at the same CPU addresses (§13); mailbox at page offset `$1A00`; EXTRA CONFIG UI on tech's warp, DEV flag and ring buffer (§14.5-14.6); `SA.META` = its meta index (§4.2); its fight table points at engine ids (legacy `$08-$0F`, §4.2); ENGRISH as an override table (§11.5); difficulty bytes read by `IFHARD` and poke lists (§5.5) |
+| `systems.md` | its hot bytes at `$06BD-$06C8`, per-slot arrays at `$6000+` (§3.1, §3.4); hook sites in the registry; VBlank stream budget 128 / 64 / 32 B (§15.3); controller 2 is free (§15.4); frozen tick, latch source, LFSR, death-hook audit (§7.7-7.8); the multiplier is not for game code (§12.2); stage fields `FORT_COL`, `SCORE_ID`, `PAR`, `NO_TAG`, `KEEPWE` (§4.4) |
+| `venues_a.md` | T1-lite accepted (§9.1); T4 through `RL_BANDS` with ≤ 6 bands plus the window band (§8.3); T2 (§11); T3, T5 and VA-* objects built on families `$F4/$F5` and GP player states (§7); the Knight ceiling out of the IRQ with parameters (§1.8); two tileset slots per ROM bank, each with its own alternate set (§5.2) |
+| `venues_b.md` | T6 is a layout rewrite with variant blocks, not a bitmap (§10; the bitmap is the fallback); X-BONK is a ceiling-probe callback; X-GPOBJ = families (§7.2); the ship, tide and ceiling become `EFFECTS` bits with `EFX_PARAM` (tide dwell) (§4.4); X-UPEXIT = exit type 7 (§7.9); X-FLOOR = new collision groups via `GRP_ROW` once M0.7 decodes the floor handlers; the ignition hook on `$3E:$DDFC` goes in the registry |
+| `fortress.md` | ids `$16-$1D`, `$1F` (§4.2); BG bosses on `RL_FLOOR` (§8.3); legacy ids for refights; sections for wings over 32 screens (§5.4) |
+| `story.md` | the text control codes and limits: pop-up 2 lines × 16 tiles (~22 EN characters with the VWF, 16 JP), dialogue 3 lines × 26 columns with a 32×32 portrait (§11); speaker ids with blips; kana (+ kanji if adopted) |
+| `art_audio.md` | 8 KB CHR-RAM and no banking (D6); sprite PNG + JSON input (§7.5); 1bpp 8-px fonts; portraits 32×32; the MML dialect (§12.3); 16 music banks; MMC5 companion streams (§12.5) |

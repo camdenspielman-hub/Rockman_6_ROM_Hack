@@ -18,12 +18,12 @@ Tags per BRIEF §8: **[engine-ok]** vanilla as-is or data only; **[new-code]**; 
 
 | Question | Answer |
 |---|---|
-| Where does new art live? | In **new CHR source banks** (never over Capcom art, BRIEF §7.4), plus the **1,126 blank tiles** in the gaps of vanilla CHR banks `$00-$0A`, `$10-$1F` (measured, §1.3). Banks `$0B-$0F` are left to `tech.md` for code |
+| Where does new art live? | In **14-16 new CHR source banks** (never over Capcom art, BRIEF §7.4). The **1,126 blank tiles** in the gaps of vanilla CHR banks `$00-$0A`, `$10-$1F` (measured, §1.3) stay as a reserve, and banks `$0B-$0F` are left to `tech.md` for code |
 | How does it reach the screen? | Through vanilla's **CHR set** mechanism (`$37:$8000`, 4 bytes per set), extended to a **v2 set table** that can address banks above `$3F` and gives each stage **28 local set ids** (§2.1) |
 | What limits a venue? | **256 BG tile ids live at once** and a **96-tile sprite "enemy area"** (`$1A00-$1FFF`) per screen. Not ROM space. The rules of §2 ration both |
 | How much new art? | **6,793 tiles** (4,508 BG + 2,285 sprite) and **573 metasprite frames** in total; **Must = 4,851 tiles, 421 frames** (§13). For scale: 4MI added 5,266 new tiles, CX's screens are 70 % new |
 | Who draws it? | A human pixel artist for characters, BG bosses, portraits and the logo (**1,368 BG tiles + 419 frames**, ≈ 890 hours with the cleanup of Claude's drafts); Claude drafts or generates the rest (**3,140 BG tiles + 151 frames**) (§11) |
-| Music? | Vanilla's 36 tracks stay. **37 new compositions (51 track ids)**: 5 Must (3.0 KB), 24 Should, 8 Could (+2 MMC5 layers), **27.5 KB** in all; about **75 new SFX (≈1.8 KB)**; MMC5 "16-bit" arrangements for Super Wily Castle (Could, per BRIEF §9). Vanilla has **449 bytes** of free sound space, so new music goes into **5 new 8 KB banks** with a per-track bank byte (§12) |
+| Music? | Vanilla's 36 tracks stay. **37 new compositions (51 track ids)**: 5 Must (3.0 KB), 24 Should, 8 Could (+2 MMC5 layers), **27.5 KB** in all; about **70 new SFX (≈ 1.9 KB)**; MMC5 "16-bit" arrangements for Super Wily Castle (Could, per BRIEF §9). Vanilla has **449 bytes** of free sound space, so new music goes into **5 new 8 KB banks** with a per-track bank byte (§12) |
 | The one technical bet | **8 KB CHR-RAM is the real budget.** Every in-stage pop-up, boss pinch form and form swap is planned around it (§2). §18 asks whether `tech.md` can measure a 32 KB CHR-RAM option |
 
 ---
@@ -73,7 +73,7 @@ A tile is free if no CHR set reads it and it is blank.
 
 | Banks | Free tiles | Notes |
 |---|---|---|
-| `$00`, `$03-$07`, `$09`, `$0A` (sprite art) | 806 | gaps between Capcom's sets, in runs of 16-96 (bank `$00` has one run of 96) |
+| `$00`, `$03-$07`, `$09`, `$0A` (sprite art) | 830 | gaps between Capcom's sets, in runs of 16-96 (bank `$00` has one run of 96) |
 | `$02`, `$08` | 62 | |
 | `$17`, `$19`, `$1E`, `$1F` (BG art) | 234 | `$1E` has a run of 78, `$1F` a run of 128 |
 | `$10-$16`, `$18`, `$1A-$1D` | 0 | full |
@@ -173,7 +173,7 @@ alternate set is what breakables, toggling floors (`venues_a.md` VA-TIMED), pres
 | Bank (symbolic; `tech.md` numbers it) | Slot `$80` | Slot `$89` | Slot `$92` | Alternate set used by |
 |---|---|---|---|---|
 | **TS-BLZ** | Blizzard (copy of `$2E:$80`, + ~70 tiles' worth of blocks) | Blizzard secret route + summit (`venues_b.md` 17-1A) | E3 Invader arena | Blizzard (ice cells) |
-| **TS-WND** | Wind (copy of `$2C:$80`) | Wind hangar / wing (1C-1D) | E1 Block arena | Wind; E1 uses ids `$E0-$FF` only |
+| **TS-WND** | Wind (copy of `$2C:$80`) | Wind hangar / wing (1C-1D) | E1 Block arena | Wind; E1 gives alternates only to metatile ids `$E0-$FF` |
 | **TS-PLT** | Plant (rebuilt from `$2E:$92`) | Plant underground + caverns (18-1F) | E2 Paddle arena | Plant (tar pits, croc heads); E2 bricks use T6 per-position bits, not the alternate set |
 | **TS-FLM** | Flame (copy of `$2F:$80`) | Flame palace roof + throne | Semifinal Riot | Flame (plates, oil ignite) |
 | **TS-YMT** | Yamato (copy of `$2E:$89`) | Yamato secret road + kabuki stage | E4 Maze arena | Yamato (trapdoors) |
@@ -253,9 +253,9 @@ r4mi/engine.md §8), and one stream at a time, queued.
 
 ### 2.7 MMC5 extended attributes (ExGrafix) [new-code] M · Could, spike first
 
-PLAN's W1 wanted per-tile palettes. MMC5 ExRAM mode 1 gives each BG tile its own palette (and a 4 KB CHR page). With
-8 KB of CHR-RAM the page bits only reach the two pattern tables, but the **per-tile palette works**: 16 BG colours on
-one screen without 16x16 attribute blocks. Cost: the painter (`$D1FF`/`$D322`) must also write ExRAM; emulator support
+PLAN's W1 wanted per-tile palettes. MMC5 ExRAM mode 1 lets each 8x8 BG tile pick its own palette (and a 4 KB CHR
+page). With 8 KB of CHR-RAM the page bits only reach the two pattern tables, but the **per-tile palette works**: the
+same 4 BG palettes, chosen per 8x8 tile instead of per 16x16 block, which is what makes art look "16-bit". Cost: the painter (`$D1FF`/`$D322`) must also write ExRAM; emulator support
 for MMC5 + CHR-RAM must be checked on FCEUmm and Mesen first. **Use it only in W1's "16-bit" tier**, where the effect is
 the point. If the spike fails, W1's 16-bit tier is a palette upgrade plus the MMC5 music (§12.5), which already sells
 the joke.
@@ -266,7 +266,8 @@ A mid-frame PPUCTRL write (bit 4) makes the BG rows below a scanline read **the 
 the sprite table is 80-100 % free (`rm6/text.md` §7), so:
 
 - the **title** keeps the vanilla logo and moon (232 tiles) in `$0000` and draws its menu (GAME START / SPECIAL EVENTS
-  / CONFIG / ©) from a font in `$1000`, below line 112 (§9.1);
+  / CONFIG / ©) from a font in `$1000`, below line 112 (§9.1); the moon's rows below the split are duplicated into
+  `$1000` too (≈ 60 tiles; the title's sprite table has 251 free);
 - the **bracket**, **judges' desk** and **pit stop** get a second 256-tile page for their lower panels;
 - one entry in the generic raster list (BRIEF §7.1); never used in stages, where the sprite table is busy.
 
@@ -283,7 +284,7 @@ the sprite table is 80-100 % free (`rm6/text.md` §7), so:
   scale (CX's SMB stage, cx/graphics.md §7). Parody names only; no trademark logos, no title-screen lettering of other
   games.
 - **One exception per venue may break the house style on purpose**, as a joke the art carries (CX lesson 6): Plant's
-  2600 canopy (fat pixels, 2 colours), the Game Boy tier of W1 (4 greens), Air-Man-style minimalism nowhere else.
+  2600 canopy (fat pixels, 2 colours), the Game Boy tier of W1 (4 greens), the 8-bit-on-8-bit Exhibition arenas.
 
 ### 3.2 Palettes
 
@@ -294,7 +295,7 @@ the sprite table is 80-100 % free (`rm6/text.md` §7), so:
 | Sprite palettes 2-3 | **The screen's two enemy palettes.** Every new enemy is drawn to use **one** of them plus palette 1. Two enemy types on a screen may not need two different palette-2 programs: the build checks this exactly like CHR overlap (§10.5) |
 | Boss | A boss owns palettes 2 and 3 (vanilla). A weak flash is 2 frames of white (`systems.md` §5) |
 | BG | 4 palettes, colour 0 shared (`$0F` in nearly every vanilla stage). Venue identity comes from palette first: re-use vanilla tiles under a new palette before drawing new ones (4MI's dusk city) |
-| Palette tricks to use | dusk/night variants of vanilla sets (Tomahawk's sunset program already cycles), the Game Boy tier (`$0F $1A $2A $3A`-style greens), C.FLASH's "lights a dark room" fade, a Shadow Rock as Rockman in a dark palette (Flame), Dark Man disguised as Break Man (palette swap), Mr. Y as Mr. X with a moustache (§7.3) |
+| Palette tricks to use | dusk/night variants of vanilla sets (Tomahawk's sunset program already cycles), the Game Boy tier (`$0F $0A $1A $2A` greens), C.FLASH's "lights a dark room" fade, a Shadow Rock as Rockman in a dark palette (Flame), Dark Man disguised as Break Man (palette swap), Mr. Y as Mr. X with a moustache (§7.3) |
 | Accessibility | REDUCED FLASHES (BRIEF §5.7) replaces every full-screen white flash with a 2-step darken; a flash never exceeds 3 frames on, and never repeats faster than every 6 frames |
 
 ### 3.3 Sizes
@@ -348,6 +349,22 @@ addresses (looked up with `enemysets.py`, quoted as tile ranges). A venue's new 
 
 Common to all eight [new-art] [new-code] S · Must: a **tileset slot** (§2.2), a **rebuilt champion boss set** plus a
 **pinch set** (§2.5), and the venue's **PART icon** (GP UI set, §9.7).
+
+**What stays: vanilla blocks, metatiles and tiles** (`rm6/SUMMARY.md` §2). Each venue's slot starts as a byte copy of
+its vanilla tables, so every vanilla block and metatile stays available. New blocks go into **reclaimed ids**: the
+ids the GP layout no longer uses (`levels.py` lists the ids a layout references; the rebuild drops the rest), and,
+with the section switch (§2.2), into the second slot's fresh 256.
+
+| Venue | Vanilla blocks used / 256 | Metatiles used / 256 | BG tile ids free (all CHR states) | Plan |
+|---|---|---|---|---|
+| Blizzard | 255 | 245 | 3 | reclaim from the cut screens; summit and secret route in slot `$89` |
+| Wind | 232 | 194 | 8 | 24 free blocks + reclaimed; hangar in slot `$89` |
+| Plant | 255 | 197 | 0 | rebuild from the GP layout (the second gorilla room and half the lodge go); underground and caverns in slot `$89` |
+| Flame | 254 | 178 | 27 | reclaim; palace in slot `$89` |
+| Yamato | 255 | 221 | 4 | reclaim; kabuki and secret road in slot `$89` |
+| Tomahawk | 221 | 212 | 1 | 35 free blocks; town, saloon and train in slot `$89` |
+| Knight | 255 | 155 | 6 | reclaim (only 155 metatiles used: room for 100 new ones); DQ rooms in slot `$89` |
+| Centaur | 250 | 176 | 11 | reclaim; towers and sunken throne in slot `$89` |
 
 ### 4.1 Blizzard Man: SUMMIT CLIMBER (stage 0)
 
@@ -546,7 +563,7 @@ vanilla pages (4MI: "every tile set is just a list of pages"), plus the new tile
 | **H3** ROCKMAN 3 | Gemini mirror rooms (BG mirrored by data, sprites mirrored by palette), needle presses | Wily 3 machine pages | 96 | Gamma parts 34 (6) | Must |
 | **H4** ROCKMAN 4 | Cossack's snow citadel | Blizzard's ice and skyline pages under a dusk palette | 96 | claw and prizes 36 (6) | Should |
 | **H5** ROCKMAN 5 | the "Proto" castle with gravity flips (the room flips by nametable rewrite, not by tile art) | Knight's castle pages, re-paletted | 96 | Dark Man 60 (12) | Must |
-| **W1** Upgrade Lab | Game Boy tier = palette (`0F 0A 1A 2A`-style greens) over the NES tier's tiles; NES tier; 16-bit tier = richer palette, ExGrafix if the spike works (§2.7) | Wily 2/3 lab pages | 96 | none | Should |
+| **W1** Upgrade Lab | Game Boy tier = palette (`$0F $0A $1A $2A` greens) over the NES tier's tiles; NES tier; 16-bit tier = richer palette, ExGrafix if the spike works (§2.7) | Wily 2/3 lab pages | 96 | none | Should |
 | **W2** Bracket of Doom | Teleporter hall laid out as a bracket (vanilla Wily 3 hub data) | Wily 3 hub pages (`$A2`, `$A8`, `$A9`) | 64 | (Bass β set reused) | Must |
 | **W3** MODE-7 Machine | Castle core and the pseudo-3D floor band | Wily 4 pages (`$BA`, `$BC`) | 96 | machine parts 30 (8); 16-bit Capsule 60 (8, Could) | Must |
 | **Victory lap credits** | A silhouette stadium-and-castle walk, names written into the scenery (CX's playable staff roll) | the Opening's pages in a silhouette palette | 80 | none (the cast walks in using existing sprites) | Should |
@@ -580,7 +597,7 @@ of `rm6/SUMMARY.md` §4, Section 3).
 **CHR plan for a BG boss** (one rule for all): the arena's base set keeps ≤ 100 tiles for the room, floor, HUD digits
 and the text glyph window; the boss gets the other **≥ 150 BG ids**. The MODE-7 Machine double-buffers its far and mid
 sizes in two halves of that range and shows the near size alone (its swap is the only one covered by a full smoke
-burst). Every BG boss gets a 16x16-or-larger **match-card portrait** (§9.3), since the vanilla boss-intro panel shows a
+burst). Every BG boss gets a 32x32 **match-card portrait** (§9.2), since the vanilla boss-intro panel shows a
 sprite pose that a BG boss does not have.
 
 **Totals**: 870 BG tiles (Must 600: Yellow Devil 60, Gamma 200, MODE-7 Machine 340; Should 270: Mecha Dragon 150,
@@ -696,7 +713,7 @@ for the TURBO refusal), Bass β, Mr. Y, Rockman, Dr. Wily, Beat. 192 tiles. Each
 swap (+24 tiles), so a talking face costs no extra layout.
 
 **In-stage pop-ups** use a **16x16 face icon** instead (4 sprite tiles each: Cossack, Kalinka, Mr. Y, Break Man, Roll,
-Eddie = 24 tiles), streamed into the enemy area's free tiles with the glyphs (§9.6). A full portrait never appears
+Eddie = 24 tiles), streamed into the enemy area's free tiles; the text glyphs go into free BG ids (§9.6). A full portrait never appears
 during play: the 8 KB CHR-RAM cannot hold one beside a venue.
 
 ### 9.5 Pit stop, chips, PARTs [new-art] M · Must
@@ -895,8 +912,9 @@ blocks anyway). §17 lists this as the top art risk.
    - **Public-domain melodies** may be arranged: *Korobeiniki* (E1's falling-block arena) and the folk song
      ***Kalinka*** (I. Larionov, 1860): Kalinka the commentator gets it as her 3-second sting. Cossack's daughter was
      named after it; now the game admits it.
-   - **Capcom's own Rockman 1-5** themes may be arranged for the Hall of Fame wings (the museum *is* of those games),
-     re-sequenced from scratch for RM6's driver. No sound data is imported from other ROMs (BRIEF §7.4).
+   - **Capcom's own Rockman 1-5** music may be arranged: the Hall of Fame wings (the museum *is* of those games) and
+     Break Man's whistle (he is MM3's Break Man), re-sequenced from scratch for RM6's driver. No sound data is imported
+     from other ROMs (BRIEF §7.4).
    - Everything else (1943, Dragon Quest, Pitfall, Ice Climber, Prince of Persia, Jajamaru, Atlantis, Tetris's other
      tunes, Space Invaders, Pac-Man, Breakout) is **evoked, never quoted**: scale, rhythm, instrumentation, form.
 4. **The MMC5 voices are a layer, never a requirement.** Every 6-channel track must stand alone on the 4 base channels
@@ -1010,7 +1028,7 @@ their ids still need D2): weapon-cycle tick, form-swap whoosh, parry "ting", WEA
 shop buy and deny, chip click, pop-up chime, crowd cheer (a noise swell), crowd "ooh" on a death, bonk, gate rumble,
 plate click, door unlock, chest open, ice-cell break, pogo boing, gunshot.
 
-**Should** (≈ 35, ≈ 1.1 KB): catapult, POW change, loop whoosh, gust, lamp, DQ menu blip, spell, train whistle, DRAW
+**Should** (≈ 45, ≈ 1.35 KB): catapult, POW change, loop whoosh, gust, lamp, DQ menu blip, spell, train whistle, DRAW
 bell, ricochet, bounty stamp, thunder, croc snap, log roll, tar bubble, vine creak, cat, Toppy push, condor cry,
 chomper "shing", mouse squeak, door fade, siren, slot reel, chirp, scroll spin, wooden clappers, hanabi fuse and
 burst, daruma chime, line clear, ball bounce, brick break, saucer whine, maze munch, ghost eaten, yoku "pip", dragon
@@ -1066,10 +1084,10 @@ byte-identically** (the `levels.py` standard).
 | New music, Must | 2,990 | music bank M0 |
 | New music, Should | 17,640 | M0-M2 |
 | New music, Could | 6,900 | M3 |
-| New SFX, Should and Could | ≈ 1,350 | M0 |
+| New SFX, Should and Could | ≈ 1,450 | M0 |
 | DPCM drums (Could, D12) | ≈ 2,500 | a bank mapped at `$C000` |
 | PCM announcer (Could, D13) | ≈ 4,000 | any bank (CPU-played) |
-| **Total new** | **≈ 35.8 KB** | **5 new 8 KB banks (40 KB)**, or **3 banks (24 KB) for Must + Should** |
+| **Total new** | **≈ 35.9 KB** | **5 new 8 KB banks (40 KB)**, or **3 banks (24 KB) for Must + Should** |
 
 For scale: vanilla RM6 has 18.8 KB of music; CX added 38 songs in 3 banks; 4MI 47 songs in 36 banks of gaps.
 
@@ -1112,9 +1130,9 @@ in 4MI's range because, like 4MI, it keeps every vanilla stage set and spends ne
 |---|---|---|
 | New compositions | 37 (+ 2 MMC5 layers), **51 track ids** | 27,530 |
 | of which Must | 5 (G00-G04) | 2,990 |
-| New SFX | ≈ 75 (≈ 20 Must) | ≈ 1,800 |
+| New SFX | ≈ 70 (≈ 20 Must) | ≈ 1,900 |
 | Samples (Could) | 4 drums + 1 voice | ≈ 6,500 |
-| **All new sound data** | | **≈ 35.8 KB in 5 banks** (Must + Should: 3 banks) |
+| **All new sound data** | | **≈ 35.9 KB in 5 banks** (Must + Should: 3 banks) |
 | Driver work | D1-D13 (§12.2) | Must: D1, D2, D4, D6 (with D5), D8 (with D5/D7), D11 |
 
 ---
@@ -1169,7 +1187,7 @@ in 4MI's range because, like 4MI, it keeps every vanilla stage set and spends ne
 |---|---|
 | `tech.md` | The **CHR set table v2** and stage-local ids (§2.1); **10 tileset banks** + the 2 empty slots and the section switch (§2.2); **14-16 CHR banks**, **3 sprite bank pairs**, **5 music banks** (numbers to assign); the X-GPOBJ sub-id → sprite-bank table (§10.4); the **VBlank stream path** at 128-256 B/frame, one stream at a time (§2.6); a raster-list entry for the pattern-table split (§2.8) and for the MODE-7 road (§6); whether `$C000-$DFFF` stays switchable (DPCM, D12); WRAM for D5's second channel block; the driver work D1-D11 (§12.2); the ExGrafix spike (§2.7); the 32 KB CHR-RAM question (§18) |
 | `systems.md` | **Form swap**: 109-114 of 128 tiles differ per form, so the swap streams the full 2 KB sheet (16 frames at 128 B, 8 at 256 B), not ≤ 64 tiles (§1.5); WEAK!/CRIT!/?! cost 3 + 4 tiles thanks to READY (§2.4); 21 chip icons and 8 PART icons (§9.5); the alt-fire tiles live in each weapon's 15-tile slot (§2.4); Break Man's sheet is Should (§7.1); the SFX list (§12.6); Break Man's whistle G27 |
-| `venues_a.md`, `venues_b.md` | The enemy-area maps and conflicts of §4 (e.g. Tomahawk's cowboys stay out of the town; Flame's chandeliers on 0B live in SET-FL1; Wind 01 has no vanilla enemy; Yamato's samurai screens get nothing new); the per-venue tile and frame counts (§4.9); the set-piece cues and their tiers (§12.4: one Should cue per venue, the rest Could); the vanilla stage themes kept |
+| `venues_a.md`, `venues_b.md` | The enemy-area maps and conflicts of §4 (e.g. Tomahawk's cowboys stay out of the town; Flame's chandeliers on 0B live in SET-FL1; Wind 01 has no vanilla enemy; Yamato's samurai screens get nothing new); the per-venue tile and frame counts (§4.9); the set-piece cues and their tiers (§12.4: one Should cue per venue, the rest Could); the vanilla stage themes kept; **while hanging on a vine (Plant) or carried by the condor (Blizzard) only the buster fires**, because those poses share the buster's 15-tile weapon slot (§2.4) |
 | `fortress.md` | The art of §5 and the BG-boss techniques of §6 (YD on the X Crusher / Wily Machine code, Gamma on Mechazaurus, Cossack Catcher on Metonger Z, Dark Man on the RM framework with Break Man's tiles, the MODE-7 Machine on Wily Machine 6 + CX streaming); the H-wing palette eras; the music of §12.3 for H, W, the ending and the victory lap |
 | `meta.md` | Title (vanilla logo + GP badge + new subtitle, menu under the split), file cards, bracket art, the judges' desk with the Mr. Y cut-out, the pit stop, the lobby from the Opening set, the museum sound test (D9's channel meters), the **GP fanfare** (G01) for the title and rating screens, MMC5 AUDIO in CONFIG |
 | `story.md` | 12 portraits and 6 face icons (§9.4); in-stage pop-ups have **no full portrait** and may be **deferred** when a screen has fewer than 24 free BG ids (§9.6); Kalinka's folk-song sting (G06); Mr. Y is Mr. X's sprite with a moustache (§7.3) |
