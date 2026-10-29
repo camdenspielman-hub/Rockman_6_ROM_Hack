@@ -57,13 +57,13 @@ Jet rows: a new file owns no forms, so the slice cannot reach them); the total i
 | 18 | Tap tweaks (SYS-WPN-0) | B.ATTACK cost 2, PLANT.B cost 3, C.FLASH lights dark rooms | v0.5 | 0.5 |
 | 19 | Plates and Beat (SYS-BT-1) | plates → slots; Beat's pit rescue, once per screen | v0.5 | 2 |
 | 20 | HARD framework (SYS-DIF-2) | `IFHARD`, the layout tier keyed poke lists (no per-stage content in v1.0) | v0.5 | 1.5 |
-| 21 | Special cases (SYS-SC-CASES) | SC1 Knight's shield, SC6 Bass β, SC8 the quick-draw, SC9 venue reactions (v0.5); SC5 Gamma, SC11 CHAMPION BUSTER (v1.0) | v0.5 / v1.0 | 3.5 |
+| 21 | Special cases (SYS-SC-CASES) | SC9 venue reactions (v0.1: the hook that replaces the stagger, with Blizzard's MELT; the other venues' reactions are their data at v0.5); SC1 Knight's shield, SC6 Bass β, SC8 the quick-draw (v0.5); SC5 Gamma, SC11 CHAMPION BUSTER (v1.0) | v0.1 / v0.5 / v1.0 | 3.5 |
 | 22 | MAGNET BEAM (SYS-WPN-9) | the build tap, max 2 beams | v1.0 | 2 |
 | 23 | Super Adaptor (SYS-FRM-5) | rocket fist with homing return, jet hop; needs tech's `$9B` audit | v1.0 | 3 |
 | | **Total Must** | | | **49.5** |
 
-By rung (round 3, R8.2): about **28** sessions land in the slice (items 1, 5-13, 16-17, item 3's dispatch table with
-Normal's taps, three shop chips, SNOW CHAINS), about **15.5** in Round One (items 2 and 4 and the Power and Jet rows of
+By rung (round 3, R8.2): about **28.5** sessions land in the slice (items 1, 5-13, 16-17, item 3's dispatch table with
+Normal's taps, three shop chips, SNOW CHAINS, SC9's hook with MELT), about **15** in Round One (items 2 and 4 and the Power and Jet rows of
 item 3 now open it, at M5), about **6** in v1.0. **A new file owns no forms** (Power comes with the 2nd win), so the
 slice has no form swap, no form cycle and no adaptors. RULINGS §6 (R8.1) now adds these figures up: M3 is about 44
 sessions (79 → ~123) for all slice systems, this doc's and tech's T6, X-BONK, X-WRAP, HUD widgets, commentator bus and
@@ -518,9 +518,9 @@ Per BRIEF §4 (a new file owns no forms, so the slice has none; this lands at M5
   (`meta.md` EVENTS b0/b1). WINS = the number of venue champion flags set.
 - **FORMS.SUPER is set when Rush docks in H3 screen 12, with no YOU GET card** (consistency-28: story's rule that
   adaptors are never announced on YOU GET; fortress's demo walk-out right after needs the bit already set). Roll's map
-  scene (`story.md` S29, `meta.md` EVENTS2 b4) follows on the next bracket visit.
+  scene (`story.md` S29, `meta.md` EVENTS2 b4) follows on the next Hall of Fame map visit.
 
-The announcer celebrates each new form at the next stage start (`story.md` writes the line).
+The announcer celebrates each form's first use, once per save (`story.md` §6.1 `EV_FORM_FIRST`, G.F1-G.F3; Should).
 
 ### 2.4 The normal-route rule (shared with the venue docs and fortress)
 
@@ -1232,7 +1232,7 @@ every doc as `gp_flash_ok()`, so venue storms and fortress effects obey the same
 | Sprite boss blink | 2 f hidden / 2 f shown | unchanged: a small area, and it is information | unchanged |
 | Time Stop tint (v1.1) | (new) | a darken held for the stop, not a flash | same |
 | Swap flash, WEAK! pop | (new) | small (16 × 16), exempt | same |
-| YASHICHI, DARUMA, Beat's rescue | (new) | no flash: an SFX, the HP bar fill and a pop line | same |
+| YASHICHI, DARUMA, Beat's rescue | (new) | no flash: an SFX and the HP bar fill (a pop line is Should; story has none in v1.0) | same |
 
 The boot health notice is `meta.md`'s screen with `story.md`'s words (R3.5).
 
@@ -1247,7 +1247,7 @@ results screen (judges, slide-in rows, comments) belongs to `meta.md`; the formu
 
 | Counter | Meaning |
 |---|---|
-| `T` | In-stage frames, counted while `$F0` = 0. Excludes pause, the boss bar fill (`$0642` = `$FF`) and the post-kill sequence. **Includes** death and respawn time (dying costs time) |
+| `T` | In-stage frames, counted while `$F0` = 0. Excludes pause, the boss bar fill (`$0642` = `$FF`) and the post-kill sequence. **Includes** death and respawn time (dying costs time). **Excludes the CASUAL extension of a fixed-length set piece**: `T` stops for the part of a `TIERVAL`-lengthened piece beyond its NORMAL length (Blizzard's 60-s CASUAL meter counts 40 s) |
 | `L` | HP lost by Rock (and Break Man, when he ships): damage after the multiplier, capped at the HP they had |
 | `K` | Lives lost (pits, spikes, HP) |
 | `CATS` | 16-bit set of scoring categories that killed a normal enemy **or** damaged a boss (§6.4) |
@@ -1269,7 +1269,7 @@ TIME     = 20                                    if T <= P
          = max(0, 20 - ceil(20 * (T - P) / P))   otherwise          (0 at twice the par)
 DAMAGE   = max(0, 20 - ceil(L / 3) - 4 * K)                         (a full bar lost, no death = 11)
 VARIETY  = floor(25 * min(|CATS|, Pv) / Pv),  Pv = min(5, |OWNED|)  (the par grows with the arsenal)
-SECRETS  = floor(20 * sum(w found) / sum(w all))                    (a stage with no secrets scores 20)
+SECRETS  = floor(20 * min(1, sum(w found) / W_run))                 (a stage with no secrets scores 20)
 STYLE    = 4*WEAK_FINISH + 4*BOSS_NO_HIT + 2*NO_TANKS + min(5, style acts)
 ```
 
@@ -1282,7 +1282,12 @@ Why each formula:
   So nobody is punished for an early stage, and **a buster-only run still clears, it just earns less**. Taps alone
   reach it.
 - **SECRETS** weights (default): secret exit 3, hidden room 2, behaviour-gated chip 2, Beat plate 1, venue extras 1.
-  The predicate list is the same one the judges' debrief walks (`meta.md` §4).
+  The predicate list is the same one the judges' debrief walks (`meta.md` §4). **`W_run`** is the largest secret
+  weight one run of the stage can collect: a secret exit and the secrets its route bypasses are alternatives, so a
+  full-SECRETS (and Platinum) run exists on every stage. The build computes it from the stage doc's route graph and
+  stores it per stage with this doc's ROM tables (§15.1): Flame 5 (the secret route skips the fire vault and its mouse
+  room), Centaur and Yamato 7 (plate and secret exit are exclusive, `venues_b.md` §0.3); `W_run` = sum(w all) where every
+  secret fits in one run. Each stage doc checks its own value (Wind's elevator route and H1's archive branch included).
 
 Calibration [guess, checked by playtest at M4]:
 
@@ -1312,7 +1317,9 @@ Calibration [guess, checked by playtest at M4]:
   | HIGH NOON's **EXPRESS** | the 0:55 train | **3,300 f** |
   | Blizzard's replay skip door on 0F | the 40-s bonus summit | **2,400 f** |
 
-- VARIETY's par is Pv (above). DAMAGE has no par. The SECRETS par is "all".
+  The added length is the NORMAL one in every tier (CASUAL's longer pieces count only their NORMAL length, §6.1).
+
+- VARIETY's par is Pv (above). DAMAGE has no par. The SECRETS par is `W_run`, all that one run can collect (§6.2).
 
 ### 6.4 Attribution: LATCHSRC (SYS-SC-4) [new-code] M, Must (v0.1)
 
@@ -1379,7 +1386,7 @@ the player set off; the venue doc's trap object writes LATCHSRC = HAZARD when it
 | WEAK FINISH | 4 | The killing hit on the stage's scoring boss (tech's `SCORE_ID`) is a WEAK cell; in v1.1 a synergy shot also counts (a "form finish") | Must |
 | BOSS NO-HIT | 4 | No HP lost from the boss bar filling until the kill | Must |
 | NO TANKS | 2 | No tank used in the run | Must |
-| Style acts | 1 each, max 5 | MULTI-KILL (2 kills by the same category within 8 f) · FROZEN STEP (stood on an encased enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · EXCELLENT MOVE (KAISHIN's 12th hit landed) · VENUE ACT (one per venue, named by its doc: ACE (Wind), SPELLBREAKER (Knight), QUICKEST GUN (Tomahawk), VINE KILL (Plant); "CONDOR, FIRST PASS" (Blizzard), CLEAN DUEL (Flame), NO WRONG DOOR (Centaur), SPEAR DANCER (Yamato)) | Must |
+| Style acts | 1 each, max 5 | MULTI-KILL (2 kills by the same category within 8 f) · FROZEN STEP (stood on an encased enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · EXCELLENT MOVE (KAISHIN's 12th hit landed; an internal label: on screen it is **SPLENDID STRIKE**, story's G.EX, R8.4) · VENUE ACT (one per venue, named by its doc: ACE (Wind), SPELLBREAKER (Knight), QUICKEST GUN (Tomahawk), VINE KILL (Plant); "CONDOR, FIRST PASS" (Blizzard), CLEAN DUEL (Flame), NO WRONG DOOR (Centaur), SPEAR DANCER (Yamato)) | Must |
 | Style acts, later | | SYNERGY KILL (v1.1) · OWN MOVE (SC4, v1.1) · TAG TEAM (the partner scored, v1.1) · PARRY (Could) | Should / Could |
 
 ### 6.6 Medals and pay
@@ -1412,7 +1419,7 @@ grind-proof.
 | Scorecard, first clear | score + medal bonus (≤ 160) | the 15 v1.0 stages | Must |
 | Scorecard, replay | the improvement only | | Must |
 | **Sponsor envelope** | 30, once per save | **one in every hidden room**: the 8 venue rooms (venues_b's 50-bolt bags and 100-bolt chest become envelopes: R2.7, consistency-10) and each fortress stage's hidden room, the Opening-lite's dressing room included (fortress §1.5). Each counts as a secret (SECRETS b4 for venues) | Must |
-| **Prizes** (bounties, treasures, vegetables, showpieces, props) | set by the stage docs | paid once per save per placed prize, **≤ 60 per stage, venue or not** (R2.7, consistency-19); a replay shows them as tokens. venues_b re-prices Blizzard's vegetables to ≤ 60 in all (the critic's 5/5/5/10/10/10/15) and fits Y.SPEAR's ledge bolts inside the cap; fortress's 30-bolt showpiece payouts count against it. `meta.md` stores one PRIZES bit per placed prize | Must |
+| **Prizes** (bounties, treasures, vegetables, showpieces, props) | set by the stage docs | paid once per save per placed prize, **≤ 60 per stage, venue or not** (R2.7, consistency-19); a replay shows them as tokens. venues_b re-prices Blizzard's vegetables to ≤ 60 in all (four vegetables, 10 / 10 / 15 / 25 = 60: venues_b §0.9, meta §1.6.1) and fits Y.SPEAR's ledge bolts inside the cap; fortress's 30-bolt showpiece payouts count against it. `meta.md` stores one PRIZES bit per placed prize | Must |
 | 1UP picked up at 9 lives | 10 ("fan tip") | no dead pickups | Should (SYS-PU-4) |
 | E-tank picked up while holding 4 | 20 | | Should |
 | Exhibition first clear | 100 + an exclusive racing colour | fixed prizes, not chips | Could (with E1-E4) |
@@ -1502,8 +1509,8 @@ otoshi (T8) in the Must core, or another Must gate.
 | 3 | **CHARGE KIT** | Buster charge thresholds 36/90 → 24/60 f. Power and Super 45 → 30 f (Burning Knuckle too, in v1.1). Break Man unaffected | Shop 120 | 1 | v0.1 |
 | 4 | **EXCHANGER** | A life pickup at full HP becomes weapon energy 2:1 (small 1, large 5), routed by §12.2 (4MI's EXCHANGER, credited) | Shop 100 | 1 | v0.5 |
 | 5 | **ENERGY SAVER** | Weapon costs halved, rounded with a per-weapon carry bit: a cost-1 weapon charges every other shot; 3 → 2, 1, 2… | Shop 250 | **2** | v0.5 |
-| 6 | **YASHICHI** | Once per stage, the first time HP falls to 4 or less (and Rock survives), it **refills HP to full**. The Yashichi was Capcom's full-restore item. Second-wind family. Feedback: the refill sound, the bar filling and a pop line; a pinwheel sprite is Should | **Venue, Wind**: juggle one POW through 8 hits (venues_a §1.6) | 1 | v0.5 |
-| 7 | **KAISHIN** | Every **12th damaging hit on a boss** in a fight is an **EXCELLENT MOVE**: +2 damage (the cell's damage + 2, at most 6), a chime SFX and the EXCELLENT MOVE style act. Deterministic, so records stay fair; criticals are Won't (R2.4). `EXC_COUNT` resets when a boss bar fills | **Venue, Knight**: kill the Metal Metslime (venues_a §2.7) | 1 | v0.5 |
+| 6 | **YASHICHI** | Once per stage, the first time HP falls to 4 or less (and Rock survives), it **refills HP to full**. The Yashichi was Capcom's full-restore item. Second-wind family. Feedback: the refill sound and the bar filling (a pop line is Should; story has none in v1.0); a pinwheel sprite is Should | **Venue, Wind**: juggle one POW through 8 hits (venues_a §1.6) | 1 | v0.5 |
+| 7 | **KAISHIN** | Every **12th damaging hit on a boss** in a fight is an **EXCELLENT MOVE**: +2 damage (the cell's damage + 2, at most 6), a chime SFX and the EXCELLENT MOVE style act. EXCELLENT MOVE is the internal label; the on-screen name is **SPLENDID STRIKE** (story's G.EX and HLP.KAISHIN, R8.4), and nothing on screen says EXCELLENT MOVE. Deterministic, so records stay fair; criticals are Won't (R2.4). `EXC_COUNT` resets when a boss bar fills | **Venue, Knight**: kill the Metal Metslime (venues_a §2.7) | 1 | v0.5 |
 | 8 | **SHERIFF STAR** | +20 % on every scorecard payout (replay improvements included) and on prize bolts, rounded down | **Venue, Tomahawk**: reach the Sheriff with no townsfolk hit (venues_a §3.7) | 1 | v0.5 |
 | 9 | **AUTO RECOVER** | After 60 f with no input, +1 HP every 30 f up to max. Off while a boss bar is shown | **Venue, Plant**: the EXPLORER'S PERFECT, every treasure and no log hit (venues_a §4.4) | 1 | v0.5 |
 | 10 | **SNOW CHAINS** | Ice floors (types 5/`$15`) grip like normal floor: no momentum. Falling icicles bounce off the helmet harmlessly | **Venue, Blizzard**: never destroy a seal (venues_b §1.6.3) | 1 | v0.1 (the slice's venue chip) |
@@ -1856,10 +1863,10 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WORK). Only hot, per-frame by
 |---|---|---|
 | Free RAM, tech's `SYS_HOT` `$06BD-$06C8` | 12 | `SELHOLD` (SELECT hold timer), `SELFLAGS` (SEL_USED, SWAPMASK), `LASTW`, `SWAPSTATE` (swap frame count, queued form), `WEAK_GATE`, `FLASH_GATE`, `ALT_LOCK` (the 10-f interact lock), `BOSS_ROW`, `EXC_COUNT` (KAISHIN), `MULTI_T` (multi-kill timer), `TSTOP` (Time Stop, v1.1), 1 spare |
 | WORK, per object slot (tech's `$6000-$61FF`, stride 32) | 4 arrays × 23, + 1 | `LASTHIT` (`$6060`), `LATCHSRC` (`$6080`), `REHIT` (`$60A0`), `FREEZE` (`$60C0`; on a boss slot it is the stall count), and **`ENC_CLASS`** (the encased enemy's saved class nibble), which tech places in its WORK ledger. It cannot share a GPV that a GP sub-id's AI uses |
-| WORK, run block (tech's `$6250-$62FF`) | ≈ 32 | T (3), L (2), K, CATS (2), OWNED (2), SECR, STY, TANKS, the kill count, run flags (YASHICHI used; DARUMA, SPIKE GUARD and the partner's call used this life; the call used up for the stage), `BEAT_USED` (4: screen mask), `LASTSAFE` (3: screen, X, Y), `MULTI_CAT`. (`LAYOUT_TIER` is tech's loader byte.) Cleared at stage start, **not** by a fight-loader warp (§6.1: W2's bouts count in W2's run) |
+| WORK, run block (tech's `$6300-$63FF`, a sub-range in the registry; tech's row reserves ≈ 24 B plus ≈ 48 B of scorecard counters for it, which this ≈ 32-B block, counters included, fits) | ≈ 32 | T (3), L (2), K, CATS (2), OWNED (2), SECR, STY, TANKS, the kill count, run flags (YASHICHI used; DARUMA, SPIKE GUARD and the partner's call used this life; the call used up for the stage), `BEAT_USED` (4: screen mask), `LASTSAFE` (3: screen, X, Y), `MULTI_CAT`. (`LAYOUT_TIER` is tech's loader byte.) Cleared at stage start, **not** by a fight-loader warp (§6.1: W2's bouts count in W2's run) |
 | Save (`meta.md` owns the bytes) | | BOLTS (2); CHIPS_OWNED (3) and CHIPS_EQ (3) in §9.2's order; E-TANKS; W-TANKS (Should); FORMS (POWER, JET, SUPER, TAG); FORM_DEBUT; plates (SECRETS b3) and envelopes (SECRETS b4); **PRIZES** (4 B, one bit per placed prize); STAGEREC[24]: best score + preset badge, best PAY, asterisk bit; BASS_ADAPT; WEAKFOUND (Could). Bundle (reserved now): PARTS_GOT, PARTS_USED, TANK RACK, RATEFLAGS.DOPED. **Removed**: METALLS, the DOVE flag; BREAK_JOINED is FORMS.TAG (consistency-11) |
 | Per-file DIFF bytes and the system block (`meta.md`) | | the §13.1 settings; DIFF A as §13.3; INPUT LAG global |
-| ROM tables (`$7F` or a systems bank) | ≈ 1.5 KB | GP_BOSSHIT cells (640 B); the ALT override (10); i-frame class → frames (16); column → category (32); the NOFREEZE override list (tech's `SRCTAB` and derived `FRZ_KIND` tables are tech's); the 8 featured-enemy tables (8 × 16); chip data and source bytes (18 × 4); the 3 frozen handlers (≈ 120); the venue → weapon-slot map (8) |
+| ROM tables (`$7F` or a systems bank) | ≈ 1.5 KB | GP_BOSSHIT cells (640 B); the ALT override (10); i-frame class → frames (16); column → category (32); the NOFREEZE override list (tech's `SRCTAB` and derived `FRZ_KIND` tables are tech's); the 8 featured-enemy tables (8 × 16); chip data and source bytes (18 × 4); the 3 frozen handlers (≈ 120); the venue → weapon-slot map (8); `W_run` per stage (24, §6.2) |
 
 ### 15.2 Hook sites (tech confirms them and lists them in the hook registry)
 
@@ -1892,7 +1899,7 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   - **Featured enemy:** each venue names one, which dies outright to the champion's weakness weapon: a tell only in v1.0,
     a PART with the Could bundle. No totem; Tomahawk's PART is SPUR (R3.4, design-11).
   - **Scoring data:** each venue gives its VENUE ACT, its secret list and weights (exit 3, hidden room 2, behaviour chip
-    2, plate 1), and its TIME par; a replay skip adds the piece's fixed length to the run's `T` (§6.3: LAND 7,200 f,
+    2, plate 1) with its `W_run` (the most one run can collect, §6.2), and its TIME par; a replay skip adds the piece's fixed length to the run's `T` (§6.3: LAND 7,200 f,
     EXPRESS 3,300 f, Blizzard's skip door 2,400 f).
   - **Money:** one sponsor envelope per hidden room; prizes ≤ 60 per venue. venues_b replaces its bags and chest with
     envelopes, re-prices the vegetables, and fits Y.SPEAR's ledge bolts in the cap (R2.7, consistency-10).
@@ -1918,7 +1925,8 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   OWNED override and 4 exhibition racing colours (Could, with the Exhibitions); the victory lap's character swap through
   the pause CALL row, when it is built (consistency-30).
 - **story.md** (every word): help pages (4 × 28) for the 14 chips and the weapons; commentator lines (`EV_WEAK_FIRST`
-  is Must text; `EV_RESIST`, `EV_IMMUNE`, new forms, medals, EXCELLENT MOVE, the YASHICHI and DARUMA pops); the CONFIG
+  is Must text; `EV_RESIST`, `EV_IMMUNE`, new forms, medals, KAISHIN's SPLENDID STRIKE (G.EX), and the YASHICHI and
+  DARUMA pops, which are Should and have no line in story's v1.0 count); the CONFIG
   lines for CASUAL and INPUT LAG; the boot health notice; the partner's lines (Should); the booth's lines and the doped
   headline (Could; "BREAK MAN WILL WALK." is fixed by R2.8); DARUMA's fallback last line; TURBO's WARRANTY VOID (bundle);
   the 1-bolt insurance gag.
@@ -1968,8 +1976,8 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
 
 ## Risks
 
-1. **Slice schedule.** This doc's slice share is about 28 sessions after R8.2 moved the form swap, the Power and Jet
-   dispatch rows and the adaptors to M5. RULINGS §6 (R8.1) now counts them: M3 is about 44 sessions (79 → ~123) for all
+1. **Slice schedule.** This doc's slice share is about 28.5 sessions after R8.2 moved the form swap, the Power and Jet
+   dispatch rows and the adaptors to M5 (SC9's hook, which Blizzard's MELT needs at M3, stays in the slice). RULINGS §6 (R8.1) now counts them: M3 is about 44 sessions (79 → ~123) for all
    slice systems, against round 2's 25. *Mitigation:* the scorecard, bolts and chip framework can still share M2's
    results and save work; the M4 re-estimate calibrates the rest (R0.1).
 2. **The CHR stream.** 2 KB per form swap is 11-13 stream frames at tech's rates (up to 22 with a column paint every
@@ -2189,5 +2197,14 @@ applied where no request named them.
 | R8.6, R8.7 | applied | §13.4, §13.1, Open question 5 | The quick-draw's 40 f is marked as R3.5's exception to "reflex ×2"; INPUT LAG stays 0-6 f until the user answers the hardware question |
 | fortress answers | applied | §4.5, §4.6 SC6, Open question 3 | Bass β's four pre-drawn weapons (B.ATTACK, F.BLAST, KNIGHT.C, SILVER.T) and Gamma phase 1's hit box (the chin cannon), from fortress §8 and §9.2 |
 | venues_a §4.4 | applied | §9.2 | AUTO RECOVER's gate is named the EXPLORER'S PERFECT (every treasure, no log hit) |
+| verify 1 | applied | §15.1 | The run block's range is tech's `$6300-$63FF` (a registry sub-range), not `$6250-$62FF` (the loader tail, the fight block, RULESET, RET_SNAP and the HUD records). This doc's ≈ 32 B, counters included, fits tech's ≈ 24 + ≈ 48 B reservation; tech may restate its row as this one figure |
+| verify 2 | applied | §2.3 | Roll's S29 scene plays on the next Hall of Fame map visit (meta §3.6, story S29), and the form announcer line is story's `EV_FORM_FIRST` on first use, once per save (G.F1-G.F3, Should), not at the next stage start |
+| verify 3 | applied | §5.1, §9.2 #6, §15.3 | The YASHICHI, DARUMA and Beat's-rescue pop line is Should: story has no event or string for it in v1.0, so the Must feedback is the SFX and the bar fill |
+| verify 4 | applied | v1.0 scope item 21, By rung, Risk 1 | SC9's hook (the WEAK reaction replacing the stagger) lands in the slice with Blizzard's MELT, which venues_b needs at M3; the other venues' reactions are their data at v0.5. By rung: slice ≈ 28.5, Round One ≈ 15, v1.0 ≈ 6 (total 49.5 unchanged) |
+| verify 5 | applied | §6.2, §6.3, §15.1, §15.3 | SECRETS divides by `W_run`, the most one run can collect, so a route-exclusive secret never caps a stage below Platinum (Flame's secret route skips the mouse room: 5 of 7 gave at most 14 and a 94 total). Flame 5, Centaur and Yamato 7; the build derives `W_run` from each stage doc's route graph, and each stage doc checks its value |
+| verify 6 | applied | §6.1, §6.3 | `T` stops for a fixed-length piece's CASUAL extension (Blizzard's 60-s CASUAL meter counts 40 s), and a skip adds the NORMAL length in every tier, so on CASUAL the piece never costs TIME and the skip never buys it |
+| verify 7 | applied | §7 | Blizzard's prizes cited as venues_b's and meta's four vegetables, 10 / 10 / 15 / 25 = 60, not the critic's seven |
+| verify 8, 9 | applied | §6.5, §9.2 #7, §15.3 | R8.4: KAISHIN's on-screen name is SPLENDID STRIKE (story's G.EX, HLP.KAISHIN); EXCELLENT MOVE stays as the internal label of the effect and the style act, and nothing on screen says it |
 
-Session figures: the Must total stays **49.5**; about 5 sessions move from the slice (M3) to Round One (M5) under R8.2.
+Session figures: the Must total stays **49.5**; about 5 sessions move from the slice (M3) to Round One (M5) under R8.2,
+and SC9's hook (0.5) stays in the slice (verify 4): slice ≈ 28.5, Round One ≈ 15, v1.0 ≈ 6.
