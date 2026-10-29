@@ -80,7 +80,7 @@ Vertical links (bank `$71` table, `r4mi_links.py 12`): 8 up 9 up 10 up 11 up 12 
 | 14-16 | Walkways with spike pits and heli-Joes; a big purple walker stands on 15-16. |
 | 16 → 17 | Drop into the castle. |
 | 17 | **Checkpoint 1.** A room with a **1UP** on a ledge (object `$7C`) and an orange item (object `$31`). Exit through the floor at the bottom left, under the 1UP ledge. |
-| 18 | **Eddie** (object `$33` at x 228). See 1.4. |
+| 18 | A big red spring robot (placement `$33`, object `$46`, 254 HP), not Eddie (**corrected by critic**, see 1.4). |
 | 19 | Section B begins: thin platforms over the cyan floor. A **purple walker** (a Sniper Armor with a Joe inside) patrols. **Walk into it and you take it over**: the screen flashes white, the Joe is thrown out (he keeps running and shooting at you on foot), the life bar turns purple (the vehicle's own energy, in a hidden 15th energy byte `$BE`, set to `$98` = owned + 24), and you drive the walker: it walks, jumps and fires big white balls [seen + RAM]. |
 | 20-23 | More walkers and Joes; Joes on **pink hover-copters**, hammer Joes. |
 | 24 | Touch a copter and you switch vehicles (white flash again). The copter flies freely with the D-pad (UP/DOWN to climb or sink). |
@@ -109,6 +109,9 @@ which the player position follows) [seen]. EXWP 3 (R.ARMOR) and 4 (R.COPTER) in 
 machines, which is why the scout saw a purple walking mech when he set EXWP = 3 [seen in cheats.md + here].
 
 ### 1.4 Eddie (screen 18) [seen + text]
+
+**(corrected by critic)** The hopping robot on screen 18 is placement `$33` = object `$46`, vanilla RM4's spring robot with its HP raised to 254, not Eddie (it fires white pellets; the Recycle Inhaler does nothing to it [seen]). Wily 1's real Eddie is placement `$31` on **screen 17** (x 112, y 112): vanilla RM4's small item-giving Eddie (objects `$42`/`$43`). Inhaling that Eddie sets FLAG EDDY at once and drops item `$12`, the ENERGY SPLITTER [seen in the arena lobby, whose Eddie is the same object `$43`: FLAG `$00 → $80`, then equipment `$30 → $31` on pickup; `build/research/r4mi/r4mi-critic/eddie_lobby.py`]. The text below is the original note about the screen-18 robot.
+
 
 Eddie stands at the bottom right of screen 18 and hops in place. The FLAG byte (`$7898`) was still `$00` after my
 run passed him (I fired the buster the whole way, and he was in the line of fire). Proto Man's debrief has an entry
@@ -382,6 +385,8 @@ Quick Man-like body with sparks, Hard Man-like body with Wood Man's leaves, Need
   [come] to the deepest part of Dr. Wily's base without being beaten once…"), with Proto Man's "what does that mean?
   I have no idea" [text; reconstruction of the smudged characters is mine]. The predecessor's godmode run (no deaths
   from `wily4_cp0`) met him on screen 5 and was killed by the grab [seen].
+
+**(critic addition) The exact gate and the reward** [code]. The hall controller (Wily 4 placement `$08` on screens 1/3/5 = sub-id `$CC`, AI `$50:$B46B`) checks, when the camera is on screen 5 (`$50:$B527`): in the main game, `$7E88 | $7EA0` = 0, i.e. **the game save's total death counter since NEW GAME is zero**, then `FARJMP $57:$A001` (SUPER SHADOWMAN); in an arena, the next fight must be `$2B`. So "without dying" means the **whole playthrough**, not just Wily 4. When his body dies, `$57:$B073` sets FLAG SHADOWMAN and `$57:$B097` spawns sub-id `$E2`, the two-pickup offering (full refill + **?DAGGER**): the "UNCERTAIN ITEM" is the prize for the secret boss.
 
 ![Wily 4 halls](img/wily_w4_halls.png)
 *The three chimera halls (fights `$28`, `$29`, `$2A`) and SUPER SHADOWMAN (`$2B`): his entrance, the grab, and the

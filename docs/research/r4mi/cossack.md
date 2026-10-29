@@ -99,7 +99,7 @@ Two sections: screens 0-24 (the whole stage as played) and 25-47 (the "city at d
 | 9 | Pillar tops over pits. |
 | 10-11 | Spiky-haired blue robots that run and shoot, dome cannons that lob white balls, pits. |
 | 12-13 | Drop down a two-screen shaft. |
-| 14 | **The vanilla RM4 Cossack 1 snowfield** (black pine silhouettes, snow on orange earth). A big blue robot (object `$1F`) with **254 HP** hops, turns into a jet/drill form and fires ring shots; it shoves you back to screen 13 on contact. The buster does 1 per hit (it took ~1150 frames of continuous fire to kill it), so this is hint.txt's "mooks that are too hard: better not to fight them" (`硬すぎる雑魚がいる`): jump it [doc + seen]. |
+| 14 | **The vanilla RM4 Cossack 1 snowfield** (black pine silhouettes, snow on orange earth). A big blue robot (object `$1F`) with **254 HP** hops, turns into a jet/drill form and fires ring shots; it shoves you back to screen 13 on contact. The buster does 1 per hit (it took ~1150 frames of continuous fire to kill it), so this is hint.txt's "mooks that are too hard: better not to fight them" (`硬すぎる雑魚がいる`): jump it [doc + seen]. (critic: it is placement `$33` = object `$46`, vanilla RM4's spring robot with its HP raised from 14 to 254; the same object stands in the RM stages and Wily 1, where the stage docs first took it for Eddie.) |
 | 15 | Snow steps; small blue helicopter drones that fire three-way spreads; another walker. |
 | 16 | **A green "B" capsule = the BALLOON** (picking it up sets `$B6 = $9C`, owned and full, with a ~290-frame freeze, player state 9) [seen]. It is there even if you already own the Balloon (from Dive Man's stage). At x = 153 the game then silently **re-numbers the screen from 16 to 19**: screens 16 and 19 are drawn identically, so the jump is invisible [seen]. The freeze and renumbering are tied to that x position, not to the capsule: with the capsule object deleted they still happen [seen]. |
 | 19 | **Checkpoint 1.** A cliff edge over a bottomless drop; a hovering red box with a "→" sign waits at the edge (object id `$5E`, animation `$74`; buster shots pass through it, its HP never drops: a signpost, not an enemy). Falling = death (pit), so you must make a Balloon (select it, jump, press B: a small pink balloon appears under your feet and you steer it with the D-pad) [seen]. |
@@ -113,6 +113,8 @@ small brick room under the snow with a ladder up and an exit at the bottom right
 it). The 16 → 19 renumbering skips them, walking left from 19 stops at a wall, and falling off the cliff is a pit
 death even with the capsule removed. A one-screen room off the main path looks like the RM stages' hidden rooms, but
 hint.txt promises hidden rooms only in the first 8 stages, and I found no way in [seen; purpose = guess].
+
+**(critic addition)** The link table has `13 down → 18` and `18 up → 13`, so screen 18 is entered by dropping through the floor of the shaft's lower screen (13) instead of walking on to 14. Its one placement (`$08`, x 200) resolves to `$5E` sub-id `$7F`: **a second Beat cage**. Breaking it with the Rail Buster gives BEAT at once (bank `$44:$B43F` special-cases stage 8); the first cage is in Skull Man's stage (stages_b.md §3) [code].
 
 **HARD** (`$78CD = 1`, entered from EXTRA CONFIG): the section layouts and the objects at cp0, cp1 and cp2 are
 byte-identical to NORMAL [seen], so any HARD change here is in enemy or boss behaviour (not checked).

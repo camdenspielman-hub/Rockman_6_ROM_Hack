@@ -1563,7 +1563,7 @@ Pointer-addressed PPU strings (`hi lo` VRAM address + text + `$FF`):
 ### 7.3 The fight-name roster (bank `$6F`, rom `0xDED99`, A=`$17`) [code]
 
 A list of names for every fight. `$10` is a hard space, `$FF` a line break, `$00` the separator; `$3A` is `.`, `$D8`
-is `'`, `$DA` is `-`, `$DC` is `?`, and digits are `$30+n`. I could not find what displays it: not the arena
+is `'`, `$DA` is `-`, `$DC` is `?`, and digits are `$30+n`. **(critic)** The "#" column below is the string's position in the data, not the fight ID; modes.md §3.6 found the caller (the arena lobby's NEXT panel, `$6F:$AC23`) and maps the names by fight ID: from `$23` on the IDs are ENKER `$23` … TERRA/EARTH `$27`, CHIMERABOT `$28-$2A`, SUPER SHADOWMAN `$2B`, and `$2C` shows `???` until PROOF OF OMEGA, then COCKROACH ✱ O M E G A ✱ (entry `$30`). I could not find what displays it: not the arena
 fight start and not the MY ARENA editor [seen]. A nearby lo/hi table points into `$69xx`, which suggests the names are
 rendered into CHR-RAM as a banner [guess]. In order, matched to the scout's fight IDs where the scene fits [seen in
 `arena_names.png` for 0x22, 0x1E, 0x0D]:

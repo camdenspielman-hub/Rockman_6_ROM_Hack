@@ -156,30 +156,20 @@ EDDY set), `$85D1` (despawn unless RUSH) and `$861B` (despawn unless BEAT) remov
 
 | Flag | Set by [code] | In play |
 |---|---|---|
-| BEAT (FLAG bit6 + `$7839 \|= $40`) | bank `$44:$98B3` | The rescue sets both bits. **The equipment bit is what the score reads, and it is not saved** (game save `$30 = $7839 & $BF`) and not rebuilt from FLAG bit6 on a respawn [seen: FLAG `$40` survived a death, `$7839` stayed `$00`]. So Beat has to be *with you* at the end, not merely rescued once [code + seen; the full rule is open]. Proto Man's hint for a missing Beat: "SCISSORS AND LEAVES ARE SCATTERED NEAR HIS CORE", which matches Wily 4's first two refight halls (a scissor-throwing and a leaf-shield CHIMERABOT) [seen + guess] |
+| BEAT (FLAG bit6 + `$7839 \|= $40`) | bank `$44:$98B3` (= CPU `$B8B3`) | **(critic)** Beat's cage: Skull Man's stage screen 5 (side branch under screen 0) and Cossack 1 screen 18; Rail Buster only; touch the freed Beat (stages_b.md §3). The rescue sets both bits. **The equipment bit is what the score reads, and it is not saved** (game save `$30 = $7839 & $BF`) and not rebuilt from FLAG bit6 on a respawn [seen: FLAG `$40` survived a death, `$7839` stayed `$00`]. So Beat has to be *with you* at the end, not merely rescued once [code + seen; the full rule is open]. Proto Man's hint for a missing Beat: "SCISSORS AND LEAVES ARE SCATTERED NEAR HIS CORE", which matches Wily 4's first two refight halls (a scissor-throwing and a leaf-shield CHIMERABOT) [seen + guess] |
 | RUSH (FLAG bit3) | bank `$56:$9737` | Rush was captured; the hint says "HE MIGHT HAD BEEN NEAR WILY". With the bit set, Rush's three slots are restored on load (`$40:$A55E`) |
-| EDDY (FLAG bit7) | bank `$41:$AC14` | Inhaling Eddie (inhale class `$80`) with the RECYCLE INHALER. Setting it is *bad*: you lose the friend and gain the ENERGY SPLITTER (§1.2) |
+| EDDY (FLAG bit7) | bank `$41:$AC14` | Inhaling Eddie (inhale class `$80`) with the RECYCLE INHALER. Setting it is *bad*: you lose the friend and gain the ENERGY SPLITTER (§1.2). **Checked in play by the critic**: in the arena lobby, one inhaler pull on Eddie (object `$43`) set FLAG `$00 → $80` at once, and picking up the dropped item set equipment `$30 → $31`. In the main game the inhalable Eddie is vanilla RM4's small item-giver, placed by placement types `$31`/`$32` at 13 spots (Bright 14, Drill 17, Ring 11, Skull 20, Cossack 1 12, Cossack 2 22, Cossack 3 21, Cossack 4 34/38, Wily 1 17, Wily 2 12, Wily 3 21, Wily 4 7); the big hopping robot that the stage docs first called Eddie is a different object (stages_a.md §1.3 note) |
 | KALINKA (FLAG bit5) | bank `$50:$84D8` | Wily 3's Kalinka scene (the same routine refills `$B1-$B3`, the three Rush slots). **Not scored**; used by the story |
 | TOADMAN (FLAG bit4) | bank `$41:$A16D` | ●TOAD hits Toad Man: he becomes a frog and the fight becomes a **draw** (`ROR $78A0`). Killing the frog clears the bit again (`$1D:$BD44`) unless `$013A ≠ 0` (stages_b.md §Toad) |
 | RE-ENTER (FLAG bit2) | bank `$39:$9827` | Choosing a stage whose boss is already beaten. Scored when *clear* |
-| SHADOWMAN (FLAG bit1) | bank `$57:$9073` | Bank `$57` is Wily 4's hall controller (it also writes PROG `$A6`, wily.md §4.1). The EN placeholder says "ARRIVE AT THE CERTAIN PLACE OF WILY LEVEL 4 WITHOUT DYING", the JP *yabumi* says the same in ninja speech, and fight `$2B` **SUPER SHADOWMAN** loads in Wily 4's third teal hall (screen 5) [code + text; not reproduced in play: my no-death run stalled in the corridor after hall 2] |
+| SHADOWMAN (FLAG bit1) | bank `$57:$B073` (critic: the CPU address; `$9073` is the bank offset) | **(critic)** The spawn gate is `$50:$B527`: on Wily 4 screen 5 the hall controller calls SUPER SHADOWMAN only if the save's total deaths `$7E88\|$7EA0` = 0 (the whole game, not just Wily 4); his death also spawns the ?DAGGER offering (wily.md §4.2). Bank `$57` is SUPER SHADOWMAN's own AI, whose init writes PROG `$A6` (critic: the hall controller is sub-id `$CC` in bank `$50`; wily.md §4.1 says "room controller" for the same reason). The EN placeholder says "ARRIVE AT THE CERTAIN PLACE OF WILY LEVEL 4 WITHOUT DYING", the JP *yabumi* says the same in ninja speech, and fight `$2B` **SUPER SHADOWMAN** loads in Wily 4's third teal hall (screen 5) [code + text; not reproduced in play: my no-death run stalled in the corridor after hall 2] |
 | Escape `$78B3` | bank `$43:$B34F` | Set on the 4th escape attempt (§1.4). Scored when *clear* |
 
 ![RESULT](img/text_result.png)
 *The RESULT screen and debrief from a live ending (text.md §6): MISSION 60, FRIENDS 5, EQUIPMENT 0, PLAY STYLE 10,
 BONUS 2 = 77 with the scout's fortress loadout; the debrief picked entry 1 (Beat), the first failed test.*
 
----|---|---|
-| BEAT (`$7839 \|= $40`, FLAG bit6) | bank `$44:$98B3` | Beat's rescue; the bit is **not saved** (`$30 = $7839 & $BF`), so it must be re-earned after any reload? [open] |
-| RUSH (FLAG bit3) | bank `$56:$9737` | |
-| EDDY (FLAG bit7) | bank `$41:$AC14`, inhaling Eddie | setting it is *bad* |
-| KALINKA (FLAG bit5) | bank `$50:$84D8` | same routine refills `$B1-$B3` (Rush Search, Wish Star, Rush Cannon). **Not scored** |
-| TOADMAN (FLAG bit4) | bank `$41:$A16D` (●TOAD hits Toad Man) | the frog's death (bank `$1D:$BD44`) clears it again unless `$013A ≠ 0` |
-| RE-ENTER (FLAG bit2) | bank `$39:$9827`, stage select | picking a stage whose boss is already beaten |
-| SHADOWMAN (FLAG bit1) | bank `$57:$9073` | |
-| Escape `$78B3` | bank `$43:$B34F` | 4th escape attempt |
-
-(Section to be extended: how each in-game event is triggered.)
+(critic: a leftover draft copy of the §1.7 table stood here and was removed; §1.7 above is the current version.)
 
 ---
 

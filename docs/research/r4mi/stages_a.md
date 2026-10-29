@@ -15,7 +15,8 @@ Status: complete for what could be reached; gaps are listed per stage.
   mid-boss edits the room layout in WRAM every frame.
 - **Guests**: Shadow Man ambushes you in Pharaoh's stage; Mega Man Killers from the Game Boy games (Quint with his
   pogo stick, an Enker-like spear robot) are mid-bosses; you take Quint's pogo and ride it over spikes, and you cross
-  Dive's sea on Rush as a jet ski under a flying whale battleship. Eddie stands in every stage.
+  Dive's sea on Rush as a jet ski under a flying whale battleship. ~~Eddie stands in every stage.~~ (corrected by critic: the
+  "Eddie" placements here are a 254-HP robot; see the note in §1.2.)
 - **Weakness by invincibility, measured**: per-hit damage is 1-4 for everything, but the invincibility left on the
   boss ranges from 126 frames (buster) down to 2 frames (Hell Wheel on Drill Man).
 - **Hidden rooms**: Ring 31 (off the left edge of an empty sky screen) and Dive 24 (top-left of checkpoint 1) seen;
@@ -113,7 +114,7 @@ puts you back on screen 10's right edge (the two screens share that strip), from
 | 11 | Back in section B (sunset): a red-faced turret on the wall, ladder up. |
 | 12 | **Mid-boss 2** (fight `$18`): four rails, UFOs riding green carts. |
 | 13 | Ladder room. |
-| 14 | **Eddie** (object `$33`) stands at the left. The screen is open sky. Going **left** off the edge enters the hidden room (31). |
+| 14 | A big red spring robot (placement `$33`, object `$46`, 254 HP; first identified as Eddie, **corrected by critic**) stands at the left. The screen is open sky. Going **left** off the edge enters the hidden room (31). |
 | 15-18 | Long crossing on laser bars over the void, with UFOs, in pink sunset. |
 | 19-20 | Drop down two narrow shafts. |
 | 21-24 | The **laser conduit maze**: a dark room where a colour-cycling laser beam *draws itself* through a channel network, segment by segment (screenshots below). The lit conduit is the floor you can stand on, and it keeps changing shape, so you follow the beam through the maze. |
@@ -132,10 +133,12 @@ totem; the self-drawing laser maze (screen 21); the hidden room; bars at sunset.
 
 ### 1.3 Hidden room, pickups, secrets
 
-- **Hidden room = screen 31** [seen]: go left off screen 14 (where Eddie stands) at any height above the floor.
+- **Hidden room = screen 31** [seen]: go left off screen 14 (where the 254-HP spring robot stands) at any height above the floor.
   Inside: E-tank + 1UP. The room is in section C's data although it is entered from section B.
 - The 1UP on screen 10 [code].
-- Eddie on screen 14 [seen]. (The EDDY friend flag and the Energy Splitter joke are in text.md.)
+- ~~Eddie on screen 14~~ (corrected by critic): Ring's real Eddie is placement `$31` on screen 11 (checkpoint 1, x 204, y 120). (The EDDY friend flag and the Energy Splitter joke are in text.md.)
+
+**(corrected by critic)** The object placed as type `$33` (live object id `$46`, sprite `$1F`) is **not Eddie**: it is a big red robot on a spring that hops and fires white pellets, vanilla RM4's object `$46` with its HP raised from 14 to **254** (one of hint.txt's "mooks too hard to fight"; Cossack 1's 254-HP blue robot is the same object in another palette). The real Eddie (the small item-giving Flip-Top, objects `$42`/`$43`, inhale class `$A0`) comes from placement types `$31`/`$32`, which 4MI keeps at vanilla-style spots: Bright 14, Drill 17, Ring 11, Skull 20, Cossack 1 12, Cossack 2 22, Cossack 3 21, Cossack 4 34/38, Wily 1 17, Wily 2 12, Wily 3 21, Wily 4 7. Toad, Pharaoh, Dust and Dive have no Eddie [code: placement tables `$38:$820F` vs `rm4j`; seen: Bright 14 Eddie and the Bright 26 robot, `img/critic_eddie.png`].
 - No Wire or Balloon here (they are in Drill's and Dive's stages).
 - The hint file suggests Ring Man's stage as one of three good places to suicide-farm Rush Search E-tanks, because the
   start is safe and the first pit is close [doc].
@@ -237,7 +240,7 @@ Explored edges (godmode, teleport to every open edge, both D-pad directions):
 | 36 | Pharaoh Man (pyramid backdrop). 37-38 are the lower chamber of the same fight. |
 | 47 | Shadow Man (fight `$21`), in a room stacked with red crates. |
 
-**Eddie** is on screen 13 (object `$33` at 240,164) [code].
+~~**Eddie** is on screen 13 (object `$33` at 240,164) [code].~~ (corrected by critic: `$33` is the 254-HP spring robot; Pharaoh's stage has no Eddie.)
 
 Reliability: the walk 7 → 2 → 8 was done with normal controls and the camera following. The edges from 9 onwards come
 from the explorer's teleports, and in this stage the camera often stayed on an earlier page (for example at page 9
@@ -340,7 +343,7 @@ Explored edges (BFS from checkpoint 1):
 | 20 | Purple **robot hippo** on a brick pillar (fight `$16`): Kabatoncue-style (MM5) [guess], fires from its mouth. |
 | 21-25 | Dark caves and brick; the spiky **Mole** drill robots (vanilla RM4 Drill-stage enemy) and Metalls. |
 | 26 | **Quint** (fight `$24`): the green Mega Man Killer of *Mega Man II* (GB), with his pogo stick **Sakugarne** standing beside him [guess for the name, based on the look and EXWP's QUINT]. |
-| 27-31 | Factory with green tanks, scaffolding and **spike floors**; red crab walkers. After the Quint room, Rockman is on the pogo stick (state saved by the explorer at 27). This is limited.txt's "in Drill, you must pick up a weapon and advance a little with it" [doc + seen]. **Eddie** at 30 (188,164). 31 was a dead end for the explorer. |
+| 27-31 | Factory with green tanks, scaffolding and **spike floors**; red crab walkers. After the Quint room, Rockman is on the pogo stick (state saved by the explorer at 27). This is limited.txt's "in Drill, you must pick up a weapon and advance a little with it" [doc + seen]. A 254-HP spring robot at 30 (188,164), first identified as Eddie (corrected by critic: Drill's real Eddie is placement `$31` on screen 17, checkpoint 1, at 204,152). 31 was a dead end for the explorer. |
 | 32-33 | Checkpoint 2, boss. |
 | 35, 38, 41, 47 | The other branch [seen in the fight states]: a cave room with small bomb-dropping flyers (`$15`, s35); a red-white humanoid robot in a **starry room framed by golden meander walls** (`$1E`, s38); gold platforms under a spike ceiling (s41); a green cave with waterfalls and a round one-eyed robot (`$2C`, s47; this room shows a bottom status bar "WPN P"). |
 
@@ -421,11 +424,11 @@ at 46).*
 | 24-31 | The sea floor: black water, a ceiling of spiked sea mines, rippled orange sand, rising bubbles; tall red **periscope pillars** with lamps at 29-31. |
 | 32 | Pipe hall with robot fish. |
 | 33 | Orange **spear robot** (fight `$23`) in a dark hall with the MSN floor: Enker, the *Mega Man* (GB) Mega Man Killer whose weapon is a spear (EXWP 2 ENKER) [guess]. |
-| 34-35 | Objects `$07` (16,104) and `$06` (224,108) [code]. `$06` also sits at the start of Cossack 2 (screen 1), and hint.txt says the Wire and Balloon also lie early in the Cossack stages, so `$06` is probably the **Balloon** pickup [guess]. text.md's debrief: "Dive Man hid it [the Balloon] in somewhere". Not reached. |
+| 34-35 | Objects `$07` (16,104) and `$06` (224,108) [code]. `$06` also sits at the start of Cossack 2 (screen 1), and hint.txt says the Wire and Balloon also lie early in the Cossack stages, so `$06` is probably the **Balloon** pickup [guess]. text.md's debrief: "Dive Man hid it [the Balloon] in somewhere". Not reached. | **(corrected by critic)** Placement types `$06`/`$07` are vanilla RM4 object `$1A` (an ordinary enemy, the same in `rm4j`), not a 4MI script object, so neither is the Balloon. 4MI's own objects are placement types `$08`-`$0B` (all object `$5E`, the Y value is a parameter). The Wire/Balloon capsule is `$5E` sub-id `$4D`; a scan of all 1,400 agent savestates found it live only in Cossack 2's checkpoint-1 room (screen 21, x 128); systems.md saw the Cossack 1 screen-16 one, so the RM-stage copies sit in screens nobody reached (Drill 2-16 / 34-47, Dive 8-21 / 34-47) [code + seen].
 | 40-41 | Checkpoint 2 in a purple submarine bay; Dive Man. |
 | 46 | (fight `$1F`) orange-and-blue robot in a grey machine hall that raises water geysers. |
 
-**Eddie** is on screen 36 (236,164) [code].
+~~**Eddie** is on screen 36 (236,164) [code].~~ (corrected by critic: that placement is the 254-HP spring robot; Dive's stage has no Eddie.)
 
 **Gaps:** I did not get past the pier (7), so screens 8-21 and the sea crossing in stage order are only known from the
 fight state; 34-39 and 42-47 were not reached in play.
@@ -496,7 +499,7 @@ which I did not compare.
 | Ring | A **circus**: rabbit robots riding gear unicycles, a coil-spring mid-boss that swallows Rockman, rings everywhere. | [seen] |
 | Ring | "Ring" as in **planetary rings**: Saturn-ring UFOs, and Ring Man's room has a window onto a ringed planet and the galaxy. | [seen] |
 | Ring | The sky turns from noon blue through magenta to a salmon **sunset**, and the boss is fought against outer space: the stage is a flight into the night. | [seen] |
-| Ring | The hidden room is decorated with a stack of **fake boss shutters**, and Eddie stands exactly where you step off the screen to find it. | [seen] |
+| Ring | The hidden room is decorated with a stack of **fake boss shutters**, and a 254-HP spring robot stands exactly where you step off the screen to find it (not Eddie, corrected by critic). | [seen] |
 | Ring | The credits' fabricated enemies **RONG RONG RONG / RANG RANG RANG / RUNG RUNG RUNG** conjugate "ring" (text.md); they are presumably this stage's ring enemies. | [text][guess] |
 | Pharaoh | The **pharaoh's curse** made literal, one curse per room, with the name printed under the life bar. | [seen] |
 | Pharaoh | The very first screen is **REVERSE**, so a player who presses RIGHT walks out of the pyramid the way he came, which turns out to be the route. | [seen] |
@@ -510,6 +513,8 @@ which I did not compare.
 | Dive | **Rush as a jet ski** (EXWP "R.PWC"), a nod to Rush Marine. | [seen] |
 | Dive | An **Enker**-like spear robot (the *Mega Man* (GB) Killer, whose EXWP weapon is also in the game). | [seen][guess] |
 | Dive | Kiosks and floors carry a round **"MSN"** logo (unidentified). | [seen] |
+
+**(critic addition) Where the Wire is.** Resolving every script placement (`tools/analysis/r4mi/r4mi_objects.py`) puts the Wire capsule (`$5E` sub-id `$4D`, the same object as Cossack 2's spare Wire) on **Drill screen 40** (x 212, placement `$08`), in the second branch: `31 down → 35`, then `35 → 36 → 37`, and `37 → 40` or `37 → 38 → 39 → 40`; 40 leads on to 41 and back up to 22 [code: bank `$71` link table]. The `$0A` object in room 18 resolves to sub-id `$63`, not the Wire. **The Balloon** is the same capsule on **Dive screen 47** (x 220), at the end of section C (`38 down → 42 → … → 46` WAVEMAN's hall `→ 47`). Neither screen was reached in play.
 
 ## 6. Open questions
 
@@ -537,7 +542,7 @@ which I did not compare.
    new fight while reusing the same boss.
 5. **Signal weakness through invincibility, not damage.** All weapons doing 1-4 keeps every weapon useful; the 2-to-126
    frame spread is the real lever. If RM6 GP adopts this, show the player the i-frames (flash length) clearly.
-6. **Hidden rooms as one-screen side rooms off an edge**, near a landmark (Eddie in Ring) and holding E-tank + 1UP, are
+6. **Hidden rooms as one-screen side rooms off an edge**, near a landmark (the big spring robot in Ring) and holding E-tank + 1UP, are
    cheap to add and discoverable. Make their entrances visible in the collision data so tools can find them.
 7. **Difficulty as small data deltas.** HARD changes two block attributes in Ring, puts spikes under Pharaoh's
    quicksand and adds boulders in Drill. A HARD flag that swaps a handful of blocks per section is easy to build and

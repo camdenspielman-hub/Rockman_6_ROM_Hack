@@ -259,6 +259,15 @@ generic 4MI enemy).*
 - Together with Proto Man's hint "TOAD MAN WANT TO BECOME REAL TOAD" [text], the bonus is clearly about transforming
   him. How the bit is meant to survive the fight is still open. All 15 weapons, touching, waiting and leaving either
   killed the frog (bit cleared) or never ended the fight.
+- **(critic addition)** What the "draw" is in code: `$78A0` holds the index of the boss being fought (Toad's init writes
+  1). The save routine (`$40:$AF63`) counts a **loss** for that boss when you die with `$78A0 ≥ 0`, and the boss-death
+  path (`$43:$8017`) ORs the boss's bit into `$78A1`, which the save adds to the **wins** (`$7E48+n`). ●TOAD's `ROR $78A0`
+  makes it negative, so a death after the transformation is **neither a win nor a loss**. Killing the frog clears TOADMAN
+  and also writes `$78A1 |= 2`, i.e. it is booked as a normal **win** (re-checked in play: frog touched, FLAG `$10 → $00`,
+  `$78A1 = $02`, then `$A9 |= 2` after "YOU GOT ●TOAD"). Firing Wish Star and switching weapons did not change this.
+  The frog-kill is skipped only while `$013A ≠ 0`, a "player locked in a scripted state" flag that dozens of sites set
+  (Dust Man's capture, Rush sequences, the escape). So the code offers no clean path that ends the fight with the bit
+  still set; whether the bonus is reachable at all is open [code + seen, `build/research/r4mi/r4mi-critic/frog*.py`].
 
 ![Toad Man](img/stages_b_toad_boss.png)
 *Toad Man once provoked: hops, the Rain Flush dance, splash bursts.*
@@ -344,6 +353,8 @@ drawn.*
 
 **Screens `0-10`: purple skull fortress.** This part includes a pipe maze full of skulls. In the link table, screen
 0's floor leads down to a side branch `4-5`, while the main path goes right through `0-3` and then up `3 → 6 → 7`.
+
+**(critic addition) Beat's cage is in this stage.** The side branch under the first screen (link `0 down → 4`, `4 down → 5`, a dead end) holds a placement `$09` at screen 5 (x 200) that resolves to `$5E` sub-id `$7F` = Beat (`tools/analysis/r4mi/r4mi_objects.py`). In play [seen]: a bird cage hangs from a chain with Beat inside. Normal weapons only swing it; it breaks only to the **charged Rail Buster** (the hit test `$44:$B3D2` calls `$42:$9D4E`, which accepts projectile anims `$20`/`$23`) or to a super-special weapon (`$7722 ≠ 0`). Beat then perches on the ledge; touch him and he grabs Rockman and flies him back up the shaft, and equipment `$7839` and FLAG `$7898` both get bit6 (`$30 → $70`, FLAG `$00 → $40` in the test, `build/research/r4mi/r4mi-critic/beat_skull.py`, `img/critic_beat.png`). A second cage sits in Cossack 1 (screen 18); there the code hands BEAT over as soon as the cage breaks (`$44:$B43F`: `$22 = 8`). Testing tip: `cheats.godmode()` sets BEAT already, which hides all of this.
 
 **Screens `11-37`: a free-scrolling sky section** [seen].
 
