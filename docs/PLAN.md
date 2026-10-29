@@ -32,7 +32,7 @@ scope) and revised against [`RULINGS.md`](design/RULINGS.md). [`STATUS.md`](STAT
 - **The secrets:** every venue has a secret exit, a hidden room and a chip earned by *how* you play, and the judges'
   debrief hints at the first one you missed (4MI's predicate table).
 - **The size:** v1.0 is 8 reworked venues, the Opening, a mid-game riot with the rival, 3 museum wings, 2 castle
-  stages, an escape and the ending. That is about **455 focused work sessions** (the ledger, §4), delivered as three
+  stages, an escape and the ending. That is about **450 focused work sessions** (the ledger, §4), delivered as three
   playable releases: **v0.1** (one venue, end to end), **v0.5** (all 8 venues) and **v1.0**.
 - **The platform:** MMC5, 1 MB PRG, 8 KB CHR-RAM, 32 KB battery PRG-RAM. First job: a **go/no-go spike on Mesen** (§7).
 - **The rule that keeps it finishable:** a Must item may depend only on Must items, and the ledger, not enthusiasm,
@@ -221,13 +221,13 @@ Claude work session. It is re-estimated from actual counts after the slice (M4) 
 | Opening, Riot, fortress, ending | 70 | `fortress.md` |
 | Release overhead (balance, tests, hardware matrix) | 16 | ledger |
 | **Code total** | **377.5** | |
-| Art (no pixel artist; R5.1) | ≈ 56.5 | `art_audio.md` |
+| Art (no pixel artist; R5.1) | ≈ 51.6 | `art_audio.md` |
 | Music and SFX | ≈ 9 | `art_audio.md` |
 | Text (EN + JP, compiled and fitted) | ≈ 12 | `story.md` |
-| **v1.0 total** | **≈ 455** | |
+| **v1.0 total** | **≈ 450** | |
 
 The full design (Must + Should + Could) is about 581 code sessions plus art, music and text. CX took about 5 years and
-4MI about 8; v1.0 at about 455 sessions is a long project even with AI help, which is why every rung of the ladder is a
+4MI about 8; v1.0 at about 450 sessions is a long project even with AI help, which is why every rung of the ladder is a
 playable, shareable build (R0.5).
 
 ### 4.2 The release ladder
@@ -236,7 +236,7 @@ playable, shareable build (R0.5).
 |---|---|---|
 | **v0.1 "Blizzard slice"** (M4) | new game → bracket → SUMMIT CLIMBER end to end (secret exit, hidden room, SNOW CHAINS, the Ice Block, the boss) → judges → save, reload, replay | ~115 |
 | **v0.5 "Round One"** (M6) | Opening-lite, all 8 venues, HALFTIME RIOT; the scope checkpoint | ~285 |
-| **v1.0 "Championship"** (M9) | + H1, H3, H5, W2, W3, the ending; native-JP review; BPS release | ~440-455 |
+| **v1.0 "Championship"** (M9) | + H1, H3, H5, W2, W3, the ending; native-JP review; BPS release | ~440-450 |
 | v1.1+ | the cut line below, re-added from the top | - |
 
 ### 4.3 The cut line (out of v1.0; comes back in this order)
@@ -294,9 +294,10 @@ Details: [`design/tech.md`](design/tech.md).
 - **Break Man and Bass β are composited from Rock's sheet.** 16×16 face icons with name labels instead of portraits in
   v1.0. One size per background boss. Frame caps: 8 per enemy, 16 per boss.
 - **An art-acceptance gate** with screenshots for the user at every milestone.
-- **Must art:** about 2,560 background and 1,950 sprite tiles and about 350 frames, ≈ 56.5 sessions.
+- **Must art:** 2,567 background and 1,968 sprite tiles (36 % of them reuse or composites) and 354 frames, ≈ 51.6
+  sessions. Each asset is costed by method: reuse, composite, programmatic or Claude draft.
 - **Must music:** G00 GRAND PRIX MARCH through G04 (BETA's theme), the ending's LAST MATCH arrangement (2A03 stems), a
-  2-second whistle jingle, about 20 new SFX, and the channel mute mask. Everything else falls back to vanilla tracks
+  2-second whistle jingle, 21 new SFX, and the channel mute mask. Everything else falls back to vanilla tracks
   until v1.1.
 
 Details: [`design/art_audio.md`](design/art_audio.md).
@@ -319,7 +320,7 @@ green test suites, `STATUS.md` updated, the bank ledger printed and art-acceptan
 | **M6** ⛳ | Text v1b; T1-lite; HERO'S QUEST, HIGH NOON FRONTIER, SKY ACE; HALFTIME RIOT (**v0.5 "Round One"**) | [~285] |
 | **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~340] |
 | **M8** ⛳ | W2, W3, the ending | [~380] |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~440-455] |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~440-450] |
 
 **M0 in detail** (tech §16.3; 12.5 sessions):
 
@@ -349,7 +350,7 @@ re-recorded only at gates; test overhead about 10 % of code sessions.
 
 | # | Risk | Mitigation |
 |---|---|---|
-| 1 | **Scale.** ≈ 455 sessions is years of part-time work | The release ladder makes every rung shareable; the ledger is re-estimated at M4 and every gate; the cut line is pre-ordered |
+| 1 | **Scale.** ≈ 450 sessions is years of part-time work | The release ladder makes every rung shareable; the ledger is re-estimated at M4 and every gate; the cut line is pre-ordered |
 | 2 | **MMC5 on real hardware and flash carts** is unverified; FCEUmm is too forgiving (64 KB PRG-RAM, CHR wrap, timing) | The Mesen spike before any port work; every gate checked on Mesen; the MMC3 fallback |
 | 3 | **The slice schedule.** Systems' slice share (~33) exceeds M3's room | Pull the scorecard, bolts and chips into M2's results and save work; the M4 re-estimate decides |
 | 4 | **Lag.** Set pieces sit at the 9-slot cap | Count every occupied slot; M3's OAM-builder work may raise the cap; artcheck enforces it |
@@ -410,7 +411,7 @@ None blocks M0. Each has a default.
 | [`venues_b.md`](design/venues_b.md) | SUMMIT CLIMBER (the slice, specified completely), PERSIAN PALACE, ATLANTIS RUINS, EDO NINJA ROW | ≈ 2,000 |
 | [`fortress.md`](design/fortress.md) | Opening, HALFTIME RIOT, Exhibitions, Hall of Fame H1-H5, Super Wily Castle W1-W3, the ending, Mr. X Returns | ≈ 2,230 |
 | [`story.md`](design/story.md) | Every word: scenes, commentary, death tables, hints, plaques, help pages, the ending; EN and JP | ≈ 2,400 |
-| [`art_audio.md`](design/art_audio.md) | Tile, frame and byte budgets; tileset slots; the art pipeline; the track list and SFX | ≈ 1,300 |
+| [`art_audio.md`](design/art_audio.md) | Tile, frame and byte budgets per asset; tileset slots; the no-artist art method and acceptance gate; the track list and SFX | ≈ 1,930 |
 | [`crossrefs.md`](design/crossrefs.md) | Round-1 cross-references between the docs | ≈ 460 |
 | [`review_feasibility_design.md`](design/review_feasibility_design.md), [`review_consistency_scope.md`](design/review_consistency_scope.md) | The four critics' findings (the ids RULINGS cites) | ≈ 2,370 |
 

@@ -246,18 +246,18 @@ print()
 # art_audio.md round 2 ("v1.0 scope", §11, §13; R5.1 no-artist baseline, R5.3 re-run). Source of every number:
 # build/revise/art_audio/budget_r2.py (art) and music_r2.py (music + SFX). Rows: (BG tiles, sprite tiles, frames, sessions).
 # Methods: reuse/recolour R, composite X (both "R" in R5.1's sense), programmatic C, Claude draft D (final; no artist).
-# Session model: D 80 BG tiles or 12 frames, X 150 tiles + 16 frames, R 300 tiles + 24 frames, C 200 tiles per session,
+# Session model: D 80 BG tiles or 12 frames, X 18 frames (or 150 tiles), R 300 tiles + 24 frames, C 200 tiles per session,
 # +5 % for the fixes the art-acceptance gates ask for. The 240 1-bpp text glyphs (Must) are inside the Must row's sessions.
-art = {'Must': (2567, 1948, 351, 56.7), 'Should': (1684, 538, 117, 31.0), 'Could': (828, 384, 64, 15.0),
-       "Won't": (20, 279, 63, 5.8)}
+art = {'Must': (2567, 1968, 354, 51.6), 'Should': (1684, 518, 114, 29.7), 'Could': (828, 384, 64, 14.5),
+       "Won't": (20, 279, 63, 4.6)}
 for k, (bg, spr, fr, ses) in art.items():
     print(f"art {k:6}: {bg} BG + {spr} spr tiles, {fr} frames -> ~{ses:.1f} Claude sessions")
 art_msc = sum(v[3] for k, v in art.items() if k != "Won't")
 print(f"art M+S+C : ~{art_msc:.1f} sessions (no human hours: R5.1's baseline has no pixel artist; a human pass is optional polish)")
 # music (R5.2: art_audio owns the one track list): tracks, bytes, new SFX, sessions (full 1.5, loop 1, jingle 0.5, 12 SFX/session)
-music = {'Must': (7, 3700, 20, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (15, 10550, 7, 19.1), "Won't": (2, 1500, 0, 3.0)}
+music = {'Must': (7, 3700, 21, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (15, 10550, 7, 19.1), "Won't": (2, 1500, 0, 3.0)}
 for k, (n, b, sfx, ses) in music.items():
     print(f"music {k:6}: {n} tracks, {b} B, {sfx} new SFX -> ~{ses:.1f} sessions")
-print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 20 new SFX in the $36 tail (360 of 449 B)")
+print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 21 new SFX in the $36 tail (392 of 449 B)")
 # text: story.md §10.4 ~1,100 strings x 2 languages; Must ~600
 print("text: ~1,100 strings EN+JP at ~90 strings/session (write+fit+compile checks) = ~24 sessions; Must ~600 = ~13 (+ external native JP review)")
