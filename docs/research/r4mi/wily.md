@@ -288,6 +288,15 @@ labelled accordingly.
   UNIT), 9 (COMPASS), 10 (WARP SENSOR) or 13 (Kalinka) and freezes Rockman. The Wily 3 opening (script 11) is started
   from bank `$56` (`LDA #$0B / STA $7722`).
 - PROG (`$7890`) was `$80` on arrival from Wily 2, and bank `$4F` compares it with `$40` on entry [code].
+- **(critic addition) The lairs** [code, bank `$4F`]. The room-controller parameter selects one of four handlers
+  (`$A023`/`$A027`: 0 → `$A02B` stage init, 1 → `$A248` labyrinth room, 2 → `$A2BB`, 3 → `$A427` treasure room).
+  The lair index is `(screen − $20) / 2`, so the four lairs are **screens 32, 34, 36 and 38** (all drawn with local
+  layout 16). A lair ends with an object that takes **10 weapon contacts of any kind** (`$0480 = 10`, 20 frames of
+  invincibility per hit, `$A30E-$A350`); its death routine (`$A353`) ORs `01 08 04 02` into `$782F`, counts `$782D`,
+  then walks Rockman to the centre and teleports him out (`$A3A9-$A411`), the flow of vanilla RM4's refight capsules.
+  Every labyrinth room on screens 1-16 has the same placement (controller `$88`, parameter 1), so the maze's
+  contents (lair doors, the three units, Kalinka) are spawned by code, not by the enemy table. Script-object
+  resolution for every other stage is now in `tools/analysis/r4mi/r4mi_objects.py`.
 
 ### 3.3 Kalinka, the fake Roll, and the weapons stolen in Wily 2 [text + guess]
 
