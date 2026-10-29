@@ -1,7 +1,7 @@
 # Rockman 6 GP: player-facing systems
 
-Author: design-systems. Status: **round 2** (revised against [`RULINGS.md`](RULINGS.md), which is binding and overrides
-[`BRIEF.md`](BRIEF.md) where they differ). Facts come from `docs/research/*`. Numbers measured for round 1 are tagged
+Author: design-systems. Status: **round 3** (revised against [`RULINGS.md`](RULINGS.md) §0-§8, which is binding and
+overrides [`BRIEF.md`](BRIEF.md) where they differ; round 3's changes are listed at the end). Facts come from `docs/research/*`. Numbers measured for round 1 are tagged
 **[seen, ds]** (scripts in `build/design/design-systems/`); facts re-checked in the ROM or emulator for round 2 are
 tagged **[code, r2]** or **[seen, r2]** (scripts in `build/revise/systems/`: `verify_r2.py`, `chrsets_formslot.py`,
 `cflash_strobe.py`). Every number is grounded in vanilla, argued in the text, or marked **(tune)**.
@@ -29,16 +29,18 @@ ledger baseline is `tools/plan/tight.py` (systems block) and `tools/plan/tally.p
 with this revision and agree on **49.5 sessions** of Must systems code, data and tests (the round-1 tight estimate was
 46.5: +1.5 for the Ice Block that R2.4 puts in the slice, +1 for the CASUAL lever framework of R2.9 and INPUT LAG of
 R3.5, +0.5 for the flash-safety rule of R3.5, +0.5 for SC11 and +0.5 for the input rules of R2.10, −1 for moving the
-Y.SPEAR pierce and PLANT.B's two-contact barrier to Should). This revision moves `tight.py`'s total by +3 (≈ 439 →
-≈ 442 before the other docs' round-2 changes); the full inventory in `tally.py` lists systems at Must 49.5, Should 35.5,
-Could 12 and Won't 1.5.
+Y.SPEAR pierce and PLANT.B's two-contact barrier to Should). Round 2 moved `tight.py`'s total by +3; after every doc's
+round-2 changes the tight Must is **about 450 sessions** (R8.1), and RULINGS §6's cumulative column adds up this table's
+per-rung figures. The full inventory in `tally.py` lists systems at Must 49.5, Should 35.5, Could 12 and Won't 1.5.
+**Round 3 (R8.2)** moves about 5 of these sessions from the slice to Round One (items 2-4: a new file owns no forms, so
+the slice cannot reach them); the total is unchanged.
 
 | # | Item (ids) | What ships | Rung | Sessions |
 |---|---|---|---|---|
-| 1 | SELECT modifier, last-weapon toggle, input rules (SYS-CTL-1, -2, -5) | weapon/form cycle, tap toggle, UP-interact rule, 10-f alt lock, the mash and reflex helpers | v0.1 | 2 |
-| 2 | Quick form swap (SYS-CTL-4) | 2 KB stream behind a 16-20 f flash, the per-form `$71-$7F` slot-set map, the set-piece-sheet hook, the once-per-form docking debut | v0.1 | 3 |
-| 3 | Forms fire every tap (SYS-FRM-1) | the weapon × {tap, alt, synergy} dispatch table, with only the tap column (and the Ice Block) filled | v0.1 | 2 |
-| 4 | Adaptors by win count (SYS-FRM-2) | Power at 2 wins, Jet at 4, FORMS.SUPER on Rush's dock in H3 | v0.1 | 1 |
+| 1 | SELECT modifier, last-weapon toggle, input rules (SYS-CTL-1, -2, -5) | SELECT + Up/Down weapon cycle (Normal form's slot-set stream), tap toggle, UP-interact rule, 10-f alt lock, the mash and reflex helpers, buster only while attached (the condor); the form cycle lands with item 2 | v0.1 | 2 |
+| 2 | Quick form swap (SYS-CTL-4) | 2 KB stream behind a 16-20 f flash, the per-form `$71-$7F` slot-set map, the SELECT + Left/Right form cycle, the set-piece-sheet hook, the once-per-form docking debut | v0.5 (M5, R8.2) | 3 |
+| 3 | Forms fire every tap (SYS-FRM-1) | the weapon × {tap, alt, synergy} dispatch table with Normal form's tap column and the Ice Block (slice, 1); the Power and Jet rows (M5, R8.2, 1) | v0.1 / v0.5 | 2 |
+| 4 | Adaptors by win count (SYS-FRM-2) | Power at 2 wins, Jet at 4, FORMS.SUPER on Rush's dock in H3 | v0.5 (M5, R8.2) | 1 |
 | 5 | B.ATTACK's Ice Block (SYS-WPN-3A) | the one alt in v1.0: the alt-dispatch and frozen-tick prototype | v0.1 | 1.5 |
 | 6 | Frozen tick (SYS-CMB-3) | three frozen handlers (`$E9D7`/`$EA20`/`$EA6E` kinds), the NOFREEZE override list, the boss stall | v0.1 | 2.5 |
 | 7 | GP_BOSSHIT (SYS-CMB-1) | damage and i-frame tables for the v1.0 boss list, the generator and the chart | v0.1 | 2.5 |
@@ -60,10 +62,13 @@ Could 12 and Won't 1.5.
 | 23 | Super Adaptor (SYS-FRM-5) | rocket fist with homing return, jet hop; needs tech's `$9B` audit | v1.0 | 3 |
 | | **Total Must** | | | **49.5** |
 
-By rung: about **33** sessions land in the slice (items 1-13, 16-17, three shop chips, SNOW CHAINS), about **10.5** in
-Round One, about **6** in v1.0. RULINGS §6 gives M3 25 sessions for *all* slice systems (this doc's and tech's T6,
-X-BONK, X-WRAP, HUD widgets and the commentator bus), so M3 is short by roughly 10-15 sessions unless the scorecard,
-bolts and chip framework are pulled into M2's results and save work. That is Risk 1; the M4 re-estimate decides.
+By rung (round 3, R8.2): about **28** sessions land in the slice (items 1, 5-13, 16-17, item 3's dispatch table with
+Normal's taps, three shop chips, SNOW CHAINS), about **15.5** in Round One (items 2 and 4 and the Power and Jet rows of
+item 3 now open it, at M5), about **6** in v1.0. **A new file owns no forms** (Power comes with the 2nd win), so the
+slice has no form swap, no form cycle and no adaptors. RULINGS §6 (R8.1) now adds these figures up: M3 is about 44
+sessions (79 → ~123) for all slice systems, this doc's and tech's T6, X-BONK, X-WRAP, HUD widgets, commentator bus and
+the attach state's core, so round 2's shortfall (Risk 1) is closed by the re-baseline; the M4 re-estimate calibrates
+the rest (R0.1).
 
 **Should (v1.1+), in the order they come back** (RULINGS R0.3; sessions):
 
@@ -105,8 +110,10 @@ each (§15).
    NPCs, plaques) happens on an UP press with B not held, and never within 10 frames of an alt.
 2. **The quick form swap has no cutscene** (§1.3). It streams the form's whole 2 KB sheet in **16-20 frames** behind a
    swap flash (R2.3), with CHR-RAM kept at 8 KB. The weapon slot `$71-$7F` follows a per-form map (§1.4). The vanilla
-   Rush-docking cutscene plays once per form per save.
-3. **Forms fire every weapon's tap** (§3). The dispatch table has alt and synergy columns, but in v1.0 only one alt
+   Rush-docking cutscene plays once per form per save. It lands at M5 (v0.5): a new file owns no forms, so the slice
+   cannot reach it (R8.2).
+3. **Forms fire every weapon's tap** (§3; the Power and Jet rows at M5, R8.2). The dispatch table has alt and synergy
+   columns, but in v1.0 only one alt
    ships: **B.ATTACK's Ice Block**, built in the Blizzard slice as the prototype for alt dispatch and the frozen tick
    (R2.4). The other 7 alts and the 8 synergies are Should, added one weapon at a time.
 4. **Combat = two tables, 4MI-style (credit: Puresabe)** (§4). Weakness 4 dmg / 16 f, good 3/20, neutral 2/30,
@@ -165,7 +172,7 @@ each (§15).
 | SYS-SC-2 | Results screen (judges) | new-code, new-art | M | Must (owner: meta.md) |
 | SYS-SC-3 | Secret tokens on replays | new-code | S | Must |
 | SYS-SC-4 | Attribution through LATCHSRC | new-code | M | Must |
-| SYS-SC-CASES | Special cases SC1-SC11 | new-code | S each | per row, §4.6 |
+| SYS-SC-CASES | Special cases SC1-SC11 (SC12-SC14 are stage-owned, counted by their docs) | new-code | S each | per row, §4.6 |
 | SYS-ECO-1 | Bolts, income caps, Eddie's Pit Stop stock and prices | new-code | M | Must |
 | SYS-CHP-1 | Chip framework (bits, slots, equip rules) | new-code | M | Must |
 | SYS-CHP-2 | The 14 v1.0 chips | new-code, new-art (1 tile) | M | Must |
@@ -195,10 +202,14 @@ Controller 2 is read into `$41/$43` every frame and never consumed (`tech.md` §
 **R2.10: in a stage, SELECT means only the quick swap (§1.1) and the last-weapon toggle (§1.2).** It has no meaning in
 the pause menu. The bracket screen's SELECT (open the Pit Stop) is `meta.md`'s and is not in a stage.
 
-### 1.1 SYS-CTL-1: the SELECT modifier [new-code] S, Must (v0.1)
+### 1.1 SYS-CTL-1: the SELECT modifier [new-code] S, Must (v0.1; the form cycle v0.5)
 
 One filter runs right after the joypad read. It is active only in stage play: not paused, not in a transition, no
-cutscene, no set-piece sheet (§1.4), not playing Break Man. It changes `$40/$42` before the player AI sees them.
+cutscene, no set-piece sheet and no attach state (§1.4), not playing Break Man. It changes `$40/$42` before the player
+AI sees them.
+
+**R8.2:** the slice (v0.1) builds SELECT + Up/Down (weapons) and the last-weapon toggle. The form cycle (SELECT +
+Left/Right) arrives with the quick form swap at M5, because a new file owns no forms until the 2nd win.
 
 ```
 if SELECT held:
@@ -241,9 +252,10 @@ What a swap keeps (CX lesson: "decide what survives a swap"), refined for the CH
   weapon slot. It is **refused (a buzz) while Rock stands on one of them**, so a swap never deletes the platform under
   you (CX's trap).
 - Swapping away from the buster, or changing form, clears the charge (`$9E` = 0).
-- **The pause menu** (tech's open question 4): vanilla clears slots 1-7 when the menu closes (`$38:$9624`). GP keeps that
-  for shots, Beat and Rush but **keeps every utility (slots 4-7) when the weapon is unchanged**, so pausing on a beam
-  over a pit is safe. A weapon change in the menu ends the old weapon's utilities like a SELECT change; a menu is a
+- **The pause menu** (tech's open question 4, R8.7): vanilla clears slots 1-7 when the menu closes (`$38:$9624`). GP keeps
+  that for shots, Beat and Rush but **keeps every utility (slots 4-7) when the weapon is unchanged**, so pausing on a beam
+  over a pit is safe. **tech owns the patch** of the pause-close clear at `$38:$9624` (R8.7; §15.2); this doc owns the
+  rule. A weapon change in the menu ends the old weapon's utilities like a SELECT change; a menu is a
   deliberate act, so it is not refused there, and the M.BEAM help page says so. Deaths clear everything (vanilla).
 
 Config: **SELECT SWAP = FULL / WEAPONS ONLY / OFF** (OFF for players who want vanilla feel; `meta.md` places it).
@@ -255,7 +267,10 @@ Config: **SELECT SWAP = FULL / WEAPONS ONLY / OFF** (OFF for players who want va
 - If `LASTW` is no longer owned (W2's bracket rush can withhold weapons), the toggle goes to the buster.
 - Holding SELECT longer than 15 frames with no D-pad does nothing. It is safe to "rest" on SELECT.
 
-### 1.3 SYS-CTL-4: quick form swap with the 2 KB stream [new-code] M, Must (v0.1); [new-art] 1 tile
+### 1.3 SYS-CTL-4: quick form swap with the 2 KB stream [new-code] M, Must (v0.5, M5: R8.2); [new-art] 1 tile
+
+**R8.2:** a new file owns no forms (Power comes with the 2nd win), so the slice cannot reach the swap; it is built at M5
+with the Power and Jet rows of the dispatch table (§3.0) and the adaptors (§2.3).
 
 **Vanilla** [code, r2]: closing the pause menu with a form (`$38:$93F7`) resets the weapon to the buster (`$0699` = 0),
 plays sound `$33` and runs the docking sequence `$38:$965F`; the menu-close path then loads the form's sprite set from
@@ -307,7 +322,7 @@ Rules:
   (§13.6).
 - **The swap-flash tile**: 1 tile in GP-COMMON (§15.3 art asks), mirrored 4 ways.
 
-### 1.4 The weapon slot `$71-$7F`: one owner per form (SYS-CTL-4) [new-code] S, Must (v0.1)
+### 1.4 The weapon slot `$71-$7F`: one owner per form (SYS-CTL-4) [new-code] S, Must (v0.1 for Normal form's weapon sets; the per-form map v0.5, R8.2)
 
 R2.3 asks for a per-form `$71-$7F` map. The facts [code, r2]:
 
@@ -343,11 +358,16 @@ Consequences, all Must:
 - **The Ice Block** (the one v1.0 alt) adds 4 tiles to B.ATTACK's set: GP's B.ATTACK set is 7 tiles at `$73-$79`.
 - **Beat's pit rescue** (§10) streams set `$29` (Beat, 15 tiles) at its locked moment and restores the slot set when Rock
   lands. It ends the weapon's lingering objects first.
-- **Set pieces that change Rock's body** (Wind's sortie, Plant's vine and balloon, Blizzard's condor, Yamato's pogo
-  rack) use a **dedicated 128-tile set-piece player sheet** streamed at a locked moment (a catapult, a grab, a cutaway),
-  never the weapon slot (R2.3, feasibility-8). Systems provides `gp_player_sheet(id)` and `gp_player_sheet_end()` on the
-  same stream as the form swap; while a sheet is active only the buster fires (its tiles are in the sheet) and the
-  SELECT form cycle is off. This is the venue docs' "buster only on vines and the condor" rule (consistency-43).
+- **Set pieces that change Rock's body** (Wind's sortie, Yamato's pogo rack) use a **dedicated 128-tile set-piece
+  player sheet** streamed at a locked moment (a catapult, a cutaway), never the weapon slot (R2.3, feasibility-8).
+  Systems provides `gp_player_sheet(id)` and `gp_player_sheet_end()` on the same stream as the form swap (M5, with
+  Yamato's pogo); while a sheet is active only the buster fires (its tiles are in the sheet) and the SELECT form cycle is
+  off.
+- **The attach state** (tech's; Blizzard's condor, Plant's vines and balloon) needs no sheet: Rock uses vanilla's
+  ladder-climb and ladder-shoot poses. On the grab the weapon switches to the buster, only the buster fires and SELECT
+  is off; the equipped weapon returns on release. This is the venue docs' "buster only on vines and the condor" rule
+  (consistency-43). **R8.2:** the attach state's core is built at M3 with the condor (Blizzard's secret exit) as its
+  first user, so this rule is in the slice; vines (T5) and the balloon follow at M5.
 - **artcheck rejects any weapon-slot set over 15 tiles** (R2.3) and any non-weapon object that draws from `$71-$7F`.
 
 Free tiles per weapon set for the Should alts and synergies (15 − set size): Y.SPEAR 13, W.STORM 0 (its Updraft and
@@ -488,9 +508,9 @@ for 3 forms; for example the shooting-pose table `$3F:$E130` has exactly three 8
 instructions. `tech.md` audits every `$9B` reader (static scan plus coverage) and relocates those tables with a fourth row
 **before** SUPER becomes form 3 (M7, before H3). The fortress fist-ride and SC5 do not depend on SUPER.
 
-### 2.3 SYS-FRM-2: acquisition [new-code] S, Must (v0.1)
+### 2.3 SYS-FRM-2: acquisition [new-code] S, Must (v0.5, M5: R8.2)
 
-Per BRIEF §4:
+Per BRIEF §4 (a new file owns no forms, so the slice has none; this lands at M5 with the form swap, R8.2):
 
 - `$38:$931D` (menu) and `$3B:$BA3F` (stage start) derive the forms from `meta.md`'s **FORMS** save bits instead of the
   Plant and Flame flags. FORMS.POWER is set when WINS reaches 2 and FORMS.JET at 4, by the bracket's hand-over events
@@ -518,9 +538,9 @@ want Time Stop wait for the alts (R3.1).
    fist-ride practice beat before the fight (fortress stages it). The Super Adaptor is not lent.
 2. **The Magnet Beam, from H1 on** (fortress §0.2).
 
-**Vehicles are not forms** (consistency-36). A stage-lent vehicle (Wind's rental Jet in the sortie, the Exhibitions'
-loaners if they return) is tech's one free-flight vehicle state (R1.10), not `$9B`: it is NO TAG, works under 1993
-rules, and gives no form-based VARIETY.
+**Vehicles are not forms** (consistency-36). A stage-lent vehicle (SKY ACE's sortie, with Rush in a RENTAL bib; the
+Exhibitions' CANNON if they return) is tech's one free-flight vehicle state (R1.10), not `$9B`: it is NO TAG, works
+under 1993 rules, and gives no form-based VARIETY.
 
 ---
 
@@ -543,6 +563,9 @@ rules, and gives no form-based VARIETY.
   - Vanilla forms cannot fire weapons only because the menu resets `$0699` when a form is chosen (`$38:$93FE`) [code,
     r2]; GP removes that reset, and the fire routines use the form's shooting pose from `$3F:$E130[form*8 + $94]`
     (relocated with a 4th row for SUPER, §2.2).
+  - **Rungs (R8.2):** the table itself, with Normal form's tap column and the Ice Block in the alt column, is built in
+    the slice (M3). **The Power and Jet rows** (the buster-reset removal and the form shooting poses above) move to M5
+    with the form swap: a new file owns no forms, so the slice cannot reach them.
   - The vanilla fire routines (`$8582` one at a time in slot 3, `$857A/$857E` two in slots 2-3, `$85D9` spreads that
     need slots 1-4 empty) are kept for the taps.
 - **Player-side object slots** (R1.11, feasibility-9; tech owns the plan, `tech.md` §7.12): slot 0 is Rock (Break Man
@@ -654,6 +677,8 @@ proposal, merged with an encase effect, and the prototype for every later alt:
   becomes the shell, glued to the enemy and drawn over it. At thaw or death the class is restored and the shell shatters.
 - **On a NOFREEZE enemy**: it deals 1 and shatters. Fire enemies die (the vanilla thematic table reads class 7).
 - **On a boss**: 1 damage with 30 i-frames (the ALT override row of GP_BOSSHIT, §4.8), never frozen.
+- **The 1 damage comes first**, so an enemy with 1 HP dies instead of being encased. A stage doc that wants an enemy to be
+  an ice step gives it at least 2 HP: Blizzard's bird has 2 for this (venues_b §1.7).
 - **Otherwise it lands** as a solid 32×16 block for 240 f, blinking the last 30 f.
 - **A weapon change shatters it** (and thaws the enemy), and is refused while Rock stands on it (§1.1).
 - STYLE: the FROZEN STEP act (stood on an encased enemy).
@@ -988,20 +1013,20 @@ Notes:
 - "-" in Grand Pi-kun's column means the player cannot own that source in a first run of the Opening. On replays the
   mid-boss default column applies.
 - The SC5 cells of Gamma phase 2 in v1.1: Time Fist punches 4/12 and Morning Star 3/20 (Should synergies).
-- In v1.0 Gamma is drawn as **head and fists only** (about 100 tiles, R2.11); fortress decides which hit box phase 1's
-  row belongs to (round 1 used a chest core).
+- In v1.0 Gamma is drawn as **head and fists only** (about 100 tiles, R2.11); fortress gives phase 1's row to **the chin
+  cannon only** (fortress §8; round 1 used a chest core).
 
-**v1.1+ rows** (defaults kept for the stages and bosses that come back later):
+**v1.1+ rows** (defaults kept for the stages and bosses that come back later; H2 and H4 are Should, R0.3 item 5):
 
-| Source | H2 Mecha Dragon MK-VI (Could, with H2) | H4 Cossack Catcher MK-VI (Could, with H4) | W1 METALL 16 (Could, with W1) | E1-E4 guests (Could) |
-|---|---|---|---|---|
-| BUSTER / CHARGE | 1/32, 3/32 | 1/32, 3/32 | helmet up only: 1/32, 3/32 | 1/32, 1/32 |
-| PUNCH / PUNCH★ / FIST | 2/32, **4/24**, 3/32 | 2/32, **4/24**, 3/32 | helmet down: full blows only (`$14`, FULL) | 1/32 |
-| W / G / R | KNIGHT.C 4/12, SILVER.T 3/16, F.BLAST 1/32 | Y.SPEAR 4/12, W.STORM 3/16, KNIGHT.C 1/32 | W.STORM 4/12 + FLIP (an SC9 reaction), SILVER.T 3/16, F.BLAST 1/32 | the RULE column 4/12 W; weapons 1/32 |
-| other weapons | 2/24 | 2/24 | 2/24 | 1/32 |
+| Source | H2 Mecha Dragon MK-VI (Should, with H2) | H4 Cossack Catcher MK-VI (Should, with H4) | W1 METALL 16 (Could, with W1) | E1-E4 guests (Could) | Air Man (Doc Robot MK-VI's copy; Should, with him) |
+|---|---|---|---|---|---|
+| BUSTER / CHARGE | 1/32, 3/32 | 1/32, 3/32 | helmet up only: 1/32, 3/32 | 1/32, 1/32 | 1/60, 3/60 (the robot scale) |
+| PUNCH / PUNCH★ / FIST | 2/32, **4/24**, 3/32 | 2/32, **4/24**, 3/32 | helmet down: full blows only (`$14`, FULL) | 1/32 | 2/40, 3/30, 3/40 |
+| W / G / R | KNIGHT.C 4/12, SILVER.T 3/16, F.BLAST 1/32 | Y.SPEAR 4/12, W.STORM 3/16, KNIGHT.C 1/32 | W.STORM 4/12 + FLIP (an SC9 reaction), SILVER.T 3/16, F.BLAST 1/32 | the RULE column 4/12 W; weapons 1/32 | **PLANT.B 4/12 W** (the Leaf Shield echo, fortress §8); no G or R |
+| other weapons | 2/24 | 2/24 | 2/24 | 1/32 | 2/30 |
 
-Doc Robot MK-VI (Should, R3.6) has no row: he copies a Rockman 2 boss through the fight loader and uses that boss's
-row (a GP row per copied boss, added with him).
+Doc Robot MK-VI (Should, R3.6; fight `$29`) copies **AIR MAN** through the fight loader (fortress §8) and uses the Air
+Man row above, row 22 of §4.8, added with him.
 
 **The 1993 column** (Could, with 1993 RULES; design-18, consistency-39): every row above gets a "1993" twin generated
 by family: machines 32 f with the full punch at 4 and the vanilla-style weakness at 4 on the W cell, everything else 1;
@@ -1015,18 +1040,27 @@ vanilla had 4. SC5 stays on under 1993; SC6, COUNTER and Knight's HEALMORE are o
 |---|---|---|---|---|
 | SC1 | Knight Man's shield (class 3, `$38:$90A2`) | Frontal shots reflect, except: **Y.SPEAR** (class 5) and the **`$14` full-power blows** (PUNCH★, the Super fist's outward leg, the Break Shot), which vanilla already lets through [code, r2: `$38:$90A9-$90B7`], and **C.FLASH** (latched directly). Y.SPEAR pierces without breaking it (consistency-35; story's KNT-08 line stands). A FULL-flagged hit on the shield from the front **breaks the shield**: systems' default is 180 f (tune); venues_a's rework makes it permanent for the fight ("THE SHIELD BROKE!"), and the venue decides | new-code S | Must |
 | SC2 | Centaur Man vs Time Stop | Immune to Time Stop and Time Fist's stop; announcer "He galloped right through it!" | new-code S | Should (with Time Stop) |
-| SC3 | Plant Man vs C.FLASH | "Photosynthesis": the first C.FLASH of each fight **heals him 2** (the bar rises, with a "?!" pop). After that, R 1/45. venues_b's Flame ABSORB (heals 1) is the same kind of named exception | new-code S | Could |
-| SC4 | Own weapons (refights, and any fight where the player already owns it) | The **first** own-weapon hit per fight does **0 damage** and plays the champion's joke reaction (≤ 60 f). After that it is the O cell (1/60). The OWN MOVE style act. The reactions belong to the venue docs. Without SC4 the O cell simply applies from the first hit | new-code M | Should |
+| SC3 | Plant Man vs C.FLASH | "Photosynthesis": the first C.FLASH of each fight **heals him 2** (the bar rises, with a "?!" pop). After that, R 1/45. venues_b's Flame ABSORB (heals 1) is a named exception of the same kind, listed under SC4 | new-code S | Could |
+| SC4 | Own weapons (refights, and any fight where the player already owns it) | The **first** own-weapon hit per fight does **0 damage** and plays the champion's joke reaction (≤ 60 f). After that it is the O cell (1/60). The OWN MOVE style act. The reactions belong to the venue docs. Without SC4 the O cell simply applies from the first hit. **Named exception: Flame Man's ABSORB** (venues_b §2.8, consistency-33): his first F.BLAST hit **heals him 1** instead of doing 0, and PILLARS fires three flames for 300 f | new-code M | Should |
 | SC5 | Gamma MK-VI phase 2 | Only fists hurt the head: the tap punch (2/30), PUNCH★ (4/12) and, on replays, the Super fist (3/20); in v1.1 Time Fist (4/12) and Morning Star (3/20). Everything else dinks (`$27`). The telegraph: the plaque reads "THE HEAD RESPECTS ONLY A FIST" (`story.md` owns the words), and H3 adds a no-risk fist-ride practice beat before the fight (R2.11). **Under 1993 RULES SC5 stays on**: Power is reached through the pause menu's vanilla transform, and the punch is the 1993 player's answer too | new-code S | Must (H3) |
-| SC6 | Bass β adaptive armour | The 3rd consecutive damaging hit from the same column makes that column 1/45 until a *different* column hits him. Announcer: "He's adapting!". In W2 the armour starts adapted to the column the player used most in the Riot duel (meta's BASS_ADAPT byte). The rival literally punishes a one-weapon player: the premise in one rule. Off under 1993 RULES. His copy attack uses only the weapons whose tiles are pre-drawn in his own boss set (4, R3.6; fortress picks them) | new-code S | Must |
+| SC6 | Bass β adaptive armour | The 3rd consecutive damaging hit from the same column makes that column 1/45 until a *different* column hits him. Announcer: "He's adapting!". In W2 the armour starts adapted to the column the player used most in the Riot duel (meta's BASS_ADAPT byte). The rival literally punishes a one-weapon player: the premise in one rule. Off under 1993 RULES. His copy attack uses only the weapons whose tiles are pre-drawn in his own boss set: **B.ATTACK, F.BLAST, KNIGHT.C and SILVER.T** (4, R3.6; fortress §9.2's pick) | new-code S | Must |
 | SC7 | Yellow Devil MK-VI "SELECT trick" | A nod to RM1's famous pause bug: a weapon swap within 2 frames of a WEAK hit clears the eye's i-frames, once per eye opening. Hinted in the H1 plaque only | new-code S | Could |
-| SC8 | Tomahawk Man's quick-draw (venues_a §3) | A won draw deals a **free hit of 3** with 30 i-frames, whatever is equipped; booked as BUSTER for VARIETY. **The window is NORMAL 24 f, HARD 18 f, CASUAL 40 f, plus INPUT LAG** (R3.5, §1.6). The draw is staged by the venue as a judged tournament event (R3.4) | new-code S | Must |
+| SC8 | Tomahawk Man's quick-draw (venues_a §3.5, VA-DRAW) | A won draw deals a **free hit of 3** with 30 i-frames, whatever is equipped; booked as BUSTER for VARIETY. **The window is NORMAL 24 f, HARD 18 f, CASUAL 40 f (R8.6), plus INPUT LAG (0-6 f, R8.7)**, in every VA-DRAW (the saloon's and the boss's; R3.5, §1.6). The draw is staged by the venue as a judged tournament event (R3.4) | new-code S | Must |
 | SC9 | Venue-defined weak reactions | A venue's WEAK reaction (Wind's STALL 120 f, Tomahawk's HAY FEVER, Blizzard's MELT 40 f, METALL 16's FLIP…) **replaces** the generic 10-f stagger of §5. It is an AI state, not a freeze, so damage keeps working. The 90-f re-trigger rule and the 16-f i-frames still apply. Venue proposals of 8-f weakness i-frames are overridden by the 16 f of Table 2 | data | Must |
 | SC10 | Bass β COUNTER (fortress §2.4) | When Bass fires a copy, the same weapon from Rock cancels it; Rock's next hit with that weapon within 60 f is a COUNTER!: 3/16, outside SC6. Off under 1993 RULES | new-code S | Should |
 | SC11 | The CHAMPION BUSTER (fortress §5.3.3, Break Man's or Roll's gift in W3) | While held it replaces the buster and the weapon menu (HUD `WPN: CB`); its column CHAMP.B is **4/8 with the WEAK bit on the Capsule row** and 0 elsewhere; **while it is held any hit of 2 or more on Rock becomes 1** (a branch in the hurt routine `$38:$8F72`). A death after the gift keeps it on respawn | new-code S | Must (W3) |
 
-`fortress.md`'s Dark Man phase-1 exposure rule (a hit from the real Break Man sets HP to min(HP, 14)) lives beside these
-in the same visible-code list; fortress owns its tier.
+**Stage-owned special cases.** These live in the same visible-code list, never in a table cell; the owner doc stages
+them, sets the tier and counts the code:
+
+| Id | Case (owner) | Rule | Tier |
+|---|---|---|---|
+| SC12 | Metal Metslime (venues_a §2.7, KAISHIN's gate; mid-boss fight `$09`) | **Every hit does exactly 1**, whatever the source, with 2-f i-frames: a substitution before the mid-boss default cell. NOFREEZE | Must |
+| SC13 | Kamegoro Maker MK-VI (fortress §4.3, H3's mid-boss) | **Each turtle destroyed also costs the machine 2 HP** (the turtle's death hook calls the machine's HP step) | Must |
+| SC14 | Dark Man MK-VI's **WRONG NOTE** (fortress §4.5) | A FULL-flagged hit while the red note is up sets his HP to min(HP, 14) and plays the exposure (the boss panel's third record, R8.5). With the partner (Should), calling Break Man in phase 1 does the same | Must |
+
+fortress's other visible cases (Pi-kun's reflect outside the valve, Gamma's chin and cockpit boxes, WILY MACHINE 6.5's
+drag, the SUPER copies' per-fight pinch byte) sit in the same list, as fortress §8 states them.
 
 ### 4.7 SYS-CMB-2: normal enemies [engine-ok] + [new-code] S, Must (v0.1)
 
@@ -1063,7 +1097,8 @@ in the same visible-code list; fortress owns its tier.
   their punchable states).
 - **row** = `BOSS_ROW`, set when a boss bar starts: the venue id for the champions (vanilla `$063D`), the stage record's
   boss-row field for fortress bosses on the `$EF64` path (tech's `FORT_COL`), or the sub-id record's row byte for GP
-  bosses (tech's families `$F8/$F9`).
+  bosses (tech's families `$F8/$F9`). The stage record v0 exists from M2.1, so the slice reads it too: **no stage-`$00`
+  stop-gaps** (R8.2).
 
   | Row | Boss | Row | Boss |
   |---|---|---|---|
@@ -1072,7 +1107,8 @@ in the same visible-code list; fortress owns its tier.
   | 9 | Bass β | 16 | mid-boss default |
   | 10 | Yellow Devil MK-VI | 17 | machine default |
   | 11 / 12 | Gamma MK-VI phase 1 / phase 2 | 18-21 | v1.1+: Mecha Dragon, Cossack Catcher, METALL 16, exhibition guest |
-  | 13 | Dark Man MK-VI | 22-31 | spare (Doc Robot's copies, legacy) |
+  | 13 | Dark Man MK-VI | 22 | v1.1+: Air Man (Doc Robot MK-VI's copy, Should) |
+  | | | 23-31 | spare (legacy) |
 
 - **col** = `LATCHSRC,X` bits 0-4 (§6.4):
 
@@ -1158,7 +1194,9 @@ WEAK bit (§4.8):
 1. **The WEAK! pop.** tech's effect family `$FD`, one sub-id (consistency-24). Its tiles are art's GP-COMMON build:
    **W, K and ! (3 new tiles)**, with E and A taken from READY (`$99-$9D`). It spawns at the shot's position, rises
    1 px/f for 24 f, and cycles yellow/white every 4 f. At most one per boss per 30 f. It counts as an occupied slot in
-   the lag budget (R1.8); in a boss room that is the boss, the pop, Rock and up to 3 shots.
+   the lag budget (R1.8); in a boss room that is the boss, the pop, Rock and up to 3 shots. **It takes a free slot
+   only**: it spawns only while fewer than 3 boss-side objects are out, and otherwise it is skipped while the stagger,
+   the crunch and the announcer still play (venues_b §0.2's boss-room rule, applied to every boss).
 2. **The stagger.** The boss stall for **10 f** (`FREEZE` = 10 on the boss slot; damage keeps working), with the ±1-px shake. That is a
    hit-stop. Only if **≥ 90 f** have passed since the boss's last stagger (`WEAK_GATE`); otherwise 16-f i-frames plus
    10-f staggers would stunlock. **Unique reaction** (SC9): if the boss's AI defines a "weak" entry, the stagger calls it
@@ -1204,7 +1242,7 @@ The boot health notice is `meta.md`'s screen with `story.md`'s words (R3.5).
 Every cleared stage is judged out of 100 (BRIEF §5.3): TIME 20, DAMAGE 20, VARIETY 25, SECRETS 20, STYLE 15. The
 results screen (judges, slide-in rows, comments) belongs to `meta.md`; the formulas are here.
 
-### 6.1 Counters (per run; reset at stage start, kept through deaths in the same run)
+### 6.1 Counters (per run; reset at stage start, kept through deaths and fight-loader warps in the same run)
 
 | Counter | Meaning |
 |---|---|
@@ -1219,6 +1257,9 @@ results screen (judges, slide-in rows, comments) belongs to `meta.md`; the formu
 
 A CONTINUE after a game over starts a new run. That run's lost progress is the game-over penalty; there is no E-tank
 halving (CX) in GP.
+
+**A fight-loader warp does not reset the run block** (meta §9.2.1). W2's pair bouts are part of W2's own run: their
+kills, boss hits, HP lost and frames count in W2's scorecard, and only W2's clear pays, saves and goes to the desk.
 
 ### 6.2 Formulas
 
@@ -1251,17 +1292,24 @@ Calibration [guess, checked by playtest at M4]:
 
 ### 6.3 Pars
 
-- The par `P` is a per-stage field in the stage-attribute table (`tech.md` `PAR`, in 4-s units, rounded up).
+- The par `P` is a per-stage field in the stage-attribute table (`tech.md` `PAR`, in 4-s units, rounded up). It is in
+  the 48-byte stage record v0 from M2.1, so the slice reads it there: no stage-`$00` stop-gap (R8.2).
 - **Rule for setting it**: P = 1.25 × the golden-movie reference route (normal exit, no deaths, a competent player),
   rounded up to 10 s. The golden movies exist from M0, so pars are measured, not guessed.
 - Placeholder pars until the routes exist **(tune)**: Opening-lite 120 s, HALFTIME RIOT 150 s, H1/H3/H5 200 s each,
   W2 300 s, W3 240 s. v1.1+: H2/H4 200 s, W1 200 s, each Exhibition 90 s.
-- Venue pars are the venue docs': venues_a gives Wind 4:45 (the sortie is a fixed 2:00), Knight 4:30, Tomahawk 5:00
-  (the train is a fixed 0:55), Plant 4:00; venues_b gave Blizzard 330 s (with its 40-s bonus round), Flame 300 s,
-  Centaur 300 s, Yamato 330 s. A set piece with a fixed length is part of the par, so it never costs TIME.
-- **Replay skips** (R3.8): after the first clear, a fixed-length set piece may be skipped (Wind's LAND option). A skip
-  **subtracts the piece's fixed length from that run's par**, and that run cannot meet the piece's secret predicates or
-  its VENUE ACT, so SECRETS and STYLE drop instead of TIME rising.
+- Venue pars are the venue docs' (§0.8 of venues_a, §5.3 of venues_b): Wind 4:30 (the sortie is a fixed 2:00), Knight
+  4:30, Tomahawk 5:00 (the train is a fixed 0:55), Plant 4:00; Blizzard 330 s (with its 40-s bonus round), Flame
+  300 s, Centaur 300 s, Yamato 300 s. A set piece with a fixed length is part of the par, so it never costs TIME.
+- **Replay skips** (R3.8): after the first clear, a fixed-length set piece may be skipped. A skip **adds the piece's
+  fixed length to that run's `T`** at the moment it is taken, so the par stays one field and the skip neither buys nor
+  costs TIME; that run cannot meet the piece's secret predicates or its VENUE ACT, so SECRETS and STYLE drop instead:
+
+  | Skip (after the first clear) | Piece skipped | Added to `T` |
+  |---|---|---|
+  | SKY ACE's **LAND** (the run is marked LANDED) | the 2:00 sortie | **7,200 f** |
+  | HIGH NOON's **EXPRESS** | the 0:55 train | **3,300 f** |
+  | Blizzard's replay skip door on 0F | the 40-s bonus summit | **2,400 f** |
 - VARIETY's par is Pv (above). DAMAGE has no par. The SECRETS par is "all".
 
 ### 6.4 Attribution: LATCHSRC (SYS-SC-4) [new-code] M, Must (v0.1)
@@ -1329,7 +1377,7 @@ the player set off; the venue doc's trap object writes LATCHSRC = HAZARD when it
 | WEAK FINISH | 4 | The killing hit on the stage's scoring boss (tech's `SCORE_ID`) is a WEAK cell; in v1.1 a synergy shot also counts (a "form finish") | Must |
 | BOSS NO-HIT | 4 | No HP lost from the boss bar filling until the kill | Must |
 | NO TANKS | 2 | No tank used in the run | Must |
-| Style acts | 1 each, max 5 | MULTI-KILL (2 kills by the same category within 8 f) · FROZEN STEP (stood on an encased enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · EXCELLENT MOVE (KAISHIN's 12th hit landed) · VENUE ACT (one per venue, named by its doc: ACE, SPELLBREAKER, QUICKEST GUN, VINE KILL…) | Must |
+| Style acts | 1 each, max 5 | MULTI-KILL (2 kills by the same category within 8 f) · FROZEN STEP (stood on an encased enemy) · CLOSE CALL (boss killed with Rock at HP ≤ 4) · EXCELLENT MOVE (KAISHIN's 12th hit landed) · VENUE ACT (one per venue, named by its doc: ACE (Wind), SPELLBREAKER (Knight), QUICKEST GUN (Tomahawk), VINE KILL (Plant); "CONDOR, FIRST PASS" (Blizzard), CLEAN DUEL (Flame), NO WRONG DOOR (Centaur), SPEAR DANCER (Yamato)) | Must |
 | Style acts, later | | SYNERGY KILL (v1.1) · OWN MOVE (SC4, v1.1) · TAG TEAM (the partner scored, v1.1) · PARRY (Could) | Should / Could |
 
 ### 6.6 Medals and pay

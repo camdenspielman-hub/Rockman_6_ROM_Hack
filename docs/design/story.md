@@ -1,6 +1,7 @@
 # Rockman 6 GP: narrative bible and script (story.md)
 
-Owner: design-story. Status: **round 2**, revised against [`RULINGS.md`](RULINGS.md) (binding: it overrides
+Owner: design-story. Status: **round 3**: RULINGS §8 (R8.1-R8.8) and `reconcile.md`'s story table applied (see
+"Changes in round 3" at the end). Round 2 revised it against [`RULINGS.md`](RULINGS.md) (binding: it overrides
 [`BRIEF.md`](BRIEF.md) and everything else), the four critic reports (`review_feasibility_design.md`,
 `review_consistency_scope.md`), `crossrefs.md`, and the round-2 revisions of `tech.md`, `systems.md`, `meta.md`,
 `venues_a.md`, `venues_b.md` and `fortress.md`. Scratch: `build/revise/story/` (round 1's text is kept there as
@@ -58,34 +59,34 @@ v1.0 is RULINGS R0.2's tight Must. Its text is the words of every v1.0 stage, sc
 |---|---|---|
 | Boot and menus | the license line, the **health notice** (R3.5), the three difficulty descriptions, the CONFIG help lines for INPUT LAG, FLASHES and CASUAL, the lowering warning; every label | §4 S01, §10.5 |
 | **Opening-lite** (M5) | S03, S04, the four lane judges' lines (S07 folded in, R4.4), the scoreboard pages, one parade line, S06 (masked, **no name spoken**, R4.2), S08 (the one Wily gag of Act 0), Break Man's charge tip after a death to Pi-kun: **12.5 scene pages** (25 pop-up pages) against R4.4's cap of 15 | §4 Act 0 |
-| The bracket and the pit stop | S09, S10, S12, S13, S14, S16, S24, S49 at their core lines; the debrief's requirement, scorecard and perfect lines | §4, §7.3 |
+| The bracket and the pit stop | S09, S10, S12, S13, S14, S16, S24, S49 at their core lines; the debrief's requirement hint R2 (the only one v1.0's predicate table uses), scorecard and perfect lines | §4, §7.3 |
 | **8 venues** | per venue: the champion's bar-fill line (S11), **4 death lines**, the first-weakness line, the hooks that are a Must secret's tell, the **tier B hints**, and the venue's Must mechanic text (Knight's command windows and battle log, Tomahawk's posters, conductor and Sheriff, the signs) | §4 S11, S15; §6.3; §7.1 |
 | **HALFTIME RIOT** (M6) | S17-S19 for the rejects (R4.3); Break Man's help, block and reveal; **Rock's first "Blues?"** at 0E; S20 pages 1-2 in place (R4.2) | §4 Act II |
 | **Hall of Fame H1, H3, H5** (M7) | S25 (the theft closes Act III), S26, the H1/H3/H5 plaques (they describe and say BLUES, R3.3/R3.9), S28's core lines, S29, S30 in its WRONG NOTE staging, S32, S33 (two masks, "WE KNOW."), Mr. Y's heckles at v1.0 size | §4 Act IV, §6.5 |
 | **W2, W3** (M8) | S34, S36-S39, the gift line, the escape PA, Wily's heckles at v1.0 size | §4 Act V |
-| **The ending** (M8) | R4.1's order: S40 (the catch, Rock's second "Blues?"), S41 (the arrest with **the one Mr. Y gag**), the podium and Bass's vow, S44 (no `$94`), the credits' text, S46-S47, **S42 LIGHTS OUT** (Light says "Blues" once), S43, S48 | §4 Act VI |
+| **The ending** (M8) | R4.1's order: S40 (the catch, Rock's second "Blues?"), S41 (the arrest with **the one Mr. Y gag**, the ending's only alias gag, R8.5), the podium and Bass's vow, S44 (no `$94`; page 4 is S44.4F, no Mr. Z), the credits' text, S46-S47, **S42 LIGHTS OUT** (Light says "Blues" once), S43, S48 | §4 Act VI |
 | Systems text | the 14 chip help pages; the generic secret and plate lines | §8, §6.2 |
 
 **The counts** (`fit.py` over this doc; §10.4 breaks them down):
 
 | | Must (v1.0) | Should (v1.1+) | Could | Won't |
 |---|---|---|---|---|
-| Translated strings (EN + JP) | **400** | 359 | 91 | 4 |
-| of which R4.5's six kinds (deaths, heckles, first weaknesses, secrets, scenes and plaques, tier B hints, help pages) | **336** | | | |
+| Translated strings (EN + JP) | **397** | 362 | 90 | 5 |
+| of which R4.5's six kinds (deaths, heckles, first weaknesses, secrets, scenes and plaques, tier B hints, help pages) | **333** | | | |
 | of which a Must mechanic's own text and the system sentences (R0.4, R3.5) | 64 | | | |
 | Labels (English in both) | 28 | 3 | 5 | 0 |
 | Boss-panel records (English in both) | 18 | 3 | 4 | 2 |
 | Debrief: tier B hints | 44 | 3 | | |
 | Debrief: tier A riddles | | 26 | | |
-| Debrief: generic lines (requirement, scorecard, perfect) | 10 | 4 | | |
+| Debrief: generic lines (requirement, scorecard, perfect) | 7 | 7 | | |
 
-R4.5 asks for about 350 Must strings: R4.5's own kinds come to **336**; the Must mechanics' text (Knight's windows and battle log, Tomahawk's posters and NPCs, the signs that are tells) and the system sentences add 64, for **400** in all (§10.4 explains the reading and offers a trim list).
+R4.5 asked for about 350 Must strings: R4.5's own kinds come to **333**; the Must mechanics' text (Knight's windows and battle log, Tomahawk's posters and NPCs, the signs that are tells) and the system sentences add 64, for **397** in all. **R8.4 accepts this reading** ("about 400 Must strings"); §10.4's trim list is the reserve, not a plan. Round 3 moved the three requirement hints no v1.0 predicate uses (R1, R3, R5) to Should (§7.3), and swapped S44's Mr. Z page for its fallback (R8.5); these counts are the single source the venue and fortress docs cite (R8.4; §10.4 gives them by area).
 
 ### Sessions (the ledger, R0.1)
 
 Text is its own ledger line (`tools/plan/tight.py`: **text 12**; `tools/plan/tally.py` carries the same figure and the
 v1.1+ estimate). One session writes, fits and compiles about 40 strings in both languages and runs the compiler's
-checks on them (400 Must strings over 9.5 writing sessions, plus the M2 setup and the M9 fixes); the native-JP review
+checks on them (397 Must strings over 9.5 writing sessions, plus the M2 setup and the M9 fixes); the native-JP review
 is external (below).
 
 | Milestone | Text work | Sessions |
@@ -121,9 +122,9 @@ that does is Should or Could, and the v1.0 staging it replaces is written beside
 
 | Tier | Text (R0.3 cut-line item) |
 |---|---|
-| **Should (v1.1+)** | the **tier A riddles** (R4.5); the flavour hooks of every stage; the generic death table and heckle variants; the **float lines** (the roll call, fortress's first trim); the W2 champions' shouts; the champions' defeat lines; the secret-arena bar fills except the Rodeo Ring's and the Knightlord's; the partner's lines (S20 pages 3-6, S30's TWO BREAK MEN, S40's carry art, the call lines, S47's T1 "never called": item 2); H2 and H4 (plaques, exhibits, thanks plaques: item 5); Doc Robot MK-VI; Roll's line in S42 |
+| **Should (v1.1+)** | the **tier A riddles** (R4.5); the requirement hints no v1.0 predicate uses (R1, R3, R5; §7.3); the flavour hooks of every stage; the generic death table and heckle variants; the **float lines** (the roll call, fortress's first trim); the W2 champions' shouts; the champions' defeat lines; the secret-arena bar fills except the Rodeo Ring's and the Knightlord's; the partner's lines (S20 pages 3-6, S30's TWO BREAK MEN, S40's carry art, the call lines, S47's T1 "never called": item 2); H2 and H4 (plaques, exhibits, thanks plaques: item 5); Doc Robot MK-VI; Roll's line in S42 |
 | **Could** | the **attract crawl** (S02, item 12); the Exhibitions (S22-S23 and their plaques, item 6); the victory lap's lines (S45, item 8); W1 (S35, item 5); the booth and BREAK MAN WALKS (S21, item 9); the 1993 RULES lines (item 10); ENGRISH (§9, item 12) |
-| **Won't (v1)** | Mr. X Returns (S50), Bass Mode (S51), E4 Maze Man's lines, the sekisho's lines (R3.2), the Museum's plaque gallery |
+| **Won't (v1)** | Mr. X Returns (S50), Bass Mode (S51), E4 Maze Man's lines, the sekisho's lines (R3.2), the Museum's plaque gallery, S44.4's Mr. Z page (R8.5: the alias gag plays once in the ending, at the arrest) |
 
 **The native-JP review** (R4.5) is a dated external dependency that gates release: it is booked for M9 (RULINGS §6) and
 its date is the user's to set (RULINGS §7 question 3). Until it happens, every JP line here is a draft.
@@ -211,7 +212,11 @@ The game speaks in four registers. Every line belongs to one; a scene may mix th
 7. **Toggleable.** Every commentator line obeys CONFIG ANNOUNCER (ON / DEATHS ONLY / OFF, `meta.md` §11.1). Scenes and
    the debrief are not commentary and always play; START skips a scene after its first viewing (R3.8).
 8. **ENGRISH (Could) never touches story text, hints or help pages** (`meta.md` §12): it is a menu joke (§9), with one
-   deliberate exception, Break Man's perfect-score line, 4MI's own (S47).
+   deliberate exception, Break Man's perfect-score line, a nod to 4MI's (S47).
+11. **Quoted lines from other games are paraphrased, never verbatim, in both languages** (R8.4, R3.3's spirit). A joke
+    on a famous line keeps its rhythm in new words (HERO'S QUEST's King, Princess and Knightlord; ENGRISH's classics).
+    The genre's formulas with GP's own nouns ("A METSLIME DRAWS NEAR!", the command menu) are conventions, not quotes.
+    Vanilla Rockman 6's own text is this game's, and is kept verbatim where §5.2, S44 and S45 say so.
 9. **The Wily gag plays once per act, in new words each time** (R4.4, R3.9; §1.3). Nobody repeats "It's definitely
    Wily."
 10. **Break Man's disguise is respected** (R4.2; §1.3's mirror gag). Only Rock says "Blues?", twice; Light says the name
@@ -230,10 +235,10 @@ cares. R4.4 and R3.9 make it **once per act, with new wording each time**:
 | II | S17, Riot night | The rejects in the stands: "MR. Y HIRED THEM ALL." | Must |
 | III | S25, the theft | His saucer has a Y painted over a W; Light, quietly: "...THAT WAS WILY." | Must |
 | IV | S33, the unmasking | Two masks deep. "SURPRISE! IT'S ME, DR. WI-" "WE KNOW." | Must |
-| V | S41, the arrest | "IT WAS MR. Y'S IDEA!" "YOU ARE MR. Y." "...MR. Y IS VERY PERSUASIVE." **The one Mr. Y gag of the ending** (R4.1 step 4) | Must |
-| VI | S44, the CAPCOM TIMES | "NEXT YEAR'S SPONSOR: A MR. Z." The alphabet runs out | Must |
+| V | S41, the arrest | "IT WAS MR. Y'S IDEA!" "YOU ARE MR. Y." "...MR. Y IS VERY PERSUASIVE." **The one Mr. Y gag of the ending**, and its only alias gag (R4.1 step 4, R8.5) | Must |
+| VI | S44, the CAPCOM TIMES | Page 1: "MR. Y WAS DR. WILY. WE KNEW." (the press answers S33's "WE KNOW."). Page 4 is the fallback S44.4F, "NEXT YEAR'S SPONSOR: NOT YET ANNOUNCED. COSSACK RELAXES.": **no Mr. Z** (R8.5) | Must |
 | — | every venue | one cheap prop, never a line in v1.0: the MR. Y MARU icebreaker, Flame's sponsor tapestry, the Y-MAN mural, the million-ryo poster, the WANTED: ROCKMAN poster (venue docs). Their hooks (BLZ-04, FLM-08, YAM-02, …) are Should, each in its own words | art Must, lines Should |
-| — | the judges' desk | a cardboard Mr. Y on the sponsor's chair holds up a "1"; BACK SOON from S26, RESERVED from S33 (`meta.md` §4.0) | Should |
+| — | the judges' desk | a cardboard Mr. Y on the sponsor's chair holds up a "1"; BACK SOON from S26, RESERVED from S33 (`meta.md` §4.0: the chair and its signs are Should) | Should |
 | — | Mr. Y's heckles | in JP he speaks an absurdly polite わたくし … でございます and slips into Wily's わし … じゃ when excited; in EN he slips on names: "WELCOME TO MY- TO *A* MUSEUM!" | Must (the v1.0 lines) |
 
 **The mirror gag: Break Man** (R4.2, design-2). Mr. Y's disguise is transparent and he insists on it; everyone calls him
@@ -340,7 +345,8 @@ Each sheet gives the role, the voice in EN and JP, and the rules for writing the
 ### 2.6 Roll (ロール)
 
 - **Role:** pit crew, by radio in v1.0 (her face icon): Rush's adaptors (S04, S12, S13, S29). Princess Roll in HERO'S
-  QUEST (`venues_a.md` §2.6, approved: "BUT THOU MUST!" is hers) is Should with the Inn.
+  QUEST (`venues_a.md` §2.6, approved: the YES-or-ask-again loop is hers, in new words, KNT.S23, R8.4) is Should with
+  the Inn.
 - **Voice EN:** brisk, practical, proud of Rush's fittings; she teaches controls in-world. **JP:** わたし; よ, ね;
   「ロック!」.
 
@@ -522,7 +528,7 @@ Each scene: where it plays (the staging doc's placement), then its rows. Line wi
 S37 (duel 2, patched against your favourite weapon), S41 (the podium vow: "NEXT TIME IT WON'T BE 8-BIT").
 
 **Mr. Y / Wily:** §1.3's ladder; S25 (theft), S26 (map), §6.5 (heckles), S32-S33 (the unmasking and Project SUPER),
-S34-S39 (the castle), S41 (the arrest), S44 (Mr. Z).
+S34-S39 (the castle), S41 (the arrest: the ending's one alias gag), S44 (the press: "WE KNEW."; no Mr. Z, R8.5).
 
 ### Act 0: the Opening
 
@@ -782,7 +788,7 @@ drafts; JP follows each venue's register rule. The hooks, deaths and hints of ea
 
 | Venue | JP register, and the real quote it rests on |
 |---|---|
-| HERO'S QUEST | the 1986 RPG's archaic register (わし / なんじ / じゃ). The King's death line quotes the original's own words, 「おお ロックよ! しんでしまうとは なにごとだ!」 (§6.3), and the RUN refusal is its 「しかし まわりこまれて しまった!」. A quote, not a name: no title, spell or character name of that game appears (R3.3), so the spells are "a fire spell" and "a healing spell" |
+| HERO'S QUEST | the 1986 RPG's archaic register (わし / なんじ / じゃ). **Its famous lines are paraphrased, never quoted** (R8.4, §1.2 rule 11): the King's death line keeps the scolding's 「おお ロックよ!」 rhythm in new words (§6.3), the RUN refusal is 「しかし にげみちを ふさがれた!」, the critical hit 「みごとな いちげきが きまった!」, and the Knightlord's offer and the Princess's loop are re-worded too. No title, spell or character name of that game appears (R3.3), so the spells are "a fire spell" and "a healing spell" |
 | HIGH NOON FRONTIER | plain western 「〜だぜ」 for Sam and the robbers, polite for the Sheriff and the conductor. The pianist sign is the one Oscar Wilde reported from a Leadville saloon (A-8.9), trimmed to 2 lines |
 | SKY ACE | military radio: 「りょうかい!」, 「メーデー!」. Its in-stage words are labels |
 | LOST JUNGLE | the cat only says 「ニャー」; Kalinka's "IS THAT... TANGO?" (Capcom's own cat) drops round 1's "From the Game Boy?" (R3.3) |
@@ -806,12 +812,12 @@ verbs and windows).
 | KNT.S08 | M | stage | POP | — | THE CEILING IS DEFEATED! / ROCK GAINED 8 EXP. | てんじょうを やっつけた! / けいけんち 8ポイント かくとく! |
 | KNT.S09 | M | stage | WIN | — | A METSLIME DRAWS NEAR! / COMMAND? / ▶FIGHT RUN SPELL ITEM | メットスライムが あらわれた! / どうする? / ▶たたかう にげる じゅもん どうぐ |
 | KNT.S10 | M | stage | WIN | — | KNIGHT GUARDS DRAW NEAR! / COMMAND? / ▶FIGHT RUN SPELL ITEM | ナイトガードたちが あらわれた! / どうする? / ▶たたかう にげる じゅもん どうぐ |
-| KNT.S11 | M | stage | WIN | — | BUT THOU WERT BLOCKED! | しかし まわりこまれて しまった! |
+| KNT.S11 | M | stage | WIN | — | BUT THE WAY WAS BARRED! | しかし にげみちを ふさがれた! |
 | KNT.S12 | M | stage | WIN | — | ROCK RAN AWAY. | ロックは にげだした。 |
 | KNT.S13 | M | stage | WIN | — | THOU HAST DONE WELL. ROCK / GAINED 12 EXP. | みごとだ! ロックは けいけんち / 12ポイントを かくとく! |
 | KNT.S14 | M | stage | POP | — | A METAL METSLIME APPEARS! | メタルメットスライムが あらわれた! |
 | KNT.S15 | M | stage | POP | — | THE METAL METSLIME ESCAPED! | メタルメットスライムは にげだした! |
-| KNT.S16 | M | stage | POP | — | AN EXCELLENT MOVE! / ROCK GAINED 1000 EXP. | かいしんの いちげき! / ロックは けいけんち 1000 かくとく! |
+| KNT.S16 | M | stage | POP | — | A SPLENDID STRIKE! / ROCK GAINED 1000 EXP. | みごとな いちげきが きまった! / ロックは けいけんち 1000 かくとく! |
 | KNT.S17 | M | stage | POP | — | THOU HAST BUT 1 KEY. TWO / DOORS LIE BELOW. | かぎは ひとつ しかない。 / したには とびらが ふたつ。 |
 | KNT.S18 | M | stage | POP | — | THOU HAST NO KEY. TWO DOORS / LIE BELOW. | かぎが ない。 / したには とびらが ふたつ。 |
 | KNT.S19 | M | stage | WIN | tablet | I, THOMAS LIGHT, HAVE LEFT / THIS FOR MY DESCENDANT. TELL / NO ONE. ESPECIALLY NOT WILY. | わたし トーマス・ライトは / しそんの ために これを のこす。 / だれにも いうな。 / とくに ワイリーには。 |
@@ -825,14 +831,14 @@ verbs and windows).
 | KNT.L08 | M | stage | POP | KN | THE SPEAR PIERCED THE / SHIELD! | やりが たてを つらぬいた! |
 | KNT.L09 | M | stage | POP | KN | THE SHIELD BROKE! | たてが くだけた! |
 | KNT.L10 | M | stage | POP | KN | KNIGHT MAN IS ENRAGED! | ナイトマンは いかりくるっている! |
-| KNT.K01 | M | stage | WIN | Knightlord | IF THOU WILT JOIN ME, I WILL / GIVE THEE HALF THE BRACKET. / ▶YES NO | もし わしの みかたに なれば / トーナメントの はんぶんを / なんじに やろう。 ▶はい いいえ |
-| KNT.K02 | M | stage | WIN | Knightlord | THEN HALF THE BRACKET IS / THINE... | では トーナメントの はんぶんを / なんじに あたえよう・・・ |
-| KNT.K03 | M | stage | WIN | Knightlord | THY TOURNAMENT IS OVER. TAKE / NOW A LONG, LONG REST. | なんじの たいかいは おわった。 / ゆっくりと やすむが よい。 |
-| KNT.K04 | M | stage | WIN | Knightlord | THEN THOU ART A FOOL! | ならば なんじは おろかものだ! |
+| KNT.K01 | M | stage | WIN | Knightlord | STAND AT MY SIDE, AND HALF / THE BRACKET SHALL BE THINE. / ▶YES NO | わしの がわに つけば / トーナメントの はんぶんを / くれて やろう。 ▶はい いいえ |
+| KNT.K02 | M | stage | WIN | Knightlord | SO BE IT. THY HALF IS / WAITING FOR THEE... | よかろう。なんじの ぶんは / ちゃんと とって あるぞ・・・ |
+| KNT.K03 | M | stage | WIN | Knightlord | THY TOURNAMENT ENDS HERE. / SLEEP NOW, AND SLEEP LONG. | なんじの たいかいは ここまで。 / ながい ねむりに つくが よい。 |
+| KNT.K04 | M | stage | WIN | Knightlord | REFUSED? THEN FOLLY IS / THINE, AND SO IS THIS FIGHT! | ことわるか! ならば その おろかさ / ここで おもいしらせて くれよう! |
 | KNT.S20 | S | flavour | WIN | Innkeeper | WELCOME TO THE INN. ONE / NIGHT IS 20 BOLTS. ▶YES NO | やどやへ ようこそ。ひとばん / 20ボルト です。 ▶はい いいえ |
 | KNT.S21 | S | flavour | WIN | Innkeeper | GOOD MORNING. THOU SEEMST TO / HAVE SLEPT WELL. | おはよう ございます。 / よく ねむれましたか? |
 | KNT.S22 | S | flavour | WIN | Roll | DOST THOU LOVE ME, ROCK? / ▶YES NO | ロック、わたしを あいしてる? / ▶はい いいえ |
-| KNT.S23 | S | flavour | WIN | Roll | BUT THOU MUST! | そんな ひどい・・・ |
+| KNT.S23 | S | flavour | WIN | Roll | NAY! THOU SHALT SAY YES! | いいえ なんて いわせない! |
 | KNT.S24 | S | flavour | WIN | Roll | ...FINE. THE COSTUME IS HOT, / ROCK. | ・・・もういい。この いしょう / あついのよ ロック。 |
 | KNT.S25 | S | flavour | LBL | sign | THY DEEDS ARE RECORDED. | |
 | KNT.S26 | C | flavour | POP | — | ROCK'S LEVEL WENT UP! (ROBOT / MASTERS DO NOT LEVEL UP.) | ロックの レベルが あがった! / (ボスは レベルアップ しません。) |

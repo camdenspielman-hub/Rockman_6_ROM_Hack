@@ -1,10 +1,10 @@
-# Rockman 6 GP: technical architecture (design-tech, round 2)
+# Rockman 6 GP: technical architecture (design-tech, round 3)
 
 This doc replaces `docs/PLAN.md` §5-7. Its milestone section (§16) follows [`RULINGS.md`](RULINGS.md) §6, which replaces
 PLAN §8 and round 1's tech §16 ordering. **[`RULINGS.md`](RULINGS.md) is binding and overrides everything here**, then
 [`BRIEF.md`](BRIEF.md); the research in `docs/research/` wins on facts.
 
-**Tiers** follow RULINGS §0: **Must** = v1.0 (the tight Must, about 440 sessions in all docs), **Should** = v1.1+ (re-added
+**Tiers** follow RULINGS §0: **Must** = v1.0 (the tight Must, about 450 sessions in all docs, R8.1), **Should** = v1.1+ (re-added
 in the cut-line order of R0.3), **Could**, **Won't (v1)**. A Must depends only on Musts (R0.4). Tags: **[engine-ok]**
 vanilla does it with data only, **[new-code]**, **[new-art]**, **[new-music]**; sizes **S / M / L**; evidence **[code]**,
 **[seen]**, **[guess]**. Session counts come from the ledger (`tools/plan/tight.py`, `tools/plan/tally.py`).
@@ -43,16 +43,18 @@ v1.0 scope -
 14. Dev tooling and tests -
 15. Lag plan -
 16. Milestones M0-M9 -
-Lessons applied - Risks - Open questions - Cross-doc dependencies - Changes in round 2.
+Lessons applied - Risks - Open questions - Cross-doc dependencies - Changes in round 2 - Changes in round 3.
 
 ---
 
 ## v1.0 scope
 
-v1.0 is RULINGS R0.2's tight Must. Tech's share is **102 sessions** (`tools/plan/tight.py`, area `tech`). Round 1's
-ledger had 98; the round-2 changes are: +2.5 the fight loader, moved here from `meta.md` (R1.7); +2 the OAM-builder
-lag steps, now Must because the slot cap is re-measured at M3 (R1.8); +1 the `$9B` audit and the 4th form row (R1.12);
-−1.5 F-SIZES, now Should (R3.6). Everything below is **Must** and depends only on Must items (R0.4).
+v1.0 is RULINGS R0.2's tight Must (about 450 sessions in all docs, R8.1). Tech's share is **102.5 sessions**
+(`tools/plan/tight.py`, area `tech`, holds 102). Round 1's ledger had 98; the round-2 changes are: +2.5 the fight
+loader, moved here from `meta.md` (R1.7); +2 the OAM-builder lag steps, now Must because the slot cap is re-measured at
+M3 (R1.8); +1 the `$9B` audit and the 4th form row (R1.12); −1.5 F-SIZES, now Should (R3.6). Round 3 adds +0.5 for the
+ending's engine pieces (row 44) and moves 1 session of the attach state from M5 to M3 (rows 31a/31b, R8.2). Everything
+below is **Must** and depends only on Must items (R0.4).
 
 | # | Item (section) | Milestone | Sessions |
 |---|---|---|---|
@@ -82,11 +84,12 @@ lag steps, now Must because the slot cap is re-measured at M3 (R1.8); +1 the `$9
 | 24 | HUD widget module (§7.13) | M3 | 2 |
 | 25 | Commentator event bus (§11.7) | M3 | 2.5 |
 | 26 | Lag steps 3-4 (OAM builder) and the re-measured slot cap (§15.2) | M3 | 2 |
+| 31a | The attach state's core (one record: parent slot, offsets, input, release and weapon rules), with Blizzard's condor as its first user (§7.9; R8.2) | M3 | 1 |
 | 27 | Stage-attribute table proper: the 45 `$51` and 11 `$063D` readers, relocated tables, ids `$10-$21` (§4.3) | M5 | 3 |
 | 28 | T3 switch → target (§7.10) | M5 | 2.5 |
 | 29 | T7 input mirror (pad history) (§7.9) | M5 | 2 |
 | 30 | T8 multi-part bosses (§7.11) | M5 | 2 |
-| 31 | The attach state (vines/T5, balloon, condor, claw, arrow) (§7.9) | M5 | 2 |
+| 31b | The attach state's M5 users on the M3 core: the vines and T5's pendulum, Plant's balloon (§7.9; R8.2). The claw and the arrow ride are data on the core at M7/M8 | M5 | 1 |
 | 32 | X-EXWP set-piece weapon (Yamato's pogo) (§7.9) | M5 | 1.5 |
 | 33 | Boss-panel extension (fight-id records, 10th field, re-type) (§11.2) | M5 | 1.5 |
 | 34 | Pattern-table split for menus (§8.3) | M5 | 1 |
@@ -99,9 +102,10 @@ lag steps, now Must because the slot cap is re-measured at M3 (R1.8); +1 the `$9
 | 41 | F-PIECES on the map-edit service (H1's Yellow Devil) (§5.6) | M7 | 2.5 |
 | 42 | `$9B` tables relocated with a 4th (SUPER) row (§7.9) | M7 | 1 |
 | 43 | The 8-band floor (W3) (§8.3) | M8 | 1.5 |
-| | **Tech Must total** | M0-M8 | **102** |
+| 44 | The ending's engine pieces: the CAPCOM TIMES' GP pages through the new engine (§11.2) and the credits' room table and `CREDITS` bit (§4.6) | M8 | 0.5 |
+| | **Tech Must total** | M0-M8 | **102.5** |
 
-Per milestone: M0 12.5, M1 13, M2 31.5, M3 11.5, M4 0 (support only), M5 15.5, M6 8.5, M7 8, M8 1.5. Release work in M9
+Per milestone: M0 12.5, M1 13, M2 31.5, M3 12.5, M4 0 (support only), M5 14.5, M6 8.5, M7 8, M8 2. Release work in M9
 (BPS release, emulator and hardware matrix) is in the ledger's `overhead` area, not here.
 
 **Not in v1.0** (designs kept below as v1.1+ material, each marked in place):
@@ -125,7 +129,7 @@ Per milestone: M0 12.5, M1 13, M2 31.5, M3 11.5, M4 0 (support only), M5 15.5, M
 | D5 | **32 KB battery PRG-RAM** (EWROM shape), 4 pages: 0 SAVE, 1 WORK (always at `$6000`), 2 LAYOUT, 3 TILES. It stays 32 KB | §2; R1.6 | [new-code] S · Must |
 | D6 | **8 KB CHR-RAM, no CHR banking beyond 8 KB, no extra 4 KB CHR page** | FCEUmm wraps MMC5 CHR-RAM at 8 KB [seen: `probe/chr_*.nes`]; the page bits reach only the two pattern tables (feasibility-1 probe); R1.3 | constraint |
 | D7 | **ExRAM in mode 0 for the whole game**: a spare nametable for text windows, switched in mid-frame with `$5105`. ExGrafix (mode 1) exists only as a Could, in text-free locked rooms (W1's 16-bit section, the METALL 16 arena), filled in mode 2 while blanked | works on FCEUmm from exactly the IRQ line [seen: `probe/exnt2.nes`]; R1.3 (blocker feasibility-1 / consistency-1) | [new-code] S · Must (ExGrafix Could) |
-| D8 | **Stage ids 0-31** by the binding map of §4.2, with a **48-byte stage-attribute record** per id. The record and its init hook come first (M2, read by GP code only); the 45 `$51` readers are rewritten at M5, before the first id ≥ `$10` | BRIEF §7.2; R1.2 (feasibility-2, consistency-2, scope-12); R1.14 (48 bytes) | [new-code] M · Must |
+| D8 | **Stage ids 0-31** by the binding map of §4.2, with a **48-byte stage-attribute record** per id. The record and its init hook come first (M2, read by GP code only, the slice's included: no stage-`$00` stop-gaps); the 45 `$51` readers are rewritten at M5, before the first id ≥ `$10` | BRIEF §7.2; R1.2 (feasibility-2, consistency-2, scope-12); R1.14 (48 bytes); R8.2 | [new-code] M · Must |
 | D9 | **WRAM-resident layouts in the "RAM image" form**: layout and tileset copied raw into RAM pages laid out like ROM banks; vanilla painters and collision read them unchanged through D3 (§5) | gives map edits, T6, CASUAL/HARD poke lists, per-slot alternate sets | [new-code] M · Must (sections Should) |
 | D10 | **IRQ: literal port first, raster list second.** M1 ports the 27 chains one for one. M2 replaces them with a **double-buffered raster list of 24 bands per buffer** and moves the 4 logic-in-IRQ handlers into the NMI (in `$7E`, never through the C-window) | BRIEF §7.1, 4MI lesson 11; R1.9 | [new-code] M + M · Must |
 | D11 | **Text: a fixed-cell glyph cache** in an ExRAM window. EN in ALL CAPS, JP kana, no VWF, no kanji. Pop-up 2 × 28 cells with ≤ 24 glyph ids; dialogue, debrief and help pages 4 × 28. Borrowed BG tiles are restored from ROM. TALK, CHOICE and every frame-waiting UI are yielding coroutines. Dictionary compression is Must. Split into v1a (before the slice) and v1b (before Knight) | R1.4 (feasibility-10/11, consistency-3); the BG table is full on most stages (`rm6/SUMMARY.md` §2) | [new-code] L · Must |
@@ -207,21 +211,27 @@ Could:
 | `$46` | 1 | NMI bank: the unrolled CHR/VRAM copier (1.5 KB, §15.3), raster preset tables | `$8000` during the NMI | ≈ 3 KB | ≈ 4 KB | tech |
 | `$47` | 1 | DEV: EXTRA CONFIG engine, test hooks (present in every build, entered only as §14.6 says) | C-window | ≈ 4 KB | ≈ 6 KB | tech |
 | `$48-$4D` | 6 | new object AIs, 3 pairs (`$48/$49`, `$4A/$4B`, `$4C/$4D`), incl. the text runner and the NPC Break Man | `$8000/$A000` | ≈ 30 KB (≈ 100 kinds) | ≈ 46 KB (≈ 155 kinds) | stage and systems docs (code), tech (homes) |
-| `$4E-$53` | 6 | sprite bank pairs (frames, layouts, animations; vanilla format, §6.7) | `$8000/$A000` | 2 pairs | 3 pairs | art_audio |
-| `$54-$61` | 14 | CHR source: new tiles, BG-boss art, face icons | read by the CHR loader | ≈ 62 KB (≈ 3,900 tiles, R5.1) | ≈ 106 KB (6,793 tiles) | art_audio |
+| `$4E-$53` | 6 | sprite bank pairs (frames, layouts, animations; vanilla format, §6.7) | `$8000/$A000` | 2 pairs | 2 pairs (532 frames, ≤ 512 per pair); the 3rd pair spare | art_audio |
+| `$54-$61` | 14 | CHR source: new tiles, BG-boss art, face icons | read by the CHR loader | ≈ 9 banks (70.9 KB, 4,535 tiles; R8.7) | ≈ 15.5 banks (124.2 KB): 14 here plus the vanilla gap reserve | art_audio |
 | `$62-$6E` | 13 | tileset slots: 2 slots + 2 alternate sets + T6 tables per bank (§5.3) | copied to RAM | 7 banks (14 slots) | 13 banks (26 slots) | tech (placement), art_audio (content) |
 | `$6F-$74` | 6 | layouts of the non-venue stages (2 KB sections), the YOU GET room copy, object lists, screen-script overflow, poke lists, stage-local CHR set tables | copied to RAM | ≈ 3 banks | 6 banks | tech (format), stage docs (data) |
 | `$75-$79` | 5 | music and SFX: track table v2, instruments, new songs, companion streams (Could) | `$A000` | 1 bank | 5 banks (≈ 35.9 KB) | art_audio |
 | `$7A-$7D` | 4 | text banks T1-T4: strings, dictionary, the 1-bpp glyph set | `$A000` | 4 banks (≈ 30 KB) | 9 banks with `$0B-$0F` (72 KB) | story (data), tech (format) |
-| | **64** | | | **≈ 41 banks** | **64** | |
+| | **64** | | | **≈ 42 banks** | **64** | |
 
 Reading the ledger:
 
 - **Music 5, text 9, layouts 8** (`$6F-$74` plus the recycled `$32/$33`), **tilesets 13** (2 slots per bank for the 26
-  slots of §5.3), CHR 14 (art's measured 106 KB). That is R1.5's rebalance.
-- **v1.0 uses about 41 of the 64 new banks.** The full design fills all 64 plus `$0B-$0F`: nothing is left for growth,
-  as 4MI's 97 % fill warns. A v1.1+ item that needs a bank must displace another; the ledger is re-totalled at every ⛳
-  gate (R0.1). A tenth text bank, if story's compressed size needs it, comes out of the CHR reserve once art re-measures.
+  slots of §5.3), CHR 14. That is R1.5's rebalance.
+- **CHR, after art's re-measure** (`art_audio.md` §13.1; R8.7): v1.0 needs **about 9 of the 14 CHR banks** and **2
+  sprite pairs**. The full design needs ≈ 15.5 banks; its overflow (≈ 780 tiles) goes into the **vanilla gap reserve**
+  (`art_audio.md` §1.3: 1,126 blank tiles outside Capcom's sets, so filling them overwrites no art, BRIEF §7.4), a
+  full-design allocator seed for CHR only, never used by v1.0. So **no CHR bank can leave this row**.
+- **v1.0 uses about 42 of the 64 new banks.** The full design fills all 64 plus `$0B-$0F` except two spares: music's
+  `$79` (the full design uses ≈ 3.6 of the 5 music banks) and the third sprite pair. Nothing else is left for growth, as
+  4MI's 97 % fill warns. A v1.1+ item that needs a bank must displace another; the ledger is re-totalled at every ⛳
+  gate (R0.1). **A tenth text bank**, if story's compressed size needs it, **comes from music's spare `$79`, not from
+  CHR** (R8.7).
 - **Vanilla gaps are allocator seeds for small data**, not roles: `$3F:$FAC0-$FF1F` minus `$FFE0-$FFEF` (§1.3),
   `$3A:$95D4-$9FFF` (screen scripts, §6.6), the empty tileset pages `$2B:$9200` and `$2D:$9200` (2,304 B each; no stage
   uses them now that the lap and lobby live on TS_STADIUM), the text-bank holes `$3C:$9D16-$9FE1`, `$3D:$BA8D-$BCFF`,
