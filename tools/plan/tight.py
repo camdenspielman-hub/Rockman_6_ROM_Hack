@@ -34,11 +34,18 @@ tight = {
   ('tap tweaks (costs, dark rooms)', 0.5), ('plates/Beat', 2), ('HARD framework', 1.5), ('SC1,5,6,8,9,11', 3.5),
   ('M.BEAM (max 2)', 2), ('Super fist (+hop)', 3),
  ],
- 'meta': [
-  ('saves', 3.5), ('title', 2), ('file select', 2.5), ('bracket', 4), ('results', 2.5), ('debrief (tier B only)', 2),
-  ('pit stop', 2.5), ('game over/RETIRE', 1.5), ('medals/HoF', 1), ('rating (no TURBO trap) + debrief', 1.5),
-  ('fortress maps', 2), ('RECORDS 1-3', 1.5), ('EXTRA CONFIG UI + mailbox', 3), ('CONFIG', 1.5),
-  # the fight loader (2.5) moved to 'tech' in round 2 (RULINGS R1.7: owned by tech); meta keeps the fight table data
+ 'meta': [  # round 2: docs/design/meta.md "v1.0 scope" (16 Must items, RULINGS R0.2-R0.4); total unchanged at 31:
+            # the fight loader (2.5) moved to 'tech' (R1.7); +0.5 RULESET + bits.inc, +0.5 fight table data + interface,
+            # -0.5 title (attract crawl and PASS WORD gag are Could), -0.5 fortress maps (bracket node renderer reused)
+  ('M2: saves (A/B, trailer, migrations, BROKEN paths, autosaves, unplug, save tests)', 3.5),
+  ('M2: title + boot (license line, health notice, menu)', 1.5), ('M2: file select + NEW/ERASE + difficulty pick', 2.5),
+  ('M2/M5/M6: bracket (nodes, states, centre, rematch hook, Riot trigger, event queue)', 4),
+  ('M2: results screen (judges desk)', 2.5), ('M2: debrief engine + predicates (tier B) + stage counters', 2),
+  ('M2: medals/HoF + unlock bits', 1), ('M2: RULESET + bits.inc', 0.5), ('M2: CONFIG (INPUT LAG, CASUAL, FLASHES)', 1.5),
+  ('M2/M7: EXTRA CONFIG UI + mailbox (+ FIGHT n at M7)', 3),
+  ('M3: pit stop (shop, 14-chip grid + help, file CONFIG)', 2.5), ('M3: game over/RETIRE/unplug', 1.5),
+  ('M6: RECORDS 1-3 + venue mini-records', 1.5), ('M7: fight table v1.0 rows + loader interface (loader is tech)', 0.5),
+  ('M7: fortress maps + BACK TO BRACKET', 1.5), ('M8: rating (re-derived, 100 reachable, R2.7) + Break Man debrief', 1.5),
  ],
  'venues': [  # core homage + secret exit + hidden room + behaviour chip + boss rework; arena twists -> Should
   ('Wind (sortie w/o destroyer; AYACO simple)', 14), ('Knight (no Inn/Princess)', 14), ('Tomahawk (train 3 bands)', 14),

@@ -1,22 +1,97 @@
 # Rockman 6 GP: progression, meta-game and modes (meta.md)
 
-Owner: design-meta. Status: **v1**. Scope: everything outside a stage's own screens. That covers saving and loading,
-the title and file select, the bracket stage select, the judges' debrief, medals and Hall of Fame points, the
-championship rating, the unlock chain, every post-game mode, achievements, CONFIG and ENGRISH. The doc also gives the
-byte layouts for the save and unlock flags.
+Owner: design-meta. Status: **round 2**, revised against [`RULINGS.md`](RULINGS.md), which is binding and overrides
+[`BRIEF.md`](BRIEF.md) where they differ. Facts come from `docs/research/*/` (cited as `rm6/ram.md`, `r4mi/modes.md`,
+and so on). Facts re-checked in the ROM or emulator for round 2 are tagged **[code, r2]** or **[seen, r2]**; the scripts
+are in `build/revise/meta/` (`flagscan.py`, `rematch.py`, `notes.txt`). The round-1 text is in git (commit
+`95288ee`) and, locally, in `build/revise/meta/meta_r1.md`.
 
-Out of scope, owned elsewhere:
+**What this doc owns** (the single sources of truth, RULINGS and the consistency critic): **save bytes** (the FILE and
+SYSTEM blocks, their trailer, commit and load rules, the test mailbox's format), **the bracket** (and the fortress maps),
+**events** (the bracket event queue and every seen bit), **the judges' debrief** (the predicate engine and tables), the
+medals and HoF points, the championship rating's rows and tests, the unlock chain, RULESET, the fight table's data, the
+post-game menus, CONFIG's menus and storage, and EXTRA CONFIG's screen.
 
-- the scorecard maths, bolts, chips and the shop (`systems.md`);
-- stage and boss content (`venues_a.md`, `venues_b.md`, `fortress.md`);
-- dialogue and cast beats (`story.md`);
-- the MMC5 port, bank and stage-id allocation (`tech.md`);
-- the art and music lists (`art_audio.md`).
+It **cites** the other owners:
 
-Where this doc needs something from those, it says so in **Cross-doc dependencies** (§15).
+- `systems.md`: combat, the economy, chip numbers, the scorecard formulas, what each setting does;
+- `tech.md`: stage ids, memory (PRG-RAM pages, the WORK ledger), the raster list, CHR/ExRAM limits, the bank ledger, the
+  text engine, **the fight loader's code** (§9.2.1 gives its interface);
+- `venues_a.md`, `venues_b.md`, `fortress.md`: staging, mechanics, each stage's secrets and where they sit;
+- `story.md`: **every word** (hints, Break Man's debrief, menu labels, ENGRISH, the health notice) and the ending;
+- `art_audio.md`: tile, byte and track budgets.
 
-Tags follow BRIEF §8: **[engine-ok]**, **[new-code]**, **[new-art]**, **[new-music]**, size **S/M/L**, tier
-**Must/Should/Could**. Facts come from `docs/research/*/` (cited as `rm6/ram.md`, `r4mi/modes.md`, and so on).
+**Tiers** follow RULINGS §0: **Must** = v1.0 (the tight Must), **Should** = v1.1+ (re-added in R0.3's cut-line order),
+**Could**, **Won't (v1)**. A Must depends only on Musts (R0.4). Tags: **[engine-ok]**, **[new-code]**, **[new-art]**,
+**[new-music]**; sizes **S/M/L**. Session counts come from the ledger (`tools/plan/tight.py`, `tools/plan/tally.py`).
+
+Contents: v1.0 scope · 0 The meta layer in one page · 1 Saves · 2 Title and file select · 3 The bracket, the pit stop
+and the fortress maps · 4 The judges' desk and debrief · 5 Medals and HoF points · 6 The championship rating · 7 The
+unlock chain · 8 The SYSTEM block · 9 RULESET, the fight table, RECORDS, EXTRA CONFIG and the post-game modes ·
+10 Achievements · 11 CONFIG · 12 ENGRISH · 13 Build list · 14 Lessons applied · 15 Cross-doc dependencies · 16 Risks ·
+17 Open questions · Changes in round 2.
+
+---
+
+## v1.0 scope
+
+v1.0 is RULINGS R0.2's tight Must. Meta's share is **31 sessions** of code, data and tests (`tools/plan/tight.py`, area
+`meta`; the `tally.py` meta rows marked Must sum to the same 31). Round 1's tight estimate was 33.5; the fight loader
+(2.5) moved to `tech.md` (R1.7). This revision re-itemises the remaining 31 without changing the total:
+
+- **+0.5** RULESET and the bit table that tech's `IFHARD`/`IFCASUAL`/`LAYOUT_TIER` macros are generated from (round 1
+  listed RULESET as a Must item but the ledger had no row);
+- **+0.5** the v1.0 fight table and the loader interface (data; the loader's code is tech's);
+- **−0.5** title: the attract crawl and the PASS WORD gag are Could (R0.3 item 12); the health notice (R3.5) is one
+  text-window page;
+- **−0.5** fortress maps: they reuse the bracket's node table and renderer (§3.9).
+
+Everything in this table is **Must** and depends only on Must items (R0.4). Milestones are RULINGS §6's.
+
+| # | Item (section) | What ships in v1.0 | M | Sessions |
+|---|---|---|---|---|
+| 1 | Save module (§1) | 3 files + system block, A/B ping-pong copies, trailer and commit marker, load with BROKEN paths, migrations, autosave points 1-9, IN_MATCH and UNPLUGS, the save tests of §1.9 | M2 | 3.5 |
+| 2 | Title and boot (§2.1) | license line, **health notice** (R3.5), title menu (GAME START, CONFIG, SPECIAL EVENTS once unlocked) | M2 | 1.5 |
+| 3 | File select and NEW GAME (§2.2-2.3) | 3 cards, NEW / START / ERASE with the START+A guard, the CASUAL / NORMAL / HARD pick | M2 | 2.5 |
+| 4 | The bracket (§3.1-3.7) | node table, node states, centre logic, rematches (the `$3F:$F951` hook), the HALFTIME RIOT trigger and POSTPONED, the event queue (POWER, JET, the Riot, the theft), game over and RETIRE entry points | M2 1.5, M5 1.5, M6 1 | 4 |
+| 5 | Results screen (§4.0) | the judges' desk, slide-in rows, TOTAL, medal stamp with the preset badge, prize line, secret icons | M2 | 2.5 |
+| 6 | Debrief engine and predicate tables (§4.1-4.6) | the 4MI predicate walk per stage, requirement hints, **tier B only** (tier A is Should, R4.5), the stage counters behind every collect-N secret (R1.10) | M2 | 2 |
+| 7 | Medals, HoF points, unlock bits (§5, §7) | medals derived from the best score, HoF points over the shipped stages, the v1.0 unlocks (RECORDS, EXTRA CONFIG) | M2 | 1 |
+| 8 | RULESET and the bit table (§9.0) | the 16-byte choke point at WORK `$6270`; `src/gp/bits.inc` generated from §1.6's DIFF A table | M2 | 0.5 |
+| 9 | CONFIG (§11) | global: LANGUAGE, ANNOUNCER, TEXT SPEED, FLASHES (REDUCED), SCREEN SHAKE, **INPUT LAG**, SELECT SWAP, A/B SWAP; per file: the difficulty group including the **CASUAL** bit | M2 | 1.5 |
+| 10 | EXTRA CONFIG and the test mailbox (§9.6) | the field editor on a scratch file, ENTER STAGE, TO BRACKET, WRITE FILE (marks EDITED), the mailbox format (M2); `FIGHT n` through tech's loader (M7) | M2 2.5, M7 0.5 | 3 |
+| 11 | Pit stop (§3.8) | SHOP, the 14-chip grid with B help pages (R2.10), the file's CONFIG page, SAVE & QUIT | M3 | 2.5 |
+| 12 | Game over, RETIRE, unplug (§3.7, §1.7) | CONTINUE / RETIRE, the pause-menu RETIRE row, the unplug count | M3 | 1.5 |
+| 13 | RECORDS pages 1-3 (§9.4) | FILE RESULTS, FILE TOTALS, LIFETIME with the venue mini-records | M6 | 1.5 |
+| 14 | Fight table, v1.0 rows, and the loader interface (§9.2.1) | the ids for every fight, and 10-byte records for every v1.0 boss (the mid-boss records, which only GP Rush needs, are Could); the calls and results meta uses | M7 | 0.5 |
+| 15 | Fortress maps (§3.9) | the Hall of Fame map (H1, H3, H5) and the Castle map (W2, W3), REPLAY, **BACK TO BRACKET**, per-wing saves | M7 | 1.5 |
+| 16 | Championship rating and Break Man's debrief (§6) | the rows **re-derived so 100 is reachable with v1.0 content** (R2.7), the first-failed-test debrief | M8 | 1.5 |
+| | **Meta Must total** | | M2-M8 | **31** |
+
+Per milestone: **M2 19** (save, title, file-select-lite, bracket-lite, results, debrief, medals, RULESET, CONFIG,
+EXTRA CONFIG: RULINGS §6's M2 list for meta), **M3 4** (pit stop with 3 shop chips, game over and RETIRE), **M4 0**
+(the Blizzard slice uses items 1-12), **M5 1.5** (the full 8-venue bracket and the adaptor events), **M6 2.5** (the
+HALFTIME RIOT trigger, RECORDS), **M7 2.5** (the fight table and `FIGHT n`, the fortress maps), **M8 1.5** (the
+rating). M9's balance pass (T11's time limit, the medal thresholds) and the hardware power-cycle test of the save are in
+the ledger's `overhead` rows.
+
+**The slice (v0.1) path through meta**: power on → health notice → title → FILE SELECT → NEW (difficulty) → the bracket
+(Blizzard's node; the Opening is a v0.5 stage, so the slice's new file starts at the bracket) → SUMMIT CLIMBER → judges'
+desk with the BL0-BL2 debrief → autosave → reset → reload → REMATCH from the bracket. The mailbox drives the same path in
+the test suite.
+
+**Testing policy hooks** (RULINGS §6, scope-26): golden movies run on NORMAL + EN, which are the mailbox defaults; every
+other meta setting gets one smoke movie per milestone, set through the mailbox's override bytes (§9.6) instead of menus;
+movies are re-recorded only at ⛳ gates; the save module has offline `.sav` fuzz tests (§1.9). The ~10 % test overhead is
+in the ledger's `overhead` rows, not in the items above.
+
+**Not in v1.0** (designs kept below as v1.1+ material, each marked in place):
+
+| Tier | Items (cut-line item, R0.3) |
+|---|---|
+| **Should (v1.1+)** | tier A debrief riddles (text, R4.5); Time Attack (item 7); file COPY; the sponsor's-chair gag and the Eddie SAVING icon; the HUD TIMER option; Break Man joining (EVENTS b5, with the tag partner, item 2) |
+| **Could** | the attract crawl, ENGRISH and achievements (item 12); GP Rush runner, lobby, courses and MY GP (item 11); the 1993 RULES preset's meta hooks (item 10); the Could bundle's pit-stop rows, the TURBO trap and BREAK MAN WALKS (item 9); the Exhibition layer and badges (item 6); the Riot intro animation; the hidden PASS WORD gag; RECORDS pages 5-6; the MMC5 AUDIO options (with the MMC5 pulse driver) |
+| **Won't (v1)** | KNOCKOUT, Exhibition Rules (and its TURBO rule), the Museum and its VAULT, Bass Mode, Mr. X Returns (R0.3) |
 
 ---
 
@@ -28,33 +103,33 @@ The premise reaches the menus too (CX lesson 1):
 - the stage select is a **bracket**;
 - every clear ends at the **judges' desk** with a scorecard and one hint;
 - the ending prints a **championship rating** out of 100, and Break Man gives the 4MI-style debrief;
-- the post-game is **SPECIAL EVENTS**: Time Attack, GP Rush (a boss rush on one fight table), Exhibition Rules,
-  Records, the Museum and EXTRA CONFIG.
+- the post-game is **SPECIAL EVENTS**: in v1.0, RECORDS and EXTRA CONFIG; Time Attack (Should) and GP Rush (Could) join
+  it later.
 
-**Progression flow:**
+**Progression flow (v1.0):**
 
 ```
-POWER ON → license → attract crawl → TITLE
+POWER ON → RAM probe (tech) → mailbox check (tech) → license → HEALTH NOTICE → TITLE
 TITLE → GAME START → FILE SELECT (3 files)
-   new file  → pick difficulty → OPENING CEREMONY (M00) → BRACKET
+   new file  → pick CASUAL / NORMAL / HARD → OPENING CEREMONY (meta 0, engine $10) → BRACKET
    old file  → BRACKET  (or the fortress map, if the file is inside H1-W3)
-BRACKET (8 venues, any order; SELECT = PIT STOP, B = Exhibition layer)
-   2nd win → POWER adaptor event     4th win → JET adaptor event + SEMIFINAL RIOT intro
-   SEMIFINAL (M09, centre) must be cleared before the other 4 venues reopen
-   pairs of secret exits light Exhibition badges E1-E4 (the B layer)
-   8 wins → centre = TROPHY → theft scene → HALL OF FAME map H1-H5 → unmask → SUPER WILY CASTLE W1-W3
-   → ending → playable victory-lap credits → CHAMPIONSHIP RATING + Break Man's debrief → TO BE CONTINUED…
-   → title; SPECIAL EVENTS now on the title menu; the file reopens in the post-game bracket
+BRACKET (8 venues, any order; SELECT = PIT STOP; replays allowed)
+   2nd win → POWER hand-off event     4th win → JET hand-off event, then the HALFTIME RIOT intro
+   HALFTIME RIOT (meta 9, engine $11, the centre node) must be won before the other 4 venues reopen
+   8 wins → centre = TROPHY → theft scene → HALL OF FAME map (H1 → H3 → H5) → unmasking
+          → SUPER WILY CASTLE map (W2 → W3) → the ending (story's order, R4.1), which includes the
+            CHAMPIONSHIP RATING and Break Man's debrief → TO BE CONTINUED
+   → title; SPECIAL EVENTS (RECORDS, EXTRA CONFIG) on the title menu; the file reopens in the post-game bracket
 ```
 
-| Layer | Must | Should | Could |
+| Layer | Must (v1.0) | Should (v1.1+) | Could / Won't |
 |---|---|---|---|
-| Saves | 3 files, A/B copies, checksums, autosave | file COPY | — |
-| Front end | title, file select, CONFIG | attract crawl | hidden PASS WORD gag |
-| Bracket | 8 venues, Semifinal trigger, centre progression, pit stop | Exhibition layer | animated Riot intro |
-| Judging | debrief predicates + hints, medals, HoF points | escalating hints | — |
-| Ending | championship rating, Break Man debrief | — | — |
-| Post-game | EXTRA CONFIG (it is also the dev tool), RECORDS | Time Attack, GP Rush, achievements | Exhibition Rules, Museum, KNOCKOUT, Bass Mode, Mr. X Returns, ENGRISH |
+| Saves | 3 files, A/B copies, checksums, autosave, migrations, BROKEN paths | file COPY | — |
+| Front end | boot with the health notice, title, file select, CONFIG | — | attract crawl, PASS WORD gag (Could) |
+| Bracket | 8 venues, rematches, the Riot trigger, centre progression, pit stop, event queue, fortress maps | — | Exhibition layer, Riot intro animation (Could) |
+| Judging | results screen, debrief predicates with tier B hints, medals, HoF points | tier A riddles, the sponsor's-chair gag | — |
+| Ending | championship rating (100 reachable in v1.0), Break Man's debrief | — | the partner row T1 and the TURBO trap (with the Could bundle) |
+| Post-game | EXTRA CONFIG (also the dev tool), RECORDS 1-3, the fight table | Time Attack (and RECORDS page 4) | GP Rush, MY GP, achievements, ENGRISH, RECORDS 5-6 (Could); KNOCKOUT, Exhibition Rules, Museum, Bass Mode, Mr. X Returns (Won't) |
 
 ---
 
@@ -85,34 +160,41 @@ write goes to the *older* copy, so the newest good copy is never touched.
 
 ### 1.2 Hardware and placement [new-code] S · Must
 
-The save lives in **PRG-RAM page 0** (8 KB, battery-backed), mapped at `$6000-$7FFF` with `$5113 = 0`.
+PRG-RAM is 32 KB, battery-backed, in 4 pages (`tech.md` §2, D5; R1.6). The saves live in **page 0 (SAVE)**. The running
+images live in **page 1 (WORK)**, which is always mapped at `$6000` (`tech.md` §3.4, §13; consistency decision 37).
 
-- The NES 2.0 header must declare this page as **PRG-NVRAM**. 4MI's header declares PRG-RAM size 0, the r4mi lesson
-  12 warning (`tech.md` owns the header).
-- If `tech.md` gives GP more PRG-RAM (16-32 KB of WRAM-resident stage sections), pages 1+ are work RAM. The save
-  module then maps page 0 at `$6000` only while it loads or commits; MMC5 can also map RAM pages at
-  `$8000-$DFFF` through `$5114-$5116` with bit 7 clear.
-- **Write protection** (`$5102 = 2`, `$5103 = 1` to write): if every work-RAM byte sits in other pages, the save
-  routine opens the gate only around a commit and closes it after (`$5102 = 0`). If work RAM shares page 0, the gate
-  must stay open, and the A/B copies plus checksums are the only defence. They are designed to be enough on their
-  own.
+- The NES 2.0 header declares the 32 KB as **PRG-NVRAM**. 4MI's header declares PRG-RAM size 0, the r4mi lesson 12
+  warning (`tech.md` §1.1 owns the header; its boot RAM probe stops with a message if fewer than 32 KB are present).
+- **Page 0 is mapped only inside the save module**: `save_commit` and `save_load` map it at `$A000` (`$5115 = $00`,
+  shadow `$4B = $80`), copy, and map `$A000` back (`tech.md` §13). RESET maps it briefly to read the test mailbox.
+- **Write protection is by isolation**, not by MMC5's gate. MMC5's `$5102/$5103` gate covers all PRG-RAM at once, so it
+  stays open while WORK is in use (`tech.md` §2.2). Since no code but the save module maps page 0, a runaway write lands
+  in WORK or in the current layout page (both rebuilt), never in the saves. The A/B copies and checksums (§1.3) are the
+  second line of defence, and they are designed to be enough on their own.
 
-**Page 0 map:**
+**Page 0 map** (offsets in the page; CPU address = `$A000` + offset while the save module has it mapped):
 
-| Range | Size | Use |
+| Offset | Size | Use |
 |---|---|---|
-| `$6000-$63FF` | 1 KB | SYS-A: system block, copy A |
-| `$6400-$67FF` | 1 KB | SYS-B |
-| `$6800-$69FF` | 512 B | FILE1-A |
-| `$6A00-$6BFF` | 512 B | FILE1-B |
-| `$6C00-$6DFF` | 512 B | FILE2-A |
-| `$6E00-$6FFF` | 512 B | FILE2-B |
-| `$7000-$71FF` | 512 B | FILE3-A |
-| `$7200-$73FF` | 512 B | FILE3-B |
+| `$0000-$03FF` | 1 KB | SYS-A: system block, copy A |
+| `$0400-$07FF` | 1 KB | SYS-B |
+| `$0800-$09FF` | 512 B | FILE1-A |
+| `$0A00-$0BFF` | 512 B | FILE1-B |
+| `$0C00-$0DFF` | 512 B | FILE2-A |
+| `$0E00-$0FFF` | 512 B | FILE2-B |
+| `$1000-$11FF` | 512 B | FILE3-A |
+| `$1200-$13FF` | 512 B | FILE3-B |
+| `$1400-$19FF` | 1.5 KB | reserve (round 1 put the LIVE images here; they moved to WORK) |
+| `$1A00-$1A1F` | 32 B | **TEST MAILBOX** (§9.6) |
+| `$1A20-$1FFF` | 1,504 B | reserve (save growth before v1.0: with `$1400-$19FF` the FILE blocks can grow to 768 B each, §16 risk 3) |
+
+**The running images** (WORK, page 1, `tech.md` §3.4):
+
+| CPU address | Size | Use |
+|---|---|---|
 | `$7400-$75FF` | 512 B | **LIVE FILE**: the running game's file image, laid out exactly like a file block (§1.6) |
-| `$7600-$79FF` | 1 KB | **LIVE SYS**: the running system block |
-| `$7A00-$7A1F` | 32 B | **TEST MAILBOX** (§9.6) |
-| `$7A20-$7FFF` | 1,504 B | free for `tech.md` (work RAM if page 0 is the only page) |
+| `$7600-$79FF` | 1 KB | **LIVE SYS**: the running system block (§8) |
+| `$6270-$627F` | 16 B | RULESET (§9.0) |
 
 **The LIVE FILE is the format.** A file's saved payload and the running state are the same 512-byte image, so a save
 is "checksum + copy" with no serialiser to keep in sync.
@@ -120,12 +202,12 @@ is "checksum + copy" with no serialiser to keep in sync.
 The vanilla variables that stay in CPU RAM are gathered into the image at each commit and scattered back at load,
 as 4MI does at `$40:$AF1F` / `$A9A3`:
 
-- weapons `$0688-$0691`;
+- weapons `$0688-$0691` (owned bits only; energy is never saved);
 - E-tanks `$06A1`;
 - lives `$A9`.
 
-The play-time counter ticks in CPU RAM or work RAM, never inside LIVE, so the NMI can never change the image while it
-is being checksummed. It is folded in just before each commit.
+The play-time counter ticks in CPU RAM or the run block, never inside LIVE, so the NMI can never change the image while
+it is being checksummed. It is folded in just before each commit.
 
 ### 1.3 Block trailer and checksum [new-code] S · Must
 
@@ -154,18 +236,22 @@ A copy is **valid** only if all of these hold:
 
 ### 1.4 Write and load rules [new-code] S · Must
 
-**Commit (save) one block:**
+**Commit (save) one block** (`save_commit(block)`, tech's C-window service in core bank `$3E`, `tech.md` §13):
 
 1. Fold the play-time counter and the CPU-RAM variables into LIVE.
 2. Increment LIVE's generation (16-bit) and compute the trailer in LIVE.
-3. Pick the **target copy**: an invalid copy if there is one, else the one with the older generation.
+3. Map page 0. Pick the **target copy**: an invalid copy if there is one, else the one with the older generation.
 4. Invalidate the target first: write magic byte 0 = `$00` and marker +E = `$00`.
 5. Copy bytes `$001` to the end of the trailer except the marker.
-6. Write magic byte 0, then marker +E/+F last.
+6. Write magic byte 0, then marker +E/+F last. Map `$A000` back.
 
-A file commit checksums and copies 512 bytes: about 10,000 CPU cycles for the checksum and 7,000 for the copy, or
-0.6 of a frame (a system commit is twice that). So it fits anywhere. It runs with the
-PPU idle or during a fade, and shows a 30-frame **SAVING** icon (Eddie with a clipboard) so the player trusts it.
+**The scratch image never commits**: if LIVE's magic byte 3 is `'S'` (EXTRA CONFIG's scratch file, §9.6) or RULESET
+says NO_SAVE (a fight-loader bout, `tech.md` §4.6), `save_commit` returns at once.
+
+A file commit checksums and copies 512 bytes: about 10,000 CPU cycles for the checksum and 7,000 for the copy, or 0.6 of
+a frame (a system commit is twice that). It runs at meta's commit points (§1.5), never mid-action. On menu screens a
+`SAVING` label shows for 30 frames so the player trusts it (story's word); in stages the commits (entry, death) are
+silent. The Eddie-with-a-clipboard icon is Should.
 
 **Load one block:**
 
@@ -176,9 +262,11 @@ PPU idle or during a fade, and shows a 30-frame **SAVING** icon (Eddie with a cl
   hangs on a broken block**: every reader (title, file select, RECORDS, EXTRA CONFIG) has a BROKEN path. A broken
   system block re-initialises to defaults with a one-line notice.
 
-**Version migration.** Header byte +4 is the layout version, starting at 1. On load, a block with an older version
-runs a migration routine per step (v1→v2, …) before use. New fields only ever take reserved bytes, so a v1.0 save
-still loads in v1.1. This matters for a patch that will see bug-fix releases [new-code] S · Must.
+**Version migration.** Header byte +4 is the layout version, **1 at the v1.0 release** (the layout is frozen then).
+On load, a block with an older version runs a migration routine per step (v1→v2, …) before use. New fields only ever
+take reserved bytes, so a v1.0 save still loads in v1.1. That is also why §1.6 and §8 **already allocate the fields
+of every Should and Could item** (the chip bundle's bits, TAG_STAGES, the Time Attack and GP Rush records): adding them
+in v1.1 needs no migration [new-code] S · Must.
 
 **COPY** (Should): copy the source's newest valid copy into the target's LIVE image, set the slot byte and generation
 1, and commit twice so both copies are fresh.
@@ -191,13 +279,16 @@ still loads in v1.1. This matters for a patch that will see bug-fix releases [ne
 |---|---|---|---|
 | 1 | The NEW GAME difficulty is confirmed | the new file (both copies) | The file exists before the Opening starts |
 | 2 | **Stage entry** (after READY) | `IN_MATCH` = meta index + 1; attempts | The unplug detector (§1.7) |
-| 3 | **Every death** (during the death fade) | KOs, lives, stage KOs, CHAMP_KO | Deaths count, as in 4MI; resetting cannot hide them |
-| 4 | **Stage clear**, after the scorecard and bolts | clears, secrets, best score/time, weapons, `IN_MATCH = 0` | The main progress save |
-| 5 | Leaving the **pit stop** | bolts, chips, consumables | Purchases stick |
+| 3 | **Every death** (during the death fade) | KOs, lives, stage KOs, CHAMP_KO, bolts (the 1-bolt insurance, R4.3) | Deaths count, as in 4MI; resetting cannot hide them |
+| 4 | **Stage clear**, after the scorecard and bolts (§4.0 step 7) | clears, secrets, prizes, best score/time/PAY, weapons, `IN_MATCH = 0` | The main progress save |
+| 5 | Leaving the **pit stop** | bolts, chips, consumables, the file's CONFIG page | Purchases stick |
 | 6 | The game-over choice | game overs, lives refill, `IN_MATCH = 0` | |
-| 7 | After each **bracket event** plays (§3.6) | EVENTS_SEEN | Story beats play once |
-| 8 | The championship result | rating, CHAMP TIME, CLEARED flag | |
-| 9 | Leaving CONFIG, a new TA/Rush record, an unlock or achievement | **system block** only | |
+| 7 | After each **bracket or map event** plays (§3.6) | EVENTS, EVENTS2, FORMS | Story beats play once |
+| 8 | **W3 cleared** (before the ending starts), then again after the rating screen | CLEARED, CHAMP_TIME; then BEST_RATING, LAST_RATING, LAST_ROWS | A reset during the long ending loses nothing |
+| 9 | Leaving CONFIG, a new record, an unlock | **system block** only | |
+
+**No autosave runs under FIGHT_CTX** (W2's bouts, EXTRA CONFIG's `FIGHT n`, the mailbox fight): tech's loader sets
+NO_SAVE (`tech.md` §4.6), and the hub's own clear saves afterwards.
 
 **Not saved** (each is restored to a fixed value instead):
 
@@ -207,215 +298,279 @@ still loads in v1.1. This matters for a patch that will see bug-fix releases [ne
 | weapon energy | full; vanilla fills it from the owned flags at stage start, `$3B:$BA3F` |
 | checkpoint | the stage start; a load never resumes mid-stage |
 | current form | Normal |
-| Break Man's per-life call | available |
+| the run block (scorecard counters, Beat's per-screen mask, the second-wind flags) | cleared at stage start (`systems.md` §15.1) |
 
-A loaded file always resumes at the **bracket**, or at the **fortress map** of the next uncleared H/W stage.
-Vanilla never saved fortress progress; GP saves after every fortress stage.
+A loaded file always resumes at the **bracket**, or at the **fortress map** of the next uncleared H or W stage
+(§3.9). Vanilla never saved fortress progress; GP saves after every fortress stage.
 
 ### 1.6 FILE block layout (512 B) [new-code] S · Must
 
-"Meta index" is the stage's row in the meta tables (§1.8), not the engine stage id: `tech.md` owns the ids, and the
-stage-attribute table carries a `meta` column. Multi-byte values are little-endian.
+"Meta index" is the stage's row in the meta tables (§1.8), not the engine stage id: `tech.md` §4.2 owns the ids, and the
+stage-attribute record carries the meta index in `SA.META`. Multi-byte values are little-endian. **This is the final
+layout** (consistency-11): it applies `systems.md`'s round-2 list (§15.1 there), frees the stale fields, and reserves
+every v1.1+ field now, because the layout freezes at v1.0.
 
-| Offset | Size | Field | Notes |
-|---|---|---|---|
-| `$000` | 4 | magic `'R' '6' 'F' n` | n = `'1'`..`'3'`, `'S'` = scratch (never committed) |
-| `$004` | 1 | layout version | 1 |
-| `$005` | 1 | FILEFLAGS | b0 ACTIVE; b1 CLEARED (won the championship once); b2 **EDITED** (EXTRA CONFIG wrote it, §9.6); b3 BASS (Bass Mode file); b4 HARD_CLEAN (HARD preset with all sub-settings since NEW GAME, never lowered); b5 R1993_CLEAN (likewise for 1993); b6-7 reserved |
-| `$006` | 2 | generation | |
-| `$008` | 1 | IN_MATCH | 0 = none, else meta index + 1 |
-| `$009` | 1 | DIFF preset | 0 CASUAL, 1 NORMAL, 2 HARD, 3 1993, 4 EDIT |
-| `$00A` | 1 | DIFF A | b0-1 DAMAGE (0 ×1, 1 ×0.5, 2 ×1.5, 3 ×2); b2-3 DROPS (0 NORMAL, 1 LESS, 2 MORE, 3 NONE); b4 CRITICALS on; b5 HARD on; b6 GUARDS on; b7 RULES = 1993 (`systems.md` §13.1) |
-| `$00B` | 1 | DIFF B | b0-3 LIVES 1-9; b4-6 E-TANK FLOOR 0-4; b7 reserved |
-| `$00C` | 1 | LOWEST | The easiest preset ever active (0 CASUAL < 1 NORMAL < 2 HARD); for achievements |
-| `$00D` | 1 | DIFF C | b0-1 REFILL on respawn (0 NONE, 1 HALF, 2 FULL); b2-7 reserved |
-| `$00E` | 2 | reserved | |
-| `$010` | 3 | STAGE_CLEAR | 24 bits by meta index: bit m = meta stage m cleared at least once |
-| `$013` | 1 | STORY_BEAT | Story position; `story.md` defines the values. Meta reads only the bracket states (§3.5) |
-| `$014` | 1 | EVENTS_SEEN | b0 POWER handed over; b1 JET handed over; b2 RIOT intro; b3 RIOT lifted (Semifinal won); b4 TROPHY theft; b5 BREAK MAN joins; b6 Mr. Y unmasked; b7 post-game bracket intro |
-| `$015` | 1 | EVENTS_SEEN2 | b0-3 badge E1-E4 lit; b4 SUPER adaptor handed over; b5 BREAK MAN WALKS (doping, §6.3); b6-7 reserved |
-| `$016` | 1 | FORMS | b0 POWER; b1 JET; b2 SUPER (real save flags, BRIEF §4); b3 TAG (Break Man callable); b4-7 reserved for `systems.md` |
-| `$017` | 1 | FORM_DEBUT | b0 POWER, b1 JET, b2 SUPER: the vanilla Rush-docking cutscene has played once for this form (`systems.md` §1.3) |
-| `$018` | 24 | SECRETS[24] | By meta index. b0 SECRET EXIT; b1 HIDDEN ROOM; b2 BEHAVIOUR ITEM (chip); b3 PLATE; b4 SPONSOR ENVELOPE taken (`systems.md` §7: 30 bolts, once per save); b5-7 MISS (§4.1; saturates at 7). For non-venue stages, b0-4 mean what the stage's owner defines. The 4 plate bits (Tomahawk, Yamato, Knight, Centaur) are `systems.md`'s PLATES |
-| `$030` | 2 | WEAPONS | `$030` b0-7 = the 8 champion weapons by venue id; `$031` b0 MAGNET BEAM (slot 9, `systems.md` §3.10); b1-7 reserved |
-| `$032` | 1 | E-TANKS | max 4 (`systems.md` §8) |
-| `$033` | 1 | W-TANKS | max 2 |
-| `$034` | 1 | LIVES | On load: lives = max(saved, the file's LIVES setting), as in 4MI |
-| `$035` | 3 | reserved | consumables, if `systems.md` adds any |
-| `$038` | 2 | BOLTS | 0-999 (`systems.md` §7 caps the counter at 999) |
-| `$03A` | 2 | CHIPS_OWNED | 16 bits, in `systems.md` §9.2's order (15 chips) |
-| `$03C` | 2 | CHIPS_EQ | 16 bits: equipped chips (`systems.md` §9.1 uses a bitmask, not slot positions) |
-| `$03E` | 1 | PARTS_GOT | 8 bits, SNOW GUST SEED EMBER KATANA FEATHER CREST SHELL (`systems.md` §9.3): PART dropped once per save |
-| `$03F` | 1 | PARTS_USED | spent in the garage or at Mr. Y's booth |
-| `$040` | 1 | METALLS | Full-power Metall kills, saturating at 255 (IRON HELMET at 20, `systems.md` §9.2) |
-| `$041` | 4 | WEAKFOUND | 32 bits, one per boss row: weakness found (`systems.md` §5 item 6, Could) |
-| `$045` | 1 | RATEFLAGS | b0 **DOPED** (Y-TURBO taken at Mr. Y's booth, §6.3); b1 MR. X CARD found; b2 RIVAL (Semifinal won with no damage); b3 **CHAMP_KO** (died in a champion's boss room; negative); b4 DOVE run achieved (`systems.md` chip 10); b5-7 reserved |
-| `$046` | 3 | TAG_STAGES | 24 bits: meta stages where Break Man was called |
-| `$049` | 1 | BASS_ADAPT | The damage column the player used most in the Semifinal duel; Bass β's W2 armour starts adapted to it (`systems.md` SC6) |
-| `$04A` | 6 | reserved | `systems.md` / `story.md` |
-| `$050` | 240 | STAGEREC[24] × 10 | +0 best score (0-100, `$FF` = none); +1 badge: b0-1 the preset of that best score (0 C, 1 N, 2 H, 3 93), b2 **asterisk** (earned with Y-TURBO equipped), b3-7 reserved; +2 best PAY (0-160, `systems.md` §6.6: a replay pays the improvement over this); +3 clears (saturates at 255); +4/5 best clear time in frames (saturates at `$FFFF`); +6/7 KOs; +8/9 time spent, in 256-frame units |
-| `$140` | 4 | PLAYTIME | frames, 32-bit (ticks only while a file is active) |
-| `$144` | 4 | CHAMP_TIME | PLAYTIME at the first championship; 0 = none |
-| `$148` | 2 | KOS | total deaths |
-| `$14A` | 2 | GAMEOVERS | |
-| `$14C` | 1 | UNPLUGS | saturates at 255 |
-| `$14D` | 3 | BOLTS_EARNED | 24-bit |
-| `$150` | 3 | BOLTS_SPENT | 24-bit |
-| `$153` | 2 | TAG_CALLS | Break Man calls |
-| `$155` | 2 | ETANKS_USED | |
-| `$157` | 2 | WEAK_HITS | first-weakness pops |
-| `$159` | 1 | BEST_RATING | 0-100, `$FF` = none |
-| `$15A` | 1 | LAST_RATING | |
-| `$15B` | 7 | LAST_ROWS | the seven rating rows (§6) |
-| `$162` | 142 | reserved | growth (§16 risk 3) |
-| `$1F0` | 16 | trailer | §1.3 |
+| Offset | Size | Field | Notes | Tier |
+|---|---|---|---|---|
+| `$000` | 4 | magic `'R' '6' 'F' n` | n = `'1'`..`'3'`; `'S'` = scratch (never committed) | Must |
+| `$004` | 1 | layout version | 1 at v1.0 | Must |
+| `$005` | 1 | FILEFLAGS | b0 ACTIVE; b1 CLEARED (won the championship once); b2 **EDITED** (EXTRA CONFIG wrote it, §9.6); b3 HARD_CLEAN (the HARD preset with every sub-setting unchanged since NEW GAME, never lowered); b4 R1993_CLEAN (likewise for 1993 RULES; Could); b5 BASS (Bass Mode; Won't, reserved); b6-7 reserved | Must |
+| `$006` | 2 | generation | | Must |
+| `$008` | 1 | IN_MATCH | 0 = none, else meta index + 1 | Must |
+| `$009` | 1 | DIFF preset | 0 CASUAL, 1 NORMAL, 2 HARD, 3 1993 RULES (Could), 4 EDIT | Must |
+| `$00A` | 1 | **DIFF A** | **b0-1** DAMAGE (0 ×1, 1 ×0.5, 2 ×1.5, 3 ×2); **b2-3** DROPS (0 NORMAL, 1 LESS, 2 MORE, 3 NONE); **b4 CASUAL** (`CFG_CASUAL`, R2.9); **b5 GUARDS**; **b6 HARD** (in V for `BIT`); **b7 RULES = 1993** (in N for `BIT`; Could). Criticals are gone (R2.4) | Must |
+| `$00B` | 1 | DIFF B | b0-3 LIVES 1-9; b4-6 E-TANK FLOOR 0-4; b7 reserved | Must |
+| `$00C` | 1 | LOWEST | the easiest setting ever active on this file, as a preset number (0 CASUAL < 1 NORMAL < 2 HARD); for achievements | Must |
+| `$00D` | 1 | DIFF C | b0-1 REFILL on respawn (0 NONE, 1 HALF, 2 FULL); b2-7 reserved | Must |
+| `$00E` | 2 | reserved | | |
+| `$010` | 3 | STAGE_CLEAR | 24 bits by meta index: bit m = meta stage m cleared at least once. Read by the bracket, LAND, EXPRESS and Blizzard's replay-skip door (the venue docs) | Must |
+| `$013` | 1 | STORY_BEAT | Story position; `story.md` §0 owns the values (`$00`-`$0C`). Meta reads it only for the sponsor's chair (§4.0) and the load target | Must |
+| `$014` | 1 | EVENTS | b0 POWER handed over; b1 JET handed over; b2 Riot intro; b3 HALFTIME RIOT won; b4 trophy theft; b5 Break Man joins (Should, with the partner); b6 Mr. Y unmasked; b7 post-game bracket intro (§3.6) | Must |
+| `$015` | 1 | EVENTS2 | b0-3 badges E1-E4 lit (Could); b4 SUPER adaptor scene (Roll on the map, story S29); b5 BREAK MAN WALKS (Could bundle); b6-7 reserved | Must |
+| `$016` | 1 | FORMS | b0 POWER; b1 JET; b2 SUPER (real save flags, BRIEF §4; SUPER is set when Rush docks in H3 screen 12, consistency-28); b3 TAG (Break Man callable; Should); b4-7 reserved | Must |
+| `$017` | 1 | FORM_DEBUT | b0 POWER, b1 JET, b2 SUPER: the vanilla Rush-docking cutscene has played once for this form (`systems.md` §1.3, R2.3) | Must |
+| `$018` | 24 | SECRETS[24] | By meta index. **b0** SECRET EXIT (fortress: the showpiece); **b1** HIDDEN ROOM; **b2** BEHAVIOUR ITEM (venues: the chip; fortress: the prize); **b3** PLATE (venues; fortress: H5's Mr. X card); **b4** SPONSOR ENVELOPE taken (30 bolts once, `systems.md` §7); **b5-7** MISS (§4.1, saturates at 7). The 4 plates sit at meta 5 (E), 6 (B), 7 (A), 8 (T) | Must |
+| `$030` | 2 | WEAPONS | `$030` b0-7 = the 8 champion weapons **by venue id** (b0 B.ATTACK … b7 C.FLASH); the menu slot comes from `systems.md`'s venue id → weapon slot table (consistency-37); `$031` b0 MAGNET BEAM (slot 9); b1-7 reserved | Must |
+| `$032` | 1 | E-TANKS | max 4 (5 with the bundle's TANK RACK) | Must |
+| `$033` | 1 | W-TANKS | max 2 | Should |
+| `$034` | 1 | LIVES | On load: lives = max(saved, the file's LIVES setting), as in 4MI | Must |
+| `$035` | 3 | reserved | consumables, if `systems.md` adds any | |
+| `$038` | 2 | BOLTS | 0-999 (`systems.md` §7 caps the counter) | Must |
+| `$03A` | 3 | **CHIPS_OWNED** | 24 bits in `systems.md` §9.2's order: bits 0-13 the 14 v1.0 chips; **bits 14-17 reserved for the Could bundle** (IRON HELMET, THERMOS, BIRD SEED, Y-TURBO); 18-23 spare | Must |
+| `$03D` | 3 | **CHIPS_EQ** | equipped chips, same bits (a bitmask, not slot positions) | Must |
+| `$040` | 4 | **PRIZES** | 32 bits, one per placed prize, paid once per save; bit = `PRIZE_BASE[meta]` + the stage's prize index (§1.6.1) | Must |
+| `$044` | 1 | PARTS_GOT | 8 bits, SNOW GUST SEED EMBER KATANA SPUR CREST SHELL (`systems.md` §9.4) | Could (bundle) |
+| `$045` | 1 | PARTS_USED | spent in the garage or at Mr. Y's booth | Could (bundle) |
+| `$046` | 1 | GARAGE | b0 TANK RACK built; b1-7 reserved | Could (bundle) |
+| `$047` | 1 | RATEFLAGS | b0 **DOPED** (Y-TURBO taken; bundle); b1 MR. X'S CARD found; b2 RIVAL (Bass β duel 1 with no damage); b3 **CHAMP_KO** (died in a champion's boss room; negative); b4 **SOLO RIOT** (Bass β duel 1 won without Break Man's capsule, §6.1); b5-7 reserved | Must |
+| `$048` | 1 | BASS_ADAPT | the damage column used most in Bass β duel 1; his duel-2 armour starts adapted to it (`systems.md` SC6) | Must |
+| `$049` | 1 | reserved | | |
+| `$04A` | 1 | COMMFLAGS | `story.md`'s once-per-save commentator flags, b0-7 (story §6.1 owns the meanings) | Must |
+| `$04B` | 3 | TAG_STAGES | 24 bits: meta stages where Break Man was called | Should |
+| `$04E` | 4 | WEAKFOUND | 32 bits, one per boss row: weakness found (`systems.md`) | Could |
+| `$052` | 14 | reserved | `systems.md` / `story.md` growth | |
+| `$060` | 240 | STAGEREC[24] × 10 | by meta index. +0 best score (0-100, `$FF` none); +1 badge: b0-1 the preset of that best score (0 C, 1 N, 2 H, 3 93), b2 **asterisk** (earned with Y-TURBO equipped; bundle), b3-7 reserved; +2 best PAY (0-160, `systems.md` §6.6: a replay pays the improvement over this); +3 clears (saturates at 255); +4/5 best clear time in frames (saturates at `$FFFF`); +6/7 KOs; +8/9 time spent, in 256-frame units | Must |
+| `$150` | 4 | PLAYTIME | frames, 32-bit (ticks only while a file is active) | Must |
+| `$154` | 4 | CHAMP_TIME | PLAYTIME at the first championship; 0 = none | Must |
+| `$158` | 2 | KOS | total deaths | Must |
+| `$15A` | 2 | GAMEOVERS | | Must |
+| `$15C` | 1 | UNPLUGS | saturates at 255 | Must |
+| `$15D` | 3 | BOLTS_EARNED | 24-bit | Must |
+| `$160` | 3 | BOLTS_SPENT | 24-bit (the 1-bolt insurance counts) | Must |
+| `$163` | 2 | TAG_CALLS | Break Man calls | Should |
+| `$165` | 2 | ETANKS_USED | | Must |
+| `$167` | 2 | WEAK_HITS | first-weakness pops | Must |
+| `$169` | 1 | BEST_RATING | 0-100, `$FF` = none | Must |
+| `$16A` | 1 | LAST_RATING | | Must |
+| `$16B` | 7 | LAST_ROWS | the seven rating rows (§6.1) | Must |
+| `$172` | 126 | reserved | growth (§16 risk 3) | |
+| `$1F0` | 16 | trailer | §1.3 | Must |
 
-### 1.7 The unplug detector [new-code] S · Should
+**Removed** (consistency-11, `systems.md` §15.1): METALLS (IRON HELMET is crafted now), the DOVE flag, CRITICALS (DIFF A
+b4 now holds CASUAL), round 1's 16-bit chip fields. BREAK_JOINED is FORMS.TAG. DROPS has no VANILLA value: under
+RULES = 1993 the drop reader uses vanilla's weights whatever b2-3 say (consistency-11, the conservative option).
 
-`IN_MATCH` is set at stage entry and cleared at a clear, a RETIRE or a game over. If a file loads with
+**The DIFF A bit table is the source of `src/gp/bits.inc`** (consistency-15, `tech.md` §5.5): every doc's code uses the
+generated macros, never raw bits. `IFHARD` = `BIT RS_DIFF / BVC skip`; `IF1993` = `BIT RS_DIFF / BPL skip`;
+`IFCASUAL` = `LDA RS_DIFF / AND #$10 / BEQ skip`, where `RS_DIFF` is RULESET's copy of DIFF A (§9.0), so Time Attack,
+GP Rush and fight records can override it in one place. A unit test asserts each macro follows its bit and nothing else.
+
+#### 1.6.1 Prize bits [data] S · Must
+
+One ROM table `PRIZE_BASE[24]` (by meta index) gives each stage's first PRIZES bit; a stage's prize object carries its
+local index n (`GP_ARG`), and the collector sets bit `PRIZE_BASE[m] + n`. The indexes are the venue docs':
+
+| Bits | Stage | Prizes (the stage doc's indexes) |
+|---|---|---|
+| 0-3 | Blizzard (meta 1) | the 4 bonus vegetables, 10 / 10 / 15 / 25 = 60 (`venues_b.md` §0.9) |
+| 4-7 | Plant (meta 3) | the 4 treasures #0-#3, 10 / 15 / 15 / 20 = 60 (`venues_a.md` §0.8) |
+| 8-10 | Tomahawk (meta 6) | the 3 bounties #0-#2, 15 / 20 / 25 = 60 |
+| 11 | Knight (meta 7) | the torch-pocket pouch #0, 20 |
+| 12-27 | non-venue stages | assigned by `fortress.md` (its showpiece payouts ride on SECRETS b0 and need no bit) |
+| 28-31 | spare | |
+
+Wind, Flame, Yamato and Centaur have no prizes. The ≤ 60-per-stage cap is `systems.md`'s (R2.7); the build checks it
+against this table.
+
+### 1.7 The unplug detector [new-code] S · Must (the count); the line is Should
+
+`IN_MATCH` is set at stage entry (autosave 2) and cleared at a clear, a RETIRE or a game over. If a file loads with
 `IN_MATCH ≠ 0`, the stage was abandoned by power-off or reset. The load then:
 
 - adds 1 to UNPLUGS and to that stage's KOs;
-- queues a commentator line for the bracket. Kalinka: *"We lost the feed during WIND MAN's match! …Did someone trip
-  over the stadium cable?"*
+- queues a commentator line for the bracket (story S16's words; Should: if the line is not in the build, nothing shows).
 
-Deaths are already saved on the spot (autosave 3), so unplugging gains nothing. The counter is flavour, plus one
-rating point (§6).
+Deaths are already saved on the spot (autosave 3), so unplugging gains nothing. The counter is flavour, plus rating T12
+(§6.1). It is Must because T12 is.
 
-### 1.8 Meta index (save-table rows)
+### 1.8 Meta index and engine ids (save-table rows)
 
-| Meta | Stage | Meta | Stage |
+The meta index is unchanged from round 1, so the id-map dispute never touched the save format (consistency strength).
+Engine ids are `tech.md` §4.2's binding map (R1.2); `SA.META` maps one to the other.
+
+| Meta | Stage | Engine id | Tier |
 |---|---|---|---|
-| 0 | Opening Ceremony | 14-18 | Hall of Fame H1-H5 |
-| 1-8 | the 8 venues, in vanilla stage-id order: Blizzard, Wind, Plant, Flame, Yamato, Tomahawk, Knight, Centaur (meta = vanilla id + 1) | 19-21 | Super Wily Castle W1-W3 |
-| 9 | Semifinal Riot | 22 | Mr. X Returns (Could) |
-| 10-13 | Exhibitions E1-E4 | 23 | Victory lap (the playable credits; Time Attack only) |
+| 0 | Opening Ceremony (Opening-lite) | `$10` | Must |
+| 1-8 | the 8 venues, in vanilla stage-id order: Blizzard, Wind, Plant, Flame, Yamato, Tomahawk, Knight, Centaur (meta = vanilla id + 1) | `$00-$07` | Must |
+| 9 | **HALFTIME RIOT** (R4.3) | `$11` | Must |
+| 10-13 | Exhibitions E1-E4 | `$12-$15` | Could (R3.7; E4 Won't) |
+| 14-18 | Hall of Fame H1-H5 | `$16-$1A` | H1, H3, H5 Must; H2, H4 Should |
+| 19-21 | Super Wily Castle W1-W3 | `$1B-$1D` | W2, W3 Must; W1 Could |
+| 22 | Mr. X Returns | `$1F` | Won't (v1) |
+| 23 | Victory lap (the playable credits) | `$1E` | Could (R0.3 item 8) |
 
-Medals and HoF points count meta 0-21: the BRIEF's 22 stages.
+Legacy ids `$08-$0F` (vanilla Mr. X 1-4, Wily 1-4) have no meta index: they are regression data and fight-table arenas.
+
+Medals and HoF points count **the stages a build ships**: in v1.0, meta 0-9, 14, 16, 18, 20 and 21 (15 stages).
+
+### 1.9 Save tests (the testing-policy hooks) [new-code] S · Must (inside item 1's 3.5 sessions)
+
+- **Offline fuzz** (`tools/test/savefuzz.py`, every build's unit suite): it writes 32 KB `.sav` images (page 0 at file
+  offset `$0000`) for each case, boots the build headless to the file select, and asserts the card state from RAM:
+  both copies valid (newer generation wins), generation wrap (`$FFFF` vs `$0000`), one copy torn (marker missing), one
+  copy with a bad checksum byte, both bad (`BROKEN DATA`, ERASE only), an older layout version (the migration runs), a
+  newer one (BROKEN, never loaded), a broken system block (defaults plus the notice).
+- **Round trip**: a mailbox run plays Blizzard to the clear, resets, reloads, and compares LIVE FILE byte for byte with
+  the image before the reset (play time masked).
+- **Power cut on hardware** (M9, the user's cart, RULINGS §7 question 1): power off during a commit, 20 times at random
+  frames; every reload must show either the old or the new state, never BROKEN for both copies.
 
 ---
 
 ## 2. Title flow and file select
 
-### 2.1 Boot and attract [new-code] S · Must, [new-art] M · Must
+Every label and line on these screens is `story.md`'s (R4.1); the names below are identifiers. Menu screens run in a
+scheduler thread (code in meta's banks `$42-$43`, `tech.md` §1.2) and wait through `JSR $C62B` / `$C5F6`, so text and
+glyph uploads never hit the lag-frame trap (`tech.md` §11.6). Their pages use the 4 × 28 window (R1.4).
 
-1. **License screen**: vanilla script `$1F` (`rm6/text.md` §5.1), plus one new line, `ROCKMAN 6 GP — FAN PATCH`
-   [engine-ok + text].
-2. **Attract crawl**: replaces vanilla's "IN THE YEAR 20XX…" (scripts `$50-$5E`). It is `story.md`'s GP opening
-   told in 6 typed panels; START skips it.
-3. **Title**:
-   - the new logo **ROCKMAN 6 GP**, subtitle **史上最大のグランプリ!!** (logo art; vanilla's only kanji were logo art
-     too);
-   - the vanilla moon backdrop, kept;
-   - music: the vanilla title `$19` until `art_audio.md` supplies a GP fanfare.
+### 2.1 Boot, health notice and title [new-code] S · Must; [new-art] S · Must (art_audio's title plan)
+
+1. **RAM probe and mailbox** (`tech.md` §2.3, §14.5): a short-RAM emulator stops with tech's message; a valid test
+   mailbox (§9.6) jumps straight to its command.
+2. **License screen**: vanilla script `$1F` (`rm6/text.md` §5.1) plus one GP line (story S01's words) [engine-ok + text].
+3. **Health notice** (R3.5) [new-code] S · Must: one 4 × 28 page in the text window on a black menu screen (text v1a),
+   story's words, telling the player that the game has flashing effects and that CONFIG → FLASHES → REDUCED turns every
+   flash into a fade. It shows on every power-on and reset, for at least 120 frames, then any button continues. No save
+   bit: it is never skipped for good.
+4. **Title**: `art_audio.md`'s plan: the vanilla logo and moon backdrop kept, a GP sprite badge, the subtitle with
+   グランプリ in place of 戦い, the menu under the pattern-table split (`tech.md` §16.8 M5.8; the slice's title uses a
+   plain text menu until then). Music: vanilla `$19`, or art_audio's fanfare when it exists.
+5. **Attract crawl** (Could, R0.3 item 12): story S02's GP opening in typed panels after 30 s idle on the title; START
+   skips. Without it the title idles as vanilla does.
 
 Title menu (cursor ▶, vanilla style):
 
-| Item | When shown | Does |
-|---|---|---|
-| GAME START | always | → FILE SELECT |
-| SPECIAL EVENTS | once any unlock bit is set (§7) | → the post-game menu (§9) |
-| CONFIG | always | → CONFIG (§11), global settings only; the difficulty group is per file |
-| *(hidden)* PASS WORD | hold SELECT on the title for 2 s | The vanilla password grid, fully working. A valid vanilla password gets Kalinka: *"Passwords? It's 20XX! We have batteries now."* It sets no progress. Could, S: a quirk kept on purpose (rm6 lesson 8). The vanilla codec `$3F:$F3D0` is reused |
+| Item | When shown | Does | Tier |
+|---|---|---|---|
+| GAME START | always | → FILE SELECT | Must |
+| SPECIAL EVENTS | once U0.0 is set (§7) | → the post-game menu (§9) | Must |
+| CONFIG | always | → CONFIG (§11), global settings only; the difficulty group is per file | Must |
+| *(hidden)* PASS WORD | hold SELECT on the title for 2 s | the vanilla password grid, fully working through the vanilla codec `$3F:$F3D0` (`tech.md` §13); a valid vanilla password gets a Kalinka line (story) and sets no progress. A quirk kept on purpose (rm6 lesson 8) | Could |
 
 ### 2.2 FILE SELECT: "ENTRANT REGISTRATION" [new-code] M · Must, [new-art] S · Must
 
-Three cards stacked vertically, each 6 tiles tall. Kalinka holds the clipboard at the right.
+Three cards stacked vertically, each 6 tiles tall. Kalinka holds the clipboard at the right (her 16×16 face icon in
+v1.0; R5.1).
 
 ```
 ┌ FILE 1 ───────────────────────── NORMAL ┐
 │ [8 venue icons: lit = won, medal colour]  │
-│  E1 E2 E3 E4   H1-H5 ▮▮▮▯▯   W ▯▯▯        │
+│  H ▮▯▮▯▮   W ▯▮▮        RIOT ✓            │
 │  HOF PTS 37    BOLTS 625     12:34:56     │
 │  ★ RATING 87 (FINALIST)        KOS 143     │
 └───────────────────────────────────────────┘
 ```
 
-| Card shows | From |
-|---|---|
-| venue icons, coloured by medal (none / bronze / silver / gold / platinum) | STAGEREC best score |
-| Exhibition, Hall of Fame and Castle progress | STAGE_CLEAR |
-| HOF PTS | §5.2 |
-| BOLTS | `$038` |
-| play time h:mm:ss | `$140` |
-| difficulty badge (CASUAL / NORMAL / HARD / 1993, plus `EDIT` if any override is set) | `$009` |
-| ★ and the best rating, if CLEARED (with `*` if DOPED) | `$159` |
-| a red `*` if EDITED, a Bass icon if BASS | FILEFLAGS |
-| KOs (EN "KNOCKOUTS", ENGRISH "TIWNS", §12) | `$148` |
+| Card shows | From | Tier |
+|---|---|---|
+| venue icons, coloured by medal (none / bronze / silver / gold / platinum) | STAGEREC best score | Must |
+| HALFTIME RIOT, Hall of Fame and Castle progress (only the wings the build ships; the others draw as closed) | STAGE_CLEAR | Must |
+| Exhibition progress E1-E4 | STAGE_CLEAR 10-13 | Could (with the Exhibitions) |
+| HOF PTS | §5.2 | Must |
+| BOLTS | `$038` | Must |
+| play time h:mm:ss | `$150` | Must |
+| difficulty badge (C / N / H, `93` with 1993 RULES, plus `EDIT` if any override is set) | `$009` | Must (93: Could) |
+| ★ and the best rating, if CLEARED (with `*` if DOPED) | `$169` | Must (`*`: bundle) |
+| a red `*` if EDITED | FILEFLAGS | Must |
+| KOs | `$158` | Must |
 
 An empty file shows `NEW ENTRANT`; a broken one shows `BROKEN DATA` (§1.4).
 
 Commands (UP/DOWN pick the card, A/START open a command row under it):
 
-| Command | Rule |
-|---|---|
-| **START** (on a used file) | Load; go to the bracket or the fortress map |
-| **NEW** | On an empty file: go straight to the difficulty pick. On a used file: `OVERWRITE? NO / YES`, with NO first, and YES needs **START+A** (4MI's stray-START guard, `r4mi/modes.md` §4) |
-| **COPY** (Should) | Pick the target file; the same overwrite guard |
-| **ERASE** | `ERASE? NO / YES`, START+A |
-| **ENTRANT** (after the first clear, Could) | Toggles ROCKMAN / BASS β for a NEW file (§9.7) |
+| Command | Rule | Tier |
+|---|---|---|
+| **START** (on a used file) | Load; go to the bracket or the fortress map (§3.9) | Must |
+| **NEW** | On an empty file: go straight to the difficulty pick. On a used file: `OVERWRITE? NO / YES`, with NO first, and YES needs **START+A** (4MI's stray-START guard, `r4mi/modes.md` §4) | Must |
+| **ERASE** | `ERASE? NO / YES`, START+A | Must |
+| **COPY** | Pick the target file; the same overwrite guard | Should |
+| **ENTRANT** | Toggles ROCKMAN / BASS β for a NEW file (§9.7) | Won't (Bass Mode) |
 
 ### 2.3 NEW GAME: difficulty pick [new-code] S · Must
 
-There are four big panels, each with one line of description:
+Big panels, each with one line of description (story's words; the HARD line must describe v1.0's HARD, not remixed
+stages, R2.9):
 
-| Preset | Line |
-|---|---|
-| CASUAL | "Half damage, safety net, extra lives. The crowd is on your side." |
-| NORMAL | "The Grand Prix as designed." |
-| HARD | "Remixed venues, meaner champions, no free drops." |
-| 1993 | "Vanilla rules. No chips, no shop, no mercy. Like it's 1993." |
+| Preset | Sets (`systems.md` §13.2) | Tier |
+|---|---|---|
+| CASUAL | DAMAGE ×0.5, LIVES 5, E-TANK FLOOR 2, DROPS MORE, REFILL FULL, GUARDS on, **CASUAL on** | Must |
+| NORMAL | ×1, 3, 0, NORMAL, HALF | Must |
+| HARD | ×1.5, 3, 0, **LESS**, **NONE**, **HARD on** (v1.0 HARD = ×1.5 damage, drops LESS, no refill, the 18-f quick-draw; per-stage HARD content is Should, R2.9) | Must |
+| 1993 RULES | ×1, 3, 0, vanilla drops, NONE, RULES = 1993 (`systems.md` §13.6: the rules change, the content does not) | Could (R0.3 item 10) |
 
-The pick writes DIFF preset, A, B and LOWEST, and sets HARD_CLEAN or R1993_CLEAN when the preset is HARD or 1993.
-After the first save, the Opening Ceremony starts. Overrides live in the pit stop's CONFIG page (§11.2). Changing
-anything below the starting preset clears the `_CLEAN` bit for good (4MI's HARD ROCK rule, `r4mi/modes.md` §5).
+The pick writes DIFF preset, A, B, C and LOWEST, and sets HARD_CLEAN (or R1993_CLEAN) when the preset is HARD (or
+1993). Autosave 1 runs, then the Opening Ceremony starts (in the v0.1 slice, before the Opening exists, the bracket).
+Overrides live in the pit stop's CONFIG page (§11.2). Changing anything below the starting preset clears the `_CLEAN`
+bit for good (4MI's HARD ROCK rule, `r4mi/modes.md` §5).
 
 ---
 
-## 3. The bracket stage select
+## 3. The bracket, the pit stop and the fortress maps
 
 ### 3.1 From vanilla's grid [new-code] M · Must, [new-art] M · Must
 
 Vanilla facts (`rm6/ram.md`):
 
-- **Grid.** The 3×3 grid is `$3F:$F232` = `00 01 03 FF / 02 FF 05 FF / 04 06 07 FF`. The centre gives stage 8 only
-  when `$05C8` = 0, that is, once all eight are beaten.
-- **Beaten stages.** A beaten portrait becomes Rockman's head, and a plate stage shows its B/E/A/T letter.
-- **Rematches.** A beaten boss's room beams Rockman out: there are no rematches.
+- **Grid.** The 3×3 grid is `$3F:$F232` = `00 01 03 FF / 02 FF 05 FF / 04 06 07 FF`; it is read once, at `$3F:$F182`
+  [code, r2: `flagscan.py`]. The centre gives stage 8 only when `$05C8` = 0, that is, once all eight are beaten.
+- **Beaten stages.** A beaten portrait becomes Rockman's head (the stage select asks `$3F:$F520`, "is this boss
+  beaten?", at `$F0D6` [code, r2]), and a plate stage shows its B/E/A/T letter.
+- **Rematches.** A beaten boss's room beams Rockman out: there are no rematches (§3.2 has the site).
 - **Text.** Script `$12` draws `PUSH START` and the names.
 
 GP keeps the shape (three rows of three frames and a centre) and the vanilla cursor feel, but redraws the screen as a
-**bracket** and replaces the cell table with a node table.
+**bracket** and replaces the cell table with a node table. The whole vanilla stage-select routine is retired (`tech.md`
+§4.3 "retired" rows); the bracket is meta's thread code.
 
-**Layout and pairing.** Four portraits stay in their vanilla cells (Blizzard, Wind, Tomahawk, Yamato). Four move so
-that each Exhibition pair (the PLAN §3.3 pairs, which both venue docs also use) meets at one of the four inner
-crossings around the centre. Think of the screen as a 5×5 grid: the frames sit on the even rows and columns, the
-badges on the four inner crossings.
+**Layout and pairing.** Four portraits stay in their vanilla cells (Blizzard, Wind, Tomahawk, Yamato). Four move so that
+each Exhibition pair meets at one of the four inner crossings around the centre: a 5×5 grid with the frames on the even
+rows and columns and the badges on the four inner crossings. The pinwheel is kept in v1.0 even though the Exhibitions are
+Could (R3.7): the badges then draw as plain rivets (state DARK for good), the B layer is off, and v1.1 only has to light
+them.
 
 | | col 0 | (gap) | col 1 | (gap) | col 2 |
 |---|---|---|---|---|---|
 | **row 0** | BLIZZARD (0) | | WIND (1) | | KNIGHT (6) |
-| (gap) | | **E3** ◆ wired to Blizzard + Flame | | **E1** ◆ wired to Wind + Knight | |
+| (gap) | | **E3** ◆ Blizzard + Flame | | **E1** ◆ Wind + Knight | |
 | **row 1** | FLAME (3) | | **FINAL** (centre) | | TOMAHAWK (5) |
-| (gap) | | **E4** ◆ wired to Yamato + Centaur | | **E2** ◆ wired to Tomahawk + Plant | |
+| (gap) | | **E4** ◆ Yamato + Centaur | | **E2** ◆ Tomahawk + Plant | |
 | **row 2** | YAMATO (4) | | CENTAUR (7) | | PLANT (2) |
 
-Each badge touches four cells: its two venues, the FINAL, and one other frame. Its two bracket lines run from the
-inner edges of its venues' frames into the badge, and one line runs from the badge into the FINAL's corner. Numbers
-in brackets are the vanilla stage ids.
+Numbers in brackets are the engine stage ids (= vanilla ids, `tech.md` §4.2). The frames show the **champions' names**,
+not the venue names: the bracket font has `0-9 A-Z . -` and blank only (`story.md` §10.1), and HERO'S QUEST has an
+apostrophe. The venue names appear on the match card's VENUE field, which allows `'` (§3.2).
 
-| Badge | Crossing | Wired to | Unlocked by both secret exits of |
-|---|---|---|---|
-| **E1** | top right | Wind (top middle), Knight (top right) | Wind + Knight |
-| **E2** | bottom right | Tomahawk (middle right), Plant (bottom right) | Tomahawk + Plant |
-| **E3** | top left | Blizzard (top left), Flame (middle left) | Blizzard + Flame |
-| **E4** | bottom left | Yamato (bottom left), Centaur (bottom middle) | Yamato + Centaur |
+| Badge | Crossing | Wired to | Unlocked by both secret exits of | Tier |
+|---|---|---|---|---|
+| **E1** | top right | Wind, Knight | Wind + Knight | Could |
+| **E2** | bottom right | Tomahawk, Plant | Tomahawk + Plant | Could |
+| **E3** | top left | Blizzard, Flame | Blizzard + Flame | Could |
+| **E4** | bottom left | Yamato, Centaur | Yamato + Centaur | Won't (E4 Maze is Won't, R3.7) |
 
-Each pair is a corner plus the edge next to it, a pinwheel. Each badge is wired into the centre, the FINAL. The art
-is bracket lines in the BG (gold when lit, grey when not), 32×32 portraits, and 16×16 badges drawn as sprites so
-they can blink.
+The art is bracket lines in the BG (gold when lit, grey when not), 32×32 champion portraits (vanilla's, kept), and
+16×16 badges drawn as sprites so they can blink.
 
-**Node table** (data, replacing `$F232`): 13 nodes × 6 bytes.
+**Node table** (data, replacing `$F232`): 13 nodes × 6 bytes, shared with the fortress maps (§3.9).
 
 | Byte | Contents |
 |---|---|
@@ -424,114 +579,127 @@ they can blink.
 | +2 | y |
 | +3 | neighbour UP/DOWN (two nibbles) |
 | +4 | neighbour LEFT/RIGHT (two nibbles) |
-| +5 | layer (0 = ring, 1 = badge) |
+| +5 | layer (0 = ring, 1 = badge) and flags (b7 = not in this build) |
 
-There are 9 ring nodes and 4 badge nodes. Navigation skips nodes that cannot be selected.
+There are 9 ring nodes and 4 badge nodes. Navigation skips nodes that cannot be selected, and nodes flagged "not in this
+build".
 
 ### 3.2 Controls on the bracket [new-code] S · Must
 
-| Button | Does |
-|---|---|
-| D-pad | Moves within the current layer |
-| START / A | Selects. A venue → the **match card** (`MATCH: ROCKMAN vs BLIZZARD MAN / VENUE: SUMMIT CLIMBER`, `venues_b.md` §0.6; it is vanilla's typed boss-intro panel, `$3C:$81B1`, extended to new entrants) → the stage. A cleared stage first shows a confirm card: best score, medal, best time, the 4 secret icons, and `REMATCH? NO/YES` |
-| **SELECT** | **PIT STOP**: Eddie's shop, chips, the garage, CONFIG (difficulty group), `SAVE & QUIT` (back to the title). This matches `systems.md` §1.5. SELECT is free outside stages (`rm6/ram.md` "SELECT is free") |
-| **B** | Toggles the **Exhibition layer**: the cursor jumps to the 2×2 grid of badges, and B again returns to the ring. The prompt `B: EXHIBITIONS` shows only once a badge is lit |
+| Button | Does | Tier |
+|---|---|---|
+| D-pad | Moves within the current layer | Must |
+| START / A | Selects. A venue → the **match card** (vanilla's typed boss-intro panel `$3C:$81B1`, extended by tech to records by fight id with a 10th VENUE field, `tech.md` §11.2) → the stage. A cleared stage first shows a confirm card: best score, medal, best time, the secret icons, and `REMATCH? NO/YES` | Must |
+| **SELECT** | **PIT STOP** (§3.8). SELECT is free outside stages (`rm6/ram.md`); in stages it means only the quick swap and the last-weapon toggle (R2.10) | Must |
+| **B** | Toggles the **Exhibition layer**: the cursor jumps to the 2×2 grid of badges, B again returns to the ring. The prompt `B EXHIBITIONS` (no `:`: the bracket font has none, consistency-23) shows only once a badge is lit | Could |
 
-**Mr. Y's booth** (`systems.md` §9.4) [new-code][new-art] S · Should. After the Semifinal, a shady booth sprite
-stands at the bracket's bottom-right edge under a sign, `MR. Y PERFORMANCE PARTNERS`. It is not a cursor node: the
-PIT STOP menu gains a last row, `MR. Y'S BOOTH`, which runs the offer. The booth stays until TURBO is taken; then it
-packs up, and Break Man walks (§6.3).
+**The on-screen venue names** (R3.3, consistency-42; all ≤ 20 characters, the VENUE field's limit):
 
-**Rematches are allowed** in GP: medals need replays. The vanilla beam-out on a beaten boss's room must be removed
-(`systems.md` / `tech.md`, §15). A replay pays only the score improvement (BRIEF §5.3).
+| Venue (id) | Name | Venue (id) | Name |
+|---|---|---|---|
+| Blizzard (0) | SUMMIT CLIMBER | Yamato (4) | EDO NINJA ROW |
+| Wind (1) | SKY ACE | Tomahawk (5) | HIGH NOON FRONTIER |
+| Plant (2) | LOST JUNGLE | Knight (6) | HERO'S QUEST |
+| Flame (3) | PERSIAN PALACE | Centaur (7) | ATLANTIS RUINS |
+
+No third-party trademark or character name appears on screen (R3.3); the debrief, panels and RECORDS use these names.
+
+**Rematches are allowed** in GP: medals need replays (BRIEF §5.3). [code, r2] [seen, r2] The vanilla beam-out is one
+test in the boss-room routine: **`$3F:$F951 JSR $F527 / BCS $F9A0`** (bytes `20 27 F5 B0 4A`). `$F527` returns carry
+set when the boss of the current screen is already beaten (it reads `$0692,X` with the mask from `$F6BB`, or `$F6C3`
+when `$57` = the plate screen `$F518`); `BCS $F9A0` then skips the fight and the flag set (`JSR $F4EB` at `$F99D`) and
+jumps to the post-kill end path. Measured (`rematch.py`): from Flame's boss shutter with all 8 bosses marked beaten,
+vanilla enters screen `$17`, no boss spawns, and `$F0` = 1 (stage over); with the branch replaced by two NOPs the boss
+intro spawns (slot 8 type `$93`, bar `$FF`) and the refight starts. GP's hook (registry entry `H_REMATCH`, kind `operand`, owner meta;
+`tech.md` §14.2) re-points the JSR operand at `$3F:$F952` to `gp_rematch`, a stub in `$7F` that returns carry clear
+when `SA.FLAGS1` b2 REMATCH is set (every venue and every GP stage) and otherwise falls through to `$F527`, so legacy
+ids keep vanilla's answer. `BCS $F9A0` stays as it is. On a replay (STAGE_CLEAR bit m already set) the
+post-kill path skips the YOU GET card (the weapon is already owned) and goes to the judges' desk; tech's `$3F:$F9A0`
+hook (`tech.md` §4.6) carries the test. A replay pays only the score improvement (`systems.md` §6.6).
 
 ### 3.3 Node states and what they draw [new-code] S · Must
 
-| State | Ring frame draws | Selectable |
-|---|---|---|
-| OPEN | The champion's portrait, name | yes |
-| WON | The portrait with a **medal ribbon** sprite (bronze/silver/gold/platinum colour); a gold line to its badge; a ★ on the line if its secret exit is found; the plate letter B/E/A/T in the frame corner if the plate is held | yes (rematch) |
-| POSTPONED | The portrait under a red **POSTPONED** stamp (sprite overlay) | no: Kalinka *"Rain delay! …It's not raining. It's Bass."* |
-| Badge DARK | A plain rivet | no |
-| Badge HALF | One of its two lines lit, the badge dim and showing "?" | no; START shows the pair's names: *"One more secret exit: KNIGHT MAN's venue!"* |
-| Badge LIT | Blinking badge with the guest's icon | yes |
-| Badge WON | Solid badge plus the medal ribbon | yes |
+| State | Ring frame draws | Selectable | Tier |
+|---|---|---|---|
+| OPEN | The champion's portrait, name | yes | Must |
+| WON | The portrait with a **medal ribbon** sprite (bronze/silver/gold/platinum colour); a ★ on the frame if its secret exit is found; the plate letter B/E/A/T in the frame corner if the plate is held | yes (rematch) | Must |
+| POSTPONED | The portrait under a red **POSTPONED** stamp (sprite overlay) | no: a Kalinka line (story S14) | Must |
+| Badge DARK | A plain rivet | no | Must (drawn) |
+| Badge HALF | One of its two lines lit, the badge dim and showing `?` | no; START names the missing venue (story) | Could |
+| Badge LIT | Blinking badge with the guest's icon | yes | Could |
+| Badge WON | Solid badge plus the medal ribbon | yes | Could |
 
 ### 3.4 Centre node: the FINAL frame [new-code] S · Must
 
 | Condition (checked in order) | Centre shows | START does |
 |---|---|---|
-| fewer than 4 venue wins | The GP trophy silhouette with `?` | Kalinka: *"The final? Win some matches first!"* |
-| 4+ wins and the Semifinal not cleared | **BASS β** portrait, cracked frame, `SEMIFINAL` | → the Semifinal Riot (meta 9) |
-| Semifinal cleared, fewer than 8 wins | Trophy, `4 TO GO` → `1 TO GO` | Kalinka counts down |
-| 8 wins, H1 not cleared | **Lit trophy** | First time: the trophy theft scene (`story.md`), then the HALL OF FAME map |
-| inside H1-W3 | The fortress logo of the current map | → that map (H or W) |
-| CLEARED file | The trophy with Rockman's face | → the **replay list** of meta 0, 9 and 14-21 (any cleared stage) |
+| fewer than 4 venue wins | The GP trophy silhouette with `?` | a Kalinka line (story) |
+| 4+ wins and the HALFTIME RIOT not won | **BASS β** portrait, cracked frame, `HALFTIME` | → the HALFTIME RIOT (meta 9, engine `$11`) |
+| Riot won, fewer than 8 wins | Trophy, `4 TO GO` → `1 TO GO` | Kalinka counts down (story S24) |
+| 8 wins, H1 not cleared | **Lit trophy** | First time: the trophy theft (story S25, EVENTS b4), then the HALL OF FAME map (§3.9) |
+| inside H1-W3 | The fortress logo of the current map | → that map |
+| CLEARED file | The trophy with Rockman's face | → the **replay list** of meta 0, 9 and the cleared H/W stages |
 
-The fortress maps (`fortress.md`) get one extra item, **BACK TO BRACKET** [new-code] S · Should. A player inside the
-Hall of Fame can still go back for Exhibitions or medal replays. Vanilla never allowed this, but GP saves per wing,
-so nothing is lost.
+### 3.5 The HALFTIME RIOT trigger [new-code] S · Must
 
-### 3.5 The Semifinal trigger [new-code] S · Must, [new-art] S · Should
+**HALFTIME RIOT** is the stage's name everywhere (R4.3, design-14): it happens at the bracket's halfway point, and a
+stadium riot at halftime is the joke. The rule: **venue wins = popcount(STAGE_CLEAR bits 1-8)**.
 
-The rule: **venue wins = popcount(STAGE_CLEAR bits 1-8)**.
-
-- When it reaches **4** and STAGE_CLEAR bit 9 (the Semifinal) is clear, the bracket is **SEMI_PENDING**.
-- While SEMI_PENDING, every unbeaten venue frame is POSTPONED.
+- When it reaches **4** and STAGE_CLEAR bit 9 (the Riot) is clear, the bracket is **RIOT_PENDING**.
+- While RIOT_PENDING, every unbeaten venue frame is POSTPONED.
 - Won venues stay selectable for medal replays, and the pit stop stays open. The player cannot strand themselves,
-  because the Semifinal is selectable at once.
-- The Semifinal clear sets bit 9. The POSTPONED stamps peel off (event b3), and the last 4 venues reopen.
+  because the Riot is selectable at once (§16 risk 5 has the test).
+- The Riot's clear sets bit 9. The POSTPONED stamps peel off (event b3), and the last 4 venues reopen.
 
-The "Riot" intro (event b2, plays once, about 6 s, Should; the stamps alone are Must) is a screenshot moment:
+**The Riot intro** (event b2) plays once, before the Riot opens:
 
-1. The bracket draws normally. Then the music cuts and the screen shakes (scroll jitter, 8 frames).
-2. Bass β's sprite drops in at the top centre, lands on the FINAL frame and fires three buster shots at it (the frame
-   tiles swap to a cracked version).
-3. He dashes across the four unbeaten portraits. Each one gets a POSTPONED stamp as he passes.
-4. Commentary (`story.md` writes it): Kalinka *"An unregistered entrant is attacking the bracket!"* Cossack
-   *"…Registered, actually. Sponsor: Mr. Y."* Kalinka *"Of course it is."*
-5. The centre shows BASS β; the cursor moves to it.
+- **Must:** the music cuts, the POSTPONED stamps appear on the unbeaten frames, the centre turns to Bass β's cracked
+  frame, the cursor moves to it, and story S14's lines play in the bracket's message window.
+- **Could:** the animation (≈ 6 s): an 8-frame scroll shake; Bass β's sprite drops in at the top centre, lands on the
+  FINAL frame and fires three buster shots at it (the frame tiles swap to the cracked version); he dashes across the
+  four unbeaten portraits, stamping each one as he passes.
 
-The adaptors arrive by win count (BRIEF §4):
+The adaptors arrive by win count (BRIEF §4, `systems.md` §2.3):
 
 - **POWER after the 2nd win, JET after the 4th**, stored in FORMS.
-- They are handed over as bracket events b0 and b1: Roll's pit-crew pop-up on the bracket. The event text belongs to
-  `story.md`; the bits and the order belong here.
-- On the 4th win, the order is **JET event → Riot intro**.
+- They are handed over as bracket events b0 and b1: Roll's pit-crew pop-up on the bracket (story S12, S13). The words
+  belong to `story.md`; the bits and the order belong here.
+- On the 4th win the order is **JET event → Riot intro**.
 
-### 3.6 Bracket event queue [new-code] S · Must
+### 3.6 The event queue [new-code] S · Must
 
-Story beats on the bracket are **data**: a table of `{condition, event script id, seen bit}`. The bracket runs the
-first unseen event whose condition holds, sets its seen bit, saves (autosave 7), and repeats until none are left.
+Story beats on the bracket and on the fortress maps are **data**: a table of `{condition, event script id, seen bit}`.
+The screen runs the first unseen event whose condition holds, sets its seen bit, saves (autosave 7), and repeats until
+none are left. Conditions are predicates over STAGE_CLEAR, FORMS, EVENTS, RATEFLAGS and STORY_BEAT, on the same
+predicate engine as §4 (CX lesson 7: special cases in visible tables).
 
-Conditions are predicates over STAGE_CLEAR, FORMS, FLAGS and STORY_BEAT, the same predicate engine as §4. This keeps
-the bracket code free of story special cases (CX lesson 7: special cases in visible tables).
+| Seen bit | Screen | Condition | Event (story's scene) | Tier |
+|---|---|---|---|---|
+| EVENTS b0 | bracket | venue wins ≥ 2 | Roll: POWER ready (S12) + `FORMS.POWER` | Must |
+| EVENTS b1 | bracket | venue wins ≥ 4 | Roll: JET ready (S13) + `FORMS.JET` | Must |
+| EVENTS b2 | bracket | wins ≥ 4 and the Riot not won | the Riot intro (§3.5, S14) | Must (animation Could) |
+| EVENTS b3 | bracket | the Riot won | the stamps peel off; "the bracket resumes" | Must |
+| EVENTS b4 | bracket (START on the lit trophy) | 8 wins | the trophy theft (S25); STORY_BEAT → `$03` | Must |
+| EVENTS b6 | Hall of Fame map | H5 cleared | the unmasking (S33); STORY_BEAT → `$09` | Must |
+| EVENTS2 b4 | Hall of Fame map | FORMS.SUPER (set in-stage when Rush docks in H3 screen 12, consistency-28) | Roll explains the Super Adaptor (S29) | Must |
+| EVENTS b7 | bracket | CLEARED | the post-game intro: "welcome back, champion" | Must |
+| EVENTS b5 | (in-stage) | HALFTIME RIOT screen `0E` | Break Man joins through Rule 9 (S20, played in place, R4.2) and sets `FORMS.TAG` | Should (the tag partner) |
+| EVENTS2 b0-3 | bracket | badge n becomes LIT | the badge lights; Cossack announces the guest (S22) | Could |
+| EVENTS2 b5 | bracket | RATEFLAGS.DOPED | **BREAK MAN WALKS**: he stands at the bracket's edge, says one line, and leaves for good (S21) | Could (bundle) |
 
-| Seen bit | Condition | Event |
-|---|---|---|
-| EVENTS b0 | venue wins ≥ 2 | Roll: "POWER adaptor ready" + `FORMS.POWER` |
-| EVENTS b1 | venue wins ≥ 4 | Roll: "JET adaptor ready" + `FORMS.JET` |
-| EVENTS b2 | wins ≥ 4 and the Semifinal not cleared | Riot intro (§3.5) |
-| EVENTS b3 | Semifinal cleared | Stamps peel off; Kalinka: "the bracket resumes" |
-| EVENTS b5 | the `story.md` join condition | Break Man joins: `FORMS.TAG` |
-| EVENTS2 b0-3 | badge n becomes LIT | The badge lights: Cossack announces the exhibition guest |
-| EVENTS2 b5 | RATEFLAGS.DOPED set | BREAK MAN WALKS: he stands at the bracket's edge, says one line, and leaves for good (§6.3) |
-| EVENTS b7 | CLEARED | The post-game bracket intro: "Welcome back, champion" |
-
-Three seen bits belong to scenes played **off** the bracket, but they use the same table and engine:
-
-- EVENTS b4: the trophy theft, run by START on the lit trophy;
-- EVENTS b6: Mr. Y's unmasking, on the Hall of Fame map after H5;
-- EVENTS2 b4: the SUPER adaptor, after H3.
+Without the tag partner (v1.0) the Riot still plays Break Man's NPC beats (fortress, story; R4.2), but nothing joins and
+b5 stays clear.
 
 ### 3.7 Game over and RETIRE [new-code] S · Must
 
-**RETIRE** is a new pause-menu row, available in every stage.
+**RETIRE** is a new pause-menu row, available in every stage (the pause font has no D, O, Q or Z, so the label is
+`RETIRE`; consistency-23).
 
 - It returns to the bracket (or the fortress map) at once: no life is lost and no scorecard is shown.
 - It clears `IN_MATCH`, so it never counts as an unplug.
 - On an uncleared stage nothing is saved but the death counters already written.
 - The Opening Ceremony has no RETIRE: it is the tutorial, and the bracket does not exist yet.
+- Under FIGHT_CTX (a W2 bout) RETIRE leaves the whole hub stage, as a game over would.
 
 **GAME OVER** replaces vanilla's password screen.
 
@@ -541,62 +709,89 @@ Three seen bits belong to scenes played **off** the bracket, but they use the sa
   | Choice | Does |
   |---|---|
   | **CONTINUE** | Restart this stage from its start: lives = the file's LIVES, E-tanks = max(held, the E-TANK FLOOR) |
-  | **RETIRE** | Back to the bracket or the fortress map. Vanilla's fortress game over offered CONTINUE only, but GP saves per stage, so retiring from a fortress loses nothing |
+  | **RETIRE** | Back to the bracket or the fortress map. Vanilla's fortress game over offered CONTINUE only (`$3C:$805F`'s fortress test, `tech.md` §4.3), but GP saves per stage, so retiring from a fortress loses nothing |
 
 - GAMEOVERS +1 is saved first (autosave 6).
-- Kalinka gets one line from a rotating table (`story.md`), such as *"He'll be back. They always come back."*
+- Kalinka gets one line from a rotating table (story S16).
 - There is no E-tank halving (CX) and no other penalty: the cost is the run, and FAIR PLAY's 4 points (§6).
 
-### 3.8 The PIT STOP and garage UI [new-code] M · Must (shop, chips), Should (garage, booth)
+### 3.8 The PIT STOP [new-code] M · Must (v1.0 rows); the bundle rows Could
 
-`systems.md` §8-§9 own the stock, the prices, the chips and the recipes. This is the screen. It opens with SELECT on
-the bracket: Eddie behind a counter, the bolt total top right, and a row list on the left.
+`systems.md` §8-§9 own the stock, the prices and the chips. This is the screen. It opens with SELECT on the bracket or
+a fortress map, from 0 wins on (after the Opening; consistency decision 14): Eddie behind a counter, the bolt total top
+right, and a row list on the left.
 
-| Row | Contents |
+| Row | Contents | Tier |
+|---|---|---|
+| **SHOP** | The stock list: name, price, held / max. A greyed row reads `???` with its unlock (`AFTER 3 WINS`). Buying asks `BUY? NO/YES`; Eddie's line (story S10). v1.0 stock: E-TANK, 1UP, SHOCK ABSORBER, SPIKE GUARD, CHARGE KIT (the slice), EXCHANGER, ENERGY SAVER; W-TANK is Should | Must |
+| **CHIPS** | A 7 × 2 grid of the **14 v1.0 chips** (bits 0-13; owned lit, unowned `?`), `SLOTS n/m` at the top. **A** toggles equip (refused with a buzz if the slots are full or the second-wind family is taken, `systems.md` §9.1); **B opens the help page** (4 × 28, story §8's words; R2.10). SELECT does nothing here. With the bundle, a third row shows bits 14-17 | Must |
+| **CONFIG** | The file's difficulty page (§11.2) | Must |
+| **SAVE & QUIT** | Commits, then returns to the title | Must |
+| **GARAGE** | Appears once a PART is owned. The four recipes as `SNOW + EMBER → THERMOS`, unowned PARTs shown as `???` (`systems.md` §9.4). BUILD consumes both PARTs | Could (bundle) |
+| **MR. Y'S BOOTH** | After the HALFTIME RIOT, until Y-TURBO is taken: a shady booth sprite stands at the bracket's bottom-right edge under a sign (story's words), and this row runs the offer. He asks twice; the second confirmation reads **"BREAK MAN WILL WALK."** (R2.8). The booth packs up once TURBO is taken | Could (bundle) |
+
+Leaving the pit stop is autosave 5. On a 1993 RULES file (Could) SHOP, CHIPS, GARAGE and the booth are hidden
+(`systems.md` §13.6 closes the shop).
+
+### 3.9 The fortress maps [new-code] S · Must, [new-art] S (fortress.md's map art)
+
+Two maps, drawn by `fortress.md` / `art_audio.md`, driven by meta's node table and renderer (§3.1), so they cost a node
+list each:
+
+| Map | Nodes (meta) | v1.0 | Opens |
+|---|---|---|---|
+| **HALL OF FAME** | H1 (14), H2 (15), H3 (16), H4 (17), H5 (18): a line of wings | H1 → H3 → H5; H2 and H4 draw as closed wings (flag b7 "not in this build"; Should) | after the trophy theft (EVENTS b4) |
+| **SUPER WILY CASTLE** | W1 (19), W2 (20), W3 (21) | W2 → W3; W1 draws closed (Could) | after the unmasking (EVENTS b6) |
+
+| Button | Does |
 |---|---|
-| **SHOP** | The stock list: name, price, held / max. A greyed row reads `???` with its unlock (`AFTER 3 WINS`). Buying asks `BUY? NO/YES`; Eddie's line rotates |
-| **CHIPS** | A grid of the 15 chips (owned lit, unowned `?`), with `SLOTS 3/4` at the top. A toggles equip; SELECT shows the help page, 3 lines × 28 (`systems.md` §9.2) |
-| **GARAGE** | Appears once a PART is owned. The four recipes as `SNOW + EMBER → THERMO CORE`, unowned PARTs shown as `???` (`systems.md` §9.3). BUILD consumes both PARTs |
-| **MR. Y'S BOOTH** | After the Semifinal, until TURBO is taken (§3.2) |
-| **CONFIG** | The file's difficulty page (§11.2) |
-| **SAVE & QUIT** | Commits, then returns to the title |
+| START / A on the next uncleared wing | the stage (a match card for its first boss is the stage's own business) |
+| START / A on a cleared wing | `REPLAY? NO/YES` (medal replays; the improvement rule) |
+| **SELECT** | the PIT STOP (§3.8) |
+| **B** | **BACK TO BRACKET**: the bracket, for venue replays, the Riot replay and the pit stop. The centre node leads back here (§3.4) |
 
-Leaving the pit stop is autosave 5. The same screen serves 1993 files with SHOP, GARAGE and the booth hidden
-(`systems.md` §13.3 closes the shop).
+- **Saves per wing**: every H or W clear is autosave 4, and a load resumes on this map (§1.5). Vanilla never saved
+  fortress progress.
+- **The load target**: if EVENTS b4 is set and the file is not CLEARED, the file loads to the Hall of Fame map while an
+  H wing the build ships is uncleared, else to the Castle map.
+- Events on the maps run through the same queue (§3.6): EVENTS2 b4 (S29) and EVENTS b6 (S33).
+- **W3 has no judges' desk**: its clear runs the ending (story's order, R4.1), whose rating screen is the game's
+  debrief. W3's scorecard is still computed and stored (STAGEREC, PAY) silently before the ending starts (autosave 8).
 
 ---
 
-## 4. The judges' debrief
+## 4. The judges' desk and debrief
 
-### 4.0 The results screen (SYS-SC-2's presentation) [new-code] M · Must, [new-art] S · Should
+### 4.0 The results screen (SYS-SC-2's presentation) [new-code] M · Must; the sponsor's chair Should
 
 `systems.md` §6 owns the numbers; this is the screen. It is a black-backed **judges' desk** drawn in the top third:
+Cossack (head judge) in the centre and Kalinka (commentary) at the left, drawn as their 16×16 face icons with name labels
+in v1.0 (R5.1; desk portraits are Should).
 
-- Cossack (head judge) in the centre and Kalinka (commentary) at the left;
-- at the right, the **SPONSOR'S CHAIR**, where a cardboard Mr. Y cut-out always holds up a "1". After the unmasking
-  (EVENTS b6) the chair is empty and carries a `RESERVED` sign. It is one sprite: a running gag on every clear.
+**The sponsor's chair** (Should, one sprite): at the right a cardboard Mr. Y cut-out always holds up a "1". From
+STORY_BEAT `$03` (S26, the cup stolen) the chair carries a `BACK SOON` sign, and from `$09` (S33, the unmasking) a
+`RESERVED` sign (story's request; its words).
 
 The sequence (about 6 s, A skips each step):
 
 | Step | What appears | Frames |
 |---|---|---|
-| 1 | `MATCH RESULT: WIND MAN` and the stage time | 20 |
+| 1 | `MATCH RESULT` with the venue or stage name (§3.2) and the stage time | 20 |
 | 2 | Five rows slide in from the right, one by one: `TIME 14/20`, `DAMAGE 11/20`, `VARIETY 25/25`, `SECRETS 5/20`, `STYLE 6/15`, each with a tick SFX | 5 × 16 |
 | 3 | The TOTAL counts up | 30 |
-| 4 | The **medal stamp** (or none), with the C/N/H/93 preset badge and, with Y-TURBO equipped, the `*` | 20 |
-| 5 | `PRIZE  +81 BOLTS`. On a replay: `IMPROVEMENT  +12` or `NO IMPROVEMENT` (`systems.md` §6.6) | 20 |
+| 4 | The **medal stamp** (or none), with the C/N/H preset badge (`93` with 1993 RULES, Could) and, with Y-TURBO equipped, the `*` (bundle) | 20 |
+| 5 | `PRIZE +81 BOLTS`. On a replay: `IMPROVEMENT +12` or `NO IMPROVEMENT` (`systems.md` §6.6) | 20 |
 | 6 | Secret icons for this stage: exit, room, item, plate and envelope; found ones lit, this run's new ones flashing | 20 |
-| 7 | The debrief hint types into the box below (§4.1) | text |
+| 7 | The debrief hint types into the 4 × 28 window below (§4.1) | text |
 
-Then autosave 4 runs, and the bracket returns.
+Then autosave 4 runs, and the bracket (or the fortress map) returns. W3 skips the desk (§3.9). Under FIGHT_CTX there is
+no desk (`tech.md` §4.6).
 
-### 4.1 How it plays [new-code] M · Must
+### 4.1 How the debrief plays [new-code] M · Must (tier B); tier A Should
 
-Every stage clear ends at the **judges' desk**:
-
-1. The scorecard slides in (`systems.md`: TIME / DAMAGE / VARIETY / SECRETS / STYLE, a medal, bolts).
-2. **One debrief hint** types into a box under it: 4 lines × 28 characters, pre-wrapped by the text build tool. The
-   speaker is **Kalinka** at the commentary desk (she "hears things"; `story.md` may swap the speaker).
+Every stage clear ends at the desk. **One debrief hint** types into a box under the scorecard: 4 lines × 28 cells
+(R1.4), pre-wrapped by the text compiler. The speaker is **Kalinka** at the commentary desk (story §7 confirms: she
+"hears things").
 
 The line is chosen 4MI's way (`r4mi/modes.md` §1.5: entry = first failed test), but **per stage**:
 
@@ -608,211 +803,153 @@ for each predicate p of this stage, in table order:
         if blocked == none: blocked = p                         (remember it, keep looking)
         continue
     tier = (SECRETS[m].MISS >= 2) ? B : A                       (escalation)
-    show HINT[p.hint + tier]; goto done
+    if HINT[p.hint].A is absent: tier = B                       (v1.0: tier A is Should, R4.5)
+    show HINT[p.hint].tier; goto done
 if blocked: show REQ_HINT[blocked.require]; goto done           (CX lesson 6: telegraph the tool)
-show a "perfect venue" line (rotating, 4 lines)
+show a "perfect venue" line
 done: if any predicate failed, SECRETS[m].MISS += 1 (saturating at 7)
 ```
 
-A predicate that needs a tool the player lacks never hides a hint the player can use now. The "come back with JET"
-line appears only when everything left is tool-gated.
+A predicate that needs a tool the player lacks never hides a hint the player can use now. The "come back with JET" line
+appears only when everything left is tool-gated.
 
-So the first clears get a riddle (tier A), and from the third clear on the judges get blunt (tier B). Players who
-like to puzzle keep the puzzle; players who are stuck get unstuck. Nothing ships as WIP text (4MI's EN debrief shipped
-"WIP WIP WIP", `r4mi/text.md` §4).
+- **v1.0 (Must):** tier B only (R4.5, scope-18): every hint is the plain instruction from the first miss on. The tier
+  A slots are compiled as absent, so the engine falls back to B.
+- **v1.1 (Should):** tier A riddles fill in from `story.md` §7.1, and the escalation runs: a riddle on the first two
+  clears with a miss, the instruction from the third. Players who like to puzzle keep the puzzle; players who are stuck
+  get unstuck.
+- Nothing ships as WIP text (4MI's EN debrief shipped "WIP WIP WIP", `r4mi/text.md` §4): the text compiler's release
+  check fails on it (`tech.md` §11.5).
 
 ### 4.2 Predicate record format [new-code] S · Must
 
-One record per meta stage (22 records × 20 B = 440 B, in a data bank):
+One record per meta stage (24 records × 24 B = 576 B, in meta's data bank):
 
 | Byte | Contents |
 |---|---|
 | +0 | n = number of predicates (0-6) |
-| +1.. | n × 3 bytes: `test`, `require`, `hint` |
-| pad | to 20 bytes |
+| +1..+18 | n × 3 bytes: `test`, `require`, `hint` |
+| +19 | c = number of stage counters this stage uses (0-2) |
+| +20..+21 | the counters' targets (§4.6) |
+| +22..+23 | `HINT_BASE`: the stage's first string id in story's hint table (16-bit) |
 
 **`test`** (high nibble = type, low nibble = argument):
 
 | Type | Test passes when | Argument |
 |---|---|---|
-| `$0n` | SECRETS[m] bit n set | n = 0 exit, 1 room, 2 item, 3 plate |
+| `$0n` | SECRETS[m] bit n set | n = 0 exit, 1 room, 2 item, 3 plate (or the stage owner's meaning, §1.6) |
 | `$1n` | best medal ≥ n | 1 bronze … 4 platinum |
 | `$2n` | the last scorecard's row n is at its maximum | 0 TIME … 4 STYLE |
 | `$3n` | RATEFLAGS bit n set (inverted for CHAMP_KO) | |
-| `$4n` | stage counter n ≥ its table target | for stage-owner extras |
+| `$4n` | stage counter n ≥ its target (§4.6) | n = 0-1 |
 | `$FF` | — | end of list |
 
 **`require`:**
 
-| Value | Requirement |
-|---|---|
-| 0 | none |
-| 1 | POWER |
-| 2 | JET |
-| 3 | SUPER |
-| 4 | TAG |
-| `$10+w` | weapon w owned |
-| `$20+v` | venue v won |
+| Value | Requirement | Tier |
+|---|---|---|
+| 0 | none | Must |
+| 1 | POWER | Must |
+| 2 | JET | Must |
+| 3 | SUPER | Must |
+| 4 | TAG | Should (no v1.0 stage uses it: without the partner every TAG room is a full-charge door, R4.2) |
+| `$10+w` | weapon w owned (w = venue id 0-7; 8 = MAGNET BEAM) | Must |
+| `$20+v` | venue v won | Must |
 
-**`hint`**: the index of tier A in the hint table; tier B is the next entry.
+**`hint`**: the predicate's local hint index h. The text compiler emits, per stage, a table of 16-bit string ids from
+`HINT_BASE`: entry 2h is tier A, entry 2h + 1 is tier B; `$0000` = absent. Story owns every string (R4.1).
 
-### 4.3 The venue predicate table [new-code + text] S · Must
+### 4.3 The venue predicate table [new-code + data] S · Must
 
-**One rule for every stage: predicates run in descending `systems.md` SECRETS weight** (exit 3, room 2, item 2,
-plate 1; `systems.md` §6.2), then **Gold**, then **Platinum**. So each hint points at the biggest gain still on the table. Room
-comes before item on the tie, as both venue docs do.
-
-The two venue docs proposed different orders: `venues_a.md` room → item → exit, `venues_b.md` exit → room → chip.
-This doc owns the debrief and picks the weight rule for consistency. The table is data, so a venue owner can still
-argue a reorder in its own row.
+**One rule for every stage: predicates run in descending `systems.md` SECRETS weight** (exit 3, room 2, item 2, plate 1;
+`systems.md` §6.2), then **Gold**, then **Platinum**. So each hint points at the biggest gain still on the table. Room
+comes before item on the tie, as both venue docs do. Both venue docs now follow this order (venues_a §0.2, venues_b
+§0.9). The table is data, so a venue owner can still argue a reorder in its own row.
 
 **Where plates sit:**
 
 - In **Knight** (A) and **Tomahawk** (B) the plate sits in the secret boss room (`venues_a.md` §0.2), so it is set
   together with the exit and needs no predicate of its own.
-- In **Yamato** (E) and **Centaur** (T) the plate is a separate JET-gated predicate (`venues_b.md` §0.3).
+- In **Yamato** (E) and **Centaur** (T) the plate is a separate JET-gated predicate (`venues_b.md`).
 - Wind, Plant, Blizzard and Flame have no plate.
 
-**The text.** Tier B is **the venue owner's own hint, word for word** (`venues_a.md` §1.5-§4.8, `venues_b.md`
-§1.12, §2.12; this doc writes tier B for Yamato and Centaur until venues_b adds theirs). Tier A is a riddle this doc
-adds: **tier A rewards knowing the homage game; tier B is an instruction.**
-
-| Meta | Venue | Predicates, in order (test / require / hint id) |
+| Meta | Venue (R3.3 name) | Predicates, in order (test / require / hint id) |
 |---|---|---|
 | 1 | Blizzard: SUMMIT CLIMBER | `$00`/–/BL0 · `$01`/–/BL1 · `$02`/–/BL2 · `$13`/–/G · `$14`/–/G |
-| 2 | Wind: SKY ACE 1943 | `$00`/–/WI0 · `$01`/–/WI1 · `$02`/–/WI2 · `$13` · `$14` |
-| 3 | Plant: JUNGLE PITFALL | `$00`/–/PL0 · `$01`/–/PL1 · `$02`/–/PL2 · `$13` · `$14` |
-| 4 | Flame: PRINCE OF PERSIA PALACE | `$00`/–/FL0 · `$01`/–/FL1 · `$02`/–/FL2 · `$13` · `$14` |
+| 2 | Wind: SKY ACE | `$00`/–/WI0 · `$01`/–/WI1 · `$02`/–/WI2 · `$13` · `$14` |
+| 3 | Plant: LOST JUNGLE | `$00`/–/PL0 · `$01`/–/PL1 · `$02`/–/PL2 · `$13` · `$14` |
+| 4 | Flame: PERSIAN PALACE | `$00`/–/FL0 · `$01`/–/FL1 · `$02`/–/FL2 · `$13` · `$14` |
 | 5 | Yamato: EDO NINJA ROW | `$00`/–/YA0 · `$01`/–/YA1 · `$02`/–/YA2 · `$03`/JET/YA3 · `$13` · `$14` |
-| 6 | Tomahawk: GUN.SMOKE FRONTIER | `$00`/–/TO0 (plate B with it) · `$01`/–/TO1 · `$02`/–/TO2 · `$13` · `$14` |
-| 7 | Knight: DRAGON QUESTLIKE | `$00`/–/KN0 (plate A with it) · `$01`/–/KN1 · `$02`/–/KN2 · `$13` · `$14` |
+| 6 | Tomahawk: HIGH NOON FRONTIER | `$00`/–/TO0 (plate B with it) · `$01`/–/TO1 · `$02`/–/TO2 · `$13` · `$14` |
+| 7 | Knight: HERO'S QUEST | `$00`/–/KN0 (plate A with it) · `$01`/–/KN1 · `$02`/–/KN2 · `$13` · `$14` |
 | 8 | Centaur: ATLANTIS RUINS | `$00`/–/CE0 · `$01`/–/CE1 · `$02`/–/CE2 · `$03`/JET/CE3 · `$13` · `$14` |
-| 0, 9-21 | Opening, Semifinal, Exhibitions, fortress | whatever SECRETS bits the stage's owner defines (same weight rule), then `$13`, `$14`. The Mr. X card (§6.1, T14) is one of them, in the Hall of Fame |
+| 0, 9, 14, 16, 18, 20, 21 | Opening-lite, HALFTIME RIOT, H1, H3, H5, W2, W3 (W3 has no desk, §3.9) | the SECRETS bits each stage's owner defines in `fortress.md` §0.4 (b0 showpiece 3, b1 room 2, b2 prize 2, b3 the Mr. X card 1 in H5), by the same weight rule, then `$13`, `$14`. Their `require` values in v1.0 are none: the TAG rooms are full-charge doors (R4.2), and H4's SUPER-gated prize is Should |
 
-**No venue secret exit, room or item needs an adaptor**:
-
-- `venues_a.md` §0.3 and `venues_b.md` §0.3 both say so.
-- Only Yamato's E and Centaur's T plates need JET, as in vanilla.
-- Knight's stairs can also be opened by vanilla's charged-punch pillar, but they never require it.
-
-The adaptor-gated *extras* (Tomahawk's Energy Balancer room and sky bypass, item pockets) are not predicates.
+**No venue secret exit, room or item needs an adaptor** (`venues_a.md` §0.3, `venues_b.md` §0.3, `systems.md` §2.4).
+Only Yamato's E and Centaur's T plates need JET, as in vanilla. Knight's stairs can also be opened by vanilla's
+charged-punch pillar, but they never require it. The adaptor-gated *extras* (Tomahawk's Energy Balancer room and sky
+bypass, item pockets) are not predicates.
 
 `G` is the generic scorecard hint, chosen by the **weakest row** of this run's scorecard (§4.5).
 
-### 4.4 Hint text list (EN; JP in the text pass)
+### 4.4 Hint ids (the words are `story.md` §7)
 
-An entry is at most 4 lines of 28 characters, wrapped by the text tool. " / " marks a forced break in tier A. Ids end
-in 0 for the exit, 1 for the room, 2 for the item and 3 for the plate.
+`story.md` owns every word (R4.1): §7.1 holds the final EN and JP text of both tiers for every id below, with tier B
+taken verbatim from the venue docs (venues_a §1.5-§4.8, venues_b §1.14, §2.12, §3.14, §4.13) and fitted to 4 × 28.
+This doc owns the ids, the order and which secret each id points at. Ids end in 0 for the exit (or showpiece), 1 for the
+room, 2 for the item, 3 for the plate.
 
-**Blizzard: SUMMIT CLIMBER** (*Ice Climber*; secrets `venues_b.md` §1.5, tier B §1.12)
+| Venue | Id | Secret | v1.0 (tier B) | Notes |
+|---|---|---|---|---|
+| Blizzard | BL0 / BL1 / BL2 | the condor / the no-wrap floor / SNOW CHAINS | Must | |
+| Wind | WI0 / WI1 / WI2 | the ace's elevator / WEATHER BALLOON / YASHICHI | Must | |
+| Plant | PL0 / PL1 / PL2 | follow the cat / TREETOP HUT / AUTO RECOVER (the explorer's perfect) | Must | tier A: PL0's riddle loses the explorer's name (R3.3) |
+| Flame | FL0 / FL1 / FL2 | don't fight your shadow (the mirror glows, R3.9) / the mouse / FIREPROOF | Must | FL0's tier B is reworded for the glow (venues_b §2.12) |
+| Yamato | YA0 / YA1 / YA2 / YA3 | **the draft** (the turning scroll; the sekisho is cut, R3.2) / the gold crest / DARUMA / plate E | Must | YA0's round-1 tier A riddle (the sekisho) is retired; story writes a new one |
+| Tomahawk | TO0 / TO1 / TO2 | the back way (+ plate B) / THE OUTHOUSE / SHERIFF STAR | Must | TO1 no longer names a game (venues_a) |
+| Knight | KN0 / KN1 / KN2 | the stairs behind the empty throne (+ plate A) / LIGHT'S TABLET / KAISHIN | Must | |
+| Centaur | CE0 / CE1 / CE2 / CE3 | ZONE 100 / ZONE 0 / CENTURION / plate T | Must | |
+| Opening, Riot, H1, H3, H5, W2 | `OP`, `RI`, `H1`, `H3`, `H5`, `W2` + 0-3 | per `fortress.md` §0.4 | Must where the secret is in v1.0 | |
 
-| Id | Secret | Tier A (riddle, this doc) | Tier B (the venue owner's hint) |
-|---|---|---|---|
-| BL0 | exit: catch the condor | THE CONDOR NEVER WAITS FOR / SLOW CLIMBERS. RACE THE / BONUS CLOCK TO THE TOP. | The summit condor only carries climbers who reach it with time on the clock. Jump for its feet. |
-| BL1 | room: the no-wrap floor | THE SEALS KNOW EVERY FLOOR / OF THAT MOUNTAIN. ONE OF / THEM NEVER COMES BACK. | On the mountain, one floor doesn't wrap around. Watch where the seals walk. |
-| BL2 | item: SNOW CHAINS | THE SEALS ARE UNION / WORKERS. THE UNION REMEMBERS / WHO WAS NICE TO THEM. | The seals are only doing their job. A climber who never breaks one earns a set of chains. |
+Round 1's riddle and instruction text moved to `story.md` §7 (which already corrected four riddles' facts); the
+round-1 draft is in git (commit `95288ee`).
 
-**Wind: SKY ACE 1943** (*1942/1943*; `venues_a.md` §1.5-§1.6)
+### 4.5 Generic lines (ids; the words are `story.md` §7.2)
 
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| WI0 | exit: the ace's elevator | IN 1943 THE RED PLANES / CAME IN FIVES. AN ACE / LEAVES NONE OF THEM FLYING. | FOUR RED SQUADRONS, FOUR LAMPS. THE ELEVATOR ONLY TAKES ACES. |
-| WI1 | room: WEATHER BALLOON | SEAGULLS NEVER STAND ON / NOTHING. ASK ONE WHERE / IT'S STANDING. | A SEAGULL WAS STANDING ON A CLOUD. CLOUDS AREN'T FLOORS... ARE THEY? |
-| WI2 | item: YASHICHI | CAPCOM'S OLDEST SECRET IS / A PINWHEEL. IT HIDES IN / SOMETHING YOU SHOOT. | SHOOT THE POW. THEN KEEP SHOOTING IT. |
+| Group | Ids | v1.0 |
+|---|---|---|
+| **Requirement hints** (the tool is missing; CX lesson 6) | R1 POWER, R2 JET, R3 SUPER, R5 weapon w (with the `%WEAPON%` variable) | Must |
+| | R4 TAG | Should (with the partner) |
+| **Scorecard hints** (G), chosen by the weakest row as a fraction of its maximum; they must match `systems.md` §6.2's rules | G-TIME (with `%PAR%` and `%TIME%`), G-DAMAGE, G-VARIETY, G-SECRETS, G-STYLE | Must |
+| **Perfect-venue lines** (rotate by the frame counter) | P1 | Must (one line) |
+| | P2-P4 | Should (rotation) |
 
-**Plant: JUNGLE PITFALL** (*Pitfall!*, *Pitfall II*; `venues_a.md` §4.4-§4.8)
+### 4.6 Stage counters: every "collect N" secret [new-code] S · Must
 
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| PL0 | exit: follow the cat | IN PITFALL II, HARRY HAD / TO FIND HIS CAT. THIS / ONE IS TRYING TO FIND YOU. | THE CAT KNEW A WAY DOWN. NEXT TIME, FOLLOW IT. |
-| PL1 | room: TREETOP HUT | THE STORM SHOWS MORE THAN / RAIN. WATCH THE TREES / WHEN THE SKY LIGHTS UP. | WHEN THE LIGHTNING STRUCK, A LADDER APPEARED IN THE TREES. |
-| PL2 | item: PITFALL PERFECT | HARRY'S PERFECT SCORE / NEVER LET A LOG TOUCH / HIM. NOT ONE. | FOUR TREASURES, ZERO LOGS. THE DIAMOND IS SHY. |
+R1.10 and scope-16: one mechanism for every counted secret (Plant's treasures, Tomahawk's bounties, Wind's squadrons,
+Centaur's three statues, the Riot's auditions, H1's score balls, …), so a new counter costs data, not code. R3.1 allows
+**at most one collect-N secret per stage**.
 
-**Flame: PRINCE OF PERSIA PALACE** (*Prince of Persia*; `venues_b.md` §2.5, tier B §2.12)
-
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| FL0 | exit: don't fight your shadow | THE PRINCE NEVER BEAT HIS / SHADOW. HE DID SOMETHING / SMARTER WITH IT. | Your shadow only fights if you fight. Hold your fire and walk into it. |
-| FL1 | room: the mouse | IN 1989 A MOUSE SAVED THE / PRINCE. MICE STILL LIVE IN / THAT PALACE. | Something small lives behind a gate in the fire vault. Stand still and listen. |
-| FL2 | item: FIREPROOF | THE FIRE MARSHAL HATES / BONFIRES. HE COUNTS EVERY / POOL YOU LIGHT. | The palace fire marshal rewards entrants who leave the oil unlit. Shoot the fire-droppers first. |
-
-**Yamato: EDO NINJA ROW** (*Jajamaru*, *Goemon*, *DuckTales*; secrets `venues_b.md` §0.3; tier B by this doc until
-venues_b writes its own)
-
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| YA0 | exit: the sekisho back road | NO TRAVELLER PASSES THE / SEKISHO WITHOUT PAPERS. / GOEMON KNEW THAT. | Collect all 3 travel passes and show them at the checkpoint gate. The back road opens. |
-| YA1 | room: the gold crest | SCROOGE KNEW IT: SOME / FLOORS ONLY OPEN IF YOU / BOUNCE ON THEM. | Pogo on the gold crest in the caltrop hall. A trapdoor opens. |
-| YA2 | item: DARUMA | DARUMA OTOSHI: KNOCK OUT / THE BLOCKS, NOT THE HEAD. / KEEP HIS FACE ON. | Win the daruma otoshi without ever hitting its head. |
-| YA3 | plate E (JET) | BEAT'S E-PART IS ON THE / CASTLE ROOF, WHERE ONLY / FLYING NINJAS GO. | Fly up to the castle roof with Rush Jet. Plate E is up there. |
-
-**Tomahawk: GUN.SMOKE FRONTIER** (*Gun.Smoke*, *Wild Gunman*; `venues_a.md` §3.7)
-
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| TO0 | exit: the back way (+ plate B) | THREE FACES ON THE WANTED / POSTERS. THE SHERIFF / KNOWS WHO COLLECTS. | THE SHERIFF ONLY OPENS THE BACK WAY FOR A DEPUTY WITH THREE BOUNTIES. |
-| TO1 | room: THE OUTHOUSE | "OCCUPIED," SAYS THE SIGN. / IT HAS SAID SO ALL DAY. / KNOCK LOUDER. | SOMETHING IN TOWN WAS RATTLING. IN GUN.SMOKE YOU SHOOT WHAT LOOKS ODD. |
-| TO2 | item: SHERIFF STAR | PLEASE DO NOT SHOOT THE / PIANIST. OR ANYONE ELSE / WHO ISN'T WANTED. | THE SHERIFF SAW YOU SHOOT AT TOWNSFOLK. READ THE SIGN BY THE PIANO. |
-
-**Knight: DRAGON QUESTLIKE** (*Dragon Quest*; `venues_a.md` §2.5-§2.7)
-
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| KN0 | exit: the stairs behind the empty throne (+ plate A) | IN 1986 THE REAL LORD / HID UNDER HIS OWN EMPTY / THRONE. OLD HABITS... | THE KNIGHTLORD'S THRONE IS EMPTY. WHY? SEARCH WHERE NO ONE SITS. |
-| KN1 | room: LIGHT'S TABLET | ERDRICK LEFT A TABLET FOR / HIS HEIR. SOMEONE ELSE / LEFT ONE HERE. | SOMETHING GLITTERED ON THE FLOOR OF THE HALL. THOU DIDST NOT SEARCH. |
-| KN2 | item: KAISHIN | A METAL ONE IS WORTH 1000 / EXP. IT KNOWS THAT. IT / WON'T WAIT AROUND. | METAL ONES FLEE FAST. HIT THEM OFTEN, NOT HARD. |
-
-**Centaur: ATLANTIS RUINS** (*Atlantis no Nazo*, *Kid Icarus*; secrets `venues_b.md` §0.3; tier B by this doc until
-venues_b writes its own)
-
-| Id | Secret | Tier A | Tier B |
-|---|---|---|---|
-| CE0 | exit: ZONE 100 | ATLANTIS HAD 100 ZONES. / THE LAST ONE IS UNDER WATER / MOST OF THE TIME. | A sunken door in the ruins opens only at low tide. Wait for the water to drop, then go in. |
-| CE1 | room: ZONE 0 | ZONE 0 IS ON NO MAP. IT / ONLY SHOWS UP WHEN THE / LIGHTS GO OUT. | In the black zone, one door glows only in the dark. Don't light the room: look for it. |
-| CE2 | item: CENTURION | THREE STONE SOLDIERS STILL / GUARD THE RUINS. THEY'D / LIKE TO STOP GUARDING. | Free all three petrified Centurion-bots with a charged shot. |
-| CE3 | plate T (JET) | PEGASUS CROSSED THAT GAP / WITH WINGS. YOU HAVE A DOG / WITH A JETPACK. | Fly across the Pegasus gap with Rush Jet. Plate T is on the far side. |
-
-Text rules for the pass: the debrief font is upper case, so tier B strings are set in capitals at build time. Each
-venue owner may rewrite its tier B line, and this doc's tier A line then gets checked against it. JP lines are
-written for both tiers in the text pass (`story.md`).
-
-### 4.5 Generic lines
-
-**Requirement hints** (the tool is missing; CX lesson 6):
-
-| Id | Text |
-|---|---|
-| R1 POWER | THIS ONE NEEDS MORE PUNCH / THAN YOU HAVE. COME BACK / AFTER YOUR 2ND WIN! |
-| R2 JET | SOME ROUTES HERE ARE FOR / ENTRANTS WHO FLY. COME / BACK AFTER YOUR 4TH WIN. |
-| R3 SUPER | THE HALL OF FAME HIDES A / NEW ADAPTOR. SOMETHING / HERE IS WAITING FOR IT. |
-| R4 TAG | TWO CAN GO WHERE ONE / CAN'T. YOU'LL HAVE A TAG / PARTNER SOON. A MASKED ONE. |
-| R5 weapon w | THE JUDGES THINK ANOTHER / CHAMPION'S WEAPON OPENS / THIS. %WEAPON%, MAYBE? |
-
-**Scorecard hints (G)**, chosen by the weakest row as a fraction of its maximum. They must match `systems.md`'s rules;
-these are the v0 lines:
-
-| Row | Text |
-|---|---|
-| TIME | TOO SLOW FOR THE JUDGES! / PAR HERE IS %PAR%. YOU / TOOK %TIME%. |
-| DAMAGE | THE JUDGES COUNT EVERY / HIT YOU TAKE. FEWER HITS, / BIGGER CHEQUE. |
-| VARIETY | THE JUDGES LOVE VARIETY! / KILLS WITH LOTS OF WEAPONS / AND FORMS PAY THE MOST. |
-| SECRETS | THIS VENUE STILL HIDES / THINGS. FIND ONE AND I'LL / TELL YOU THE NEXT. |
-| STYLE | FINISH THE CHAMPION WITH / HIS WEAKNESS, AND KEEP / THE E-TANK IN YOUR POCKET. |
-
-**Perfect-venue lines** (rotate by the frame counter):
-
-1. PERFECT VENUE! PAPA IS / CRYING. HE SAYS IT'S THE / STADIUM LIGHTS.
-2. NOTHING LEFT TO FIND! THE / JUDGES ARE OUT OF HINTS / AND OUT OF CARDS.
-3. EVEN MR. Y'S JUDGE HELD / UP A 10! THEN HE TOOK IT / BACK. BUT WE ALL SAW IT.
-4. THIS VENUE IS 100% DONE. / YOU CAN STOP NOW. …NO? / OKAY. I'LL WATCH AGAIN.
+- **Storage**: `STAGE_CNT[2]`, 2 of the 8 bytes tech's run block reserves for "meta's stage counters" (WORK `$6300`
+  range, `tech.md` §3.4; the other 6 stay spare), cleared
+  at stage start, kept through deaths in the same run (a CONTINUE starts a new run).
+- **Writers**: a stage object increments counter n through `cnt_add(n)` (a C-window service in meta's code bank; 1 byte
+  of `GP_ARG` names n). The HUD widget module shows it with a DIGITS or ICONROW widget (`tech.md` §7.13).
+- **Readers**: one predicate routine, `pred_test(test)`, serves both the in-stage reward (the object that gives the
+  chip or opens the door calls `pred_test($4n)` when Rock reaches it) and the debrief (§4.1). So the gate and its hint
+  can never disagree.
+- **Targets**: the stage's predicate record (§4.2, +20..+21). A CASUAL target (one step easier, R2.9) is a CASUAL
+  poke on the record copy, or `TIERVAL` in the reward object (`systems.md` §13.4).
+- When the counted secret is a SECRETS bit (the usual case: the behaviour item, b2), the reward sets the bit and the
+  debrief tests `$02`; `$4n` is for stage-owner extras that have no bit of their own.
 
 ---
 
 ## 5. Medals and Hall of Fame points
 
-### 5.1 Medals [engine: systems.md] · Must
+### 5.1 Medals [new-code] S · Must (thresholds: `systems.md`)
 
-The scorecard is out of 100 (`systems.md`, BRIEF §5.3). The medal comes from the **best** score ever on that meta
+The scorecard is out of 100 (`systems.md` §6, BRIEF §5.3). The medal comes from the **best** score ever on that meta
 stage (STAGEREC +0):
 
 | Medal | Best score | HoF points |
@@ -823,64 +960,57 @@ stage (STAGEREC +0):
 | GOLD | 80-94 | 3 |
 | PLATINUM | 95-100 | 4 |
 
-The medal is never stored, only derived from the best score, so the thresholds can be retuned without breaking
-saves.
+The medal is never stored, only derived from the best score, so the thresholds can be retuned without breaking saves.
 
 ### 5.2 Hall of Fame points [new-code] S · Must
 
-**HOF PTS = the sum of the medal points over meta 0-21.** The maximum is 22 × 4 = **88**. The file card and the
-bracket's top bar show it.
+**HOF PTS = the sum of the medal points over the stages the build ships** (§1.8). The v1.0 maximum is 15 × 4 = **60**
+(the full design's 22 stages give 88). The file card and the bracket's top bar show it.
 
-HoF points are the currency of the global unlocks (§7). At every file commit, the system block's unlocks are
-re-checked against that file's HoF points (unlocks never re-lock). Medal ribbons on the bracket frames show where the
-points are.
+HoF points are the currency of the global unlocks (§7). At every file commit, the system block's unlocks are re-checked
+against that file's HoF points (unlocks never re-lock). Medal ribbons on the bracket frames show where the points are.
 
 ---
 
 ## 6. The championship rating (the Hero Score analogue)
 
-### 6.1 Rows and tests [new-code] M · Must
+### 6.1 v1.0 rows and tests [new-code] M · Must
 
-After the victory-lap credits, the **CHAMPIONSHIP RATING** screen fills seven rows, one by one, like 4MI's RESULT
-(`r4mi/modes.md` §1). Every point comes from one test in a single jump table, and **the same table, in the same
-order, picks Break Man's debrief** (the first failed test).
+R2.7 and scope-3 (decision 8): **the rating is re-derived so that 100 is reachable with v1.0 content**. T1 (the
+partner) and T7 (the TURBO trap) exist only when the Could bundle and the tag partner ship; T3 (Exhibitions) is removed
+in v1.0. Every test below reads Must content only (R0.4); the right-hand column names it.
 
-| Test | Row | Points | Passes when |
-|---|---|---|---|
-| — | **CHAMPIONSHIP** | 40 | Constant: you won |
-| T0 | TEAM | 5 | **Beat rebuilt**: all 4 plates (B-E-A-T) |
-| T1 | TEAM | 5 | **Break Man is your partner**: TAG_STAGES has ≥ 3 bits (you called him in 3 different stages), **and** he has not refused you (RATEFLAGS.DOPED clear, §6.3) |
-| T2 | ROUTE | 1 each, 8 max | Secret exits found (SECRETS b0, meta 1-8). The test passes at 8/8 |
-| T3 | ROUTE | 1 each, 4 max | Exhibitions cleared (STAGE_CLEAR 10-13) |
-| T4 | ROUTE | 2 | All 8 venue hidden rooms |
-| T5 | ROUTE | 2 | All 8 venue behaviour chips |
-| T6 | GEAR | 1 per chip, 10 max | Chips owned from **Eddie**: bought at the shop or built in the garage from PARTs (`systems.md` §9: 7 bought + 4 crafted = 11, so one may be missed). The test passes at 10 |
-| T7 | GEAR | +2 | **TURBO** owned: the doping chip from Mr. Y's booth. **The trap** (§6.3) |
-| T8 | MEDALS | 5 | GOLD or better on all 8 venues |
-| T9 | MEDALS | 4 | At least 3 PLATINUMs (any stages) |
-| T10 | FAIR PLAY | 4 | GAMEOVERS = 0 |
-| T11 | FAIR PLAY | 4 | CHAMP_TIME < 648,000 frames (3:00:00) |
-| T12 | FAIR PLAY | 2 | UNPLUGS = 0 (§1.7) |
-| T13 | BONUS | 2 | **RIVAL**: the Semifinal won with no damage taken in Bass β's fight (RATEFLAGS b2) |
-| T14 | BONUS | 2 | **MR. X'S CARD**: a business card hidden somewhere in the Hall of Fame (RATEFLAGS b1; `fortress.md` places one pickup) |
-| T15 | BONUS | 1 | **TOP SEED**: never KO'd in a champion's boss room (CHAMP_KO clear) |
-| T16 | — | — | Sentinel: always fails → the "perfect" debrief |
+The **CHAMPIONSHIP RATING** screen fills seven rows one by one, like 4MI's RESULT (`r4mi/modes.md` §1), during the
+ending at the place story's order gives it (R4.1, step 8). Every point comes from one test in a single jump table, and
+**the same table, in the same order, picks Break Man's debrief** (the first failed test).
 
-T7 is a *bonus-shaped* test: it never picks the debrief, because the debrief skips T7 (a hint that says "go and dope"
-would be wrong). In the jump table it returns "passed" for the debrief's purposes and adds its 2 points only to the
-rows.
+| Test | Row | Points | Passes when | Must content it reads |
+|---|---|---|---|---|
+| — | **CHAMPIONSHIP** | 40 | constant: you won | W3 |
+| T0 | TEAM | 5 | **Beat rebuilt**: all 4 plates (SECRETS b3 on meta 5, 6, 7, 8) | the 4 plate venues (`venues_a.md`, `venues_b.md`) |
+| T1 | TEAM | 5 | **SOLO RIOT** (R4.2's partner-free test): Bass β duel 1 won **without Break Man's capsule** (RATEFLAGS b4, set at the Riot clear when the capsule never dropped in that run) | the HALFTIME RIOT's NPC Break Man beat: the whistle and the life capsule when Rock's HP falls below 6 in the pinch (`fortress.md` §2.4) |
+| T2 | ROUTE | 1 each, 8 max | secret exits found (SECRETS b0, meta 1-8); the test passes at 8/8 | the 8 venues' secret exits |
+| T4 | ROUTE | **4** | all 8 venue hidden rooms (SECRETS b1, meta 1-8) | the 8 hidden rooms, Flame's mouse room included (Must, R0.4) |
+| T5 | ROUTE | **4** | all 8 venue behaviour chips (CHIPS_OWNED bits 6-13) | the 8 venue chips (R2.5) |
+| T6 | GEAR | **2 each**, 10 max | Eddie's chips owned (`systems.md` source "shop": bits 1-5); the test passes at 5/5 | the v1.0 shop (740 bolts in all; `systems.md` §7 puts a typical player's v1.0 income at ≈ 1,860) |
+| T8 | MEDALS | 5 | GOLD or better on all 8 venues | the venues |
+| T9 | MEDALS | 4 | at least 3 PLATINUMs (any stages) | any stage |
+| T10 | FAIR PLAY | 4 | GAMEOVERS = 0 | |
+| T11 | FAIR PLAY | 4 | CHAMP_TIME < 648,000 frames (3:00:00) **(tune at M9** with v1.0's 15 stages) | |
+| T12 | FAIR PLAY | 2 | UNPLUGS = 0 (§1.7) | the unplug count (Must) |
+| T13 | BONUS | 2 | **RIVAL**: Bass β duel 1 won with no damage from the bar fill to the overdrive (RATEFLAGS b2; `fortress.md` §2.4) | the Riot |
+| T14 | BONUS | 2 | **MR. X'S CARD** (RATEFLAGS b1; H5's hidden room, `fortress.md` §4.5.3) | H5 and its card (Must, §15) |
+| T15 | BONUS | 1 | **TOP SEED**: never KO'd in a champion's boss room (CHAMP_KO clear) | |
+| T16 | — | — | sentinel: always fails → the "perfect" debrief | |
 
-**The arithmetic hides a trade-off**, as 4MI's does (`r4mi/modes.md` §1.2). The row maxima are 40 + 10 + 16 + 12 + 9
-+ 10 + 5 = **102**, but the readme says 100. The 2-point TURBO chip can only be had by doping, and doping costs Break
-Man's partnership, worth 5 TEAM points:
+Row maxima: CHAMPIONSHIP 40 + TEAM 10 + ROUTE 16 + GEAR 10 + MEDALS 9 + FAIR PLAY 10 + BONUS 5 = **100**, and every point
+is reachable on one v1.0 file. The readme prints the sum.
 
-- **With TURBO**, the most you can score is 97.
-- **Without it**, exactly 100.
+**Fallbacks**, so the table never depends on content a build lacks (R0.4): if `fortress.md` cannot keep the Riot's
+capsule beat in v1.0, T1 becomes "the HALFTIME RIOT won with no E-tank used"; if the Mr. X card is not in a v1.0 room,
+T14 becomes "every hidden room of the v1.0 non-venue stages". Both are one-line changes in the test table.
 
-The readme can print the honest sum `40 + 10 + 16 + 10 + 9 + 10 + 5 = 100`, and the off-by-two is a clue players can
-solve, as 4MI's was.
-
-**Rank titles** under the number (EN; JP in the text pass):
+**Rank titles** under the number (words: `story.md` S46):
 
 | Rating | Title |
 |---|---|
@@ -891,779 +1021,838 @@ solve, as 4MI's was.
 | 55-69 | QUARTERFINALIST |
 | < 55 | PARTICIPANT, with a participation-ribbon sprite |
 
-**Asterisks.** A doped file prints its number with `*` and the title gets `(TURBO)`, which honours `systems.md`'s
-"your records carry an asterisk". An EDITED file reads `RESULT UNDER REVIEW *` and grants no achievement (§10).
+**Asterisks.** An EDITED file reads `RESULT UNDER REVIEW *` and grants no achievement (§10). With the bundle, a doped
+file prints its number with `*` (§6.3).
 
-**When it is computed.** The rating is computed at every championship win: a cleared file can replay W3 and see the
-ending again. BEST_RATING keeps the maximum. T11 always uses CHAMP_TIME, the time of the *first* win.
+**When it is computed.** At every championship win: a cleared file can replay W3 and see the ending again (START skips
+each scene page). BEST_RATING keeps the maximum. T11 always uses CHAMP_TIME, the time of the *first* win. The screen's
+background in v1.0 is the judges' desk; fortress's PHOTO FINISH still joins with the victory lap (Could).
 
 ### 6.2 Break Man's debrief [new-code + text] S · Must
 
 After the rating, Break Man (4MI's Proto Man pattern; BRIEF §2) speaks: one greeting, then the entry for the **first
-failed test**, then `TO BE CONTINUED`. That is vanilla's last line, kept on purpose. On the first clear only, a second
-line follows: `(SPECIAL EVENTS ARE NOW OPEN)`.
+failed test**, then his close and `TO BE CONTINUED` (vanilla's last line, kept on purpose). On the first clear only,
+`(SPECIAL EVENTS ARE NOW OPEN)` follows. The NPC Break Man is Must (R4.2); in v1.0 he speaks through his 16×16 face icon
+and name label (R5.1).
 
-EN v0 (`story.md` may restyle the voice, but must keep one hint per test):
+`story.md` S47 owns every word. This doc owns the entries, one per test, and their order:
 
-| Entry | Text |
-|---|---|
-| greeting | …SO YOU WON. NOT BAD, / ROCK. FOR A BUSTER WITH / LEGS. |
-| T0 Beat | THAT BIRD OF YOURS IS / STILL IN FOUR PIECES. B, / E, A, T. SPELL IT OUT. |
-| T1 tag (never called) | YOU NEVER CALLED ME. I / WASN'T WAITING. BUT THE / PAUSE MENU HAS A BUTTON. |
-| T1 tag (doped) | YOU TOOK MR. Y'S CHIP. I / DON'T TAG WITH CHEATS. / THE JUDGES NOTICED TOO. |
-| T2 exits | THE JUDGES COUNTED %N% / SECRET EXITS. THERE ARE 8. / ONE PER VENUE. |
-| T3 exhibitions | FOUR BADGES ON THAT / BRACKET. TWO SECRET EXITS / LIGHT EACH ONE. |
-| T4 rooms | EVERY VENUE HIDES ONE / ROOM, ONE SCREEN BIG. THE / JUDGES DROP HINTS. LISTEN. |
-| T5 chips | SOME PRIZES AREN'T WON BY / WINNING. THEY'RE WON BY / ACTING STRANGE. |
-| T6 gear | EDDIE STILL HAS CHIPS ON / HIS SHELF, AND PARTS IN / HIS GARAGE. GO SHOPPING. |
-| T8 gold | GOLD IN EVERY VENUE IS / WHAT CHAMPIONS GET. YOU / GOT SOME. GET THE REST. |
-| T9 platinum | 95 IS A PERFECT RUN. THE / JUDGES WANT THREE. PICK / YOUR BEST VENUES. |
-| T10 game over | %N% GAME OVERS. A CHAMP / DOESN'T PAY THE ENTRY / FEE TWICE. |
-| T11 time | %H%:%MM% ON THE CLOCK. A / CHAMPION'S FIRST TITLE / TAKES UNDER 3 HOURS. |
-| T12 unplug | THE STADIUM LOST POWER %N% / TIMES DURING YOUR MATCHES. / FUNNY. IT NEVER DOES. |
-| T13 rival | BASS TELLS EVERYONE HE / HIT YOU IN THE SEMIS. / MAKE HIM A LIAR. |
-| T14 card | SOMEONE DROPPED A CARD IN / THE HALL OF FAME. IT SAYS / "MR. X". A REAL ONE? |
-| T15 top seed | YOU WENT DOWN IN A CHAMP'S / RING. TOP SEEDS DON'T. / NOT EVEN ONCE. |
-| perfect | NOTHING TO ADD. YOU ARE / THE REAL CHAMPION. NOW GO / HOME BEFORE WILY DOES. |
-| perfect (ENGRISH) | I HAVE NO ADVICE. / YOU ARE REAL CHAMPION! (a 4MI tribute, `r4mi/text.md` §4 entry 15) |
+| Entry | Shown when | v1.0 |
+|---|---|---|
+| greeting | always | Must |
+| T0 Beat | T0 failed | Must |
+| T1 SOLO RIOT | T1 failed (v1.0: "you needed help against Bass") | Must (new: story writes it) |
+| T2 exits | T2 failed (`%N%` = exits found) | Must |
+| T4 rooms, T5 chips, T6 gear, T8 gold, T9 platinum, T10 game overs (`%N%`), T11 time (`%H%:%MM%`), T12 unplugs (`%N%`), T13 rival, T14 card, T15 top seed | that test failed | Must |
+| perfect | every test passed | Must |
+| T1 partner: never called / doped; T3 exhibitions | with the bundle and the partner; with the Exhibitions | Should / Could |
+| perfect (ENGRISH) | LANGUAGE = ENGRISH (4MI's own line, `r4mi/text.md` §4 entry 15) | Could |
 
-### 6.3 The trade-off: doping (owned by `systems.md` SYS-CHP-4) [new-code] S · Should
+Story S47's T1 "never called" line must point at the pause menu's **CALL row confirmed with A** (R2.10), not at SELECT.
 
-`systems.md` §0 decision 7 defines the moral trade-off, and this doc only scores it:
+### 6.3 With the bundle: the partner and the TURBO trap [new-code] S · Could (cut-line 9, with the partner)
 
-- **The offer.** Mr. Y's booth buys a PART from you and gives you the **TURBO** chip.
-- **The cost.** Break Man refuses to partner you for the rest of the file (`FORMS.TAG` is cleared and the pause-menu
-  CALL greys out), and your records carry an asterisk.
+`systems.md` §9.4 owns the doping trade-off (SYS-CHP-4); this doc only scores it. When the bundle and the tag partner
+ship together (R2.5):
 
-What it does to the meta layer:
+- **T1 becomes PARTNER** (5): Break Man called in at least 3 different stages (TAG_STAGES ≥ 3 bits) **and** he has not
+  refused you (RATEFLAGS.DOPED clear). SOLO RIOT stays recorded but scores nothing.
+- **T6 becomes** 1 per Eddie chip (shop 5 + garage 3: IRON HELMET, THERMOS, BIRD SEED) + 2 for the TANK RACK, 10 max.
+- **T7 TURBO** (+2, GEAR): Y-TURBO owned. **The trap.** It is bonus-shaped: the debrief skips it (a hint that says "go
+  and dope" would be wrong), so in the jump table it returns "passed" for the debrief and adds its 2 points to the row.
 
-- It sets RATEFLAGS.DOPED (b0).
-- It plays bracket event EVENTS2 b5, **BREAK MAN WALKS**: on the next bracket visit Break Man's sprite stands at the
-  bracket's edge, says one line (`story.md`), and leaves. Like 4MI's Eddie, the cost is shown, not explained.
-- In the rating, TURBO adds +2 (T7) and costs T1's 5.
-- In RECORDS and on the file card, a `*` follows the rating and the TOTALS page reads `TURBO: YES`.
-- In GP Rush, a MY GP run with TURBO in its chip set marks its record with `*`.
+**The arithmetic hides a trade-off**, as 4MI's does (`r4mi/modes.md` §1.2). The row maxima are 40 + 10 + 16 + 12 + 9 +
+10 + 5 = **102**, but the readme says 100. TURBO's +2 costs Break Man's 5 (T1) and the PART it is bought with breaks one
+garage pair (−1 or −2 in GEAR):
 
-The judges never mention it. Break Man does (T1, doped variant).
+- **With TURBO**, the most you can score is 96.
+- **Without it**, exactly 100.
 
-If the tag partner (a Should) does not ship, the cost moves to FAIR PLAY: T12 becomes "no unplugs and no TURBO", and
-the trap's arithmetic must be re-checked in that build.
+The off-by-two between the printed rows and the readme is a clue players can solve, as 4MI's was.
+
+What doping does to the meta layer (R2.8, design-8):
+
+- It sets RATEFLAGS.DOPED (b0) and plays bracket event EVENTS2 b5, **BREAK MAN WALKS** (story S21): like 4MI's Eddie,
+  the cost is shown, not explained.
+- **No secret is lost**: TAG-gated secrets use their full-charge-door fallbacks on a doped file (R2.8; this replaces
+  consistency-38's "TAG secrets void" note). `systems.md`'s OWNED drops BREAK.
+- In RECORDS and on the file card, a `*` follows the rating and the TOTALS page reads `TURBO: YES`; medals earned with
+  Y-TURBO equipped carry STAGEREC's asterisk bit; the CAPCOM TIMES headline changes (story).
+- The judges never mention it. Break Man does (T1's doped entry).
+
+**1993 RULES** (Could, cut-line 10): chips and the shop are off on a 1993 file, so T5 and T6 cannot pass. On a
+RULES = 1993 file the GEAR row and T5's 4 points are replaced by a constant **1993 ROW** of 14 ("won under 1993 rules"),
+which keeps the maximum at 100.
+
+**Bass Mode** (Won't, v1): TEAM is re-labelled SOLO and passes automatically; the full round-1 treatment is in git (commit
+`95288ee`, §9.7).
 
 ### 6.4 Data [new-code] S · Must
 
-- **Test table:** 17 entries × 4 bytes `{routine lo, routine hi, points, row}`.
-- **Row sums:** stored in LAST_ROWS, the total in LAST_RATING.
+- **Test table:** 17 entries × 4 bytes `{routine lo, routine hi, points, row}`; v1.0 compiles T1 = SOLO RIOT and leaves
+  T3 and T7 as "absent" entries (0 points, never failed). The bundle build swaps T1's routine, T6's points rule, and
+  T7's points in by a build flag (`BUNDLE = 1`); a unit test asserts the row maxima sum to 100 (v1.0) or 102 (bundle).
+- **Row sums:** stored in LAST_ROWS, the total in LAST_RATING, the maximum in BEST_RATING.
 - **Debrief index:** first failed test + 1, as 4MI does at `$4D:$9BDB`.
 
 ---
 
-## 7. The unlock chain
+## 7. The unlock chain [new-code] S · Must (the v1.0 bits)
 
-All unlocks are **global** (system block `$010`, one bit each). Any file can earn them, and they never re-lock. The
-SPECIAL EVENTS menu reveals its items word by word as the bits arrive (4MI `$4C:$811A`). Locked items show as `??? ???`
-with a one-line condition (4MI lesson: be exact, and show it).
+All unlocks are **global** (system block `$010`, one bit each; consistency decision 34: global is simpler and kinder).
+Any file can earn them, and they never re-lock. The SPECIAL EVENTS menu reveals its items word by word as the bits
+arrive (4MI `$4C:$811A`). Locked items show as `??? ???` with a one-line condition (4MI lesson: be exact, and show it).
+Files played on 1993 RULES earn unlocks as normal (decision 34).
 
 | Step | You do | You get (bit) | Tier |
 |---|---|---|---|
-| 1 | Reach **20 HoF points** on any file (possible mid-game) | SPECIAL EVENTS on the title, with MUSEUM (sound test, the plaques you have read) and RECORDS (U0.0, U0.1, U0.2) | Should |
-| 2 | Reach **40 HoF points** | EXHIBITION RULES (U0.3) | Could |
-| 3 | **Win the championship** | TIME ATTACK (U0.4), GP RUSH: OPEN BRACKET (U0.5), the ENTRANT option (Bass Mode, U0.6) | Should / Could |
-| 4 | Clear the **OPEN BRACKET** | GP RUSH: the 9 ONE-WEAPON CUPS and ALL-STAR (U0.7); KNOCKOUT (U1.3) | Should / Could |
-| 5 | Clear **any one cup** | MY GP (U1.0), **EXTRA CONFIG** (U1.1), TRUE GP (U1.2) | Should / Must (EXTRA CONFIG) |
-| 6 | Clear **TRUE GP** | The `???` fight's name is revealed (U1.4); MUSEUM VAULT (U1.6); achievement | Should |
-| 7 | All 22 stages GOLD or better, and the Mr. X card on the same file | **MR. X RETURNS** (U1.5) | Could |
-| 8 | Beat every **DEV** time in Time Attack | MUSEUM DEV ROOM: the developers' commentary plaques (U1.7) | Could |
+| 1 | Reach **20 HoF points** on any file (possible mid-game) | SPECIAL EVENTS on the title, with RECORDS (U0.0, U0.2) | Must |
+| 2 | **Win the championship** | **EXTRA CONFIG** (U1.1) | Must |
+| 2 | **Win the championship** | TIME ATTACK (U0.4) | Should |
+| 2 | **Win the championship** | GP RUSH: OPEN BRACKET (U0.5) | Could |
+| 3 | Clear the **OPEN BRACKET** | GP RUSH: the 9 ONE-WEAPON CUPS and ALL-STAR (U0.7) | Could |
+| 4 | Clear **any one cup** | MY GP (U1.0), TRUE GP (U1.2) | Could |
+| 5 | Clear **TRUE GP** | the `???` fight's name is revealed (U1.4) | Could |
+| — | (round 1: 20 HoF → MUSEUM; 40 HoF → EXHIBITION RULES; championship → ENTRANT: BASS β; OPEN → KNOCKOUT; TRUE GP → the VAULT; all Gold + the card → MR. X RETURNS; every DEV time → the DEV ROOM) | U0.1, U0.3, U0.6, U1.3, U1.5, U1.6, U1.7 | Won't (v1); the bits stay reserved |
 
-EXTRA CONFIG is Must as a **dev tool** (BRIEF §7.3). In development builds (`DEV=1`) every unlock bit reads as set,
-and EXTRA CONFIG is also on the title (SELECT+START) and in the pause menu. In release builds it unlocks at step 5,
-as in 4MI.
+EXTRA CONFIG is Must as a **dev tool** (BRIEF §7.3). In DEV builds (`DEV = 1`) every unlock bit reads as set, and EXTRA
+CONFIG opens from the title with pad 1 SELECT + START held and from the pause menu's `TEST` row (§9.6). In release
+builds it unlocks with the championship: round 1's "clear any cup" depended on GP Rush, which is Could (R0.4).
 
 **System block unlock bits** (`$010-$017`):
 
 | Byte.bit | Unlock | Byte.bit | Unlock |
 |---|---|---|---|
-| U0.0 | SPECIAL EVENTS menu | U1.0 | MY GP |
-| U0.1 | MUSEUM | U1.1 | EXTRA CONFIG |
-| U0.2 | RECORDS | U1.2 | TRUE GP |
-| U0.3 | EXHIBITION RULES | U1.3 | KNOCKOUT format |
-| U0.4 | TIME ATTACK | U1.4 | `???` name revealed |
-| U0.5 | GP RUSH: OPEN | U1.5 | MR. X RETURNS |
-| U0.6 | ENTRANT: BASS β | U1.6 | MUSEUM VAULT (the 1993 debug sound player) |
-| U0.7 | GP RUSH: CUPS + ALL-STAR | U1.7 | MUSEUM DEV ROOM |
+| U0.0 | SPECIAL EVENTS menu | U1.0 | MY GP (Could) |
+| U0.1 | MUSEUM (Won't) | U1.1 | **EXTRA CONFIG** |
+| U0.2 | **RECORDS** | U1.2 | TRUE GP (Could) |
+| U0.3 | EXHIBITION RULES (Won't) | U1.3 | KNOCKOUT format (Won't) |
+| U0.4 | TIME ATTACK (Should) | U1.4 | `???` name revealed (Could) |
+| U0.5 | GP RUSH: OPEN (Could) | U1.5 | MR. X RETURNS (Won't) |
+| U0.6 | ENTRANT: BASS β (Won't) | U1.6 | MUSEUM VAULT (Won't) |
+| U0.7 | GP RUSH: CUPS + ALL-STAR (Could) | U1.7 | MUSEUM DEV ROOM (Won't) |
 | U2-U7 | reserved | | |
 
 ---
 
 ## 8. SYSTEM block layout (1 KB) [new-code] S · Must
 
-| Offset | Size | Field | Notes |
-|---|---|---|---|
-| `$000` | 4 | magic `'R' '6' 'S' 'Y'` | |
-| `$004` | 1 | layout version | 1 |
-| `$005` | 1 | SYSFLAGS | b0 INITIALISED; b1 a DEV build has written this block (release builds show `DEV SAVE` on the title) |
-| `$006` | 2 | generation | |
-| `$008` | 1 | LANGUAGE | 0 JAPANESE, 1 ENGLISH, 2 ENGRISH |
-| `$009` | 1 | DISPLAY | b0-1 ANNOUNCER (0 ON, 1 DEATHS ONLY, 2 OFF); b2 FLASHES REDUCED; b3 HUD TIMER; b4-5 TEXT SPEED (0 SLOW … 3 INSTANT); b6 SCREEN SHAKE OFF; b7 reserved |
-| `$00A` | 1 | AUDIO | b0 MMC5 CHANNELS OFF; b1 MMC5 ARRANGEMENTS (Could); b2-7 reserved |
-| `$00B` | 1 | CONTROLS | b0-1 SELECT SWAP (0 FULL, 1 WEAPONS ONLY, 2 OFF); b2 2P SHIFT OFF; b3 A/B SWAP; b4-7 reserved |
-| `$00C` | 4 | reserved config | |
-| `$010` | 8 | UNLOCKS | §7 |
-| `$018` | 2 | ACHIEVEMENTS | §10 |
-| `$01A` | 2 | ACH_NEW | Shows NEW! until RECORDS has shown it |
-| `$01C` | 4 | reserved | |
-| `$020` | 3 | CLEARED_ANY | 24 bits by meta index: cleared on any file (feeds the Time Attack and Rules menus) |
-| `$023` | 3 | ENTERED_ANY | Entered on any file (otherwise the menus show `???`) |
-| `$026` | 1 | BEST_RATING_EVER | Unedited files only |
-| `$027` | 1 | reserved | |
-| `$028` | 120 | LIFE_STAGE[24] × 5 | Lifetime KOs (16-bit) + time (24-bit, 256-frame units) |
-| `$0A0` | 32 | LIFE_TOTALS | play (32-bit, 256-frame units), KOs (24), game overs (16), unplugs (16), boots (16), championships (16), bolts earned (32), weakness hits (24), tag calls (16), reserved |
-| `$0C0` | 264 | TA_REC[24] × 11 | Best time (24-bit frames) + 4 checkpoint splits of that run (16-bit frames from the start) |
-| `$1C8` | 72 | TA_BASS[24] × 3 | Bass Mode best times (Could) |
-| `$210` | 96 | RUSH_REC[16] × 6 | Per course: best time (24-bit frames), tries (16-bit), clears (8-bit) |
-| `$270` | 18 | KO_REC[3] × 6 | KNOCKOUT 8 / 16 / 32 |
-| `$282` | 72 | MYGP[3] × 24 | Saved MY GP setups (§9.2.5) |
-| `$2CA` | 48 | RULES_BOOK[24] × 2 | Exhibition Rules sticker book: bit r = cleared with rule r on |
-| `$2FA` | 16 | HEARD | 128 bits: tracks heard (sound test list) |
-| `$30A` | 8 | PLAQUES | 64 bits: Museum plaques read |
-| `$312` | 6 | WEAK_SEEN | 48 bits by fight id: weakness landed at least once |
-| `$318` | 6 | FIGHT_SEEN | 48 bits by fight id: reached (lobby names show `???` otherwise) |
-| `$31E` | 16 | VENUE_REC[8] × 2 | One lifetime mini-record per venue, defined by its venue doc: Wind's SHOOTING DOWN % (higher is better), Tomahawk's quick-draw reaction time in frames (lower is better), …; a ROM table gives each venue's label and direction |
-| `$32E` | 194 | reserved | |
-| `$3F0` | 16 | trailer | §1.3 |
+Every v1.1+ record is allocated now (§1.4: the layout freezes at v1.0).
+
+| Offset | Size | Field | Notes | Tier |
+|---|---|---|---|---|
+| `$000` | 4 | magic `'R' '6' 'S' 'Y'` | | Must |
+| `$004` | 1 | layout version | 1 at v1.0 | Must |
+| `$005` | 1 | SYSFLAGS | b0 INITIALISED; b1 a DEV build has written this block (release builds show `DEV SAVE` on the title) | Must |
+| `$006` | 2 | generation | | Must |
+| `$008` | 1 | LANGUAGE | 0 JAPANESE, 1 ENGLISH, 2 ENGRISH (Could) | Must |
+| `$009` | 1 | DISPLAY | b0-1 ANNOUNCER (0 ON, 1 DEATHS ONLY, 2 OFF); b2 **FLASHES REDUCED**; b3 HUD TIMER (Should); b4-5 TEXT SPEED (0 NORMAL, 1 FAST, 2 INSTANT, 3 SLOW); b6 SCREEN SHAKE OFF; b7 reserved | Must |
+| `$00A` | 1 | AUDIO | b0 MMC5 AUDIO OFF; b1 MMC5 ARRANGEMENTS (both Could, with the MMC5 pulse driver; MMC5 AUDIO defaults to ON, consistency decision 36); b2-7 reserved | Could |
+| `$00B` | 1 | CONTROLS | b0-1 SELECT SWAP (0 FULL, 1 WEAPONS ONLY, 2 OFF); b2 2P SHIFT OFF (Should); b3 A/B SWAP; b4-7 reserved | Must |
+| `$00C` | 1 | **INPUT LAG** | b0-2: 0-6 frames, default 0, added to every reflex window (R3.5, `systems.md` §1.6); b3-7 reserved | Must |
+| `$00D` | 3 | reserved config | | |
+| `$010` | 8 | UNLOCKS | §7 | Must |
+| `$018` | 2 | ACHIEVEMENTS | §10 | Could |
+| `$01A` | 2 | ACH_NEW | shows NEW! until RECORDS has shown it | Could |
+| `$01C` | 4 | reserved | | |
+| `$020` | 3 | CLEARED_ANY | 24 bits by meta index: cleared on any file (feeds the Time Attack list) | Must |
+| `$023` | 3 | ENTERED_ANY | entered on any file (otherwise the lists show `???`) | Must |
+| `$026` | 1 | BEST_RATING_EVER | unedited files only | Must |
+| `$027` | 1 | reserved | | |
+| `$028` | 120 | LIFE_STAGE[24] × 5 | lifetime KOs (16-bit) + time (24-bit, 256-frame units) | Must |
+| `$0A0` | 32 | LIFE_TOTALS | play (32-bit, 256-frame units), KOs (24), game overs (16), unplugs (16), boots (16), championships (16), bolts earned (32), weakness hits (24), tag calls (16), reserved | Must |
+| `$0C0` | 264 | TA_REC[24] × 11 | best time (24-bit frames) + 4 checkpoint splits of that run (16-bit frames from the start) | Should |
+| `$1C8` | 72 | TA_BASS[24] × 3 | Bass Mode best times | Won't (reserved) |
+| `$210` | 96 | RUSH_REC[16] × 6 | per course: best time (24-bit frames), tries (16-bit), clears (8-bit) | Could |
+| `$270` | 18 | KO_REC[3] × 6 | KNOCKOUT 8 / 16 / 32 | Won't (reserved) |
+| `$282` | 72 | MYGP[3] × 24 | saved MY GP setups (§9.2.5) | Could |
+| `$2CA` | 48 | RULES_BOOK[24] × 2 | the Exhibition Rules sticker book | Won't (reserved) |
+| `$2FA` | 16 | HEARD | 128 bits: tracks heard (the Museum's sound test) | Won't (reserved) |
+| `$30A` | 8 | PLAQUES | 64 bits: plaques read (the Museum's gallery) | Won't (reserved) |
+| `$312` | 6 | WEAK_SEEN | 48 bits by fight id: weakness landed at least once | Could (achievements) |
+| `$318` | 6 | FIGHT_SEEN | 48 bits by fight id: reached (EXTRA CONFIG's FIGHT list and the GP Rush lobby show `???` otherwise) | Must |
+| `$31E` | 16 | VENUE_REC[8] × 2 | one lifetime mini-record per venue, by venue id (§9.4) | Must (per venue as listed there) |
+| `$32E` | 194 | reserved | | |
+| `$3F0` | 16 | trailer | §1.3 | Must |
 
 ---
 
-## 9. Post-game: SPECIAL EVENTS
+## 9. RULESET, the fight table, RECORDS, EXTRA CONFIG and the post-game modes
 
-The menu is a list (vanilla font) with the achievement plates in a strip at the bottom (§10).
+**SPECIAL EVENTS** is a list on the title (vanilla font) that grows with the unlocks (§7):
 
-| Item | Section |
-|---|---|
-| TIME ATTACK | §9.1 |
-| GP RUSH | §9.2 |
-| EXHIBITION RULES | §9.3 |
-| RECORDS | §9.4 |
-| MUSEUM | §9.5 |
-| EXTRA CONFIG | §9.6 |
-| MR. X RETURNS | §9.8 |
+| Item | Section | Tier |
+|---|---|---|
+| RECORDS | §9.4 | Must |
+| EXTRA CONFIG | §9.6 | Must |
+| TIME ATTACK | §9.1 | Should |
+| GP RUSH | §9.2 | Could |
+| (achievement plates, a strip under the list) | §10 | Could |
+| EXHIBITION RULES, MUSEUM, MR. X RETURNS | §9.3, §9.5, §9.8 | Won't (v1) |
 
-**One ruleset choke point** [new-code] S · Must (4MI lesson: modes override config through one set of globals,
-`r4mi/modes.md` §5). At every stage start a 16-byte **RULESET** in work RAM is filled from exactly one source:
+### 9.0 RULESET: one choke point [new-code] S · Must
 
-| Mode | Source |
-|---|---|
-| main game | the file's DIFF |
-| Time Attack | the TA preset |
-| GP Rush | the course setup |
-| any mode | ORed with the Exhibition Rules mask and the EXTRA CONFIG cheats |
+4MI lesson: modes override config through one set of globals (`r4mi/modes.md` §5). At every stage start (and at every
+fight-loader warp) the 16-byte **RULESET** in WORK (`$6270-$627F`, owner meta, `tech.md` §3.4) is filled from exactly
+one source, then the engine reads only RULESET:
 
-The engine reads only RULESET:
+| Mode (`RS_MODE`) | Source | Tier |
+|---|---|---|
+| 0 main game | the file's DIFF bytes (§1.6) and the global INPUT LAG | Must |
+| 3 EXTRA CONFIG scratch | the scratch file's DIFF, then the CHEATS group ORed in | Must |
+| 4 mailbox test | the mailbox's source file, then its overrides (§9.6) | Must |
+| 5 fight-loader bout | the current mode's ruleset, then the fight record's flags (§9.2.1) | Must |
+| 1 Time Attack | the TA preset (§9.1) | Should |
+| 2 GP Rush | the course setup (§9.2.4) | Could |
 
-- damage multiplier, drops, criticals, HARD;
-- lives policy, E-tank floor, GUARDS, refill on respawn;
-- allowed weapons, forms and tag;
-- chips on/off;
-- checkpoints on/off, max HP, refill at pause;
-- i-frame cap;
-- rules bits, cheat bits;
-- HUD timer.
+| Byte | Name | Contents |
+|---|---|---|
+| +0 | `RS_DIFF` | DIFF A's format (§1.6): DAMAGE, DROPS, **CASUAL**, GUARDS, **HARD**, RULES 1993. `IFHARD`, `IFCASUAL`, `IF1993` and tech's `LAYOUT_TIER` read this byte (`tech.md` §5.5) |
+| +1 | `RS_LIVES` | b0-3 lives at start and continue; b4 ONE_LIFE (a death ends the run); b5 LIVES LOCK (cheat) |
+| +2 | `RS_TANKS` | b0-2 E-TANK FLOOR; b4-7 E-tanks given at start (TA, Rush) |
+| +3 | `RS_REFILL` | b0-1 REFILL on respawn; b2 refill at pause (Rush cups, cheat); b3 checkpoints off (reserved) |
+| +4 | `RS_WPN` | allowed weapons by venue id (`$FF` all) |
+| +5 | `RS_WPN2` | b0 buster; b1 M.BEAM; b2 POWER; b3 JET; b4 SUPER; b5 TAG; b6 chips on; b7 Beat rescue |
+| +6 | `RS_MAXHP` | max HP (vanilla's full bar by default) |
+| +7 | `RS_ICAP` | i-frame cap (0 = none; Rush cups 30) |
+| +8/+9 | `RS_RULES` | the Exhibition Rules mask: always 0 in v1 (Won't) |
+| +10 | `RS_CHEAT` | b0 GOD; b1 BOSS HP 1; b2 RNG LOCK; b3 REFILL AT PAUSE; b7 any cheat used (records off) |
+| +11 | `RS_MODE` | the mode number above |
+| +12 | `RS_HUD` | b0 timer shown (Should) |
+| +13 | `RS_LAG` | INPUT LAG 0-6, copied from the system block, read by `systems.md`'s `REFLEX` macro |
+| +14 | `RS_FLAGS` | b0 NO_SAVE (no commit, §1.4); b1 NO_RECORDS (no records, achievements or BEST_RATING_EVER); b2 NO_DESK (no judges' desk) |
+| +15 | reserved | |
 
-`systems.md` and `tech.md` read the same block (§15).
+`systems.md` and `tech.md` read the same block. The bit names come from the generated `src/gp/bits.inc` (§1.6).
 
-### 9.1 TIME ATTACK [new-code] M · Should
+### 9.1 TIME ATTACK [new-code] M · Should (cut-line item 7)
 
-- **List:** every meta stage 0-21 cleared on any file, plus the victory lap (meta 23). Each row shows `RECORD
-  m:ss.cc` and `DEV m:ss.cc`; a ★ means the record beats the DEV time.
+- **List:** every meta stage cleared on any file (CLEARED_ANY) among the stages the build ships, plus the victory lap
+  (meta 23) once it exists. Each row shows `RECORD m:ss.cc` and `DEV m:ss.cc`; a ★ means the record beats the DEV time.
 - **Regulation loadout** (fixed, so records compare; 4MI's TA fixes its loadout too, `r4mi/modes.md` §2):
-  - the buster and all 8 weapons, full;
-  - forms: none in the Opening (meta 0), POWER + JET everywhere else, and SUPER from H4 (meta 17) on, since H3
-    awards it. A venue's TA therefore allows its adaptor-gated routes (plates, sky routes), and every record is set
-    with the same tools;
-  - no chips, no tag partner, 0 E-tanks, one life, max HP 28;
-  - NORMAL rules, criticals off, drops off. That is 4MI's STABLE, its "no luck" setting.
+  - the buster and all 8 weapons, full; M.BEAM from H1 on (meta 14+);
+  - forms: none in the Opening (meta 0), POWER + JET everywhere else, and SUPER after H3 (meta 17-21). A venue's TA
+    therefore allows its adaptor-gated routes, and every record is set with the same tools;
+  - no chips, no tag partner (consistency decision 34), 0 E-tanks, one life, full HP;
+  - NORMAL rules, drops NONE (`systems.md`: records modes have no dice; criticals no longer exist).
 - **Story state:** STORY_BEAT and FORMS are preset per stage from a 24-entry table, as 4MI presets PROG per fortress
   stage.
-- **Timer:**
-  - It runs from the first frame of control after READY to the frame the boss's bar empties; for the victory lap, to
-    the last name.
-  - It is shown when CONFIG HUD TIMER is on: 7 sprite digits under the HP bar.
-  - At each checkpoint, a split pops up for 60 frames: `+0:01.23` (red) or `-0:00.40` (green) against the record
-    run's split.
-- **Pause menu:** RETRY (restart the stage at once) and QUIT. A death goes straight back to the list.
+- **Entry and return:** the stage is entered through tech's fight-loader path with a stage target instead of a fight
+  record, and **return kind 6 (TA list)**, ONE_LIFE and NO_SAVE set (a request to `tech.md` §4.6; Should). The clear and
+  death paths return to the list; no YOU GET, flags, desk or autosave run.
+- **Timer:** from the first frame of control after READY to the frame the boss's bar empties (for the lap, to the last
+  name), shown as a HUD widget (DIGITS with tenths, `tech.md` §7.13) when CONFIG's HUD TIMER is on (always in TA). At
+  each checkpoint a split pops up for 60 frames: `+0:01.23` (red) or `-0:00.40` (green) against the record run's split.
+- **Pause menu:** RETRY (restart the stage at once) and `EXIT` (the pause font has no Q, consistency-23).
 - **Result:** `TIME 1:23.45` under `RECORD`, and `NEW RECORD!!` (which 4MI's TA lacks). The system block commits.
 - **DEV times:** a 24-entry ROM table, filled from the developers' golden-movie runs (§9.6).
 
-### 9.2 GP RUSH: a boss rush on one fight table [new-code] M · Should
+### 9.2 GP RUSH: a boss rush on one fight table [new-code] M · Could (cut-line item 11); the fight table Must
 
 The design copies two proven things:
 
-- **Vanilla Wily 3's data-driven rush** (`rm6/fortress.md` §7):
-  - a hub screen;
-  - one room per boss at `$09 + id`;
-  - tables `$39:$8EC8` (X), `$8ED2` (boss stage id) and `$8EDC` (alcove metatiles);
-  - palette `$9A + id`;
-  - a big life capsule that returns you to the hub;
-  - alcoves closed through the `$0340` bitfield;
-  - a ninth teleporter after the eighth win.
-- **4MI's arena family** (`r4mi/modes.md` §3):
-  - one 45-entry fight table with block markers;
-  - a 6-byte fight bitmask and seven presets of about 19 bytes;
-  - a list builder (`$4C:$9762`) that keeps table order, plus four shufflers;
-  - a runner whose step counter makes even steps lobbies and odd steps fights;
-  - one lobby with a NEXT / LEFT panel, gift bits and an exit;
-  - 24-bit frame-count records.
+- **Vanilla Wily 3's data-driven rush** (`rm6/fortress.md` §7): a hub screen; one room per boss at `$09 + id`; tables
+  `$39:$8EC8` (X), `$8ED2` (boss stage id) and `$8EDC` (alcove metatiles); palette `$9A + id`; a big life capsule that
+  returns you to the hub; alcoves closed through the `$0340` bitfield; a ninth teleporter after the eighth win.
+- **4MI's arena family** (`r4mi/modes.md` §3): one 45-entry fight table with block markers; a 6-byte fight bitmask and
+  seven presets of about 19 bytes; a list builder (`$4C:$9762`) that keeps table order, plus four shufflers; a runner
+  whose step counter makes even steps lobbies and odd steps fights; one lobby with a NEXT / LEFT panel, gift bits and an
+  exit; 24-bit frame-count records.
 
-#### 9.2.1 The fight table [new-code] S · Should
+#### 9.2.1 The fight table and the fight-loader interface [data] S · Must
 
-Fight ids are fixed by type. A separate **run order** list sets the play order and the shuffle blocks (bit 7 marks a
-block start, as at 4MI `$4C:$97A3`).
+R1.7 (scope-6, scope decision 12): **the fight loader is Must and `tech.md`'s** (§4.6 there: `fight_load`, `FIGHT_CTX`,
+the 64-byte return-to snapshot, the stale-bit clear). **This doc owns the fight table** (ids, records, run order) and
+the calls it makes. In v1.0 the table serves W2's pair bouts (`fortress.md`), EXTRA CONFIG's `FIGHT n` and the test
+mailbox's fight command; GP Rush (Could), Time Attack (Should) and Doc Robot MK-VI (Should) use it later.
 
-| Ids | Fights | Block |
-|---|---|---|
-| `$00-$07` | the 8 champions (venue id order) | CHAMPIONS |
-| `$08-$17` | up to 16 mid-bosses and set-piece fights (AYACO, the Daruma, …), assigned by the venue and fortress owners | MID |
-| `$18-$1B` | Exhibition guests E1-E4 | GUESTS |
-| `$1C-$20` | Hall of Fame MK-VI bosses H1-H5 | LEGACY |
-| `$21` | Bass β (Semifinal) | CASTLE |
-| `$22` | the W1 boss | CASTLE |
-| `$23` | Bass β (Castle duel) | CASTLE |
-| `$24` | the W3 machine | CASTLE |
-| `$25` | the Wily Capsule | CASTLE |
-| `$26` | the Opening Ceremony boss | MID |
-| `$27` | **`???`**: the Castle's final form, renamed (below) | SECRET |
-| `$28` | Mr. X (Could, §9.8) | SECRET |
-| `$29-$2F` | spare | |
+**Fight ids** are fixed by type (consistency-44, fortress §9.3). The ids and arenas are assigned now for all of them; a
+record is **Must** when a v1.0 caller needs it (W2's bouts, the tests of every v1.0 boss), and the mid-boss records,
+which only GP Rush needs, are Could (the venue docs list their arenas "for GP Rush when it ships"). A separate **run order** list sets GP Rush's play order
+and shuffle blocks (bit 7 marks a block start, as at 4MI `$4C:$97A3`).
 
-Run order: `[$26 $08-$17] [$00-$07] [$18-$1B] [$1C-$20] [$21-$25] [$27 $28]`.
+| Ids | Fights | Arena (stage, screen) | Tier of the record |
+|---|---|---|---|
+| `$00-$07` | the 8 champions, venue id order | each venue's boss room | Must (W2, tests) |
+| `$08` | AYACO | Wind, 01 (the sortie) | Could (with GP Rush) |
+| `$09` | METAL METSLIME | Knight, 12 | Could |
+| `$0A` | DOMINGO DOME | Tomahawk, 05 | Could |
+| `$0B` | SIX-SHOT SAM | Tomahawk, 0D | Could |
+| `$0C` | SIDEWINDER | Tomahawk, 10-11 | Could |
+| `$0D` | CONGA | Plant, 08 | Could |
+| `$0E` | SHADOW ROCK | Flame (venues_b) | Could |
+| `$0F` | GAMARN & GAMADAYU | Yamato (venues_b) | Could |
+| `$10` | DARUMA | Yamato (venues_b) | Could |
+| `$11-$12` | spare (venues) | | |
+| `$13-$17` | `fortress.md`'s five mid-bosses (Big Eye, Picopico-kun, the H3 mid-boss slot, Enker, the Trophy Dispenser; fortress assigns them) | fortress | Could (with GP Rush) |
+| `$18-$1B` | Exhibition guests E1-E4 | E1-E4 | Could (E4 Won't) |
+| `$1C-$20` | Hall of Fame MK-VI bosses H1-H5 (Yellow Devil, Mecha Dragon, Gamma, Cossack Catcher, Dark Man) | H1-H5 | `$1C`, `$1E`, `$20` Must; `$1D`, `$1F` Should |
+| `$21` | Bass β, duel 1 (HALFTIME RIOT) | `$11` | Must |
+| `$22` | METALL 16 (the W1 boss, R3.6) | W1 | Could |
+| `$23` | Bass β, duel 2 (Castle) | W2 | Must |
+| `$24` | WILY MACHINE 6.5 (R3.6) | W3 | Must |
+| `$25` | the Wily Capsule SUPER | W3 | Must |
+| `$26` | Grand Pi-kun (Opening-lite, one size) | `$10` | Must |
+| `$27` | **`???`**: vanilla Wily 4's whole final fight, untouched: engine id `$0F`, room 06, under RULESET 1993 (feasibility-2, consistency decision 40) | legacy `$0F` | Could (with GP Rush) |
+| `$28` | Mr. X | Mr. X Returns | Won't |
+| `$29-$2F` | spare (W2's SUPER copies may take these if `fortress.md` wants records separate from the champions') | | |
 
-**Fight record, 10 bytes:**
+**Fight record, 10 bytes** (the format tech's `fight_load` reads):
 
 | Byte | Contents |
 |---|---|
-| +0 | engine stage id |
-| +1 | room screen (written to `$0684`) |
-| +2 / +3 | spawn x / y |
-| +4 | room CHR set (to `$0685`) |
-| +5 | palette (to `$0686`) |
+| +0 | engine stage id (`tech.md` §4.2) |
+| +1 | room screen (→ `$0684`) |
+| +2 / +3 | spawn x / y (slot 0) |
+| +4 | room CHR set (→ `$0685`) |
+| +5 | palette (→ `$0686`) |
 | +6 | music |
-| +7 | portrait id |
-| +8 | name text id |
-| +9 | flags: b0 needs JET; b1 needs POWER; b2 BG boss; b3 multi-part; b4 SECRET name; b5-7 block |
+| +7 | face icon id (R5.1; a portrait id when portraits ship) |
+| +8 | name text id (story's string; the `???` gag swaps it, below) |
+| +9 | flags: b0 needs JET; b1 needs POWER; b2 BG boss; b3 multi-part; b4 SECRET name; **b5 RULES_1993** (the bout runs with `RS_DIFF` b7 forced on: fight `$27`); b6-7 reserved |
 
-**Loading a fight uses vanilla's own warp:** write `$51`, `$0684-$0686`, then `$F0 = 2` (`rm6/SUMMARY.md` §3). The
-fight therefore loads in **the boss's own arena**, with its real stage data, as 4MI's arenas do. The legacy fights
-need no hub-room art.
+Round 1's three "block" bits in +9 are dropped: the run-order list already marks the blocks, and b5 is needed for the
+1993 bout.
 
-**The `???` gag (a running gag on Mr. Y).** Until U1.4, the lobby panel names fight `$27` **`MR. Y'S ???`**. After
-the TRUE GP clear it reads **`DR. WILY (OBVIOUSLY)`**. This is 4MI's `???` → COCKROACH OMEGA trick (`r4mi/modes.md`
-§3.6), at the cost of one byte test. If Mr. X Returns ships, `$28` follows it, named `???` → `MR. X (THE REAL ONE)`.
+**The interface** (what meta calls, what it reads back; tech implements):
 
-#### 9.2.2 The lobby: "PLAYERS' TUNNEL" [new-code] S · Should, [new-art] S · Should
+| Caller | Call | Return kind (`FIGHT_CTX` b0-2) | Meta reads afterwards | Tier |
+|---|---|---|---|---|
+| W2's hub (fortress's mechanic) | `fight_load(id, HUB)` | 1 hub | — (the hub reads `FIGHT_RESULT`, WORK `$6262`, and closes its alcove) | Must |
+| EXTRA CONFIG `FIGHT n` | `fight_load(n, XCONFIG)` | 3 | `FIGHT_RESULT` → `WIN` / `LOSS` on the EXTRA CONFIG screen | Must (M7) |
+| the mailbox, command 2 | `fight_load(+17, TEST)` (tech's RESET code) | 4 | the test reads `FIGHT_RESULT` from WORK | Must (M7) |
+| GP Rush runner | `fight_load(list[step/2], LOBBY)` with ONE_LIFE when lives run out | 2 | `FIGHT_RESULT`, time | Could |
+| Time Attack | the stage-target variant (§9.1) | 6 (requested) | the timer | Should |
 
-One screen, built from the Opening Ceremony's stadium tileset: GP's home stadium, as 4MI's lobby is its own home city
-(`r4mi/modes.md` §3.1). It needs a tunnel interior, a scoreboard and a gate of light at the right.
+- `fight_load` fills RULESET (§9.0) with `RS_MODE = 5` from the caller's ruleset and the record's flags: b5 forces 1993
+  rules; `RS_FLAGS` gets NO_SAVE and NO_DESK; legacy ids keep vanilla fortress rules unless the record overrides them
+  (consistency decision 37).
+- A bout is not a stage clear: no YOU GET, no `FLAGIDX`, no SECRETS, no STAGEREC, no autosave, no desk (`tech.md`
+  §4.6). In W2 the bouts are part of W2's own run: the scorecard counts them, and W2's clear is the one that saves and
+  goes to the desk (a request to `systems.md`: the run block is not reset by a fight warp).
+- `FIGHT_SEEN` (SYS `$318`) gets the fight's bit when the bout starts; `WEAK_SEEN` (Could) when its first weakness lands.
 
-**The scoreboard** (text window) reads `NEXT  LEFT:16`, then the portrait and the name.
+**The `???` gag** (Could, a running gag on Mr. Y). Until U1.4, the lobby panel names fight `$27` **`MR. Y'S ???`**; after
+the TRUE GP clear, `DR. WILY (OBVIOUSLY)` (story's words). This is 4MI's `???` → COCKROACH OMEGA trick (`r4mi/modes.md`
+§3.6), at the cost of one byte test.
 
-**Gifts**, one per GIFTS bit:
+#### 9.2.2 The lobby: "PLAYERS' TUNNEL" [new-code] S · Could, [new-art] S · Could
 
-| Bit | Gift |
-|---|---|
-| b0 | **Eddie**: touch him for a random item (1UP / E-tank / big life / big weapon energy) |
-| b1 | **Roll's** HP refill, left |
-| b2 | **Roll's** HP refill, right |
-| b3 | **Beat**: refills every weapon |
-| b4 | **Break Man**: recharges the tag call |
+**Screen `$1D` of the Opening's layout**, on TS_STADIUM, entered by the warp to stage `$10` screen `$1D` (`tech.md`
+§4.2, consistency-31): it has no stage id and no tileset slot of its own (art_audio's dedicated slot is dropped). It needs
+a tunnel interior, a scoreboard and a gate of light at the right. The Opening's layout owner (`fortress.md`) places it.
 
-**Exit:** stand in the gate and press UP. The camera flashes and `ROUND n` is announced.
+**The scoreboard** (text window) reads `NEXT LEFT 16`, then the face icon and the name.
 
-START in the lobby opens the normal pause menu, for weapon and chip choices.
+**Gifts**, one per GIFTS bit: b0 **Eddie** (touch him for a random item: 1UP / E-tank / big life / big weapon energy);
+b1-b2 **Roll's** HP refills, left and right; b3 **Beat** refills every weapon; b4 **Break Man** recharges the tag call
+(with the partner).
 
-#### 9.2.3 The runner [new-code] S · Should
+**Exit:** stand in the gate and press UP (`IFINTERACT`, `systems.md` §1.6). The camera flashes (through tech's
+rate-limited flash service) and `ROUND n` is announced. START in the lobby opens the normal pause menu, for weapon and
+chip choices.
+
+#### 9.2.3 The runner [new-code] S · Could
 
 ```
 step = 0; list = build(mask, run_order, shuffle)       ; 4MI $4C:$9762, shufflers at $97DB
 loop: if step even: if GIFTS == 0 → heal HEAL HP, step++  else → LOBBY until gate
-      if step odd : fight list[step/2] via the warp; on boss death → step++
-      on player death: lives-- ; lives < 0 → ELIMINATED screen
+      if step odd : fight_load(list[step/2], LOBBY); on FIGHT_RESULT = WIN → step++
+      on LOSS: lives-- ; lives < 0 → ELIMINATED screen
       step/2 == count → CHAMPION screen
 ```
 
-- **ELIMINATED** screen: `ELIMINATED IN ROUND 5 / BY PLANT MAN`, in tournament language, with the time and the round
-  record.
-- **CHAMPION** screen: the time, `NEW RECORD!!`, and the unlocks (§7).
+The runner's state (≈ 64 B: the list, step, lives, timer) takes a range from WORK's free 1,280 B through the registry
+(`tech.md` §3.4; feasibility-12). **ELIMINATED** (`ELIMINATED IN ROUND 5 / BY PLANT MAN`, tournament language, with the
+time and the round record) and **CHAMPION** (the time, `NEW RECORD!!`, the unlocks of §7) are one screen each.
 
-#### 9.2.4 Courses (presets) [data] S · Should
+#### 9.2.4 Courses (presets) [data] S · Could
 
-Each course is a 24-byte setup in ROM, in the same format as MY GP (§9.2.5). Course n saves to RUSH_REC[n].
+Each course is a 24-byte setup in ROM, in the MY GP format (§9.2.5). Course n saves to RUSH_REC[n]. Every course runs
+with drops NONE (`systems.md`: records modes have no dice).
 
 | # | Course | Fights | Weapons | Gifts | Tanks | Other |
 |---|---|---|---|---|---|---|
 | 0 | **OPEN BRACKET** | the 8 champions, shuffled | all + forms | all | 4 E | one life |
 | 1-9 | **ONE-WEAPON CUPS**: BUSTER CUP, then Y.SPEAR … C.FLASH CUP | the 8 champions | that weapon only (+ forms; only the BUSTER CUP has the buster, as 4MI's SUPPIN) | none; HEAL 5 | 9 E | refill at pause; i-frame cap 30 (4MI's SHORT INV) |
-| 10 | **ALL-STAR** | every non-secret fight, shuffle 3 (within blocks) | all + forms | all | 4 E | one life |
+| 10 | **ALL-STAR** | every non-secret fight the build ships, shuffle 3 (within blocks) | all + forms | all | 4 E | one life |
 | 11 | **TRUE GP**: "THE GREATEST GRAND PRIX IN HISTORY" | **all**, secrets included, shuffle 3, finale fixed | all | all | 9 E | HARD, one life |
 | 12 | **MY GP** | user | user | user | user | user |
-| 13 | **1993 CUP** (Could) | the 8 champions in vanilla Wily 3 hub order | vanilla weapons, no forms | none | 0 | 1993 rules: the nostalgia course |
+| 13 | **1993 CUP** | the 8 champions in vanilla Wily 3 hub order, in the legacy rooms (ids `$08-$0F`) | vanilla weapons, no forms | none | 0 | 1993 rules: the nostalgia course (with 1993 RULES) |
 | 14-15 | reserved | | | | | |
 
-Every course runs with criticals OFF and drops NONE (`systems.md` §14, §15.2: records modes have no dice).
+Weapon cups never need to drop fights, unlike 4MI's three "(15 STAGES)" courses: under BRIEF §5.1 every weapon does 1-4
+to every boss.
 
-Weapon cups never need to drop fights, unlike 4MI's three "(15 STAGES)" courses. Under BRIEF §5.1 every weapon does
-1-4 to every boss.
-
-#### 9.2.5 MY GP: the bracket editor [new-code] S · Should
+#### 9.2.5 MY GP: the bracket editor [new-code] S · Could
 
 A bit-grid editor over a 24-byte setup, 4MI's MY ARENA (`r4mi/modes.md` §3.5):
 
 | Byte | Field | Format |
 |---|---|---|
 | +0..+5 | FIGHTS | 48-bit mask by fight id (they always run in run order, shuffled by SHUFFLE) |
-| +6 | WEAPONS A | b0-7 = the 8 champion weapons |
-| +7 | WEAPONS B | b0 BUSTER; b1 POWER; b2 JET; b3 SUPER; b4 TAG (Break Man); b5 M.BEAM (slot 9); b6 BEAT RESCUE (`systems.md` §10); b7 reserved |
+| +6 | WEAPONS A | b0-7 = the 8 champion weapons by venue id |
+| +7 | WEAPONS B | b0 BUSTER; b1 POWER; b2 JET; b3 SUPER; b4 TAG (Break Man); b5 M.BEAM; b6 BEAT RESCUE (`systems.md` §10); b7 reserved |
 | +8 | GIFTS | lobby bits (§9.2.2); 0 = no lobby |
 | +9 | SHUFFLE | 0 fixed, 1 all, 2 all but the finale block, 3 within blocks |
 | +10 | TANKS | low nibble E-tanks 0-9, high nibble W-tanks |
-| +11 | HEAL | HP restored between fights when there is no lobby (0-28) |
+| +11 | HEAL | HP restored between fights when there is no lobby |
 | +12 | LIVES | 0-9 (0 = one life) |
-| +13 | DIFF | b0 HARD; b1 reserved (criticals are always OFF in GP Rush, `systems.md` §14); b2-3 DAMAGE; b4 SHORT I-FRAMES (cap 30); b5 REFILL AT PAUSE; b6 CHIPS ON; b7 reserved |
-| +14..+15 | RULES | Exhibition Rules mask (§9.3) |
-| +16..+17 | CHIPS | the chip set used when CHIPS ON (16 bits, `systems.md` §9.2 order); slot limits are ignored here |
-| +18..+19 | reserved | |
+| +13 | DIFF | b0 HARD; b1 reserved; b2-3 DAMAGE; b4 SHORT I-FRAMES (cap 30); b5 REFILL AT PAUSE; b6 CHIPS ON; b7 reserved |
+| +14..+15 | RULES | the Exhibition Rules mask (Won't: always 0) |
+| +16..+18 | CHIPS | the chip set used when CHIPS ON (24 bits, `systems.md` §9.2 order); slot limits are ignored here |
+| +19 | reserved | |
 | +20 | ORIGIN | the preset it was loaded from |
 | +21..+23 | reserved | |
 
 - **Commands:** EDIT, LOAD PRESET ◀▶, SAVE / LOAD (3 slots in the system block), START.
 - **Field help:** one help line per field, from the same help-string engine as EXTRA CONFIG.
-- **A one-fight MY GP is a boss select**, which is also how the test harness builds per-boss states (4MI's scout built
-  its 45 `fight_XX` states this way).
+- **A one-fight MY GP is a boss select**, which is also how 4MI's scout built its 45 `fight_XX` states; GP's tests use
+  the mailbox's fight command instead (§9.6), which needs no MY GP.
 
-#### 9.2.6 KNOCKOUT format [new-code] M · Could, [new-art] S
+#### 9.2.6 KNOCKOUT format [new-code] M · Won't (v1)
 
-**What it is.** A real single-elimination bracket of 8, 16 or 32 entrants. Rockman is one entrant; the others are
-drawn from the champions, guests, mid-bosses and legacy bosses.
+A real single-elimination bracket of 8, 16 or 32 entrants: only Rockman's matches are played (3-5 fights); the others
+are simulated from a POWER byte per fight id (`winner = higher (POWER + rand 0-7)`), with commentary between rounds
+("UPSET!"), on the bracket renderer with a tree layout. Cost: a 48-byte POWER table, the simulator, the tree nametable,
+records per size. Won't (R0.3). If it ever returns, its seed is shown and can be entered (consistency decision 34: the
+NES has no clock, so a "daily" seed is impossible).
 
-**How a round plays:**
+### 9.3 EXHIBITION RULES (modifiers) [new-code] S-M · Won't (v1)
 
-- Only **Rockman's** matches are played: 3, 4 or 5 fights.
-- The other matches are **simulated** from a POWER byte per fight id (1-15): `winner = higher (POWER + rand 0-7)`.
-- Commentary pops up between rounds: *"UPSET! PLANT MAN knocks out BASS β!"* (lower POWER won) or *"WIND MAN
-  wins on a technical decision."*
-- The bracket screen fills in after each round, which reuses the bracket renderer with a classic tree layout.
+Kept as a record (R0.3: Won't). Any cleared stage, a 4×4 grid of rules, unranked runs (scorecard, no bolts, no medals),
+a sticker per active rule in RULES_BOOK, the same mask in MY GP. The rules: 0 BUSTER ONLY; 1 NO FORMS; 2 ONE HIT (4MI's
+"Owata-shiki" nod); 3 FAMICOM RULES (no checkpoints: the `$0684` write suppressed except at the start); 4 ICE AGE (the
+floor-type latch `$A7` forced to 5 on solid ground); 5 MOON BOOTS (the water gravity `$00.18` without water); 6 SUDDEN
+DEATH (damage ×2 both ways); 7 NO CHIPS; 8 PACIFIST; 9 ROULETTE (the weapon changes every 600 frames); 10 NO HUD;
+11 TURBO (enemy AI twice every 4th frame: a lag risk under the 9-slot cap, R1.8). `RS_RULES` keeps its two bytes so the
+mode can return without a layout change.
 
-**What it costs:** a 48-byte POWER table, the simulator, the tree nametable, and records per size. The premise
-reaches even the post-game (CX lesson 1).
+### 9.4 RECORDS [new-code] M · Must (pages 1-3); page 4 Should, 5-6 Could, 7 Won't
 
-### 9.3 EXHIBITION RULES (modifiers) [new-code] S-M · Could
+Pages with NEXT / PREV; a page whose mode is not in the build is skipped. Times are frame counts, formatted `h:mm:ss`
+or `m:ss.cc` (60 frames = 1 s, 4MI's convention).
 
-- **Choose:** any meta stage cleared on any file, then toggle rules on a 4×4 grid, then START.
-- **Scoring:** the scorecard shows, but there are no bolts and no medals (rules runs are unranked).
-- **Sticker book:** a clear sets one sticker per active rule in RULES_BOOK[m].
-- **In GP Rush:** the same mask works inside MY GP.
+| Page | Contents | Tier |
+|---|---|---|
+| 1 **FILE RESULTS** (pick a file) | per meta stage the build ships: the medal, best score, best time, KOs and clears. The KO column's heading is story's (`KNOCKOUTS` in EN; `TIWNS` in ENGRISH, 4MI's heading, `r4mi/modes.md` §7) | Must |
+| 2 **FILE TOTALS** | play time, KOs, game overs, unplugs, bolts earned and spent, E-tanks used, weakness hits, HoF points, and the best rating with its seven rows (tag calls and `TURBO: YES` with the bundle) | Must |
+| 3 **LIFETIME** (system block) | per-stage KOs and time, the totals, and the **venue mini-records** (below) | Must |
+| 4 TIME ATTACK | records, DEV times, ★, the total of all records | Should |
+| 5 GP RUSH | per course: the best time, tries and clears | Could |
+| 6 ACHIEVEMENTS | every plate with its **exact condition** and its state | Could |
+| 7 RULES | the sticker grid | Won't |
 
-| Bit | Rule | Effect, and the hook | Size |
+**Venue mini-records** (`VENUE_REC[8] × 2`, by venue id; a ROM table gives each label, its direction and its tier; the
+venue's code writes it):
+
+| Venue | Record | Better | Tier |
 |---|---|---|---|
-| 0 | **BUSTER ONLY** | The weapon menu locks to R.BUSTER; forms allowed | S |
-| 1 | **NO FORMS** | The POWER and JET menu entries are disabled; the form swap does nothing | S |
-| 2 | **ONE HIT** | Max HP 1 (4MI's "Owata-shiki" nod) | S |
-| 3 | **FAMICOM RULES** | No checkpoints: the checkpoint write `$0684` is suppressed except at the stage start | S |
-| 4 | **ICE AGE** | Every solid floor reads as slippery ice: the floor-type latch `$A7` forced to type 5 on solid ground (vanilla momentum `$A1.$A0`) | S |
-| 5 | **MOON BOOTS** | Low gravity: the water gravity `$00.18` without water (no bubbles, normal speed) | S |
-| 6 | **SUDDEN DEATH** | All damage ×2, both ways | S |
-| 7 | **NO CHIPS** | Equipped chips ignored | S |
-| 8 | **PACIFIST** | Killing any normal enemy is a KO (`systems.md`'s kill attribution) | S |
-| 9 | **ROULETTE** | The equipped weapon changes at random every 600 frames, announced with a slot-machine jingle (a nod to 4MI Pharaoh's curse of that name) | S |
-| 10 | **NO HUD** | HP and weapon bars hidden | S |
-| 11 | **TURBO** | Enemy AI runs twice every 4th frame. **Lag risk**: playtest per venue first | M |
-| 12-15 | reserved | | |
+| Wind (1) | best SHOOTING DOWN % in the sortie | higher | Must (`venues_a.md`) |
+| Tomahawk (5) | best quick-draw reaction, in frames | lower | Must (`venues_a.md`) |
+| Knight (6) | fastest Metal Metslime kill, in frames | lower | Should (`venues_a.md`'s proposal) |
+| Blizzard (0) | most bonus-meter time left at the condor grab | higher | Could (`venues_b.md`'s proposal) |
+| Plant, Flame, Yamato, Centaur | none (the slot stays free) | | |
 
-### 9.4 RECORDS [new-code] M · Must (pages 1-3), Should (the rest)
+### 9.5 MUSEUM and sound test [new-code] M · Won't (v1)
 
-Seven pages, with NEXT / PREV:
-
-1. **FILE RESULTS** (pick a file): per meta stage, the medal, best score, best time, KOs and clears. The KO column is
-   headed `KNOCKOUTS` in EN, `ティウン` in JP, and **`TIWNS`** in ENGRISH (4MI's heading, `r4mi/modes.md` §7).
-2. **FILE TOTALS:** play time, KOs, game overs, unplugs, bolts earned and spent, tag calls, weakness hits, E-tanks used,
-   HoF points, and the best rating with its seven rows.
-3. **LIFETIME** (system block): per-stage KOs and time, the totals, and the 8 **venue mini-records** (`VENUE_REC`).
-4. **TIME ATTACK:** records, DEV times, ★, and the total of all records.
-5. **GP RUSH:** per course, the best time, tries and clears; KNOCKOUT sizes.
-6. **RULES:** the 22 × 12 sticker grid.
-7. **ACHIEVEMENTS:** every plate with its **exact condition** and its state.
-
-Times are frame counts, formatted `h:mm:ss` or `m:ss.cc` (60 frames = 1 s, 4MI's convention).
-
-### 9.5 MUSEUM and sound test [new-code] M · Could, [new-art] S
-
-| Room | Contents |
-|---|---|
-| **BROADCAST BOOTH** (sound test) | The track list by name (JP/EN). Only HEARD tracks are listed; the rest show `??????`. Live meters for the 5 channels plus the 2 MMC5 pulses (note name, volume and duty per channel, as 4MI's AUDIO PLAYER does), and Rockman and Roll dancing on the right. SELECT holds a note (4MI's `SEL=HOLD`) |
-| **PLAQUE GALLERY** | Every plaque read: the 5 Hall of Fame wing plaques, the 8 venue homage plaques and the 4 Exhibition plaques. Thanks plaques for Rockman CX, Rockman 4 Minus ∞, and the 8 fan designers (vanilla's DWNB-41..48 credit cards, `rm6/SUMMARY.md` §1.7) |
-| **ENTRANT FILES** | The vanilla boss-intro data panel (HEIGHT / WEIGHT / ATTACK / DEFENCE / MOBILE / ENERGY / LOCATION / SPECIALTY, typed by `$3C:$81B1`) for **every fight in FIGHT_SEEN**. The new entrants need panel data (`story.md`), and Centaur Man keeps "ABILITY UNKNOWN" |
-| **VAULT: 1993** (U1.6) | Launches vanilla's **hidden debug SOUND PLAYER** from bank `$28` (`SEQ COL TBL TMR SOUND PLAYER`). Capcom left it in the ROM unreachable; GP gives it a door. Plaque: *"Found in bank $28 of the 1993 cartridge. Nobody could reach it. Until now."* It needs a launcher that sets up its thread and CHR sets `$FC-$FF`, plus a START+SELECT exit hook. S, Could |
-| **DEV ROOM** (U1.7) | The developers' commentary plaques: one per venue, on how it was built |
+Kept as a record (R0.3: Museum/VAULT is Won't): a BROADCAST BOOTH sound test (only HEARD tracks; live channel meters;
+Rockman and Roll dancing), a PLAQUE GALLERY (every plaque read, plus thanks plaques for CX, 4MI and the 8 fan
+designers), ENTRANT FILES (the vanilla boss panel for every fight in FIGHT_SEEN), the **VAULT: 1993** (vanilla's
+unreachable debug SOUND PLAYER in bank `$28`, given a door; it needs its own band setup, since tech keeps IRQ handler 0
+only as a preset, feasibility-21), and a DEV ROOM of commentary plaques. The SYS fields HEARD and PLAQUES stay allocated;
+`fortress.md`'s F-PLAQUE may set PLAQUES bits so a returning Museum has data.
 
 ### 9.6 EXTRA CONFIG: RAM editor, level select, dev tool [new-code] M · Must
 
 4MI's EXTRA CONFIGURATION (`r4mi/cheats.md` §5) is a page of binary fields, each pointing straight at live RAM, with
-one help line per field. GP does the same, in hex and bit grids.
+one help line per field. GP does the same, in hex and bit grids. Tech builds the engine (bank `$47`, warps, the DEV flag
+and ring buffer, `tech.md` §14.6); this doc designs the screen.
 
 **How it works:**
 
 - **Data-driven:** a field table `{RAM address lo/hi, format, help id}`.
 - **Formats:** hex byte, bit grid with labels, decimal 0-999.
-- **On open:** pick a source: FILE 1-3 or DEFAULTS. It loads into the **scratch file** (magic `'S'`, never committed),
-  and every edit changes the scratch LIVE image.
+- **On open:** pick a source: FILE 1-3 or DEFAULTS. It loads into the **scratch file** (magic `'S'`, never committed,
+  §1.4), and every edit changes the scratch LIVE image. RULESET mode 3.
 
 **Fields:**
 
-| Group | Fields (help line in brackets) |
-|---|---|
-| WHERE | STAGE (meta 0-23 → stage id) · CP (checkpoint 0-7, from the stage's checkpoint table) · SCREEN (raw `$0684` override, `FF` = use CP) |
-| PROGRESS | CLEAR (24-bit STAGE_CLEAR) · STORY · EVENTS · EVENTS2 · FORMS `TAG SUP JET POW` |
-| SECRETS | 24 × 5-bit grid `ENV PLT ITM RM EX`, one row per meta stage |
-| LOADOUT | WPN `CEN KNI TOM YAM FLA PLA WIN BLI` · WPN2 `M.BEAM` · E-TANK · W-TANK · LIVES · BOLTS · CHIPS (16-bit owned) · EQUIP (16-bit equipped) · PARTS / PARTS USED · METALLS · RATEFLAGS `DOVE KO RIV CARD DOPE` |
-| RULES | DIFF preset · DIFF A · DIFF B · DIFF C · RULES mask (§9.3) |
-| CHEATS | LIVES LOCK · REFILL AT PAUSE · GOD (HP pinned, pits and spikes respawn you in place) · BOSS HP 1 · RNG LOCK (seed 16-bit) |
-| DEBUG | LAG BAR (PPUMASK grey bit on while the main thread runs, so lag is visible as a bar) · OBJ COUNT (live objects in the corner) · FRAME STEP (SELECT+START freezes; SELECT steps one frame) · HITBOXES (Could) |
+| Group | Fields | Tier |
+|---|---|---|
+| WHERE | STAGE (meta 0-23 → engine id via §1.8; stages not in the build are skipped) · CP (checkpoint 0-7, from the stage record's `CK_TABLE`, `tech.md` §4.4) · SCREEN (raw `$0684` override, `FF` = use CP) | Must |
+| PROGRESS | CLEAR (24-bit STAGE_CLEAR) · STORY · EVENTS · EVENTS2 · FORMS `TAG SUP JET POW` | Must |
+| SECRETS | 24 × 5-bit grid `ENV PLT ITM RM EX`, one row per meta stage · PRIZES (32-bit) | Must |
+| LOADOUT | WPN `CEN KNI TOM YAM FLA PLA WIN BLI` (venue-id bits) · WPN2 `M.BEAM` · E-TANK · LIVES · BOLTS · CHIPS (24-bit owned) · EQUIP (24-bit equipped) · RATEFLAGS `SOLO KO RIV CARD DOPE` | Must |
+| | W-TANK; PARTS / PARTS USED / GARAGE | Should; Could (bundle) |
+| RULES | DIFF preset · DIFF A (bits labelled `93 HRD GRD CAS DROP DMG`) · DIFF B · DIFF C | Must |
+| CHEATS | LIVES LOCK · REFILL AT PAUSE · GOD (HP pinned, pits and spikes respawn you in place) · BOSS HP 1 · RNG LOCK (seed 16-bit) | Must |
+| DEBUG | LAG BAR (PPUMASK grey bit on while the main thread runs) · OBJ COUNT (occupied slots in the corner, the R1.8 cap) · LAST KILL (the last death hook's LATCHSRC category, `systems.md` §13.7) · FRAME STEP (enables pad 2's START/RIGHT, below) | Must |
+| | HITBOXES | Could |
 
 **Actions:**
 
-| Action | Does |
-|---|---|
-| ENTER STAGE | Load STAGE/CP with the edited state, through the vanilla warp (`$51`, `$0684-$0686`, `$F0 = 2`; 4MI lesson 10's one-byte respawn) |
-| TO BRACKET | Open the bracket with the edited bits |
-| FIGHT n | A one-fight GP Rush on a fight id |
-| WRITE FILE n | Commit the scratch image into file n, which sets **EDITED** for good |
-| RESET COUNTERS | |
+| Action | Does | Tier |
+|---|---|---|
+| ENTER STAGE | Load STAGE/CP with the edited state, through the vanilla warp (`$51`, `$0684-$0686`, `$F0 = 2`; 4MI lesson 10's one-byte respawn), which now clears stale bits on an id change (`tech.md` §4.5) | Must (M2) |
+| TO BRACKET | Open the bracket with the edited bits | Must (M2) |
+| FIGHT n | `fight_load(n, XCONFIG)` (§9.2.1); shows WIN / LOSS on return | Must (M7) |
+| WRITE FILE n | Commit the scratch image into file n, which sets **EDITED** for good | Must |
+| RESET COUNTERS | | Must |
 
 **Disqualifier.** Anything played from EXTRA CONFIG runs on the scratch file, which never saves and never earns
-achievements or records. WRITE FILE marks the target EDITED. An EDITED file still plays, and its rating shows with
-`*` (`RESULT UNDER REVIEW`), but it grants no achievements. This is 4MI's `$7697 = 3` rule (`r4mi/modes.md` §6),
-except that GP **marks the file** instead of silently voiding it.
+achievements or records. WRITE FILE marks the target EDITED. An EDITED file still plays, and its rating shows with `*`
+(`RESULT UNDER REVIEW`), but it grants no achievements. This is 4MI's `$7697 = 3` rule (`r4mi/modes.md` §6), except
+that GP **marks the file** instead of silently voiding it.
 
-**The dev-tool half** (BRIEF §7.3; the regression entry point) [new-code] S · Must:
+**DEV entry points: one meaning each** (R1.14, feasibility-21, `tech.md` §14.5). In DEV builds (`DEV = 1`):
 
-- **TEST MAILBOX** (PRG-RAM page 0 `$7A00-$7A1F`). At boot, before the title, the reset code checks it.
+| Combo | Where | Meaning |
+|---|---|---|
+| pad 1 SELECT + START held | the title | open EXTRA CONFIG |
+| the pause menu's `TEST` row (not "DEBUG": the pause font has no D, consistency-23) | in a stage | open EXTRA CONFIG |
+| pad 2 SELECT held 1 s | in a stage | kill and respawn at the current checkpoint |
+| pad 2 START / pad 2 RIGHT | in a stage, with FRAME STEP on | freeze / step one frame (round 1's pad-1 "SELECT+START freezes" is gone: pad 1's SELECT means only the swap in stages, R2.10) |
 
-  | Bytes | Contents |
-  |---|---|
-  | +0..+7 | magic `"R6GPTEST"` |
-  | +8 | command: 1 enter stage, 2 fight, 3 bracket, 4 title with a file loaded, 5 run the TA timer |
-  | +9 | meta stage |
-  | +10 | CP |
-  | +11 | file source (0 defaults, 1-3 a file) |
-  | +12..+13 | RULES |
-  | +14 | cheats |
-  | +15..+16 | RNG seed |
-  | +17 | fight id |
-  | +18..+30 | loadout overrides (WEAPONS, FORMS, CHIPS, E-tanks) |
-  | +31 | checksum (sum of +0..+30) |
+**The test mailbox** (BRIEF §7.3; the regression entry point) [new-code] S · Must. 32 B at **page 0 offset `$1A00`**
+(§1.2). RESET maps page 0, reads it, **clears the magic first**, then builds that state without menus (`tech.md`
+§14.5). Tests write it into the `.sav` before boot, which replaces savestates (vanilla states cannot load into the MMC5
+build).
 
-  If it is valid, the boot code consumes it: it clears the magic first, then goes straight there.
+| Bytes | Contents |
+|---|---|
+| +0..+7 | magic `"R6GPTEST"` |
+| +8 | command: 1 enter stage; 2 fight (through the fight loader, return kind 4; from M7); 3 bracket; 4 title with a file loaded; 5 run the TA timer (Should); 6 **judges' desk** for the meta stage with the given SECRETS (screenshots every debrief, §16 risk 1) |
+| +9 | meta stage |
+| +10 | CP |
+| +11 | file source (0 defaults, 1-3 a file) |
+| +12 | **DIFF preset override** (`$FF` = keep the source's) |
+| +13 | **global overrides**: b7 apply; b0-1 LANGUAGE; b2-3 ANNOUNCER; b4 FLASHES REDUCED; b5 SELECT SWAP OFF; b6 A/B SWAP |
+| +14 | cheats (`RS_CHEAT` bits) |
+| +15..+16 | RNG seed |
+| +17 | fight id |
+| +18..+19 | WEAPONS |
+| +20 | FORMS |
+| +21..+23 | CHIPS_OWNED |
+| +24..+26 | CHIPS_EQ |
+| +27 | E-tanks |
+| +28 | lives |
+| +29 | INPUT LAG |
+| +30 | b0 the loadout bytes +18..+29 are valid; b1-7 reserved |
+| +31 | checksum (sum of +0..+30) |
+
 - **Why a mailbox:** golden movies, damage sweeps and per-stage states (the CX lesson 9 harness) become one Python line
-  that pokes WRAM before the first frame. This is 4MI's injected-save trick (`r4mi/cheats.md` §10), made explicit.
+  that pokes the `.sav` before the first frame. This is 4MI's injected-save trick (`r4mi/cheats.md` §10), made explicit.
+- **The testing policy** (RULINGS §6): golden movies run with +12 = `$FF` and +13 = 0 on a NORMAL source file, i.e.
+  NORMAL + EN; the smoke movie for each other meta setting (CASUAL, HARD, JP, ANNOUNCER OFF, FLASHES REDUCED, A/B SWAP,
+  INPUT LAG 6, SELECT SWAP OFF) is the same movie with one override byte changed, recorded once per milestone and
+  re-recorded only at ⛳ gates.
 - **It is kept in release builds**, so the tests run on the shipped ROM. The magic plus the checksum make a false
   trigger from garbage RAM a 1-in-2^72 event.
-- **Also from day one** (BRIEF §7.3): the pause-menu `DEBUG` item and SELECT+START on the title, in `DEV=1` builds.
 
-### 9.7 BASS MODE [new-code] L · Could, [new-art] L
+### 9.7 BASS MODE [new-code] L · Won't (v1)
 
-This section covers only the meta-side hooks. The moveset is PLAN §2.8's; the art is `art_audio.md`'s.
+Kept as a record: a NEW-file ENTRANT toggle (U0.6), FILEFLAGS.BASS, records in TA_BASS, story line swaps at the key
+beats (the Riot intro becomes Rockman crashing Bass's bracket), the rating's TEAM row re-labelled SOLO, a Bass solution
+for every adaptor gate (PLAN §2.8; the venue owners mark which). The FILEFLAGS bit and the SYS field stay reserved.
 
-- **NEW GAME:** `ENTRANT: ROCKMAN / BASS β` on the file select (after U0.6). FILEFLAGS.BASS is set on the file.
-- **File card:** a Bass icon. Records go to TA_BASS.
-- **Story:** `story.md` swaps lines at the key beats, gated on the BASS flag. The Riot intro becomes **Rockman**
-  crashing *Bass's* bracket, the same script with the actors swapped.
-- **Rating:** TEAM is re-labelled **SOLO**:
-  - T0 counts "Treble's parts" if `systems.md` re-homes the plates, else it passes automatically;
-  - T1 passes automatically (*"Bass works alone. He says."*);
-  - there is nobody to refuse him, so TURBO costs Bass nothing: Mr. Y is his own sponsor. On a BASS file T7's +2
-    is not counted, which keeps the maximum at 100, and the trap shrinks to the asterisk alone (Break Man's T1
-    line becomes *"Even Wily's own robot gets an asterisk."*). The rating is also clamped to 100 in every case.
-- **Levels:** every adaptor gate needs a Bass solution (PLAN §2.8). The venue owners mark which.
+### 9.8 MR. X RETURNS [new-code] M · Won't (v1)
 
-### 9.8 MR. X RETURNS [new-code] M · Could
-
-- **Unlock:** U1.5 (all 22 Gold+ and the Mr. X card).
-- **Premise (PLAN §4):** the *original* Mr. X turns out to be a real, separate person after all, and he is furious
-  that Wily borrowed his name twice.
-- **Cheap build: the 1993 fortress, untouched.**
-  - **Map:** vanilla **Mr. X Fortress 1** (22 screens). Its layout data stays in ROM when `tech.md` relocates the
-    tables, and its tileset `$2C:$92` is vanilla. It plays with the **vanilla music `$09`** and the vanilla boss
-    (Rounder II).
-  - **Ending:** a one-screen exchange (`story.md`), then a new final fight against Mr. X's flying chair (fight `$28`;
-    `fortress.md` or `story.md` designs the pattern).
-  - **The stage itself:** the museum of the 1993 game, played as it was.
-- **Rewards:** achievement **THE X-FILES**, and the TRUE GP finale `$28`.
+Kept as a record: unlocked by Gold on every stage plus the Mr. X card (U1.5); the *original* Mr. X turns out to be real
+and furious that Wily borrowed his name twice; built cheaply on vanilla **Mr. X Fortress 1** untouched (engine id `$1F`
+points at legacy `$08`'s layout and tileset `$2C:$92`, `tech.md` §4.2; vanilla music `$09`, vanilla boss), a one-screen
+exchange, and a final fight against Mr. X's flying chair (fight `$28`). Its reward was the achievement THE X-FILES and
+the TRUE GP finale `$28`.
 
 ---
 
-## 10. Achievements [new-code] S · Should
+## 10. Achievements [new-code] S · Could (cut-line item 12)
 
-There are 16 plates in a strip under the SPECIAL EVENTS menu (4MI shows 3). Each bit is set at the moment the
-condition is met, and **never on an EDITED file or the scratch file**. Every condition is printed in RECORDS (§9.4):
-4MI's HARD ROCK silently required six sub-settings, and GP will not repeat that.
+There are up to 16 plates in a strip under the SPECIAL EVENTS menu (4MI shows 3). Each bit is set at the moment the
+condition is met, and **never on an EDITED file, the scratch file, or with `RS_CHEAT` b7 set**. Every condition is
+printed in RECORDS page 6: 4MI's HARD ROCK silently required six sub-settings, and GP will not repeat that. A plate
+exists only in a build that ships what its condition reads; the plate's tier is the highest tier among its
+dependencies.
 
-| Bit | Plate | Exact condition |
-|---|---|---|
-| 0 | **GRAND CHAMPION** | Championship rating 100 |
-| 1 | **IRON ENTRANT** | Win the championship with HARD_CLEAN (the HARD preset, all its sub-settings unchanged since NEW GAME) and GAMEOVERS = 0 |
-| 2 | **1993** | Win with R1993_CLEAN |
-| 3 | **FULL BRACKET** | All 4 Exhibitions cleared |
-| 4 | **ALL GOLD** | GOLD or better on all 22 stages |
-| 5 | **PLATINUM ROW** | PLATINUM on all 8 venues |
-| 6 | **TOURNAMENT HISTORIAN** | Every SECRETS bit the 22 stages define, and every plaque read |
-| 7 | **THE GREATEST GP IN HISTORY** | Clear TRUE GP |
-| 8 | **CUP COLLECTOR** | Clear all 9 one-weapon cups |
-| 9 | **SPEED KING** | CHAMP_TIME < 324,000 frames (1:30:00) |
-| 10 | **ONE HIT WONDER** | Clear all 8 venues with the ONE HIT rule (RULES_BOOK bit 2) |
-| 11 | **WEAK SPOT** | WEAK_SEEN covers every non-secret fight id |
-| 12 | **DEV TIME** | ★ on every Time Attack stage |
-| 13 | **INCORRUPTIBLE** | Win a file on which Mr. Y's booth offered TURBO and you never took it (RATEFLAGS.DOPED clear). Hidden as `???` until earned, so the trap stays a surprise |
-| 14 | **BASS CLEAR** | Win on a BASS file (Could) |
-| 15 | **THE X-FILES** | Beat MR. X RETURNS (Could). Hidden until earned |
+| Bit | Plate | Exact condition | Needs |
+|---|---|---|---|
+| 0 | **GRAND CHAMPION** | championship rating 100 | Could |
+| 1 | **IRON ENTRANT** | win the championship with HARD_CLEAN (the HARD preset, all its sub-settings unchanged since NEW GAME) and GAMEOVERS = 0 | Could |
+| 2 | **1993** | win with R1993_CLEAN | 1993 RULES (Could) |
+| 3 | **FULL BRACKET** | every Exhibition the build ships cleared | the Exhibitions (Could) |
+| 4 | **ALL GOLD** | GOLD or better on every stage the build ships | Could |
+| 5 | **PLATINUM ROW** | PLATINUM on all 8 venues | Could |
+| 6 | **TOURNAMENT HISTORIAN** | every SECRETS bit the shipped stages define | Could |
+| 7 | **THE GREATEST GP IN HISTORY** | clear TRUE GP | GP Rush (Could) |
+| 8 | **CUP COLLECTOR** | clear all 9 one-weapon cups | GP Rush (Could) |
+| 9 | **SPEED KING** | CHAMP_TIME < 324,000 frames (1:30:00) (tune) | Could |
+| 10 | **WEAK SPOT** | WEAK_SEEN covers every non-secret fight id the build ships | Could |
+| 11 | **DEV TIME** | ★ on every Time Attack stage | Time Attack (Should) |
+| 12 | **INCORRUPTIBLE** | win a file on which Mr. Y's booth offered TURBO and you never took it; hidden as `???` until earned | the bundle (Could) |
+| 13 | **ONE HIT WONDER** | all 8 venues with the ONE HIT rule | Won't (Exhibition Rules) |
+| 14 | **BASS CLEAR** | win on a BASS file | Won't (Bass Mode) |
+| 15 | **THE X-FILES** | beat MR. X RETURNS; hidden until earned | Won't |
 
 ---
 
 ## 11. CONFIG
 
 `systems.md` §13 owns what each setting does and where it is read. This section owns the menus, the storage, and the
-split between **global** settings (system block) and **per-file** settings (the file's DIFF bytes).
+split between **global** settings (system block) and **per-file** settings (the file's DIFF bytes). Every label and
+help line is story's.
 
-**Why per file** (an amendment to `systems.md` §13.1, which put every setting in the system block): three files are
-often three players. Each file's achievements (IRON ENTRANT, 1993) and its records' C/N/H/93 badges must reflect the
-settings that file was played on. So the difficulty group lives in the file, and everything about the person or the
-TV is global.
+**Why per file** (accepted by `systems.md` §13.1): three files are often three players. Each file's achievements and
+its records' C/N/H badges must reflect the settings that file was played on. So the difficulty group lives in the file,
+and everything about the person or the TV is global.
 
-### 11.1 Global options (title → CONFIG; system block `$008-$00B`) [new-code] S · Must
+### 11.1 Global options (title → CONFIG; system block `$008-$00C`) [new-code] S · Must
 
-| Option | Values (default first) | Effect |
-|---|---|---|
-| LANGUAGE | ENGLISH / JAPANESE / ENGRISH | Text table selection through the one hook at `$3C:$8631` (`rm6/SUMMARY.md` §4, 2.7) and the new text engine. ENGRISH: §12 |
-| ANNOUNCER | ON / DEATHS ONLY / OFF | Commentator pop-ups (BRIEF §5.5). DEATHS ONLY keeps the death lines and mutes the rest (an extension of `systems.md`'s ON/OFF). The judges' debrief is unaffected |
-| TEXT SPEED | NORMAL / FAST / INSTANT / SLOW | Typewriter frames per character: 2 / 1 / 0 / 4 |
-| FLASHES | NORMAL / REDUCED | C.FLASH, the WEAK flash, the Time Stop tint, explosions and the Riot shake use a 2-step palette dim instead of full-white frames; no frame-alternating flicker above 10 Hz |
-| SCREEN SHAKE | ON / OFF | |
-| HUD TIMER | OFF / ON | In-stage timer sprite (always on in Time Attack) |
-| SELECT SWAP | FULL / WEAPONS ONLY / OFF | `systems.md` §1.1: hold SELECT + D-pad cycles weapons (and forms, in FULL); a tap toggles the last weapon. OFF = vanilla feel |
-| 2P SHIFT | ON / OFF | Controller 2's A/B cycle weapons (`systems.md` §1.4, 4MI) |
-| A/B SWAP | OFF / ON | Jump on B, fire on A (one EOR at the joypad read `$3E:$C711`) |
-| MMC5 AUDIO | ON / OFF | The extra pulse channels; OFF for consoles without expansion audio (BRIEF §5.7) |
-| MMC5 ARRANGEMENTS | OFF / ON | Could: arranged tracks where `art_audio.md` makes them |
-| SOUND TEST | → | A shortcut to the Museum booth once it is unlocked |
-| LOAD DEFAULTS | | Everything above except LANGUAGE |
+| Option | Values (default first) | Effect | Tier |
+|---|---|---|---|
+| LANGUAGE | ENGLISH / JAPANESE | text table selection: the new engine's string tables, and the vanilla PPU-script hook at **`$3C:$8636`**, where the interpreter reads the script pointer (`tech.md` §11.2 is the source of truth; consistency-41) | Must |
+| | ENGRISH | §12 | Could |
+| ANNOUNCER | ON / DEATHS ONLY / OFF | commentator pop-ups (BRIEF §5.5, `tech.md` §11.7). DEATHS ONLY keeps the death and P1 lines. The judges' debrief and scenes are unaffected | Must |
+| TEXT SPEED | NORMAL / FAST / INSTANT / SLOW | typewriter frames per cell: 2 / 1 / 0 / 4 | Must |
+| FLASHES | NORMAL / REDUCED | **R3.5**: in NORMAL no effect flashes a large area more than 3 times per second (tech's flash service enforces it, `tech.md` §8.5; `systems.md` §5.1); REDUCED turns every flash into a fade (C.FLASH, the WEAK flash, boss hit pulses, the Riot blackout, explosions) | Must |
+| SCREEN SHAKE | ON / OFF | | Must |
+| **INPUT LAG** | 0-6 frames (default 0) | **R3.5**: added to every reflex window, never to mash counts or timers (`systems.md` §1.6: the quick-draw is 24 / 18 / 40 f + INPUT LAG). Story's help line tells the player to set it to the TV's lag | Must |
+| SELECT SWAP | FULL / WEAPONS ONLY / OFF | `systems.md` §1.1: hold SELECT + D-pad cycles weapons (and forms, in FULL); a tap toggles the last weapon. OFF = vanilla feel | Must |
+| A/B SWAP | OFF / ON | jump on B, fire on A. [code, r2] The joypad read `$3E:$C711` builds each pad's held byte in `$40,X` and its new-press byte with `AND $44,X / STA $42,X` at `$C732`; the swap is a conditional `EOR #$C0` on `$40` (when exactly one of A and B is held) just before `$C732`, in the same registry hook as `systems.md`'s SELECT filter | Must |
+| HUD TIMER | OFF / ON | the in-stage timer widget (always on in Time Attack) | Should |
+| 2P SHIFT | ON / OFF | controller 2's A/B cycle weapons (`systems.md` §1.5) | Should |
+| MMC5 AUDIO | ON / OFF | the extra pulse channels; OFF for consoles without expansion audio; default ON, every track being complete on the 4 base channels (consistency decision 36) | Could (with the MMC5 pulse driver, `tech.md` §12.5) |
+| MMC5 ARRANGEMENTS | OFF / ON | arranged tracks where `art_audio.md` makes them | Could |
+| SOUND TEST | → | a shortcut to the Museum booth | Won't |
+| LOAD DEFAULTS | | everything above except LANGUAGE | Must |
 
 ### 11.2 Per-file options (pit stop → CONFIG; DIFF bytes `$009-$00D`) [new-code] S · Must
 
 The preset values are `systems.md` §13.2's:
 
-| Option | Values | CASUAL | NORMAL | HARD | 1993 |
+| Option | Values | CASUAL | NORMAL | HARD | 1993 RULES (Could) |
 |---|---|---|---|---|---|
-| DIFFICULTY | the 4 presets, or EDIT after any hand change | | | | |
+| DIFFICULTY | the presets, or EDIT after any hand change | | | | |
 | DAMAGE (to Rockman) | ×0.5 / ×1 / ×1.5 / ×2, rounded up | ×0.5 | ×1 | ×1.5 | ×1 |
 | LIVES (start and continue) | 1-9 | 5 | 3 | 3 | 3 |
 | E-TANK FLOOR | 0-4 | 2 | 0 | 0 | 0 |
-| DROPS | NONE / LESS / NORMAL / MORE | MORE | NORMAL | LESS | vanilla |
+| DROPS | NONE / LESS / NORMAL / MORE | MORE | NORMAL | LESS | vanilla (from the RULES bit) |
 | REFILL on respawn | NONE / HALF / FULL | FULL | HALF | NONE | NONE |
-| GUARDS (Spike Guard + Beat on loan, slotless) | OFF / ON | ON | OFF | OFF | OFF |
-| HARD (poke lists + AI branches) | OFF / ON | OFF | OFF | ON | OFF |
-| CRITICALS (if they ship) | OFF / ON | OFF | ON | ON | OFF |
+| GUARDS (SPIKE GUARD + Beat on loan, slotless) | OFF / ON | ON | OFF | OFF | OFF |
+| **CASUAL** (the CASUAL layout tier and lever values: reflex ×2, mash −40 % or hold, timers +50 %, +1 checkpoint per section, skill-gated secrets one step easier; R2.9) | OFF / ON | ON | OFF | OFF | OFF |
+| HARD (the HARD tier: in v1.0 the 18-f quick-draw; per-stage HARD content is Should) | OFF / ON | OFF | OFF | ON | OFF |
 | RULES | GP / 1993 | GP | GP | GP | 1993 |
 
-**1993 is a NEW GAME choice only** (`systems.md` §13.3 lists what it switches off: alt fires, synergies, the parry,
-chips, the shop, bolts, the Beat rescue, criticals, the refill). Switching a file into or out of 1993 would strand
-owned chips and bolts, so the RULES row is greyed out after NEW GAME.
+CRITICALS is gone (R2.4). **1993 RULES is a NEW GAME choice only** (Could; `systems.md` §13.6 lists what it switches
+off): switching a file into or out of 1993 would strand owned chips and bolts, so the RULES row is greyed out after NEW
+GAME.
 
-**Lowering a setting.** If the file becomes easier than its starting preset on any row (DAMAGE lower, LIVES higher,
-DROPS more, REFILL more, GUARDS on, HARD off, criticals don't count), HARD_CLEAN clears for good and LOWEST updates.
-The pit stop warns first: *"The judges will note this."* The records keep each medal's preset badge
-(`systems.md` §13.2: accessibility is never punished in the score, only labelled).
+**Lowering a setting.** If the file becomes easier than its starting preset on any row (DAMAGE lower, LIVES higher, DROPS
+more, REFILL more, GUARDS on, **CASUAL on**, HARD off), HARD_CLEAN clears for good and LOWEST updates. The pit stop warns
+first (story's words). The records keep each medal's preset badge (`systems.md` §13.2: accessibility is never punished in
+the score, only labelled).
 
-## 12. ENGRISH [new-code + text] S · Could
+### 11.3 The health notice (R3.5) [new-code] S · Must
 
-**What it is.** A joke tribute to 4MI, whose language option offers JAPANESE / ENGRISH with "ENGLISH COMING SOON"
-(`r4mi/modes.md` §5). GP has real English, so ENGRISH is a third choice that swaps deliberately broken strings into a
-handful of **menus**. Dialogue and hints stay ENGLISH, so nothing becomes unreadable.
-
-**How it works:**
-
-- `LANGUAGE = 2` reads a sparse override table (sorted string ids → pointers); missing ids fall back to ENGLISH.
-- **Digits:** ENGRISH prints numbers with the letter **O for zero** (`1OO`, `TIME 1:O3.45`). This is 4MI's zero-less
-  font, mirrored: vanilla RM6's pause font has no O and writes `N0R`, `P0W`, `W.ST0RM` with zeros
-  (`rm6/text.md` §5.3).
-- **C.FLRSH:** the ENGRISH weapon name is vanilla's own data misspelling (`rm6/SUMMARY.md` §1.2).
-
-| Where | ENGLISH | ENGRISH |
-|---|---|---|
-| Title | GAME START | GAME STARTING |
-| Title | CONFIG | CONFIGULATION |
-| Title | SPECIAL EVENTS | SPECIAL EVENT IS HAPPEN |
-| Language row | ENGRISH | ENGRISH (ENGLISH IS COME!!) |
-| File select | NEW ENTRANT | NEW CHALLENGER IS HERE |
-| File select | ERASE | ERASE IT!! |
-| File select | BROKEN DATA | DATA IS BROKEN. SORRY |
-| Difficulty | CASUAL / HARD | CASUALLY / VERY HARD |
-| Bracket | PUSH START | PUSH START BUTTON |
-| Bracket | SEMIFINAL | SEMI-FAINAL |
-| Bracket | POSTPONED | POSTPONE |
-| Bracket | EXHIBITIONS | EXHIBITON MATCH |
-| Weapon get | YOU GET | YOU GOT A |
-| Pause-menu weapon name | C.FLASH | C.FLRSH (the YOU GET card already keeps vanilla's C.FLRSH in every language, `systems.md` §3.9) |
-| Scorecard | MEDAL / PLATINUM / BOLTS | METAL / PLATINAM / BORTS |
-| Shop | WELCOME! | ALL YOUR BOLTS ARE BELONG TO EDDIE |
-| Pause | CALL / RETIRE | CALL HIM / GIVE UP |
-| Game over | GAME OVER / CONTINUE | GAME IS OVER / CONTINUE? YOU CAN |
-| Records | KNOCKOUTS / TOTAL | TIWNS / TOTALLY |
-| Rating | GRAND CHAMPION / PARTICIPANT | GRAND CHAMPIOM / THANK YOU FOR PARTICIPATE |
-| Break Man (perfect) | NOTHING TO ADD… | I HAVE NO ADVICE. / YOU ARE REAL CHAMPION! |
-| Translation credit | TRANSLATION: (name) | TRANSLATION: (RESERVED) (4MI's credit) |
-
-Rule for the text pass: ENGRISH is affectionate, never mocking, and never in story text, hints or help pages.
+The boot screen of §2.1 step 3. It is the one place the game tells the player about REDUCED before any flash can play.
+`story.md` writes it (EN and JP); `systems.md` §5.1 and `tech.md` §8.5 are what make it true.
 
 ---
 
-## 13. Build list (tags, sizes, tiers)
+## 12. ENGRISH [new-code + text] S · Could (cut-line item 12)
 
-| Item | Tags | Size | Tier |
-|---|---|---|---|
-| Save module: A/B copies, trailer, commit, load, migration, BROKEN paths | [new-code] | M | Must |
-| LIVE FILE / LIVE SYS gather and scatter, play-time fold | [new-code] | S | Must |
-| Autosave points 1-9 | [new-code] | S | Must |
-| Unplug detector | [new-code] | S | Should |
-| Title (new logo) + menu | [new-code][new-art] | M | Must |
-| Attract crawl | [new-code][new-art] | S | Should |
-| Hidden PASS WORD gag | [engine-ok][new-code] | S | Could |
-| File select (cards, NEW/ERASE guards) | [new-code][new-art] | M | Must |
-| File COPY | [new-code] | S | Should |
-| Difficulty pick | [new-code] | S | Must |
-| Bracket screen, node table, node states, centre logic, pit-stop access | [new-code][new-art] | M | Must |
-| Exhibition layer (B) + badges | [new-code][new-art] | S | Should |
-| Semifinal trigger + POSTPONED | [new-code] | S | Must |
-| Riot intro animation | [new-code][new-art] | S | Should |
-| Bracket event queue | [new-code] | S | Must |
-| Fortress map BACK TO BRACKET | [new-code] | S | Should |
-| Results screen: judges' desk, slide-in rows, medal stamp, prize line | [new-code][new-art] | M | Must (the sponsor's-chair gag: Should) |
-| Judges' debrief engine + predicate tables + hint text (EN/JP) | [new-code] | M | Must |
-| PIT STOP UI: shop, chips grid, garage, booth, file CONFIG | [new-code][new-art] | M | Must (shop, chips) / Should |
-| Game over screen + pause RETIRE | [new-code] | S | Must |
-| Medal derivation + HoF points | [new-code] | S | Must |
-| Championship rating + Break Man debrief | [new-code][new-art] | M | Must |
-| Doping hooks: DOPED flag, BREAK MAN WALKS event, asterisks | [new-code] | S | Should (with `systems.md` SYS-CHP-4) |
-| Unlock bits + SPECIAL EVENTS menu with word reveals | [new-code] | S | Should |
-| RULESET choke point | [new-code] | S | Must |
-| Time Attack (+ splits, DEV times) | [new-code] | M | Should |
-| GP Rush engine: fight table, runner, lobby, courses | [new-code][new-art] | M | Should |
-| MY GP editor | [new-code] | S | Should |
-| KNOCKOUT | [new-code][new-art] | M | Could |
-| Exhibition Rules (bits 0-10) | [new-code] | S | Could |
-| TURBO rule | [new-code] | M | Could |
-| RECORDS pages 1-3 | [new-code] | S | Must |
-| RECORDS pages 4-7 | [new-code] | S | Should |
-| Museum booth, plaques, entrant files | [new-code][new-art] | M | Could |
-| VAULT: 1993 debug sound player | [engine-ok][new-code] | S | Could |
-| EXTRA CONFIG editor + actions + scratch file | [new-code] | M | Must |
-| TEST MAILBOX + DEV build switches | [new-code] | S | Must |
-| Achievements | [new-code][new-art] | S | Should |
-| CONFIG global + per file | [new-code] | S | Must |
-| ENGRISH table | [new-code] | S | Could |
-| Bass Mode meta hooks | [new-code] | S (meta only) | Could |
-| Mr. X Returns | [new-code] | M | Could |
-| GP fanfare for the title / rating screens | [new-music] | S | Should |
+**What it is.** A joke tribute to 4MI, whose language option offers JAPANESE / ENGRISH with "ENGLISH COMING SOON"
+(`r4mi/modes.md` §5). GP has real English, so ENGRISH is a third choice that swaps deliberately broken strings into a
+handful of **menus**. Dialogue, hints and help pages stay ENGLISH, so nothing becomes unreadable.
+
+**How it works:**
+
+- `LANGUAGE = 2` reads a sparse override table (sorted string ids → pointers); missing ids fall back to ENGLISH
+  (`tech.md` §11.5: the TSV's ENGRISH column).
+- **Digits:** ENGRISH prints numbers with the letter **O for zero** (`1OO`, `TIME 1:O3.45`). This is 4MI's zero-less
+  font, mirrored: vanilla RM6's pause font has no O and writes `N0R`, `P0W`, `W.ST0RM` with zeros (`rm6/text.md` §5.3).
+- **C.FLRSH:** the ENGRISH pause-menu weapon name is vanilla's own data misspelling (`rm6/SUMMARY.md` §1.2); the YOU GET
+  card keeps C.FLRSH in every language (`systems.md` §3.9).
+- **The list** (title, file select, difficulty, bracket, YOU GET, scorecard, shop, pause, game over, RECORDS, rating,
+  Break Man's perfect line, the translation credit) is `story.md` §9's final list; round 1's draft is in git
+  (`95288ee`). Rule for the text pass: ENGRISH is affectionate, never mocking, and never in story text, hints or help
+  pages (one deliberate exception: Break Man's perfect line, 4MI's own).
+
+---
+
+## 13. Build list (tags, sizes, tiers, sessions)
+
+The ledger rows (`tools/plan/tally.py`, area `meta`); the Must rows sum to 31, the same as `tight.py`'s meta block.
+
+| Item | Tags | Size | Tier | Sessions |
+|---|---|---|---|---|
+| Save module: A/B copies, trailer, commit, load, migration, BROKEN paths, autosaves, IN_MATCH, save tests | [new-code] | M | Must | 3.5 |
+| Title and boot: license line, health notice, menu | [new-code][new-art] | S | Must | 1.5 |
+| File select (cards, NEW/START/ERASE guards) and the difficulty pick | [new-code][new-art] | M | Must | 2.5 |
+| Bracket: node table, states, centre logic, rematch hook, Riot trigger and POSTPONED, event queue | [new-code][new-art] | M | Must | 4 |
+| Results screen: judges' desk, slide-in rows, medal stamp, prize line, secret icons | [new-code][new-art] | M | Must | 2.5 |
+| Debrief engine, predicate tables (tier B), stage counters | [new-code] | M | Must | 2 |
+| Medal derivation, HoF points, unlock bits | [new-code] | S | Must | 1 |
+| RULESET choke point and the generated bit table | [new-code] | S | Must | 0.5 |
+| CONFIG global + per file (INPUT LAG, CASUAL, FLASHES, A/B SWAP) | [new-code] | S | Must | 1.5 |
+| EXTRA CONFIG UI, actions, scratch file, test mailbox, DEV entry points | [new-code] | M | Must | 3 |
+| Pit stop: shop, 14-chip grid with help pages, file CONFIG, SAVE & QUIT | [new-code][new-art] | M | Must | 2.5 |
+| Game over screen, pause RETIRE, unplug count | [new-code] | S | Must | 1.5 |
+| RECORDS pages 1-3 with the venue mini-records | [new-code] | S | Must | 1.5 |
+| Fight table: v1.0 records, run order, the loader interface (the loader is tech's) | [data] | S | Must | 0.5 |
+| Fortress maps (H, W) with REPLAY and BACK TO BRACKET | [new-code][new-art] | S | Must | 1.5 |
+| Championship rating (re-derived) and Break Man's debrief | [new-code] | M | Must | 1.5 |
+| **Must total** | | | | **31** |
+| Time Attack (+ splits, DEV times, story presets, return kind 6, HUD TIMER, RECORDS page 4) | [new-code] | M | Should | 3 |
+| File COPY | [new-code] | S | Should | 0.5 |
+| Sponsor's-chair gag, Eddie SAVING icon, tier A escalation data | [new-code][new-art] | S | Should | 0.5 |
+| Attract crawl | [new-code][new-art] | S | Could | 1.5 |
+| Hidden PASS WORD gag | [engine-ok][new-code] | S | Could | 0.5 |
+| Exhibition layer (B) and badges | [new-code][new-art] | S | Could | 1.5 |
+| Riot intro animation | [new-code][new-art] | S | Could | 1 |
+| Bundle hooks: garage and booth rows, DOPED, BREAK MAN WALKS, asterisks, the T1/T6/T7 bundle rows | [new-code] | S | Could | 1.5 |
+| 1993 RULES meta hooks (NEW GAME choice, R1993_CLEAN, the 93 badge, the 1993 ROW) | [new-code] | S | Could | 0.5 |
+| GP Rush: runner, lobby, courses, MY GP | [new-code][new-art] | M | Could | 5 |
+| RECORDS pages 5-6 and achievements (page 4 is Time Attack's) | [new-code][new-art] | S | Could | 2.5 |
+| ENGRISH override table | [new-code] | S | Could | 1 |
+| KNOCKOUT | [new-code][new-art] | M | Won't | 3 |
+| Exhibition Rules and the TURBO rule | [new-code] | S-M | Won't | 3.5 |
+| Museum, VAULT, plaque gallery | [new-code][new-art] | M | Won't | 3.5 |
+| Bass Mode (player sheet code, meta hooks, level answers) | [new-code][new-art] | L | Won't | 10 |
+| Mr. X Returns (and the chair boss) | [new-code] | M | Won't | 4 |
+
+Moved out of this doc: **the fight loader** (2.5, now `tech.md`'s item 40, R1.7); the GP fanfare (`art_audio.md`'s
+track list, R5.2).
 
 ---
 
 ## 14. Lessons applied
 
 - **CX 1, one premise everywhere:** the file select is a registration desk, the stage select a bracket, every clear a
-  judging, the boss rush a tournament with simulated upsets, the rating a championship.
-- **CX 3, voice on failure:** unplug lines, the ELIMINATED screen, BREAK MAN WALKS.
-- **CX 6, telegraph the tool:** requirement hints override riddles when the needed form is missing.
-- **CX 7, special cases in visible tables:** bracket events, debrief predicates and rating tests are all data tables.
-- **CX 9, a test harness:** crafted saves with checksums become the TEST MAILBOX.
+  judging, the halftime riot a stadium joke, the rating a championship.
+- **CX 3, voice on failure:** the unplug line, the game-over table, BREAK MAN WALKS (with the bundle).
+- **CX 6, telegraph the tool:** requirement hints override instructions when the needed form is missing.
+- **CX 7, special cases in visible tables:** the event queue, debrief predicates, rating tests, the fight table and the
+  prize-bit table are all data.
+- **CX 9, a test harness:** crafted saves with checksums become the TEST MAILBOX, with override bytes for the smoke
+  matrix.
 - **CX saves:** three slots. The silent "bad sum = new game" failure is *not* kept; GP shows BROKEN DATA.
-- **4MI 5, one predicate table for score and hints:** used twice, per stage (judges) and per game (rating + Break Man).
-- **4MI's 102→100 trade-off:** TURBO (+2) costs Break Man (−5).
-- **4MI 9, boss rushes on one fight table with one lobby:** presets, cups, MY GP and the boss select all share it.
+- **4MI 5, one predicate table for score and hints:** used twice, per stage (judges) and per game (rating + Break Man);
+  the same routine gates collect-N rewards in the stage.
+- **4MI's 102→100 trade-off:** kept for the bundle build (TURBO +2 costs Break Man −5); v1.0 reaches exactly 100.
+- **4MI 9, boss rushes on one fight table with one lobby:** the fight table is Must data now; the rush modes reuse it.
 - **4MI 10, a level select and RAM editor from day one:** EXTRA CONFIG plus the mailbox.
 - **4MI, the double copy and a strong checksum:** kept and improved (ping-pong, commit marker), with graceful BROKEN
-  handling everywhere.
+  handling everywhere, and fuzz-tested.
 - **4MI, START+A to overwrite.**
-- **4MI, modes override config through one choke point:** RULESET.
-- **4MI, hidden names behind achievements:** `MR. Y'S ???` → `DR. WILY (OBVIOUSLY)`.
-- **4MI, exact achievement rules, shown in game.**
+- **4MI, modes override config through one choke point:** RULESET, now also the fight loader's and the macros' source.
+- **4MI, exact achievement rules, shown in game** (Could).
 - **4MI, frame-count records.**
-- **4MI's ENGRISH and TIWNS:** a tribute.
 - **RM6 3:** GP state lives in PRG-RAM, not in the 89 free CPU bytes.
 - **RM6 7:** adaptors become real save flags.
-- **RM6 8, vanilla quirks kept on purpose:**
-  - TO BE CONTINUED ends the rating;
-  - C.FLRSH appears in ENGRISH;
-  - the password grid survives as a gag;
-  - the debug sound player gets a museum door;
-  - Mr. X Fortress 1 is replayed as it was.
-- **RM6 fortress.md:** the Wily 3 rush shows the rush is data, and GP Rush generalises its tables. Fights load through
-  the vanilla warp (`$51`, `$0684-$0686`, `$F0 = 2`).
+- **RM6 8, vanilla quirks kept on purpose:** TO BE CONTINUED ends the rating; C.FLRSH (ENGRISH, Could); the password
+  grid gag (Could).
+- **RM6 fortress.md:** the Wily 3 rush shows the rush is data; fights load through the vanilla warp (`$51`,
+  `$0684-$0686`, `$F0 = 2`), wrapped by tech's loader.
+
+---
 
 ## 15. Cross-doc dependencies
 
+**What the Musts here lean on (R0.4)**, all Must in their owners' docs: tech's PRG-RAM pages and save module service,
+the WORK ledger ranges (LIVE images, RULESET, the run block's stage counters, the fight block), the stage record's
+`META`, `FLAGS1.REMATCH`, `CK_TABLE` and `FIGHT_ROW`, the fight loader, the text engine v1a (menu-screen windows) and the
+mailbox read in RESET; systems' scorecard, prices, chips and settings; story's strings; the fortress's map art, the
+Riot's capsule beat and H5's card; the venue docs' secrets, prizes and mini-records.
+
 | Doc | Must agree on |
 |---|---|
-| `systems.md` | **Adopted from it:** SELECT opens the pit stop from the bracket (§1.5 there); medal points B1/S2/G3/P4; best PAY and the C/N/H/93 badge per stage (STAGEREC +1/+2); the per-stage TURBO asterisk; Time Attack and GP Rush with criticals OFF and drops NONE; its save list (§15.1 there) is all in the FILE block (§1.6). **Amended here:** its §13.1 puts every setting in the system block, but this doc keeps the difficulty group **per file** (§11). The scorecard rows, maxima and medal thresholds 40/60/80/95 (medals derive from the best score). Kill attribution (PACIFIST, VARIETY hints). The chip id order (CHIPS_OWNED bits), a chip-source attribute per chip (shop / garage / venue / TURBO) so rating T6 can count Eddie's chips. **The moral trade-off is `systems.md`'s doping (SYS-CHP-4: TURBO from Mr. Y's booth; Break Man refuses; records get an asterisk)**: this doc scores it (T1, T7) and stores RATEFLAGS.DOPED. The PART inventory, the garage and TURBO's effect are `systems.md`'s. Removing vanilla's no-rematch beam-out. W-tanks and consumables (FILE `$033-$037`). The RULESET fields it reads. Criticals shipping or not |
-| `story.md` | STORY_BEAT values. Break Man's join condition (event b5) and his debrief voice. Kalinka as the judges' speaker. The Riot intro lines. Roll's adaptor hand-off lines. The trophy theft. The post-game bracket intro. ENTRANT FILES panel data for new bosses. The Mr. X Returns premise. Bass Mode line swaps. The attract crawl |
-| `venues_a.md` / `venues_b.md` | Their secrets are used as written (§4.3-§4.4). Their hints are tier B **verbatim**, and the tier A riddles must be re-checked if they change. **The debrief order is this doc's weight rule** (exit → room → item → plate, then Gold, Platinum), not the per-doc orders they proposed. venues_b to add tier B lines for Yamato and Centaur. Plates: A and B ride on the secret exits (venues_a), E and T are JET predicates (venues_b). Each venue's one **mini-record** (Wind's SHOOTING DOWN %, Tomahawk's quick-draw time, and one per other venue if wanted) goes in SYS `VENUE_REC`. Mid-boss fight ids `$08-$17` with arena screens (CONGA, AYACO, the Daruma, …). Bass solutions for adaptor gates (Could) |
-| Exhibition owner (venues or fortress) | **Pairs: E1 Wind + Knight, E2 Tomahawk + Plant, E3 Blizzard + Flame, E4 Yamato + Centaur** (PLAN §3.3). Guest fight ids `$18-$1B` |
-| `fortress.md` | The Hall of Fame and Castle maps get BACK TO BRACKET. Saves per wing. **Mr. X's business card**: one pickup somewhere in H1-H5, setting RATEFLAGS.MRX_CARD. The SECRETS bits of non-venue stages. Fight ids `$1C-$25` and their arenas. The `???` finale. Mr. X Returns' chair fight. Whether the W2 refight hub reuses vanilla Wily 3's tables (GP Rush can share the hub art) |
-| `tech.md` | PRG-RAM size and the NES 2.0 NVRAM declaration. Page 0 reserved for the save (`$6000-$7A1F`). Work-RAM placement. The meta column in the stage-attribute table. Stage ids for the fight table. Keeping vanilla Mr. X 1's layout and tileset in ROM (Mr. X Returns). The text engine's language hook (ENGRISH override table). The DEV build flag. Mailbox handling in RESET |
-| `art_audio.md` | The title logo, bracket nametable, badges, medal ribbons, POSTPONED stamp, Bass β and trophy portraits, the cracked frame, the file cards, the judges' desk with the Mr. Y cut-out on the sponsor's chair, Eddie's pit-stop counter, the Mr. Y booth sprite, the participation ribbon, the lobby tunnel (from the Opening tileset), achievement plates, Museum booth meters, and the GP fanfare |
-| Opening Ceremony owner | One extra **lobby screen** (players' tunnel) in the stadium tileset for GP Rush |
+| `systems.md` | **Adopted:** 3-byte CHIPS_OWNED/EQ in §9.2's order with bits 14-17 reserved for the bundle; PRIZES (4 B); STAGEREC[24]; FORMS.TAG (not BREAK_JOINED); DIFF A = DAMAGE b0-1, DROPS b2-3, CASUAL b4, GUARDS b5, HARD b6, 1993 b7; INPUT LAG global (SYS `$00C`, copied to `RS_LAG` for `REFLEX`); medal points B1/S2/G3/P4; best PAY and the C/N/H badge; the §9.5 rating inputs (implemented as §6.1); METALLS and DOVE removed; the difficulty group per file (accepted in its §13.1). **Asks:** W2's run block survives the bout warps, so the bouts count in W2's scorecard (§9.2.1); its `REFLEX` reads `RS_LAG`; its code says `IFHARD` etc., which read `RS_DIFF`, not the file byte |
+| `story.md` | **Owns every word**: hint text (§7, both tiers, with YA0's new riddle and PL0's without the explorer's name), generic debrief lines (§7.2), Break Man's debrief (S47, with a new T1 SOLO RIOT entry, and the "never called" line pointing at the pause **CALL row with A**, R2.10), rank titles (S46), every menu label, the HARD description that matches v1.0's HARD, the health notice, INPUT LAG and CASUAL help lines, the Riot intro lines (S14), the adaptor hand-offs (S12, S13, S29), the theft (S25), the unmasking (S33), the game-over and unplug lines (S16), the sponsor's-chair signs, ENGRISH's list (§9). **Kept here as story asked:** STORY_BEAT at FILE `$013` with story's values; COMMFLAGS at FILE `$04A`; the chair's `BACK SOON` from STORY_BEAT `$03` and `RESERVED` from `$09`; `B EXHIBITIONS` without a colon (Could) |
+| `venues_a.md` / `venues_b.md` | SECRETS b0-b4 per venue and the debrief order (§4.3, the weight rule they both now follow); tier B hints verbatim (through story §7); PRIZES indexes (§1.6.1: Blizzard 4, Plant 4, Tomahawk 3, Knight 1); VENUE_REC (§9.4: Wind and Tomahawk Must, Knight Should, Blizzard Could); STAGE_CLEAR read by LAND, EXPRESS and Blizzard's replay-skip door; `CFG_CASUAL` = DIFF A b4; mid-boss fight ids `$08-$10` with their arenas (§9.2.1); the R3.3 venue names (§3.2); every collect-N secret on the stage counters (§4.6), at most one per venue |
+| `fortress.md` | SECRETS b0-b3 for meta 0, 9, 14-21 and their tier B hints; **the Riot's capsule beat (Bass β duel 1: Break Man's whistle and a life capsule below 6 HP) stays Must**, and Bass β's death sets RATEFLAGS b4 SOLO RIOT when the capsule never dropped in that run (and b2 RIVAL as before), since rating T1 reads it (else §6.1's fallback); **Mr. X's card in H5's hidden room stays Must** (T14; else the fallback); RIVAL (no damage from the bar fill to the overdrive); fight ids `$13-$17` and `$1C-$28` and their arenas; the HoF and Castle maps' art, with H2, H4 and W1 drawn as closed wings in v1.0; the GP Rush lobby as Opening screen `$1D` (Could); W2's hub calls `fight_load(id, HUB)` and reads `FIGHT_RESULT`; W3's clear runs the ending without a desk; F-PLAQUE may set SYS PLAQUES bits |
+| `tech.md` | Page 0 map (§1.2) at page offsets `$0000-$1A1F`, LIVE images in WORK at `$7400`/`$7600`, write protection by isolation; `save_commit` refuses the scratch magic and NO_SAVE; RULESET at `$6270` with `RS_DIFF` as the macros' source and `bits.inc` generated from §1.6; the stage counters (2 B) in the run block; the mailbox at page 0 `$1A00` with §9.6's format and the fight command through the loader (return kind 4); the rematch hook `H_REMATCH` at `$3F:$F951` and the replay test in the `$F9A0` hook (skip YOU GET); the A/B SWAP edit at `$3E:$C732` inside the joypad hook; return kind 6 for Time Attack (Should); the language hook at `$3C:$8636`; the DEV entry points of §9.6; meta's thread code in banks `$42-$43` |
+| `art_audio.md` | The title (vanilla logo + GP badge + subtitle), the bracket nametable, medal ribbons, the POSTPONED stamp, the cracked frame, Bass β's portrait, the trophy states, the file cards, the judges' desk with face icons, the pit-stop counter, the fortress maps (with closed wings), the participation ribbon; Could: badges, the booth sprite, the lobby tunnel, achievement plates, Eddie's SAVING icon (Should), the sponsor's-chair cut-out (Should) |
 
 ## 16. Risks
 
-1. **Hint text drifting from the venues.** The §4.4 tier B lines are the venue docs' own, but the tier A riddles are
-   this doc's, and Yamato's and Centaur's tier B lines were written from `venues_b.md`'s gate matrix alone. Mitigation:
-   - every hint id is listed per venue;
-   - the M10 text pass checks each predicate against its venue doc;
-   - a test scenario (mailbox: enter the stage with SECRETS = 0) screenshots each debrief.
-2. **PRG-RAM shared with work RAM.** The write gate cannot protect the save then. The ping-pong copies and the commit
-   marker are designed for exactly this case, but **power-cycle testing on real hardware** (EverDrive) is needed
-   before release.
-3. **Save size growth.** The FILE block keeps about 150 reserved bytes and the system block about 200, after taking
-   in everything `systems.md` §15.1 asks for. If more is needed (per-row scorecard bests would take 120 B), the FILE
-   block can grow to 1 KB by moving the copies, but only before v1.0: after release, only migrations.
-4. **Rating balance.**
-   - The 3-hour T11 limit and SPEED KING's 1:30 are guesses; tune them against playtest saves (the RECORDS totals
-     exist for this).
-   - TOP SEED (no champion-room KO) may be harsher than its 1 point suggests; that is fine for a bonus.
-5. **Semifinal soft lock.** POSTPONED must never leave a player with nothing selectable. The Semifinal is always
-   selectable, and the pit stop stays reachable. A test: a file with 4 wins, 0 lives and 0 bolts must still reach the
-   Semifinal.
-6. **TURBO and lag.** Doubling enemy AI on a ~10-object budget can push frames over. It stays Could, behind a
-   per-venue playtest.
-7. **Scope.** The post-game is large. If time runs short, the order to cut: KNOCKOUT → Museum → Exhibition Rules →
-   MY GP → GP Rush courses beyond OPEN.
-
-   The kernel to keep:
-   - saves;
-   - the bracket;
-   - the debrief and rating;
-   - EXTRA CONFIG and the mailbox;
-   - RECORDS 1-3;
-   - Time Attack.
-8. **The `1993` preset's promise** (vanilla damage tables, forms that can't fire) rests on `systems.md` §13.3's
-   generated "1993" row set (a Should). If it slips, 1993 shrinks to "no chips, no shop, no tag, classic lives", and
-   the 1993 achievement's text must say so.
+1. **The slice is overloaded.** Meta's M2-M3 share is 23 sessions (items 1-12) against RULINGS §6's 45 for all of M2
+   and 25 for all of M3; tech's M2 is 31.5 and systems' slice about 33. Mitigation: file-select-lite and bracket-lite
+   in M2 (one node, no centre logic), the title as a plain text menu until M5's pattern-table split, RECORDS at M6; the
+   M4 re-estimate decides the rest.
+2. **Hint text drifting from the venues.** The tier B lines are the venue owners', through story §7. Mitigation: every
+   hint id is listed per venue (§4.4); mailbox command 6 screenshots every stage's desk with SECRETS = 0 at each gate,
+   and the M9 text pass checks each predicate against its venue doc.
+3. **Save size and the layout freeze.** The FILE block keeps 126 reserved bytes and the system block 194, after
+   allocating every v1.1+ field. If more is needed before v1.0 (per-row scorecard bests would take 120 B), the FILE blocks
+   can grow to 768 B each into page 0's 3 KB of reserve; after release, only migrations.
+4. **Rating balance.** T11's 3 hours and SPEED KING's 1:30 are guesses for 15 stages; T1 and T13 both read the same
+   duel (a perfect duel passes both). Tune at M9 against playtest saves (RECORDS' totals exist for this).
+5. **Riot soft lock.** POSTPONED must never leave a player with nothing selectable. The Riot is always selectable and
+   the pit stop reachable. A test: a file with 4 wins, 0 lives and 0 bolts must still reach the Riot.
+6. **The rating's two fortress dependencies** (the Riot capsule, the Mr. X card). If either leaves v1.0, §6.1's
+   fallbacks apply; the unit test of §6.4 asserts the sum is still 100.
+7. **Power-cycle safety on hardware.** The ping-pong copies and the commit marker are designed for torn writes, but the
+   real test is the M9 hardware run (§1.9), which depends on the user's cart (RULINGS §7 question 1).
+8. **The bundle's arithmetic.** When the bundle returns, T1, T6 and T7 change together; §6.4's build flag and unit test
+   (102 printed, 100 reachable, 96 with TURBO) keep it honest.
 
 ## 17. Open questions
 
-1. Should the Semifinal be **forced at once** after the 4th win (a tighter story) instead of the POSTPONED lock (which
-   lets the player shop and replay first)? This doc picks the lock.
-2. Should **RETIRE** from an uncleared stage cost a life? This doc says no. RETIRE is free and is not an unplug.
-3. Is **Kalinka** the right per-stage debrief speaker, or should Cossack, as head judge, speak the hints? This doc
-   picks Kalinka: she is the one who "hears things", and Cossack already owns the scorecard.
-4. Does Time Attack's regulation loadout include **Break Man's call** from his join point? This doc says no, to keep
-   records pure.
-5. Should **unlocks** be per file instead of global (4MI is global)? Global is simpler and kinder.
-6. Should KNOCKOUT's simulated results use a **fixed seed per day** (from the play-time counter) so friends can race
-   the same bracket?
-7. Should **1993** files be allowed to unlock anything? This doc says yes, as normal.
+Round 1's seven questions are closed (consistency decision 34): the POSTPONED lock, not a forced Riot; RETIRE is free;
+Kalinka speaks the debrief; no tag call in Time Attack; unlocks are global; KNOCKOUT's seed would be shown and enterable
+(KNOCKOUT is Won't); 1993 files may earn unlocks.
+
+Still open:
+
+1. **The hardware target** (RULINGS §7 question 1) decides how §1.9's power-cut test runs.
+2. **Should EXTRA CONFIG unlock earlier** than the championship in release builds (for example at 40 HoF points), so
+   players can practise a boss with `FIGHT n` before the ending? This doc says no: it marks files EDITED, and the
+   championship is the natural "you have seen everything" point.
+3. **Is RECORDS at 20 HoF points too late?** A first-time player reaches it around the 6th venue. The alternative is to
+   show SPECIAL EVENTS from the first save. This doc keeps 20, for the 4MI-style reveal.
+
+---
+
+## Changes in round 2
+
+| # | Change | Ruling / finding |
+|---|---|---|
+| 1 | Added **"## v1.0 scope"**: 16 Must items with milestones and sessions, 31 in all (round 1's tight 33.5 minus the fight loader's 2.5, now tech's); per-milestone split; the slice path; the testing-policy hooks; Should/Could/Won't lists | R0.1, R0.2, R0.4, R1.7; scope-1, scope-2, scope-3 |
+| 2 | Re-tiered every section to Must / Should / Could / Won't (v1); each table row carries its tier; the build list (§13) carries sessions | R0.2, R0.3, R0.4; scope-2, scope-22 |
+| 3 | Post-game per R0.3: EXTRA CONFIG and RECORDS 1-3 Must; Time Attack Should; GP Rush, MY GP, achievements, ENGRISH, the attract crawl, RECORDS 5-6 Could (page 4 goes with Time Attack); KNOCKOUT, Exhibition Rules, Museum/VAULT, Bass Mode, Mr. X Returns Won't (kept as short records) | R0.3; scope-22, design-6 |
+| 4 | §1.2: page 0 as page offsets mapped at `$A000` only inside the save module; LIVE FILE / LIVE SYS in WORK at `$7400`/`$7600`; write protection by isolation; the mailbox at page 0 `$1A00` | R1.6; tech §2.2, §13; consistency decision 37 |
+| 5 | §1.6 FILE block re-laid as the final layout: 3-byte CHIPS_OWNED/EQ (14 v1.0 bits, 14-17 reserved for the bundle), PRIZES (4 B) with a prize-bit table (§1.6.1), RATEFLAGS b4 SOLO RIOT, COMMFLAGS kept at `$04A`, every v1.1+ field pre-allocated; METALLS, DOVE and CRITICALS removed; DROPS VANILLA derived from the RULES bit; FILEFLAGS bits re-packed | consistency-11; R2.5, R2.7; systems §15.1; story's `$04A` request |
+| 6 | DIFF A: CASUAL b4 (new `CFG_CASUAL`), GUARDS b5, HARD b6 (so `BIT`/`BVC` tests HARD), 1993 b7; `bits.inc` generated from this table; macros read RULESET's copy | consistency-15, consistency-16; R2.9, R1.10; design-7 |
+| 7 | §1.8 meta index table now names each engine id from tech §4.2 and its tier; HoF points and medals count only shipped stages | R1.2; feasibility-2, consistency-2, scope-12 |
+| 8 | §1.9 save tests: offline `.sav` fuzz cases, a save/reset/reload round trip, the M9 hardware power-cut test | RULINGS §6 testing policy; scope-26 |
+| 9 | **SEMIFINAL RIOT renamed HALFTIME RIOT** everywhere (centre node, trigger, events, RIVAL) | R4.3; design-14 |
+| 10 | Rematches: located vanilla's no-rematch beam-out at `$3F:$F951 JSR $F527 / BCS $F9A0`, verified in the emulator (a refight spawns with the branch removed), and specified the `H_REMATCH` hook and the replay skip of YOU GET | R0.2 (the slice's replay); venues_b decision 38 |
+| 11 | On-screen venue names fixed to R3.3's list (all ≤ 20 characters); the bracket shows champion names (its font has no apostrophe); no third-party names in hint ids or screens | R3.3; consistency-42, design-10 |
+| 12 | The Exhibition layer and badges are Could (badges draw as rivets in v1.0; E4 Won't); `B EXHIBITIONS` without a colon | R3.7; scope-9; consistency-23 |
+| 13 | Riot intro: stamps and lines Must, the animation Could | R0.3 item 12 (scope tally); story S14 |
+| 14 | Event queue rewritten with tiers and story scene ids; EVENTS b5 (Break Man joins at Riot 0E with Rule 9 played in place) is Should with the partner; EVENTS2 b4 follows FORMS.SUPER set at the H3 screen-12 dock | R4.2; consistency-28; consistency decision 11 |
+| 15 | Pit stop: v1.0 rows SHOP, CHIPS (14-chip grid, B opens the 4 × 28 help page), CONFIG, SAVE & QUIT; GARAGE and MR. Y'S BOOTH are the Could bundle, with "BREAK MAN WILL WALK." on the second confirmation | R2.5, R2.8, R2.10; design-21, design-24, scope-21 |
+| 16 | New §3.9 fortress maps (Must): node-table driven, H2/H4/W1 closed in v1.0, REPLAY, BACK TO BRACKET (now Must), per-wing saves, the load target; W3 runs the ending without a desk | R0.2; fortress §9.3 requests |
+| 17 | Debrief: tier B Must, tier A Should, with the engine falling back to tier B when tier A is absent; requirement hint R4 TAG Should; perfect-line rotation Should | R4.5; scope-18 |
+| 18 | Hint and debrief **text removed** from this doc: story owns every word (§7, S46, S47, §9); meta keeps ids, order and the secrets they point at; YA0 is now the draft (the sekisho is cut) | R4.1, R3.2; consistency-6; story §7 |
+| 19 | Predicate record widened to 24 B (counter targets, `HINT_BASE`); `require` codes tiered (TAG Should; weapon 8 = M.BEAM) | R1.10, R4.2 |
+| 20 | New §4.6 stage counters: one `pred_test` routine gates collect-N rewards in the stage and drives the debrief; at most one per stage | R1.10, R3.1; scope-16, design-5 |
+| 21 | **Rating re-derived so 100 is reachable with v1.0 content**: T1 = SOLO RIOT (the Riot won without Break Man's capsule), T3 removed, T4 and T5 4 points each, T6 2 per shop chip; every test reads Must content; fallbacks for the two fortress dependencies; the T1 partner / T7 TURBO trap / garage rows move to the Could bundle (102 printed, 100 reachable, 96 with TURBO); a 1993 ROW for 1993 files | R2.7, R2.8, R4.2, R0.4; scope-3, scope-15, scope-21, consistency decisions 8 and 31; systems §9.5 |
+| 22 | Doping: TAG-gated secrets use their full-charge-door fallbacks (nothing is lost); OWNED drops BREAK; consistency-38's "void" note superseded | R2.8; design-8, consistency-38 |
+| 23 | Unlock chain: EXTRA CONFIG unlocks with the championship (round 1's "any cup" depended on Could GP Rush); RECORDS at 20 HoF; Won't unlocks kept as reserved bits | R0.4, R0.3 |
+| 24 | §8 SYSTEM block: INPUT LAG at `$00C`; every record field tiered (TA Should, Rush and MY GP Could, KNOCKOUT/rules/Museum Won't reserved); FIGHT_SEEN Must for EXTRA CONFIG's list | R3.5, R0.3 |
+| 25 | New §9.0 RULESET: the 16 bytes specified at WORK `$6270`, the mode table, `RS_DIFF` as the macros' source, `RS_LAG`, NO_SAVE / NO_DESK flags | R1.6, R2.9, R1.10; consistency-16; tech §3.4 |
+| 26 | §9.2.1 **fight table is Must data**; the fight loader is tech's (R1.7); the interface table (callers, return kinds, `FIGHT_RESULT`); record flag b5 RULES_1993 for fight `$27` → legacy id `$0F` room 06; venue mid-boss ids `$08-$10` assigned; Doc Robot via the loader (Should); bouts never autosave | R1.7; scope-6, feasibility-3, feasibility-19, consistency-44, consistency decisions 12, 37, 40; R3.6 |
+| 27 | GP Rush lobby = Opening layout screen `$1D` on TS_STADIUM (no id, no slot); runner state from WORK's free range; courses drop the criticals rule (criticals are Won't) | consistency-31, feasibility-12, R2.4 |
+| 28 | RECORDS: pages tiered; venue mini-records assigned (Wind, Tomahawk Must; Knight Should; Blizzard Could) | venues_a / venues_b requests; R0.3 |
+| 29 | EXTRA CONFIG: fields updated (24-bit chips, PRIZES, RATEFLAGS, DIFF A labels, LAST KILL, OBJ COUNT as the R1.8 cap); `FIGHT n` through tech's loader (M7); DEV combos with one meaning each (pause row `TEST`, frame step on pad 2) | R1.14, R1.8, R2.10; feasibility-21, consistency-23 |
+| 30 | Mailbox: round 1's RULES bytes replaced by a DIFF preset override and a global-settings override, so each setting's smoke movie needs no menus; loadout overrides widened to 24-bit chips and INPUT LAG; command 6 (judges' desk for screenshots) | RULINGS §6 testing policy; scope-26 |
+| 31 | CONFIG: **INPUT LAG** (0-6 f), FLASHES REDUCED tied to the 3-per-second rule, the boot **health notice** (§2.1, §11.3), the **CASUAL** row; CRITICALS removed; MMC5 AUDIO options Could; SOUND TEST Won't; A/B SWAP's patch site verified at `$3E:$C711-$C734` | R3.5, R2.9, R2.4, R1.3, R5.2; design-13, design-7; consistency decision 36 |
+| 32 | Language hook cited at `$3C:$8636` (tech is the source of truth) | consistency-41 |
+| 33 | Text windows: debrief, help and dialogue 4 × 28 (the CHIPS help page was 3 × 28); menu screens wait through the scheduler | R1.4; feasibility-10, feasibility-11, consistency-3 |
+| 34 | Pause labels fit the pause font: `RETIRE`, `EXIT` (not QUIT), `TEST` (not DEBUG) | consistency-23 |
+| 35 | Face icons and name labels replace desk and match-card portraits in v1.0 | R5.1 |
+| 36 | Difficulty pick: CASUAL / NORMAL / HARD in v1.0 (HARD = ×1.5, drops LESS, no refill, 18-f quick-draw); 1993 RULES Could, with its rename; the HARD line must not promise remixed stages | R2.9, R3.5; design-18, scope-19, scope-20 |
+| 37 | Title per art_audio's plan (vanilla logo + GP badge + subtitle); attract crawl and PASS WORD gag Could; the GP fanfare moved to art_audio's track list | R5.2, R0.3; scope-23 |
+| 38 | Ledger: `tools/plan/tight.py` meta block re-itemised to these 16 Must rows (total unchanged at 31); `tools/plan/tally.py` meta rows rebuilt with round-2 tiers (Must 31, Should 4, Could 15, Won't 24) | R0.1; scope-1 |
+| 39 | Cross-doc dependencies, risks and open questions rewritten; round 1's 7 open questions closed | consistency decision 34 |
