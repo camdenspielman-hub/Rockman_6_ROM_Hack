@@ -54,10 +54,16 @@ tight = {
   ('Centaur (tidal shaft, + CENTURION; no Reap-bot/Mage/spring)', 13.5),
   ('Yamato (trimmed: + Daruma/DARUMA, the draft; no sekisho/kites/nightingale/kabuki)', 13),
  ],
- 'fortress': [
-  ('Opening-lite (lanes + one-size mascot)', 8), ('Semifinal (2 reject types, NPC Break Man beats, Bass duel 1)', 10),
-  ('H1', 9), ('H3 (Doc Robot via fight loader or cut)', 10), ('H5 (low-grav fallback, unmasking)', 9),
-  ('W2', 8), ('W3 (8 bands, one machine size, escape without eras)', 11), ('ending + vanilla-style staff roll', 4),
+ 'fortress': [  # round 2: docs/design/fortress.md "v1.0 scope" (R0.2, R3.6, R4.1); was 69, now 70: +1 the ending's
+               # credits mode (the reworked bosses fight in their rooms with no player, fortress §6.2)
+  ('Opening-lite (POP scenes <= 15 pages, 4 lane judges, parade, one-size Pi-kun)', 8),
+  ('HALFTIME RIOT (2 reject types, NPC Break Man beats, Bass duel 1 with 4 pre-drawn copies)', 10),
+  ('H1 (appearing blocks as BG cells, Yellow Devil on F-PIECES; Guts lifts Should)', 9),
+  ('H3 (Kamegoro Maker re-skin, fist-ride practice, Gamma head + fists; Doc Robot Should)', 10),
+  ('H5 (low-grav form, WRONG NOTE, unmasking)', 9),
+  ('W2 (pair bouts on the fight loader, SUPER palettes, Bass duel 2)', 8),
+  ('W3 (WILY MACHINE 6.5 on vanilla art + 8 bands, Capsule + gift, escape without eras)', 11),
+  ('ending (R4.1 order) + vanilla staff roll with the bosses\' credits mode', 5),
  ],
  'overhead': [('user gates', 8), ('balance', 4), ('release/matrix', 4)],
 }
@@ -66,8 +72,12 @@ for area, items in tight.items():
     s = sum(x for _, x in items); total += s
     print(f'{area:9} {s:6.1f}')
 print(f'{"CODE":9} {total:6.1f}')
-art_tiles, art_frames = 3900, 350   # tight Must art after the cuts in the report
-prog = art_tiles * 0.35 * 0.6       # ~60% of the 35% BG share assumed reuse/programmatic under the tight plan
-art = (art_tiles*0.65 - prog*0)/80*0.66 + art_frames/12
-print(f'art ~{art:.0f}  music ~10  text ~12')
-print(f'TIGHT MUST TOTAL ~{total+art+10+12:.0f} sessions')
+# art_audio round 2 (docs/design/art_audio.md "v1.0 scope", §11, §13; R5.1, R5.3): the re-run ledger
+# build/revise/art_audio/budget_r2.py gives the Must art as 4,505 CHR tiles (2,557 BG + 1,948 sprite; 954 reused,
+# 658 composited, 495 programmatic, 2,398 drawn) + 240 1-bpp glyphs and 351 frames = 56.5 Claude sessions, including
+# +5 % for the fixes the art-acceptance gates ask for. Round 1's formula on R5.1's ~3,900 tiles / 350 frames gave ~50.
+# Music (music_r2.py): G00-G04, G27 WHISTLE and G37 LAST MATCH, 20 new SFX and the fallback wiring = 9 (was ~10).
+art_tiles, art_frames = 4505, 351
+art, music, text = 56.5, 9, 12
+print(f'art ~{art:.1f}  music ~{music}  text ~{text}')
+print(f'TIGHT MUST TOTAL ~{total+art+music+text:.0f} sessions')

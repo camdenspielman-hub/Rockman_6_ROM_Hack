@@ -183,25 +183,36 @@ add(V, "Yamato Won't (R3.2, R3.1): sekisho + passes + runner, kite run, hanabi",
 add(V, 'venues_b tag-partner shortcuts (4 venues; ship with the partner bundle)', 'C', 1)
 
 # ---------------- NON-VENUE STAGES (fortress.md) ----------------
+# fortress.md round 2 ("v1.0 scope"): tiers = the round-2 tiers (RULINGS R0.2-R0.4, R3.6, R3.7). The Must rows sum to
+# 70, the same as tight.py's fortress block (was 69: +1 for the ending's credits mode, fortress §6.2). Shared engine
+# pieces (F-PIECES, the fight loader, RL_FLOOR8, F-SIZES, F-ERA, HUD widgets) are counted under tech; HARD per-stage
+# lists under systems' HARD line.
 F = 'fortress'
-add(F, 'Opening: layout, lanes/judges, high striker, parade + high fives, sabotage, Pi-kun (3 sizes), intro, room, tests', 'M', 12)
-add(F, 'Semifinal: layout, 3 rejects + audition, blackout/fuses, Break Man beats, Bass beta duel 1 (copies), locker room, tests', 'M', 14)
-add(F, 'E1 Block Man (falling-block engine + boss)', 'S', 9, 'C')
-add(F, 'E2 Paddle Man (ball engine + boss)', 'S', 8, 'C')
-add(F, 'E3 Invader Man (BG formation engine + boss)', 'S', 8, 'C')
-add(F, 'E4 Maze Man (top-down maze mode + 4 ghost AIs + boss)', 'S', 9, 'W')
-add(F, 'H1: layout, score balls, M.BEAM case, Guts lifts, Elec beams, Fire pillars, Big Eye, Yellow Devil (F-PIECES), tests', 'M', 11)
-add(F, 'H2: force beams, password board, Heat blocks, Picopico, Mecha Dragon, tests', 'S', 11, 'C')
-add(F, 'H3: presses, mirror hall fallback, magnet pull, Doc Robot (portable champion AI), Gamma 2 phases, Super room, tests', 'M', 13)
-add(F, 'H3 Should: Gemini Rock (T7 reuse)', 'S', 2)
-add(F, 'H4: dark rooms, bells, Balloon, compactor, Flip-Top, Cossack Catcher, tests', 'S', 11, 'C')
-add(F, 'H5: low-grav, crystals, Super Arrow, geysers, letters, Dark Man (lying panel), 1993 wing, unmasking, tests', 'M', 12)
-add(F, 'H5 Should: gravity flips', 'S', 3, 'C')
-add(F, 'W1 Upgrade Lab (POCKET rooms, palette blocks, SUPER section, Enker, METALL 16)', 'S', 14, 'C')
-add(F, 'W2: hub as bracket, pair bouts via loader, 8 SUPER copies portable, Championship Ring, Bass duel 2, tests', 'M', 10)
-add(F, 'W3: Trophy Dispenser, MODE-7 machine (F-SIZES), Capsule SUPER, gift + CHAMPION BUSTER, escape, tests', 'M', 16)
-add(F, 'Ending (9 scenes, lights-out per channel, CAPCOM TIMES)', 'M', 6)
-add(F, 'Victory lap playable credits', 'S', 8, 'C')
+add(F, 'Opening-lite v1.0: tunnel + scenes as POP sequences (<= 15 pages), 4 lanes/judges (DAMAGE/TIME/STYLE/SECRETS), high striker, beach balls, scoreboard, parade (1 float per screen) + high fives, sabotage, Grand Pi-kun ONE size, dressing room, CASUAL, tests', 'M', 8)
+add(F, 'HALFTIME RIOT v1.0: layout, VENDING + CHEER + audition rule, blackout + fuse boxes + master breaker, Bass sighting + crumble, NPC Break Man beats (help/crowd, block, reveal + Rule 9 in place), Bass beta duel 1 (4 pre-drawn copies, NO DATA, overdrive, help capsule), locker room, CASUAL, tests', 'M', 10)
+add(F, 'H1 v1.0: Wily 2 remix, SCORE + 24 score balls, M.BEAM case + 96-px gap, appearing blocks as BG cells, Elec beams, Fire pillars, Big Eye, Yellow Devil on F-PIECES, archive + storeroom, CASUAL, tests', 'M', 9)
+add(F, 'H3 v1.0: Mr. X 3 remix, Rush Coil, statue, needle presses, Gemini laser hall, Kamegoro Maker (re-skinned vanilla dispenser), fist-ride practice beat, Gamma head + fists (SC5), Super dock + demo, workshop via M.BEAM stair, CASUAL, tests', 'M', 10)
+add(F, 'H5 v1.0: Mr. X 4 remix, low gravity (+ bubble flag) incl. the gravity hall low-grav form, crystals, Super Arrow, MEGAMAN V letters, 1993 wing + Mr. X card, Dark Man (lying panel, WRONG NOTE), unmasking (two masks, cup, castle picture palette steps), CASUAL, tests', 'M', 9)
+add(F, 'W2 v1.0: SUPER-palette moat, hub as bracket board, pair bouts through the fight loader (hub-run TAG chain, +10 HP), 8 SUPER copies (records, palettes, pinch 14), Championship Ring + ropes, Bass duel 2, losers room, CASUAL, tests', 'M', 8)
+add(F, 'W3 v1.0: Wily 4 remix, Trophy Dispenser + GP Cup, WILY MACHINE 6.5 (vanilla art retinted, 8 bands, drag, mortar shadow), Capsule SUPER (decoys, glow-band blast), gift + CHAMPION BUSTER, phase checkpoints, escape (clock, mercy, crumbling ladders, palette downgrade, Wily at the door), trophy room, CASUAL, tests', 'M', 11)
+add(F, 'Ending v1.0 (R4.1 order): pixelation, S40 catch, arrest, podium + vow, CAPCOM TIMES (no $94), vanilla staff roll + DWNB cards with the bosses\' credits mode, rating hookup, LIGHTS OUT cue sync, sixth wing, silent TO BE CONTINUED', 'M', 5)
+add(F, 'Opening Should: Grand Pi-kun three sizes on F-SIZES', 'S', 1)
+add(F, 'Riot Should: UMBRELLA MAN (parachute, no shield), roof gust (VA-GUST), partner join pages + banner, TAG locker door', 'S', 1)
+add(F, 'H1 Should: Guts Man tipping lifts, tag pocket, box-art figure', 'S', 1.25)
+add(F, 'H3 Should: Doc Robot MK-VI copying AIR MAN through the fight loader, magnet pull (VA-GUST), tag pocket', 'S', 3.25)
+add(F, 'H5 Should: Wave Man geysers, TWO BREAK MEN with the partner, tag pocket', 'S', 1.25)
+add(F, 'W3 Should: THE APPROACH phase (drive-toward-camera sizes; F-SIZES and RL_FLOOR16 are tech), Flip-Top Jr. escape cameo', 'S', 1.5)
+add(F, 'H2 ROCKMAN 2 wing: force beams (map_set), password board, Heat blocks, Picopico-kun on F-PIECES, Mecha Dragon, AIR MAN room', 'S', 11)
+add(F, 'H4 ROCKMAN 4 wing: flash-bulb photo puzzle, chapel bells, Balloon, Dust Man conveyors, Flip-Top Jr., Cossack Catcher', 'S', 11)
+add(F, 'W1 Upgrade Lab (POCKET rooms, palette blocks, 16-bit section with locked ExGrafix rooms, Enker, METALL 16)', 'C', 14)
+add(F, 'Escape eras (F-ERA in reverse) + castle picture ExGrafix bloom', 'C', 1)
+add(F, 'H5 Could: gravity arrows (flip rooms + Dark Man arena flip)', 'C', 3)
+add(F, 'E1 Block Man (single arena on map_set/T6)', 'C', 4)
+add(F, 'E2 Paddle Man (single arena)', 'C', 4)
+add(F, 'E3 Invader Man (single arena, CANNON on the vehicle state)', 'C', 4)
+add(F, 'Victory lap (one lap, playable credits)', 'C', 6)
+add(F, 'E4 Maze Man (top-down MAZE mode, 4 ghost AIs)', 'W', 9)
+add(F, 'Gemini Rock input-mirror twin (R3.1 keeps the laser)', 'W', 2)
 
 # ---------------- PRODUCTION OVERHEAD ----------------
 O = 'overhead'
@@ -232,18 +243,21 @@ print(f"TOTAL      M {pm:6.1f} S {ps:6.1f} C {pc:6.1f} W {pw:6.1f}")
 
 # ---------------- ART / MUSIC / TEXT (from the ledgers) ----------------
 print()
-# art_audio.md §13.1 / §11.2
-art = {'Must': (3228, 1623, 421), 'Should': (1208, 465, 107), 'Could': (72, 197, 45)}
-# Claude-only throughput assumptions (draft quality): BG 80 tiles/session drafted, 200/session programmatic,
-# sprites 12 animated frames/session (tiles included). Programmatic share of BG ~11% (510/4508).
-def art_sessions(bg, spr, fr):
-    prog = bg * 510 / 4508
-    return (bg - prog) / 80 + prog / 200 + fr / 12
-for k, (bg, spr, fr) in art.items():
-    print(f"art {k:6}: {bg} BG + {spr} spr tiles, {fr} frames -> ~{art_sessions(bg, spr, fr):.0f} Claude sessions")
-print(f"art all   : ~{sum(art_sessions(*v) for v in art.values()):.0f} sessions; human model in art_audio: 660 h Must / 890 h all")
-# music: 37 compositions (+2 MMC5 layers) + ~4 missing (RIOT, FINAL LAP, POCKET arr., lights-out stems)
-mus_full, mus_jingle = 30, 11
-print(f"music: ~{mus_full} full tracks x1.5 + ~{mus_jingle} jingles x0.5 + SFX 70 (~4) = ~{mus_full*1.5+mus_jingle*0.5+4:.0f} sessions; Must 5 tracks + 20 SFX ~ 9")
+# art_audio.md round 2 ("v1.0 scope", §11, §13; R5.1 no-artist baseline, R5.3 re-run). Source of every number:
+# build/revise/art_audio/budget_r2.py (art) and music_r2.py (music + SFX). Rows: (BG tiles, sprite tiles, frames, sessions).
+# Methods: reuse/recolour R, composite X (both "R" in R5.1's sense), programmatic C, Claude draft D (final; no artist).
+# Session model: D 80 BG tiles or 12 frames, X 150 tiles + 16 frames, R 300 tiles + 24 frames, C 200 tiles per session,
+# +5 % for the fixes the art-acceptance gates ask for. The 240 1-bpp text glyphs (Must) are inside the Must row's sessions.
+art = {'Must': (2557, 1948, 351, 56.5), 'Should': (1684, 538, 117, 31.0), 'Could': (828, 384, 64, 15.0),
+       "Won't": (20, 279, 63, 5.8)}
+for k, (bg, spr, fr, ses) in art.items():
+    print(f"art {k:6}: {bg} BG + {spr} spr tiles, {fr} frames -> ~{ses:.1f} Claude sessions")
+art_msc = sum(v[3] for k, v in art.items() if k != "Won't")
+print(f"art M+S+C : ~{art_msc:.1f} sessions (no human hours: R5.1's baseline has no pixel artist; a human pass is optional polish)")
+# music (R5.2: art_audio owns the one track list): tracks, bytes, new SFX, sessions (full 1.5, loop 1, jingle 0.5, 12 SFX/session)
+music = {'Must': (7, 3700, 20, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (15, 10550, 7, 19.1), "Won't": (2, 1500, 0, 3.0)}
+for k, (n, b, sfx, ses) in music.items():
+    print(f"music {k:6}: {n} tracks, {b} B, {sfx} new SFX -> ~{ses:.1f} sessions")
+print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 20 new SFX in the $36 tail (360 of 449 B)")
 # text: story.md §10.4 ~1,100 strings x 2 languages; Must ~600
 print("text: ~1,100 strings EN+JP at ~90 strings/session (write+fit+compile checks) = ~24 sessions; Must ~600 = ~13 (+ external native JP review)")
