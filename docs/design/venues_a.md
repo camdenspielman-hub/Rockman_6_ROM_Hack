@@ -1,7 +1,8 @@
 # Heritage Venues A: SKY ACE, HERO'S QUEST, HIGH NOON FRONTIER, LOST JUNGLE (design-venues-a)
 
 Owner: design-venues-a. Round 2: every director's ruling in [`RULINGS.md`](RULINGS.md) and every critic finding about
-this doc is applied (see "Changes in round 2" at the end). Covers four of the eight Heritage Venues:
+this doc is applied (see "Changes in round 2" at the end). Round 3: RULINGS §8 and the venues_a requests of
+[`reconcile.md`](reconcile.md) are applied (see "Changes in round 3"). Covers four of the eight Heritage Venues:
 
 | On-screen name (R3.3) | Champion | Stage id (R1.2) | Meta index | Vanilla stage | Homage (design notes only, never on screen) |
 |---|---|---|---|---|---|
@@ -72,9 +73,12 @@ music and text under art_audio and story):
 These match `tight.py` (14 per venue) and the venues_a rows of `tools/plan/tally.py`, which round 2 splits into
 v1.0 and v1.1+ rows with unchanged totals. HARD lists for these venues are in tally's systems row "HARD content".
 
-**Milestones (R6).** LOST JUNGLE is built in **M5** (it needs the stage-attribute table, the map-edit service, T5 and the
-attach state). HERO'S QUEST, HIGH NOON FRONTIER and SKY ACE are built in **M6**, after **text v1b** (dialogue, choices,
-NPC menus: R1.4) and T1-lite, before the "Round One" checkpoint (v0.5).
+**Milestones (R6, R8.1).** LOST JUNGLE is built in **M5** (it needs the stage-attribute table, the map-edit service, T5
+and the attach state's vine and balloon users; the attach state's core arrives earlier, at M3, with Blizzard's condor:
+R8.2). HERO'S QUEST, HIGH NOON FRONTIER and SKY ACE are built in **M6**, after **text v1b** (dialogue, choices,
+NPC menus: R1.4) and T1-lite, before the "Round One" checkpoint (v0.5). Per milestone, for RULINGS §6's cumulative
+column (R8.1): **M5 14, M6 42**. The bosses' credits modes (§1.7.2, §2.8.2, §3.8.3, §4.7.2) are costed in fortress's
+ending row, not here.
 
 ### What v1.0 depends on (all Must, R0.4)
 
@@ -84,13 +88,14 @@ NPC menus: R1.4) and T1-lite, before the "Round One" checkpoint (v0.5).
 | tech | **One map-edit service** (`map_set` + per-id alternate flip, one repaint queue, R1.10) | stairs, trapdoor, doors, tar pits, outhouse, gallery windows, lamp board, windsock, sprouts, brick wall |
 | tech | Families `$F4` (enemies) / `$F5` (directors, T3 switches and targets) and the object lists v2 | every new object |
 | tech | **One HUD widget module** (R1.10) | key count, LOOP and lamp icons, bounty icons, log counter, draw readout |
-| tech | **One attach state** (vine, balloon) with T5; **one free-flight vehicle state** (SKY ACE, lane flag off) | Plant; Wind |
+| tech | **One attach state** (vine, balloon) with T5 (its core at M3 with Blizzard's condor; T5, the vine and the balloon at M5: R8.2); **one free-flight vehicle state** (SKY ACE, lane flag off) | Plant; Wind |
 | tech | T1-lite (camera lock, time-scrolled bands, the wave director folded into the screen script), T3, T8 | Wind sortie and AYACO; Tomahawk train; doors, keys, lifts |
 | tech | Raster list (24 bands, `RL_PARALLAX`, `RL_SHIMMER` = 2 entries, `RL_BANDS`; R1.9) | sortie, train, Tomahawk desert and sunset |
 | tech | Text **v1a** (pop-up, 2 × 28) everywhere; **v1b** (dialogue 4 × 28, CHOICE, NPC menus) | Knight, Tomahawk |
 | tech | The Knight ceiling's logic moved out of IRQ `$11` with a retract parameter (`EFFECTS` b2, `EFX_PARAM`) | Knight Trap Hall |
 | tech | One poke-list format (tech §5.5) with the `CFG_CASUAL` layout tier (R2.9) | every CASUAL list |
-| systems | SC1 (with **Y.SPEAR in the pass-through list**), SC8 (the draw's free hit), SC9 (weak reactions); chips 13-16 and the Energy Balancer; the frozen handler and NOFREEZE (R2.2); the INPUT LAG setting (R3.5) | the bosses, the chips |
+| tech | The credits' room table and `GP_MODE` b0 `CREDITS`, tested by `IFCREDITS` (tech §4.6, M8) | each boss's credits mode (§1.7.2, §2.8.2, §3.8.3, §4.7.2) |
+| systems | SC1 (with **Y.SPEAR in the pass-through list**), SC8 (the draw's free hit), SC9 (weak reactions); chips 13-16 and the Energy Balancer; the frozen handler and NOFREEZE (R2.2); the INPUT LAG setting (0-6 f: R3.5, R8.7) | the bosses, the chips |
 | meta | SECRETS bits by meta index, the PRIZES field, `VENUE_REC`, the debrief (tier B hints), `STAGE_CLEAR` (LAND and EXPRESS appear after the first clear) | all |
 | story | Every word; 4 death lines per venue in v1.0 (R4.5) | all |
 | art_audio | The sets and thirds of §1.1/§2.1/§3.1/§4.1 below; vanilla music fallbacks | all |
@@ -168,7 +173,7 @@ Ids T1-T8 are PLAN's; `VA-` pieces are this doc's, built **on** tech's shared se
 |---|---|---|---|---|
 | **T1-lite** | Camera locked on one or two screens; raster bands scroll by time (plus camera for parallax); a **wave director folded into the slot-22 screen script** spawns from a data list (frame, kind, x, y, path) | tech §9.1, `RL_BANDS` | Wind sortie 01; Tomahawk train 10-11 | [new-code] M · Must (tech) |
 | **Vehicle state** | Free flight in 8 directions, no gravity, lane flag off | tech §7.9 (R1.10) | Wind sortie 01 | [new-code] M · Must (tech) |
-| **Attach state** + **T5** | Hang from a moving object (offset, input rules, release on A); T5 gives the vine its pendulum | tech §7.9 (R1.10) | Plant vines, balloon, Plant Man's vine | [new-code] M · Must (tech) |
+| **Attach state** + **T5** | Hang from a moving object (offset, input rules, release on A); T5 gives the vine its pendulum | tech §7.9 (R1.10) | Plant vines, balloon, Plant Man's vine | [new-code] M · Must (tech; the core at M3 with Blizzard's condor, T5 and these users at M5: R8.2) |
 | **T2** | Text window, typewriter, CHOICE (YES/NO, 2-4 rows) | text v1a (pop-up) / v1b (dialogue, menus) | all; Knight heavily | [new-code] L · Must (tech) |
 | **T3** | Switch → target: doors (UP), keys (a per-stage key counter in the run block, tech §7), chests, gates, lifts through a down exit, shot-count switches, warps | tech `$F5` channels | Knight, Tomahawk, Wind | [new-code] M · Must (tech) |
 | **T4** | Raster bands per screen (≤ 4 here + the window band) | tech §8, `RL_BANDS` (24 bands per buffer, R1.9) | Wind 01, Tomahawk 00-02, 0A-0C, 10-11 | [new-code] M · Must (tech) |
@@ -193,6 +198,13 @@ shots = **5 fixed slots, leaving 4 for the enemy side**. Every set piece below s
 - An explosion stays in its dying enemy's slot; directors count it as live.
 - A director that would exceed the cap **delays** the spawn (never drops it), so waves stay deterministic for golden
   movies.
+- **The text runner and player utilities are occupied slots too** (tech §7.12, §15.1): an open pop-up or window (the
+  text runner, slot `$15`) and a utility in slots 4-7 (the Ice Block, R1.11). Every director and boss AI here counts
+  them before a spawn or a shot and waits while one more would make 10 (the sortie, the gallery, the train, Knight
+  Man's fireballs). A pickup's pop-up opens as the pickup leaves, so the count holds (the treasures, the ring). On a screen with no
+  director, a utility or a commentator pop-up can lift a full screen to 10 for its lifetime; the slice measures exactly
+  that on Blizzard (venues_b §0.2, test G7) before these venues are built, and a screen that lags past the band drops to
+  3 stage objects.
 - The only vanilla screens kept as-is that could reach 10 are fixed by one AI rule each (CONGA, §4.6).
 
 ### 0.6 Text, pop-ups and commentators
@@ -235,7 +247,8 @@ envelope (SECRETS b4). Replays show collected prizes as tokens (systems §6.7).
 ### 0.9 CASUAL and HARD
 
 - **CASUAL** (R2.9, Must): a `CFG_CASUAL` bit (meta owns it) selects the CASUAL layout tier of tech's poke lists.
-  **Every venue fills in the one standard lever list** (§1.8, §2.9, §3.9, §4.9): reflex windows ×2; mash counts −40 %
+  **Every venue fills in the one standard lever list** (§1.8, §2.9, §3.9, §4.9), in systems §13.4's form with each
+  row's mechanism (its How column): reflex windows ×2; mash counts −40 %
   (hold-to-struggle allowed); set-piece timers +50 %; +1 checkpoint per section; skill-gated secrets relaxed by one
   step. None of these four venues has a mash.
 - **HARD in v1.0** is systems' preset: ×1.5 damage, drops LESS, no refill, the framework hooks kept. The only
@@ -248,8 +261,8 @@ envelope (SECRETS b4). Replays show collected prizes as tokens (systems §6.7).
 - **Flashes**: in the default mode, no effect here flashes a large area more than **3 times per second**; REDUCED turns
   every flash into a fade. Large-area effects in these venues: the encounter transition (§2.3), the tunnels (§3.6),
   the storm (§4.8). Each states its numbers.
-- **Reflex windows**: the quick-draw is NORMAL 24 f, HARD 18 f, CASUAL 40 f, plus the CONFIG **INPUT LAG** offset
-  (§3.5). Every reflex tell has a sound as well as a picture.
+- **Reflex windows**: the quick-draw is NORMAL 24 f, HARD 18 f, CASUAL 40 f (R3.5, R8.6), plus the CONFIG **INPUT LAG**
+  offset (0-6 f, R8.7; §3.5). Every reflex tell has a sound as well as a picture.
 
 ### 0.11 Freeze classes (R2.2)
 
@@ -352,7 +365,8 @@ is data and the POW/LOOP rules, S):
   top line while open. Band budget: sky, sea, window, ExRAM flush = 4 entries of 24; the sound update rides the sea
   band (line 152), with 48 band-free lines before the bottom window's band (R1.9 asks for 36).
 - **Lag (R1.8)**: player 1 + script with the director 1 + shots 3 = 5; **the enemy side holds at most 4** (planes,
-  enemy bullets, the POW, AYACO's parts, a bomb). The director delays a spawn by up to 30 f while 4 are live.
+  enemy bullets, the POW, AYACO's parts, a bomb). The director delays a spawn for as long as 4 enemy-side slots are
+  taken (a lingering POW and an open pop-up each take one, §0.5) and never drops it.
   Flicker: ≤ 3 fighters in any 8-px band (art_audio §3.4); chains keep that.
 
 #### 1.3.2 The wave list (v1.0)
@@ -401,7 +415,8 @@ v1.0 is the simple build (T8: one controller and two part objects) [new-code][ne
 | Engine pair, left / right | 10 each | Smoke below half |
 
 Both pairs destroyed: AYACO tilts and falls out of the sky (+1 to the planes destroyed; the WND-05 line is Should). Lag: body + 2 pairs +
-1 bomb = 4 enemy-side slots, so no fighters fly during AYACO. Mid-boss fight id `$08` (meta, consistency-44) with the
+1 bomb = 4 enemy-side slots, so no fighters fly during AYACO, and the bomb bay stays shut while red squadron 3's POW
+lingers (§0.5). Mid-boss fight id `$08` (meta, consistency-44) with the
 arena "01, director at the AYACO wave" serves GP Rush when it ships (Could).
 
 **Should (v1.1):** four engines of HP 6, a tail gun (3-shot burst every 90 f), and AYACO drawn as BG art in the sky
@@ -502,6 +517,11 @@ the rework adds a **push** phase (the vanilla pull with its sign flipped: AI, no
 Lag: A = player + script + boss + 2 tornados + 3 shots = 8; C = 8 (2 pinwheels); **E = 9** (3 planes; the POW takes
 the last plane's slot). The pinch set (24 tiles, §1.1) streams during D's first loop, which is invincible.
 
+**Credits mode** (fortress §6.2; tech's `IFCREDITS`, §4.6) [new-code] S · Must, costed in fortress's ending row: the
+v1.0 credits show Wind Man fighting in 13 with no Rockman. The A, B, C, B cycle loops at full HP (no pinch), aimed at an
+empty spot (x `$40` on the floor) instead of Rockman; the push and the pull still turn the windsock and roll the
+tornados, with nothing to move. Fallback (fortress's): his card strip only.
+
 #### 1.7.3 Weapons in this fight
 
 | Weapon | Effect | Tags · tier |
@@ -525,13 +545,13 @@ Defeat (Could): his propellers spin down and he spirals to the floor like a pape
 
 ### 1.8 CASUAL levers (R2.9, Must)
 
-| Lever | SKY ACE |
-|---|---|
-| Reflex windows ×2 | the windsock's warning 12 → 24 f; the YASHICHI juggle window 240 → 480 f |
-| Mash counts −40 % | none in this venue |
-| Set-piece timers +50 % | the 1943 drain every 600 → 900 f; a POW stays 6 → 9 s (drift 0.33 px/f) |
-| +1 checkpoint per section | sortie: a restart point at t = 60 s (after red squadron 2; the lamps earned are kept; the director resumes at that list index); tower: 0A; secret route: 1A |
-| Skill-gated secrets −1 step | a red squadron counts at 4 of 5 planes; the YASHICHI needs 6 hits |
+| Lever | SKY ACE (NORMAL → CASUAL) | How (systems §13.4) |
+|---|---|---|
+| Reflex windows ×2 | the windsock's warning 12 → 24 f | `REFLEX` (`TIERVAL` + INPUT_LAG) |
+| Mash counts −40 % | none in this venue | none |
+| Set-piece timers +50 % | the 1943 drain every 600 → 900 f; a POW stays 6 → 9 s (drift 0.33 px/f); the YASHICHI juggle window 240 → 360 f (a timer, not a reaction window) | `TIERVAL` |
+| +1 checkpoint per section | sortie: a restart point at t = 60 s (after red squadron 2; the lamps earned are kept; the director resumes at that list index); tower: 0A; secret route: 1A | the sortie: a CASUAL poke on the director's restart index; 0A, 1A: tech's dormant checkpoint objects, woken by a CASUAL poke |
+| Skill-gated secrets −1 step | a red squadron counts at 4 of 5 planes (the secret exit); the YASHICHI needs 6 hits (the chip) | `IFCASUAL` in the two predicates |
 
 ### 1.9 HARD pokes (Should, R0.3 item 3; tech §5.5 format)
 
@@ -545,7 +565,8 @@ Defeat (Could): his propellers spin down and he spirals to the floor like a pape
 
 ### 1.10 Text, commentators and the partner
 
-- **v1.0 text** (R4.5): "TAKE OFF!", "COMMITTEE LOANER JET", the tally, "LANDED", WND-08 (the elevator unlocks: a
+- **v1.0 text** (R4.5; story §10.4 counts **10 Must strings** and 2 labels, the single source: R8.4): "TAKE OFF!",
+  "COMMITTEE LOANER JET", the tally, "LANDED", WND-08 (the elevator unlocks: a
   secret line), WND-10 (first C.FLASH: the first-weakness line), 4 death lines (story picks from "Mayday, mayday!",
   "He forgot the loop button.", "Gone with the wind.", "The windsock tried to warn him.", "That cloud was NOT a
   floor.", "Even 1942 gave you three loops!"), and the hints WI0-WI2. The "ACES ONLY" and LAND signs are BG art.
@@ -613,7 +634,7 @@ the Power pillar in v15 (charged punch) and two more Power walls in v18. Boss `$
 | **07** | v07 | Up | `$65` skeleton robot | | [engine-ok] · Must |
 | **08-09** | v08-v09 | **Tower of torches** (torch CHR animation kept) | `$67` swooper | The green ring blocks (collision `$D`) stay F.BLAST pockets: one holds a large weapon energy, the other the **20-bolt pouch** (prize #0) | [engine-ok] S · Must |
 | **0A** | v0A | Tower top | none | v1.0: plain. Should: **Princess Roll** at a window (§2.6) | Must / Should |
-| **0B** | v0B | **Checkpoint 1** | none | Should: the **INN** (§2.6) and the sign "THY DEEDS HAVE BEEN RECORDED." | [engine-ok] · Must; Inn Should |
+| **0B** | v0B | **Checkpoint 1** | none | Should: the **INN** (§2.6) and the sign "THY DEEDS ARE RECORDED." (KNT.S25) | [engine-ok] · Must; Inn Should |
 | **0C** | v0C | **ENCOUNTER 1** at x `$40` (§2.3) | 3 Metslimes, 1 Killer Chest | Victory chest: MAGIC KEY 2 | VA-ENCOUNTER M · Must |
 | **0D** | v0D | Walks on, then up (vanilla up exit). **Hidden-room tell**: a floor glint at x `$A0` (§2.7) | none (2 small energies, vanilla) | Search → trapdoor → down exit to 1E | VA-SEARCH S · Must |
 | **0E-0F** | v0E-v0F | Climb | `$70` red spearman as the ROYAL GUARD | | [engine-ok] · Must |
@@ -653,7 +674,7 @@ is random).
 | Transition | 16 | The command window **wipes open from the centre** (a wipe, never a flash: R3.5, so default and REDUCED match); vanilla shutters close both screen edges |
 | Window (v1b) | - | "A METSLIME DRAWS NEAR! / COMMAND?" ▶FIGHT RUN SPELL ITEM. The music swaps to vanilla's boss theme in v1.0 (art_audio picks the id); G23 ENCOUNTER is Should |
 | FIGHT | - | The window closes; the wave spawns |
-| RUN | - | 1st try: "BUT THOU WERT BLOCKED!" and the enemies get a free hop; the menu returns after 60 f. 2nd try: "ROCK RAN AWAY." The shutters open, the enemies vanish, **no chest**, and nothing counts for VARIETY |
+| RUN | - | 1st try: "BUT THE WAY WAS BARRED!" (KNT.S11) and the enemies get a free hop; the menu returns after 60 f. 2nd try: "ROCK RAN AWAY." The shutters open, the enemies vanish, **no chest**, and nothing counts for VARIETY |
 | SPELL / ITEM | - | Opens the vanilla pause menu on the weapon row / the E-tank row, then FIGHT |
 | Victory | - | "THOU HAST DONE WELL. ROCK GAINED 12 EXP." A chest drops (MAGIC KEY); the shutters open; the stage music resumes |
 
@@ -713,10 +734,10 @@ stairs down to the real lord.
 
 | NPC | Where | Lines (draft) and effect | Tags · tier |
 |---|---|---|---|
-| King | 01 | Quest giver; key 1 comes from his tutorial chest. His line heads the death table (story: "DEATH SHOULD NOT HAVE TAKEN THEE, ROCK. I WILL GIVE THEE ANOTHER CHANCE.") | T2 S · Must |
+| King | 01 | Quest giver; key 1 comes from his tutorial chest. His line heads the death table (story's KNT.D1, the genre's scolding in new words, R8.4: "O ROCK! TO FALL SO SOON! ARISE, AND TRY AGAIN!") | T2 S · Must |
 | Sage | 00 | Teaches UP to talk and DOWN to search; his after-death line is the stairs tell (§2.5) | T2 S · Must |
 | Innkeeper | 0B | "WELCOME TO THE INN. ONE NIGHT IS 20 BOLTS. ▶YES NO". YES: a fade to black (R3.5), a 2-s inn jingle (Could; a vanilla SFX until then), full HP and weapon energy, "GOOD MORNING. THOU SEEMST TO HAVE SLEPT WELL." A bolt sink that systems confirms (it is not income) | T2 S · Should |
-| **Princess Roll** | 0A | Roll (pit crew, BRIEF §2 cameo; story approved) in the venue's princess costume. "DOST THOU LOVE ME, ROCK? ▶YES NO". **NO → "BUT THOU MUST!"** and the question again, forever (after 10 NOs: "...FINE. THE COSTUME IS HOT, ROCK."). YES: **ROLL'S LOVE**: a heart beside the life bar pulses within one screen of a secret (0D's glint, 12's Metslime, 15's throne). A tell-helper, not a secret | T2 S · Should |
+| **Princess Roll** | 0A | Roll (pit crew, BRIEF §2 cameo; story approved) in the venue's princess costume. "DOST THOU LOVE ME, ROCK? ▶YES NO". **NO → "NAY! THOU SHALT SAY YES!"** (KNT.S23: the famous loop in new words, R8.4) and the question again, forever (after 10 NOs: "...FINE. THE COSTUME IS HOT, ROCK."). YES: **ROLL'S LOVE**: a heart beside the life bar pulses within one screen of a secret (0D's glint, 12's Metslime, 15's throne). A tell-helper, not a secret | T2 S · Should |
 
 ### 2.7 Hidden room and behaviour chip
 
@@ -733,9 +754,10 @@ stairs down to the real lord.
   visible special case for systems' mid-boss rules); 2-f i-frames; hops erratically at 2 px/f; flees through the right
   edge at f240 ("THE METAL METSLIME ESCAPED!"). NOFREEZE. It returns on the next visit to 12 (after a death, or on a
   replay). Mid-boss fight id `$09` (meta), arena 12, for GP Rush when it ships.
-- Killed: "AN EXCELLENT MOVE! ROCK GAINED 1000 EXP." and the chip capsule drops (a token on replays).
+- Killed: "A SPLENDID STRIKE! ROCK GAINED 1000 EXP." (KNT.S16) and the chip capsule drops (a token on replays).
 - Effect (systems §9.2 #14, R2.4): criticals are Won't, so KAISHIN is always the deterministic **EXCELLENT MOVE**: +2
-  on every 12th damaging boss hit, with the chime. "AN EXCELLENT MOVE!" is used only for KAISHIN.
+  on every 12th damaging boss hit, with the chime. "A SPLENDID STRIKE!" (story's paraphrase of the genre's
+  critical-hit line, R8.4) is used only for KAISHIN.
 - Best tools: many small hits (B.ATTACK's flakes, KNIGHT.C's return pass hitting twice, a fast buster).
 - Tells: its own announcement and its escape line. Should: Roll's Love pulses here.
 - **Hint (KN2, tier B)**: "METAL ONES FLEE FAST. HIT THEM OFTEN, NOT HARD."
@@ -751,8 +773,10 @@ a fixed lead time before it starts [new-code] M · Must.
 - **The log uses the pop-up window** (top by default; consistency-26 resolves round 1's open question 6). The log has
   priority: the commentators are muted while it runs, and the first-weakness line (KNT-08) and the kill line wait in
   story's queue for the next 60 f without a log line.
-- Intro (v1b): "KNIGHT MAN DRAWS NEAR! / COMMAND?" ▶FIGHT RUN. RUN: "BUT THOU WERT BLOCKED!" (always: he is a boss)
+- Intro (v1b): "KNIGHT MAN DRAWS NEAR! / COMMAND?" ▶FIGHT RUN. RUN: "BUT THE WAY WAS BARRED!" (always: he is a boss)
   and Knight Man acts first.
+- The log's words are story's KNT.L01-L10. BLAZE and HEALMORE below are design labels only: on screen they are "a fire
+  spell" and "a healing spell" (R3.3, R8.4).
 
 #### 2.8.1 Patterns
 
@@ -761,20 +785,26 @@ a fixed lead time before it starts [new-code] M · Must.
 | A | "KNIGHT MAN ATTACKS!" | 30 f | Mace `$96` sweeps along the floor across the room (60 f out, 40 f back); jump it | **Yes**: shield down for the whole 130 f |
 | B | "KNIGHT MAN IS GUARDING." | 20 f | Walks at Rockman at 1 px/f for 90 f, shield up (front shots reflect, vanilla class 3), then a **shield bash** lunge of 32 px in 12 f (contact 4) | From behind only |
 | C | (none: a physical move) | 10-f crouch | High jump onto Rockman's x, peak y `$3F`, 72 f airtime (vanilla). Landing **quake**: a grounded Rockman is stunned 16 f | In the air |
-| D | "KNIGHT MAN CASTS BLAZE!" | 40 f cast pose, shield lowered | 3 fireballs: along the floor, +15°, +30°, at 2 px/f, contact 3. The mace stays in his hand | **Yes** during the cast |
+| D | "KNIGHT MAN CASTS A FIRE SPELL!" | 40 f cast pose, shield lowered | 3 fireballs: along the floor, +15°, +30°, at 2 px/f, contact 3. The mace stays in his hand | **Yes** during the cast |
 | | Cycle | | B, A, C, B, D, C (about 650 f) | |
 
-Lag: D = player + script + boss + 3 fireballs + 3 shots = **9**; A and the pinch's E add one mace object = 7.
+Lag: D = player + script + boss + 3 fireballs + 3 shots = **9**; A and the pinch's E add one mace object = 7. D's log
+line closes as the cast ends, before the first fireball, so the text runner never makes 10 (§0.5).
 
 #### 2.8.2 Pinch (HP ≤ 9): "KNIGHT MAN IS ENRAGED!"
 
 | Id | Log line | Action |
 |---|---|---|
 | E | "KNIGHT MAN SWINGS THE MORNING STAR!" | The mace grows and orbits him (radius 28 px, 1 turn per 40 f) for 120 f while he walks at Rockman, then he flings it out; it **hangs at its farthest point** for 30 f and returns. Boss-move previews of KNIGHT.C's Morning Star synergy and its Hold alt (R2.4) |
-| F | "KNIGHT MAN CASTS HEALMORE!" | Once per fight. A 45-f cast, shield down. **Any hit during the cast** → "THE SPELL FIZZLED!" (the SPELLBREAKER act). Otherwise +6 HP |
+| F | "KNIGHT MAN CASTS A HEALING SPELL!" | Once per fight. A 45-f cast, shield down. **Any hit during the cast** → "THE SPELL FIZZLED!" (the SPELLBREAKER act). Otherwise +6 HP |
 | | Cycle | E, C, A, F (once), D, B |
 
 The pinch opens with a 30-f invincible ENRAGED pose (the log line above), and the 12-tile pinch set streams under it.
+
+**Credits mode** (fortress §6.2; tech's `IFCREDITS`, §4.6) [new-code] S · Must, costed in fortress's ending row: in 17
+with no Rockman there is no intro window and no battle-log line (the lead times stay, silent); the B, A, C, B, D, C
+cycle loops at full HP, aimed at an empty spot (x `$40`) instead of Rockman, and the landing quake stuns nobody.
+Fallback (fortress's): his card strip only.
 
 #### 2.8.3 Weapons in this fight (special cases in visible code)
 
@@ -788,11 +818,13 @@ The pinch opens with a 30-f invincible ENRAGED pose (the log line above), and th
 #### 2.8.4 Secret room 1A: THE KNIGHTLORD
 
 - **v1.0**: 1A (vanilla's own second boss room) in Knight's vanilla **revisit palette** (bank `$28`). The window (v1b):
-  "IF THOU WILT JOIN ME, I WILL GIVE THEE HALF THE BRACKET. ▶YES NO".
-  - **YES** (CX lesson: a Yes that hurts): the screen tints red (a palette fade, not a flash). "THEN HALF THE BRACKET IS
-    THINE..." then "THY TOURNAMENT IS OVER. TAKE NOW A LONG, LONG REST." A DISQUALIFIED card, **one life lost**,
-    respawn at 19. KNT-09: C "Did he just take the deal?!" K "Papa, he pressed YES." [new-code] S · Must.
-  - **NO**: "THEN THOU ART A FOOL!" The fight starts with BLAZE.
+  "STAND AT MY SIDE, AND HALF THE BRACKET SHALL BE THINE. ▶YES NO" (KNT.K01: the genre's famous offer in new words,
+  R8.4).
+  - **YES** (CX lesson: a Yes that hurts): the screen tints red (a palette fade, not a flash). "SO BE IT. THY HALF IS
+    WAITING FOR THEE..." then "THY TOURNAMENT ENDS HERE. SLEEP NOW, AND SLEEP LONG." (KNT.K02-K03). A DISQUALIFIED
+    card, **one life lost**, respawn at 19. KNT-09: C "Did he just take the deal?!" K "Papa, he pressed YES."
+    [new-code] S · Must.
+  - **NO**: "REFUSED? THEN FOLLY IS THINE, AND SO IS THIS FIGHT!" (KNT.K04). The fight starts with BLAZE.
 - Same AI; pinch at HP 12. Kill: the YOU GET card per story S11 (KNIGHT.C), the **plate A** pickup, SECRETS b0.
 - **Should (the arena twist)**: he sits on the real throne (K-DQ's second throne swapped into 1A) and rises from it.
 - **Could**: TRUE FORM. At 0 HP, "KNIGHT MAN REVEALS HIS TRUE FORM!" He refills 12 HP in a red palette with a taller
@@ -800,13 +832,13 @@ The pinch opens with a 30-f invincible ENRAGED pose (the log line above), and th
 
 ### 2.9 CASUAL levers (R2.9, Must)
 
-| Lever | HERO'S QUEST |
-|---|---|
-| Reflex windows ×2 | battle-log leads 30 / 20 / 40 → 60 / 40 / 80 f; HEALMORE's interruptible cast 45 → 90 f; the Killer Chest bites 12 → 24 f after opening |
-| Mash counts −40 % | none in this venue |
-| Set-piece timers +50 % | the Trap Hall's descent 220 → 330 f (latch step ×0.67); the Metal Metslime flees at f240 → f360 |
-| +1 checkpoint per section | after the Trap Hall: 07; the upper castle: 10; the secret route: 18 (at the ladder) |
-| Skill-gated secrets −1 step | the Metal Metslime has HP 6 |
+| Lever | HERO'S QUEST (NORMAL → CASUAL) | How (systems §13.4) |
+|---|---|---|
+| Reflex windows ×2 | battle-log leads 30 / 20 / 40 → 60 / 40 / 80 f; HEALMORE's interruptible cast 45 → 90 f; the Killer Chest bites 12 → 24 f after opening | `REFLEX` (`TIERVAL` + INPUT_LAG) |
+| Mash counts −40 % | none in this venue | none |
+| Set-piece timers +50 % | the Trap Hall's descent 220 → 330 f (latch step ×0.67); the Metal Metslime flees at f240 → f360 | `TIERVAL` |
+| +1 checkpoint per section | after the Trap Hall: 07; the upper castle: 10; the secret route: 18 (at the ladder) | tech's dormant checkpoint objects, woken by a CASUAL poke |
+| Skill-gated secrets −1 step | the Metal Metslime has HP 8 → 6 (the chip) | a CASUAL poke on its HP |
 
 ### 2.10 HARD pokes (Should, R0.3 item 3; tech §5.5 format)
 
@@ -820,27 +852,28 @@ The pinch opens with a 30-f invincible ENRAGED pose (the log line above), and th
 
 ### 2.11 Text, commentators and the partner
 
-- **v1.0 text** (R4.5; about 40 strings, the most of any venue, all on text v1b): the Sage (2), the King (1 + his
+- **v1.0 text** (R4.5; story §10.4 counts **44 Must strings**, the most of any venue, all on text v1b; the single
+  source: R8.4): the Sage (2), the King (1 + his
   death line), chest and door lines, the false throne, the ceiling (2), the encounter windows (6), the Metal Metslime
   (3), the stairs check (2), Light's tablet, the battle log (about 10), the Knightlord (4), KNT-05 and KNT-06 (the
   stairs: secret lines), KNT-08 (first weakness), KNT-09 (the offer), 4 death lines (story picks from its 6), and the
   hints KN0-KN2.
 - **Should**: KNT-01-04, 07, 10; the Inn, Princess Roll and the checkpoint sign. Could: the EXP lines.
 - **Break Man (Should, with the partner)**: with him called, RUN always works ("BREAK MAN RAN AWAY. NOBODY WAS
-  SURPRISED."). Princess Roll asks him instead: "DOST THOU LOVE ME?" "...No." "BUT THOU MUST!" (he whistles and
+  SURPRISED."). Princess Roll asks him instead: "DOST THOU LOVE ME?" "...No." "NAY! THOU SHALT SAY YES!" (he whistles and
   leaves the screen). His Break Shot opens the basement doors.
 
 ### 2.12 Homage moments
 
 1. The stage starts with a King: "O DESCENDANT OF LIGHT!"
-2. "A METSLIME DRAWS NEAR! COMMAND?" in a Rockman game, and "BUT THOU WERT BLOCKED!"
+2. "A METSLIME DRAWS NEAR! COMMAND?" in a Rockman game, and "BUT THE WAY WAS BARRED!"
 3. The spike ceiling has HP, and dies.
 4. A Metal Metslime that takes exactly 1 damage from everything, then runs.
 5. Stairs behind the empty throne.
 6. The Knightlord's offer: say YES and the game puts you to sleep.
 7. A boss that announces every attack in a battle log, and a HEALMORE you can interrupt.
 8. Light's tablet in the hidden room: "ESPECIALLY NOT WILY."
-9. v1.1: "BUT THOU MUST!" until you say yes.
+9. v1.1: "NAY! THOU SHALT SAY YES!" until you say yes.
 
 ### 2.13 Weapons as tools in this venue
 
@@ -958,7 +991,9 @@ position; about 12 pops per walk-through.
 - Players who take the sky bypass skip the gallery; their counter stays 0 and the Sheriff treats them as clean (the
   bypass is the "ride around town" option).
 - **Lag**: at most **3 figures** open on 0B and **2** on 0C (the outhouse's shot switch takes the third slot), and
-  **1 outlaw bullet** live (an outlaw holds fire while one is live): 1 + 1 + 3 + 3 + 1 = **9** on both screens.
+  **1 outlaw bullet** live (an outlaw holds fire while one is live): 1 + 1 + 3 + 3 + 1 = **9** on both screens. While
+  the pianist's sign is up (a pop-up) or a player utility is out, the director keeps one figure fewer open for each
+  (§0.5).
 - Round 1's proposed Eddie moral trade-off is **deleted** (consistency-34; story §2.8; systems' doping is the trade-off).
 
 ### 3.5 The judged quick-draw (VA-DRAW) [new-code] S · Must
@@ -976,11 +1011,12 @@ scoreboard. All movement is locked except B.
 | Late | | No fire within W: the opponent fires (4) |
 | Match (Sam) | | Best of three. Win 2: bounty 2. Lose 2: "COME BACK WHEN YOU'RE FASTER." The doors unlock, no bounty. A rematch after a death or on a replay |
 
-**The window W (R3.5)**: NORMAL **24 f**, HARD **18 f**, CASUAL **40 f**, plus CONFIG's **INPUT LAG** offset (0-6 f,
-default 0; systems and meta own the setting) added to W. VA-DRAW reads the difficulty bits itself, so these three
+**The window W (R3.5)**: NORMAL **24 f**, HARD **18 f**, CASUAL **40 f** (R8.6), plus CONFIG's **INPUT LAG** offset
+(0-6 f, R8.7; default 0; systems and meta own the setting) added to W. VA-DRAW reads the difficulty bits itself, so these three
 constants ship in v1.0. Any weapon counts as a draw; C.FLASH during READY is a FOUL like any other shot.
 
-Lag (saloon): player + script + Sam + judge + Sam's bullet + 3 shots = 8. Mid-boss fight id `$0B` (meta), arena 0D.
+Lag (saloon): player + script + Sam + judge + Sam's bullet + 3 shots = 8, plus the READY window's text runner = 9
+(§0.5). Mid-boss fight id `$0B` (meta), arena 0D.
 
 ### 3.6 The 4:50 train (T1-lite + T4)
 
@@ -1018,7 +1054,9 @@ band-free lines after it. **Should**: a separate sky band with the sun disc and 
   caboose roof for a 150-f showdown, then back to the ridge. Still alive at the third tunnel: he escapes into it
   ("SIDEWINDER GOT AWAY!"), no bounty. Mid-boss fight id `$0C` (meta), arena 10-11.
 - **Lag (R1.8)**: player + script (director and bands) + 3 shots = 5; the enemy side holds Sidewinder + (one robber
-  **or** the tunnel wall) + at most **2 enemy bullets** (a shooter waits while 2 are live) = 4 → **9**.
+  **or** the tunnel wall) + at most **2 enemy bullets** (a shooter waits while 2 are live) = 4 → **9**. An open pop-up
+  ("SIDEWINDER GOT AWAY!", "JUNCTION! ALL OFF!") or a player utility (the Ice Block) takes a bullet's place, and the
+  shooters wait for it (§0.5).
 
 ### 3.7 Secret exit, hidden room, behaviour chip
 
@@ -1086,6 +1124,11 @@ VA-DRAW with the stage's window W:
 Lag: B = player + script + boss + 3 feathers + 3 shots = **9**; C = 8; a lost SHOWDOWN = 8. The pinch opens
 with a 20-f invincible hat-tip, and the 16-tile pinch set streams under it (2 frames at 128 B/frame).
 
+**Credits mode** (fortress §6.2; tech's `IFCREDITS`, §4.6) [new-code] S · Must, costed in fortress's ending row: in 17
+with no Rockman there is no HIGH NOON draw and no SHOWDOWN (VA-DRAW never starts while `CREDITS` is set; the flag judge
+stays on his stand); the A, A, B, A, C cycle loops at full HP, aimed at an empty spot (x `$30`, Rockman's mark) instead
+of Rockman. Fallback (fortress's): his card strip only.
+
 #### 3.8.4 Weapons in this fight
 
 | Weapon | Effect | Tags · tier |
@@ -1107,13 +1150,13 @@ with a 20-f invincible hat-tip, and the 16-tile pinch set streams under it (2 fr
 
 ### 3.9 CASUAL levers (R2.9, Must)
 
-| Lever | HIGH NOON FRONTIER |
-|---|---|
-| Reflex windows ×2 | the quick-draw W is 40 f (R3.5 fixes CASUAL at 40, not 48); the outlaw's "!" 24 → 48 f; the tunnel warning 90 → 180 f |
-| Mash counts −40 % | none in this venue |
-| Set-piece timers +50 % | Sidewinder's caboose showdown 150 → 225 f; the dome dispenser's waves come 1.5× further apart |
-| +1 checkpoint per section | town: 0D (after the gallery); train: a restart at t = 30 s (after the second tunnel; bounties kept); mesa: 15 |
-| Skill-gated secrets −1 step | Sidewinder HP 10 → 7; the SHERIFF STAR allows 1 civilian hit |
+| Lever | HIGH NOON FRONTIER (NORMAL → CASUAL) | How (systems §13.4) |
+|---|---|---|
+| Reflex windows ×2 | the quick-draw W 24 → 40 f (R3.5, confirmed by R8.6: 40, not 48); the outlaw's "!" 24 → 48 f; the tunnel warning 90 → 180 f | the quick-draw table (SC8, + INPUT_LAG); the others `REFLEX` (`TIERVAL` + INPUT_LAG) |
+| Mash counts −40 % | none in this venue | none |
+| Set-piece timers +50 % | Sidewinder's caboose showdown 150 → 225 f; the dome dispenser's waves come 1.5× further apart | `TIERVAL` |
+| +1 checkpoint per section | town: 0D (after the gallery); train: a restart at t = 30 s (after the second tunnel; bounties kept); mesa: 15 | the train: a CASUAL poke on the director's restart index; 0D, 15: tech's dormant checkpoint objects, woken by a CASUAL poke |
+| Skill-gated secrets −1 step | Sidewinder HP 10 → 7 (the secret exit's third bounty); the SHERIFF STAR allows 1 civilian hit (the chip) | a CASUAL poke on Sidewinder's HP; `IFCASUAL` in the STAR's predicate |
 
 ### 3.10 HARD pokes (Should, R0.3 item 3; tech §5.5 format)
 
@@ -1128,7 +1171,7 @@ with a 20-f invincible hat-tip, and the 16-tile pinch set streams under it (2 fr
 
 ### 3.11 Text, commentators and the partner
 
-- **v1.0 text** (R4.5; about 22 strings): the three posters, the pianist's sign, Eddie's "HEY!" line, Sam's loss
+- **v1.0 text** (R4.5; story §10.4 counts **25 Must strings** and 1 label, the single source: R8.4): the three posters, the pianist's sign, Eddie's "HEY!" line, Sam's loss
   line, the conductor (the count in two forms, ALL ABOARD, the EXPRESS choice), "JUNCTION! ALL OFF!", "SIDEWINDER GOT
   AWAY!", the Sheriff (3) and the STAR line, the rodeo-ring line, TMH-07 (the gate: a secret line), TMH-10 (first
   PLANT.B: the first-weakness line), 4 death lines, the hints TO0-TO2.
@@ -1323,7 +1366,7 @@ cameo) lives in the underground hub.
 
 - **v1.0**: the vanilla object set (`$50-$53`, 24 + 23 HP, spawner `$56`, script `$1C`, the chain-7 floor-split preset,
   dark → lights on) with its vanilla rocks `$14`. **One AI rule keeps the cap** (R1.8): it throws only while the player
-  has 2 or fewer shots live, and only 1 rock flies at a time: 4 parts + 1 rock + player + script + 2 shots = 9.
+  has 2 or fewer shots and utilities live (§0.5), and only 1 rock flies at a time: 4 parts + 1 rock + player + script + 2 shots = 9.
 - **Checkpoint fix**: vanilla's script rewrites checkpoint 09 in both gorilla rooms. GP has one gorilla room, and its
   routine sets checkpoint 09 only when CONGA dies: a hook on one script byte (`stages_b.md` §8). [new-code] S · Must
   (feasibility-19: round 1 tagged it engine-ok).
@@ -1359,6 +1402,12 @@ drawing two mirrored petals that fly apart along one diagonal.
 
 Lag: A = player + script + boss + the ring (1) or the throw (2) + 3 shots = 8; B = 7; C = boss + 2 seeds = 8; BLOOM =
 boss + ring + 2 spores + 3 shots + 2 = **9**.
+
+**Credits mode** (fortress §6.2; tech's `IFCREDITS`, §4.6) [new-code] S · Must, costed in fortress's ending row: in 17
+with no Rockman the A, B, A, C cycle loops at full HP, aimed at an empty spot (x `$40`) instead of Rockman; B's vine
+hangs its 150 f with no one to grab it; C's tar and sprouts run through `map_set` as in the fight, and the room's script
+restores the floor when the segment ends (the same undo W2's fight loader needs, §7). Fallback (fortress's): his card
+strip only.
 
 #### 4.7.3 Weapons in this fight
 
@@ -1406,13 +1455,13 @@ Debrief order (meta): secret exit (PL0) → hidden room (PL1) → EXPLORER'S PER
 
 ### 4.9 CASUAL levers (R2.9, Must)
 
-| Lever | LOST JUNGLE |
-|---|---|
-| Reflex windows ×2 | the croc's red-eye BLINK 20 → 40 f; the scorpion's tail tell 30 → 60 f; the tar's BUBBLE 30 → 60 f; the hidden ladder's fade 16 → 32 f |
-| Mash counts −40 % | none in this venue |
-| Set-piece timers +50 % | croc CLOSED 120 → 180 f; tar SOLID 150 → 225 f; the vine period 128 → 192 f; the cat waits 300 → 450 f; Plant Man's sprouts last 180 → 270 f |
-| +1 checkpoint per section | the jungle: 03 (the lodge); after CONGA: 0C; the swamp: 12; the underground and caverns: 1C (the riverbank) |
-| Skill-gated secrets −1 step | the EXPLORER'S PERFECT allows 1 log hit (the ring stays the diamond) |
+| Lever | LOST JUNGLE (NORMAL → CASUAL) | How (systems §13.4) |
+|---|---|---|
+| Reflex windows ×2 | the croc's red-eye BLINK 20 → 40 f; the scorpion's tail tell 30 → 60 f; the tar's BUBBLE 30 → 60 f; the hidden ladder's fade 16 → 32 f | `REFLEX` (`TIERVAL` + INPUT_LAG) |
+| Mash counts −40 % | none in this venue | none |
+| Set-piece timers +50 % | croc CLOSED 120 → 180 f; tar SOLID 150 → 225 f; the vine period 128 → 192 f; the cat waits 300 → 450 f; Plant Man's sprouts last 180 → 270 f | `TIERVAL` |
+| +1 checkpoint per section | the jungle: 03 (the lodge); after CONGA: 0C; the swamp: 12; the underground and caverns: 1C (the riverbank) | tech's dormant checkpoint objects, woken by a CASUAL poke |
+| Skill-gated secrets −1 step | the EXPLORER'S PERFECT allows 0 → 1 log hit (the chip; the ring stays the diamond) | `IFCASUAL` in the ring's test |
 
 ### 4.10 HARD pokes (Should, R0.3 item 3; tech §5.5 format)
 
@@ -1428,7 +1477,7 @@ Debrief order (meta): secret exit (PL0) → hidden room (PL1) → EXPLORER'S PER
 
 ### 4.11 Text, commentators and the partner
 
-- **v1.0 text** (R4.5; about 12 strings): the treasure pop (one template), the rhinestone pop, PLT-08 (the cat: a
+- **v1.0 text** (R4.5; story §10.4 counts **11 Must strings** and 1 label, the single source: R8.4): the treasure pop (one template), the rhinestone pop, PLT-08 (the cat: a
   secret line, reworded), PLT-10 (first B.ATTACK: the first-weakness line), 4 death lines (story picks from "See you
   later, alligator!", "Stuck in the tar!", "He let go too early.", "The jungle always wins the first round.", "Watch
   the eyes on those crocs!", "That wasn't a floor, Rockman."), and the hints PL0-PL2.
@@ -1501,11 +1550,11 @@ venue's homage mechanic, secret exit, hidden room, behaviour chip or boss rework
 |---|---|
 | `systems.md` (combat, economy, chips) | Takes: the vanilla weakness cycle; weakness 4 / 16 f; SC1, SC8, SC9; the SC4 hook (Should); chips #1 and #13-16 and their effects; YASHICHI ⟂ DARUMA (R2.6); prize bolts ≤ 60 per venue and one envelope per hidden room; plates as pickups; SECRETS weights; the mid-boss default column; the 14-chip v1.0 set (R2.5). **Asks**: (1) Y.SPEAR in SC1's pass-through list, piercing without breaking (consistency-35); (2) the vehicle-state clause in §2.4: a stage-lent vehicle is not a form, is NO TAG, works under 1993, books no form VARIETY (consistency-36); (3) the Metal Metslime's "every hit does 1" as a named mid-boss special case; (4) LANDED adds 7,200 f and EXPRESS 3,300 f to `T`; (5) INPUT LAG (0-6 f) added to VA-DRAW's window (R3.5); (6) the VENUE ACTs and pars of §0.8; (7) the freeze classes of §0.11; (8) if PARTs ever ship, rename the FEATHER PART (design-11); (9) v1.1: the Inn's 20-bolt price as a sink |
 | `meta.md` (save bytes, bracket, events, debrief) | SECRETS b0-b4 for meta 2, 3, 6, 7; the PRIZES indexes of §0.8 (Knight 1, Tomahawk 3, Plant 4 bits); `VENUE_REC`: Wind's best SHOOTING DOWN % and Tomahawk's best draw in frames (Must), Knight's fastest Metal Metslime kill (proposed, Should); `STAGE_CLEAR`, read by LAND and EXPRESS; the `CFG_CASUAL` bit; the tier B hints verbatim (WI1, TO1 and PL2 wording here is final for round 2; TO1 no longer names a game); mid-boss fight ids `$08` AYACO, `$09` METAL METSLIME, `$0A` DOMINGO DOME, `$0B` SIX-SHOT SAM, `$0C` SIDEWINDER, `$0D` CONGA with arenas 01, 12, 05, 0D, 10-11, 08 (consistency-44; used when GP Rush ships); the E1/E2 pairing (v1.1); the R3.3 venue names on the debrief and panels. When tier A riddles return (Should), PL0's riddle loses the explorer's name (R3.3) |
-| `tech.md` (ids, memory, raster, CHR) | Stage ids `$01`/`$06`/`$05`/`$02`; the 48-byte record (`SECRET_SCR`, `PAR`, `EFFECTS`, the `NO_TAG` mask); the map-edit service; families `$F4`/`$F5`; HUD widgets; the attach and vehicle states; T1-lite with the director in the slot-22 script; T3 with the per-stage key counter; T8; the raster list (24 bands, `RL_PARALLAX`, `RL_SHIMMER` = 2 entries, `RL_BANDS`; budgets: Wind 01 = 4 entries, the train = 5); text v1a/v1b; **a per-screen pop-up position switch the screen script can set** (Wind 01, Tomahawk 10-11); the Knight ceiling out of IRQ `$11` with a retract flag; the lag cap of 9 in artcheck; the poke-list format with the CASUAL tier; four slots in the tileset table (TS_WIND, TS_KNIGHT, TS_TOMAHAWK, TS_PLANT); streaming the set-piece player sheet during the catapult; the LFSR for VA-DRAW; permission to overwrite layout banks `$32`/`$33` after regression (R1.5) |
-| `story.md` (every word, the ending) | Every line here is a draft. Changes for story: Tomahawk's death line "Boot Hill has room for one more." is dropped and a new sixth is needed (R3.4); PLT-06 and PLT-08 lose "Harry" and "Game Boy" (R3.3); TO1 no longer names a game; Tomahawk Man's §2.10 voice becomes the rodeo showman strict about duel etiquette (R3.4); "AN EXCELLENT MOVE!" is reserved for KAISHIN, and Y.SPEAR's log line is "THE SPEAR PIERCED THE SHIELD!"; new lines: LAND / "LANDED", the conductor's count and EXPRESS, the stairs check, the Sage's after-death line, the RODEO RING line. v1.0 Must text for these venues is about 86 strings (Wind ~14, Knight ~40, Tomahawk ~22, Plant ~12), 4 death lines each (R4.5) |
+| `tech.md` (ids, memory, raster, CHR) | Stage ids `$01`/`$06`/`$05`/`$02`; the 48-byte record (`SECRET_SCR`, `PAR`, `EFFECTS`, the `NO_TAG` mask); the map-edit service; families `$F4`/`$F5`; HUD widgets; the attach and vehicle states; T1-lite with the director in the slot-22 script; T3 with the per-stage key counter; T8; the raster list (24 bands, `RL_PARALLAX`, `RL_SHIMMER` = 2 entries, `RL_BANDS`; budgets: Wind 01 = 4 entries, the train = 5); text v1a/v1b; **a per-screen pop-up position switch the screen script can set** (Wind 01, Tomahawk 10-11); the Knight ceiling out of IRQ `$11` with a retract flag; the lag cap of 9 in artcheck; the poke-list format with the CASUAL tier; four slots in the tileset table (TS_WIND, TS_KNIGHT, TS_TOMAHAWK, TS_PLANT); streaming the set-piece player sheet during the catapult; the LFSR for VA-DRAW; permission to overwrite layout banks `$32`/`$33` after regression (R1.5); the credits' `CREDITS` bit and `IFCREDITS` (§4.6) for the four bosses' credits mode |
+| `story.md` (every word, the ending) | Every line here is a draft. Changes for story: Tomahawk's death line "Boot Hill has room for one more." is dropped and a new sixth is needed (R3.4); PLT-06 and PLT-08 lose "Harry" and "Game Boy" (R3.3); TO1 no longer names a game; Tomahawk Man's §2.10 voice becomes the rodeo showman strict about duel etiquette (R3.4); "A SPLENDID STRIKE!" (KNT.S16) is reserved for KAISHIN, and Y.SPEAR's log line is "THE SPEAR PIERCED THE SHIELD!"; new lines: LAND / "LANDED", the conductor's count and EXPRESS, the stairs check, the Sage's after-death line, the RODEO RING line. HERO'S QUEST's 1986-RPG lines are story's paraphrases, never quotes (R8.4: KNT.D1, S11, S16, S23, S25, K01-K04, and "a fire spell" / "a healing spell" in the log), and this doc's drafts follow them. v1.0 Must text for these venues is **story §10.4's count**, the single source (R8.4): **90 strings and 4 labels** (Wind 10 + 2, Knight 44, Tomahawk 25 + 1, Plant 11 + 1), 4 death lines each (R4.5) |
 | `art_audio.md` (tile, byte and track budgets) | The v1.0 deltas of §1.1, §2.1, §3.1, §4.1: Wind's seagull becomes Must, the windsock moves to BG, the loop poses move to the set-piece player sheet (feasibility-8), the pinch set grows to 24, W-SEA drops the destroyer, SET-WS5 becomes Should; Knight's inn bed, Princess, Innkeeper and heart become Should, the sconce flame Won't; Tomahawk's T-BOOTHILL becomes **T-MESA** (no graves, Must), T-RODEO Should, the cactus walker Must, the flag judge joins SET-TM3, "HEY!" joins SET-TM2; Plant's 12-tile vine weapon-slot set is dropped, its tar bubbles become BG animation, the eel Should. **Music**: no new track for these venues in v1.0 (G22, G23, G24 and the G28 stingers are Should, G29 and G32 Could); the encounter swaps to a vanilla boss theme; the DRAW bell and the ACE fanfare are vanilla SFX |
-| `venues_b.md` | The same rules: secret arenas = boss room + new palette in v1.0; one CASUAL lever list; the lag cap of 9 counted the same way. No second train, shoot-'em-up or quick-draw. Yamato's sekisho is trimmed (R3.1), so the Sheriff is the game's only "guard checks N items" gate; Yamato's nightingale floor reuses the ceiling engine with its own trigger. The E1-E4 pairing |
-| `fortress.md` | The HALFTIME RIOT keeps the game's one lights-on-a-timer set piece, which is why Knight's basement is lit (R3.1). W2's pair bouts load these champions through the fight loader with FIGHT_CTX (R1.7): the four boss rooms (Wind 13, Knight 17, Tomahawk 17, Plant 17) run there with a per-fight pinch byte; the HIGH NOON draw runs in W2 too |
+| `venues_b.md` | The same rules: secret arenas = boss room + new palette in v1.0; one CASUAL lever list; the lag cap of 9 counted the same way. No second train, shoot-'em-up or quick-draw. Yamato's sekisho is trimmed (R3.1), so the Sheriff is the game's only "guard checks N items" gate; Yamato's nightingale floor (Should, R8.6) reuses the ceiling engine with its own trigger. The E1-E4 pairing |
+| `fortress.md` | The HALFTIME RIOT keeps the game's one lights-on-a-timer set piece, which is why Knight's basement is lit (R3.1). W2's pair bouts load these champions through the fight loader with FIGHT_CTX (R1.7): the four boss rooms (Wind 13, Knight 17, Tomahawk 17, Plant 17) run there with a per-fight pinch byte; the HIGH NOON draw runs in W2 too. The v1.0 credits (fortress §6.2) show each champion in the same room with no Rockman: each boss here has a **credits mode** (§1.7.2, §2.8.2, §3.8.3, §4.7.2) on tech's `IFCREDITS`, costed in fortress's ending row, with fortress's card-strip fallback |
 
 ## 8. Lessons applied
 
@@ -1546,19 +1595,22 @@ venue's homage mechanic, secret exit, hidden room, behaviour chip or boss rework
 3. **Raster bands.** The sortie needs 4 band entries and the train 5, of 24 (R1.9); both depend on the generic raster
    list and MMC5's scanline IRQ, which the M0 spike tests (R1.1). Fallback: 2 bands (sky fixed, ground moving).
 4. **Lag at the cap.** Many set pieces sit at exactly 9 occupied slots. Any later addition must take a slot away
-   (artcheck rejects 10). If M3's OAM-builder measurement raises the cap, the v1.1 extras (bats, a second robber, the
-   destroyer) come back first.
+   (artcheck rejects 10). An open pop-up and a player utility count too (§0.5): the directors and boss AIs wait for
+   them, and the slice's G7 test measures a utility on a full screen before these venues are built. If M3's
+   OAM-builder measurement raises the cap, the v1.1 extras (bats, a second robber, the destroyer) come back first.
 5. **Knight depends on text v1b.** Encounters, the King and Sage, the offer and the stairs check are all dialogue and
    menus. Fallback: 4MI-style sprite words (as Pharaoh's curses) for the log and a two-choice sprite prompt.
 6. **IRQ logic.** Knight's ceiling runs inside IRQ `$11` in vanilla; tech moves it to a per-frame controller in M2.4,
    and Knight loses exact golden equality there (a behaviour-equivalence test instead).
 7. **Reaction-time content.** The quick-draw is a reflex test: 24 / 18 / 40 f plus INPUT LAG, a sound cue, and losing
    only costs the bounty. The delay is seeded at the screen lock, so Time Attack (v1.1) stays fair.
-8. **Text volume.** About 86 Must strings in four venues, a quarter of R4.5's ~350; HERO'S QUEST alone is ~40. story
-   trims, and the windows stay one or two lines.
-9. **Trademarks.** On-screen names follow R3.3, and the design notes describe the homages. Two story choices remain
-   story's call: Princess Roll's EN "BUT THOU MUST!" and the King's JP death line quote the 1986 RPG's own words (story
-   §S15). Quoting a line is not a mark, but the project may prefer paraphrase.
+8. **Text volume.** story §10.4 counts 90 Must strings in these four venues (R8.4's single source), about a quarter of
+   R8.4's ~400; HERO'S QUEST alone is 44. story's reserve trim list (not a plan) starts with Knight's battle log, and
+   the windows stay one or two lines.
+9. **Trademarks.** On-screen names follow R3.3, and the design notes describe the homages. **Quoted lines from other
+   games are paraphrased, never verbatim, in both languages** (R8.4): the King's death line, the RUN refusal, the
+   critical hit, the Princess's loop and the Knightlord's offer use story's new words (KNT.D1, S11, S16, S23, K01-K04),
+   and the log's spells are "a fire spell" and "a healing spell".
 10. **Cultural sensitivity** in HIGH NOON FRONTIER: §3.14's rules are Must. A reader outside the team should review the
     venue's lines and art at the art-acceptance gate (R5.1) alongside the native-JP review.
 11. **Text fatigue in Knight.** START skips any window; replays auto-skip NPC text; the battle log stays (it is the
@@ -1568,7 +1620,7 @@ venue's homage mechanic, secret exit, hidden room, behaviour chip or boss rework
 13. **Object ids.** About 40 new kinds in these four venues in v1.0 (about 48 with v1.1), against about 30 free vanilla
     type ids. tech's families `$F4`/`$F5` are a hard prerequisite.
 14. **Art without an artist** (R5.1). The King, Sage, Sam, the Sheriff, Sidewinder and AYACO start as composites and
-    may look rough; the art-acceptance gate shows them to the user at M5 and M6.
+    may look rough; the art-acceptance gate (a local HTML page plus PNGs, R8.8) shows them to the user at M5 and M6.
 15. **The skips and TIME.** LAND and EXPRESS only stay fair if systems adds the skipped set piece's length to `T`.
 16. **Bass Mode** is Won't (v1), so the sky-bypass ladder, the Power walls and the sortie need no Bass answers now.
 
@@ -1587,8 +1639,10 @@ the boss room plus a new palette in v1.0. New ones:
 4. **story**: the new sixth Tomahawk death line, the PLT-06 and PLT-08 rewordings, and Tomahawk Man's new voice.
 5. **art_audio**: can Wind's pinch set grow to 24 tiles (it adds the red plane and the POW), and can the windsock and
    the flag judge's stand live in BG in their boss rooms?
-6. **Director**: R2.9 says reflex windows ×2, which would make the CASUAL quick-draw 48 f; R3.5 says 40 f. This doc
-   uses R3.5's 40 f (the more specific ruling).
+6. *(Answered in round 3: R8.6 fixes the CASUAL quick-draw at 40 f; R2.9's ×2 applies to every other reflex window.)*
+
+Questions 1-5 are routed to their owners in [`reconcile.md`](reconcile.md): TECH-05, SYSTEMS-03 and SYSTEMS-04,
+META-01, STORY-02, ART_AUDIO-03.
 
 ---
 
@@ -1634,3 +1688,21 @@ the boss room plus a new palette in v1.0. New ones:
 | 36 | Milestones: LOST JUNGLE in M5; HERO'S QUEST, HIGH NOON FRONTIER and SKY ACE in M6 | R6; scope-4 |
 | 37 | No ExGrafix and no extra CHR page in these venues | R1.3; feasibility-1; consistency-1 |
 | 38 | Round 1's open questions answered and replaced by six new ones | consistency decisions 17, 18, 28, 39 |
+
+---
+
+## Changes in round 3
+
+Against [`RULINGS.md`](RULINGS.md) §8 (R8.1-R8.8) and the venues_a table of [`reconcile.md`](reconcile.md).
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| VENUES_A-01 | applied | §1.5-§1.6, §2.7, §3.7, §4.4; §0.9, §1.8, §2.9, §3.9, §4.9 | Every chip gate is a Must set piece (POW juggle in the sortie, the Metal Metslime on 12, the gallery, the four treasures and the rolling logs). The four CASUAL tables now carry systems §13.4's How column (`REFLEX`, `TIERVAL`, dormant checkpoints, `IFCASUAL` or a CASUAL poke); the YASHICHI juggle window is a timer (240 → 360 f), not a reflex window, so the chip gate keeps one relaxation step (8 → 6 hits) |
+| VENUES_A-02 | applied | §0.5, §1.3.1, §1.3.4, §3.4, §3.5, §3.6, §2.8.1, §4.6 | The sortie, AYACO and the train were already at 5 + 4 = 9. Gaps fixed: the text runner and player utilities count (tech §7.12, §15.1), and every director and boss AI waits for them; the sortie's "up to 30 f" delay (which could reach 10) is now "delay, never drop"; AYACO's bomb bay waits for a lingering POW; Knight Man's D log closes before the fireballs; CONGA counts utilities; a screen with no director is measured by the slice's G7 |
+| VENUES_A-03 | applied | §1.7.2, §2.8.2, §3.8.3, §4.7.2; §7; v1.0 scope | A credits-mode note per boss on tech's `IFCREDITS`: no player, patterns looped at an empty spot, no draw, no battle log; Plant's room restores its floor; fortress's card-strip fallback. Costed in fortress's ending row (tight.py), so no session change here |
+| VENUES_A-04 | applied | §2.2, §2.3, §2.6, §2.7, §2.8, §2.8.1, §2.8.4, §2.11, §2.12; §1.10, §3.11, §4.11, §7, Risks 8-9; §3.5, §3.9, §0.10, §10 | The 1986-RPG lines follow story's paraphrases (KNT.D1, S11, S16, S23, S25, K01-K04; "a fire spell" / "a healing spell" on screen, BLAZE and HEALMORE as design labels). String counts cite story §10.4 (90 + 4 labels) instead of this doc's ~86. The CASUAL quick-draw was already 40 f; now cited to R8.6, and open question 6 is closed |
+| R8.1 | applied | v1.0 scope (Milestones) | Per-milestone figures stated for §6's column: M5 14, M6 42; no stale ledger or cumulative figures were in this doc |
+| R8.2 | applied | v1.0 scope, "What v1.0 depends on", §0.4 | The attach state's core arrives at M3 with Blizzard's condor; T5, the vine and the balloon at M5 |
+| R8.6 | applied | §7 (venues_b row) | Yamato's nightingale floor is Should |
+| R8.7 | applied | "What v1.0 depends on", §0.10, §3.5 | INPUT LAG range 0-6 f cited to R8.7 |
+| R8.8 | applied | Risk 14 | The art-acceptance gate is a local HTML page plus PNGs |

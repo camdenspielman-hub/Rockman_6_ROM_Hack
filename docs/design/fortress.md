@@ -330,7 +330,8 @@ Must: G00 (the Opening), G04 BETA (the Riot's stage and both duels), the 2-secon
 the ending's **lights-out arrangement** (2A03 stems; MMC5 stems Could; consistency-13 names it G37 LAST MATCH) and the
 D9 mute mask. Everything else uses vanilla ids in v1.0: `$09` in the H wings (the tributes G08-G12 are Should,
 consistency decision 24), `$0B` and `$18` in W2/W3, `$18` for the escape (FINAL LAP is Should), `$0C` for the
-refights. **W2, W3 and the escape keep every 2A03 channel** (R8.3): the channel drop belongs to LIGHTS OUT alone. Round 1's "HALL OF FAME theme in 5 arrangements" is withdrawn for art's G08-G12.
+refights. **W2, W3 and the escape keep every 2A03 channel** (R8.3): the channel drop belongs to LIGHTS OUT alone.
+Round 1's "HALL OF FAME theme in 5 arrangements" is withdrawn for art's G08-G12.
 
 ---
 
@@ -1017,7 +1018,8 @@ robot" in yellow and blue, holding a pistol, beside the crate (new art).*
 **Hooks** (story's words): H1-01 the M.BEAM case (Must: it is a weapon-get line); H1-02 the first score ball (Should);
 H1-03 the gap sign (Should); H1-04 the Yellow Devil's bar fill and defeat (S28, Must); H1-05 the first C.FLASH hit on the
 eye (the first-weakness line, Must); H1-06 the first piece knocked down (Must: b2's tell); H1-07 b0's secret line
-(Must); H1-08 and H1-09, the b1 and b2 lines (Should: story's generic lines play in v1.0, R8.6). **Respawns**: story §6.5's Mr. Y heckles; wing-tagged drafts (Should): *"My Yellow Devil was the hardest boss of
+(Must); H1-08 and H1-09, the b1 and b2 lines (Should: story's generic lines play in v1.0, R8.6). **Respawns**: story
+§6.5's Mr. Y heckles; wing-tagged drafts (Should): *"My Yellow Devil was the hardest boss of
 1987. Ask anyone."* / *"Score: zero. How very 1987."*
 
 **CASUAL levers**:
@@ -1337,7 +1339,8 @@ onion domes, bells and the crane). Kept: the machine blocks, the falling bell ro
 Dr. Cossack's claw machine from Rockman 4, piloted by a **Kalinka-shaped decoy robot** (Kalinka denies the likeness). The
 **Mr. X 2 pod technique**: the cabin (a 64×48 glass dome) is BG in NT1 positioned by the scroll above the split
 (`RL_FLOOR`); **the twist**: the cabin also **travels along a crane rail** (the X scroll), and a sprite claw (the trophy
-theft's claw art, Must with S25, reused) drops from it and **grabs Rock** (tech's attach state, input rule "struggle"). The arena is a prize pit with two prize capsules (a
+theft's claw art, Must with S25, reused) drops from it and **grabs Rock** (tech's attach state, input rule
+"struggle"). The arena is a prize pit with two prize capsules (a
 large life and a `KALINKA PLUSH`) that respawn 300 f after being taken.
 
 | Id | Pattern | Timeline |
@@ -1913,8 +1916,7 @@ minutes plus the credits; START skips each scene after its first viewing (R3.8).
 | 3 | **Break Man catches Rock and Wily (S40)** | the whistle over the white; on the grass by the bay, the NPC Break Man sets Rock and Wily down. Rock's second and last *"Blues?"*; *"Break Man."*; he walks away as the whistle fades (story's words). In v1.0 the catch itself happens inside the white-out, and the scene uses the NPC's stand and walk frames; story's carry art is Should | NPC Break Man, Rock, vanilla Wily |
 | 4 | **The arrest (S41)** | two Committee guards (recoloured vanilla robots) lead Wily away; **the ending's one and only use of the Mr. Y / Mr. Z alias gag** (R4.1, R8.5; story's words) | vanilla's Wily-behind-bars art kept |
 | 5 | **The podium and Bass's vow** | the GP Stadium by day (TS_STADIUM): Rock on the top step holding the **GP CUP** he recovered in W3; **the champions applaud in pairs**, one pair at a time beside the podium, about 2 s each (SET-PARADE, two enemy palettes per pair, 0 new tiles; R8.6, art_audio's staging): Rock + a pair + Bass + the script + the text runner = **[6]**. *Should: all eight at once as a BG applause row (SET-PARADE converted to BG).* Bass β beams in at the pitch's edge for his vow (story's words; the "it won't be 8-bit" line may move here from S37), then leaves in a multicoloured beam (a palette cycle on his beam sprite, ≤ 3 changes per second). **If the escape mercy fired**, Cossack confesses the injury time (one POP; 4MI's "who lowered the output?" in tournament clothes). No Break Man on the roof | sprites over the stadium BG |
-| 6 | **The CAPCOM TIMES (S44)** | vanilla's newspaper driver (`$3B:$A886`) and masthead; the headline art redrawn (story's `ROCKMAN WINS GP!!`); story's pages, with its fallback page **S44.4F** in place of a
-second alias gag (R8.5), then vanilla's `$95/$96` verbatim. **`$94` (the jailbreak line) is not reprinted** (R4.1): S02 quotes it | vanilla `$92-$96` slots; [new-art] S |
+| 6 | **The CAPCOM TIMES (S44)** | vanilla's newspaper driver (`$3B:$A886`) and masthead; the headline art redrawn (story's `ROCKMAN WINS GP!!`); story's pages, with its fallback page **S44.4F** in place of a second alias gag (R8.5), then vanilla's `$95/$96` verbatim. **`$94` (the jailbreak line) is not reprinted** (R4.1): S02 quotes it | vanilla `$92-$96` slots; [new-art] S |
 | 7 | **The credits** (§6.2) | the vanilla staff-roll engine with GP text and the DWNB cards | vanilla |
 | 8 | **The rating (S46) and Break Man's debrief (S47)** | `meta.md` §6's screen, drawn over meta's judges' desk (R8.6; round 2's "stadium at dusk" is withdrawn) | meta |
 | 9 | **LIGHTS OUT (S42)** | night, the empty stadium; Rock and Dr. Light in the stands (with Roll, Rush, and Beat if B-E-A-T is complete). The GP theme in **the lights-out arrangement** (art_audio's G37 LAST MATCH, Must). The six floodlight towers switch off one by one, and **each takes a music channel with it** through the D9 mute mask (tech §12.6; the game's one channel drop, R8.3): the MMC5 voices first if they ship and are on, then noise, triangle, pulse 2; **pulse 1 plays the melody alone**, and the last tower goes dark on its last note (consistency decision 25: story's cue table without its DPCM cue). Each switch-off is a palette step, not a flash | stadium BG at night + 4-5 sprites; [new-music] S (art_audio's) |
@@ -2074,7 +2076,8 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
 - **Events**: EVENTS b4 the theft (S25); b6 the unmasking in H5's throne room; EVENTS2 b4 SUPER on the dock (S29 on the
   next map visit); b5 the join only with the partner (Should); b3 the Riot cleared.
 - **Names**: meta index 9 and §3.5 become **HALFTIME RIOT** (R4.3). In v1.0 the Hall of Fame map shows H2 and H4 as
-  closed wings (`CLOSED FOR RENOVATION`) and the 1993 door greyed out, and the Castle map shows W1 closed. The GP Rush lobby is the Opening's screen `$1D` (Could).
+  closed wings (`CLOSED FOR RENOVATION`) and the 1993 door greyed out, and the Castle map shows W1 closed. The GP Rush
+  lobby is the Opening's screen `$1D` (Could).
 
 ### 9.4 `story.md` (every word, the ending)
 
@@ -2136,7 +2139,8 @@ H2/H4"; this doc and tech tier H2 and H4 Should (§9.2).
   (R8.6): **Eddie as new art** (a composite, art's cast), **the trophy theft's claw** (S25; H4's Catcher reuses it), and
   the podium's champions **in pairs** from SET-PARADE (0 new tiles).
 - **Should/Could art**: Pi-kun's three sizes; the podium's all-eight BG applause row (R8.6); H2 and H4 contents (the
-  Mecha Dragon in the `$8B` budget, the Cossack Catcher, reusing the theft's claw); Doc Robot's overlay and Air Man's arena; Umbrella Man; the box-art figure; W1 (TS_LAB, METALL 16's eras,
+  Mecha Dragon in the `$8B` budget, the Cossack Catcher, reusing the theft's claw); Doc Robot's overlay and Air Man's
+  arena; Umbrella Man; the box-art figure; W1 (TS_LAB, METALL 16's eras,
   Enker); TS_ARCADE and three guests; the lap.
 - **Music**: G00, G04 (stage entry and duels), the 2-second whistle jingle and **G37 LAST MATCH** (the lights-out
   arrangement, 2A03 stems) are Must (R5.2); G07-G13 and FINAL LAP (G15) and a RIOT remix are Should with vanilla

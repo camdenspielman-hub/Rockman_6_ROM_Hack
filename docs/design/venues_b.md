@@ -1,6 +1,7 @@
 # Heritage Venues B: Blizzard, Flame, Centaur, Yamato (design-venues-b)
 
-Status: **v2 (design round 2), revised against [`RULINGS.md`](RULINGS.md).** Owner: design-venues-b. Scratch:
+Status: **v3 (design round 3), revised against [`RULINGS.md`](RULINGS.md) §8 and [`reconcile.md`](reconcile.md).**
+Owner: design-venues-b. Scratch:
 `build/revise/venues_b/` (round 1: `build/design/design-venues-b/`).
 
 This doc designs four of the eight Heritage Venues of Rockman 6 GP:
@@ -62,11 +63,16 @@ Must. Each Should figure includes about one session of v1.1 tests and golden-mov
 are not here: they sit in systems' single HARD-content line of the ledger. All figures are re-estimated from actual
 counts after the slice (R0.1): the Blizzard number becomes the calibration for the other three.
 
+**Per milestone** (RULINGS §6's cumulative column adds these up, R8.1): **M4 13.5** (Blizzard, the slice) and **M5
+39.5** (Flame, Centaur and Yamato); the Should and Could rows are v1.1+. The four champions' credits mode (§1.10, §2.8,
+§3.10, §4.8) is counted in fortress's ending (M8), not here.
+
 ### Release rungs
 
 - **v0.1 "Blizzard slice" (M4):** §1, complete: new game → bracket → SUMMIT CLIMBER (exit, room, chip, Ice Block,
-  boss) → judges → save, reload, replay. It needs no stage-attribute table (stage id `$00` keeps the ship's hard-wire),
-  no T3, no text v1b and no other venue (§1.0).
+  boss) → judges → save, reload, replay. It needs none of the M5 stage-attribute work (stage id `$00` keeps the ship's
+  hard-wire, and its GP code reads the 48-byte stage record v0 from M2.1, with no stop-gaps: R8.2), no T3, no text v1b,
+  no forms and no other venue (§1.0).
 - **v0.5 "Round One" (M5-M6):** Flame, Centaur and Yamato after the stage-attribute table (M5): the tide's dwell is an
   `EFX_PARAM`, and T3, T7 and T8 arrive with them.
 - **v1.0 "Championship":** unchanged venues, refought in W2 through the fight loader (§5.3).
@@ -90,9 +96,10 @@ counts after the slice (R0.1): the Blizzard number becomes the calibration for t
 
 - **Stage ids** (R1.2, tech §4.2): venues are `$00-$07`; these four keep vanilla's: Blizzard `$00`, Flame `$03`,
   Yamato `$04`, Centaur `$07`. The ship's and the tide's collision offsets (`$3E:$DA1C-$DA6A`) are hard-wired to ids 0
-  and 7, so both set pieces work before the stage-attribute table (M2.1, needed by M5) exists. That is why Blizzard can
-  be the slice. The tide's GP dwell is `EFX_PARAM` in the attribute record (tech §4.4), so Centaur waits for M5.
-  Yamato's re-homed ceiling (Should) also needs the table.
+  and 7, so both set pieces work before vanilla's `$51` readers are rewritten for the stage-attribute record (M5). That
+  is why Blizzard can be the slice: its GP code reads only the 48-byte record v0, which exists from M2.1 (`SECRET_SCR`,
+  `PAR`, GP_BOSSHIT's row; no stage-`$00` stop-gaps: R8.2, tech §4.1). The tide's GP dwell is `EFX_PARAM` in the
+  attribute record (tech §4.4), so Centaur waits for M5. Yamato's re-homed ceiling (Should) also needs the table.
 - **Layouts:** one 32-screen layout per venue (8 rows × 256 blocks, screens `$00-$1F`). The main route counts up from
   00; branches, the secret route and arena, and the hidden room live in the high screens, entered by exits with
   explicit targets (vanilla practice, `levels.md` §9). The new layouts may overwrite vanilla layout banks `$32/$33`
@@ -114,7 +121,8 @@ counts after the slice (R0.1): the Blizzard number becomes the calibration for t
     throws one projectile fewer per move.
   - A player utility in slots 4-7 (the Ice Block, R1.11) or B.ATTACK's fourth flake can lift a 4-object screen to 10
     for its lifetime. The slice measures exactly this (§1.0, test G7) on Blizzard 0A, 0D, 10 and the boss; if a
-    screen lags past the 9-slot band, its object count drops to 3.
+    screen lags past the 9-slot band, its object count drops to 3 (in the boss room, FLAKES throws one flake fewer
+    while the Ice Block is out: R8.6, §1.10).
   - The design trick that keeps these numbers: **BG until it moves.** Hanging icicles, loose tiles, zone doors and
     plaques, the crest and Yamato Man's wall spears are BG cells or map edits; only the moment they move costs a slot.
 - **Checkpoints:** two mid-stage checkpoints plus the boss shutter (vanilla has one plus the shutter). A checkpoint is
@@ -157,7 +165,7 @@ Round 1's working labels (X-…) map onto tech's single engines. The engines are
 | **Ceiling-probe callback** (tech §7.9, Must) | X-BONK | Blizzard: break the cell above (`t6_break`). Yamato: stun the enemy standing on the bonked floor cell |
 | **X-WRAP** (tech §7.9, Must) | X-WRAP | Blizzard's climb only (Centaur's wrap tower is gone, R3.1) |
 | **Exit type 7** (tech §7.9, Could) | X-UPEXIT | Blizzard's climb (Could). v1.0: a 2-rung ladder stub at each climb screen's top |
-| **Attach state** (R1.10, tech §7.9, Must) | condor carry | Blizzard's condor (Must). The slice is the first tranche that needs it, so it is built at M4 (R1.13); tech's revision schedules it at M5 for Plant (§5.3) |
+| **Attach state** (R1.10, tech §7.9, Must) | condor carry | Blizzard's condor (Must), its first user: the core is built at M3 with the condor (R8.2, tech §7.9); Plant's vines and balloon follow at M5 |
 | **GP player states** (tech §7.9, Must) + the **set-piece player sheet** (R2.3) | X-EXWP | Yamato's pogo (Must): the sheet streams at the rack, a locked moment |
 | **HUD widget module** (R1.10, Must) | X-METER, X-LABEL | the bonus meter (Blizzard), ZONE cards (Centaur) (both Must) |
 | **Families and sub-ids** (tech §7.2, Must) | X-GPOBJ | every new object kind here (about 37 after the cuts, §5.1) |
@@ -169,6 +177,7 @@ Round 1's working labels (X-…) map onto tech's single engines. The engines are
 | **Raster presets** (tech §8, Must) | chains 1, `$14`, `$11` | `RL_SHIP`, `RL_TIDE` (Must); `RL_CEILING` (Should) |
 | **Hook registry** (tech, Must) | ignition hook | FIREPROOF's clean bit on `$3E:$DDFC`; the ship thread's turn event (icicles) |
 | **Fight loader + FIGHT_CTX** (R1.7, Must) | - | W2 refights all four champions in their own arenas (§5.3) |
+| **Credits room table + `GP_MODE` b0 `CREDITS`** (tech §4.6, Must, M8) | - | the v1.0 credits show each champion in his own boss room with no Rockman: each AI's credits mode tests `IFCREDITS` (§1.10, §2.8, §3.10, §4.8; fortress §6.2) |
 | **Commentator bus** (tech/story, Must) | - | every hook in this doc |
 
 ### 0.5 Weapons: superseded by systems.md
@@ -273,11 +282,12 @@ Stop and the Ice Block but still takes hits); **boss** = a boss-side frozen stat
 ### 1.0 The slice build sheet (M4)
 
 Blizzard is the vertical slice (R0.2; RULINGS §6 M4; scope-4). This section is the **complete v1.0 spec**: every Must
-item below can be built on the output of M0-M3 plus this venue's own data and code. The slice needs **no
-stage-attribute table** (id `$00` keeps the ship's hard-wire), **no T3**, **no text v1b** (pop-ups and the debrief
-window are text v1a), **no forms** (a new file owns the buster only; Power comes with the 2nd win) and **no other
-venue**. The path the slice proves: new game → bracket → SUMMIT CLIMBER (exit, room, chip, Ice Block, boss) → judges →
-save, reload, replay.
+item below can be built on the output of M0-M3 plus this venue's own data and code. The slice needs **no M5
+stage-attribute work** (id `$00` keeps the ship's hard-wire, and its GP code reads the 48-byte stage record v0 from M2.1
+with **no stage-`$00` stop-gaps**: R8.2), **no T3**, **no text v1b** (pop-ups and the debrief window are text v1a),
+**no forms** (a new file owns the buster only; Power comes with the 2nd win, so the form swap, forms firing taps and
+adaptors by win count wait for M5: R8.2) and **no other venue**. The path the slice proves: new game → bracket →
+SUMMIT CLIMBER (exit, room, chip, Ice Block, boss) → judges → save, reload, replay.
 
 **What the slice needs from other docs**, in milestone order (RULINGS §6):
 
@@ -287,6 +297,7 @@ save, reload, replay.
 | Level pipeline and canvas table; Blizzard's slot in the RAM-image tileset table; CHR set table v2; `chr.py`, `sprites.py`, `palettes.py`, `artcheck.py` | tech, art_audio | M2 |
 | Families and sub-ids for the 7 Must Blizzard kinds (§1.9), with their `FRZ_KIND` (frozen or NOFREEZE) | tech | M2 |
 | `map_set` and the repaint queue: the summit gate, the replay skip door, hanging icicles | tech | M2 |
+| Stage record v0 (48 bytes, `SA_CUR`, the init hook): the slice's GP code reads `SECRET_SCR`, `PAR` and GP_BOSSHIT's row from it, as every later stage does (R8.2, tech §4.1) | tech | M2 (M2.1) |
 | Text v1a (pop-up, debrief window), the commentator bus | tech, story | M2-M3 |
 | Save, file-select-lite, bracket-lite, results, debrief (BL0-BL2), REMATCH, EXTRA CONFIG and the test mailbox | meta | M2 |
 | T6 variant blocks with `t6_break` and `t6_refill`; the ceiling-probe callback (X-BONK) | tech | M3 |
@@ -294,11 +305,10 @@ save, reload, replay.
 | The HUD widget module (the bonus meter) | tech | M3 |
 | GP_BOSSHIT, WEAK! and SC9 (MELT), the frozen tick and frozen handlers | systems, tech | M3 |
 | Scorecard, bolts, venue prizes and tokens, the sponsor envelope; the chip framework | systems | M3 |
-| The **attach state** (the condor), first built here (R1.13; tech's revision has it at M5, for Plant: §5.3 asks for M4) | tech | M4 |
-| B.ATTACK's tap in Normal form and the **Ice Block** alt: alt dispatch's prototype (R2.4) | systems | M4 |
+| B.ATTACK's tap in Normal form and the **Ice Block** alt: alt dispatch's prototype (R2.4), in the dispatch table with Normal form's tap column (R8.2) | systems | M3 |
+| The **attach state**'s core, with the condor as its first user, and a demo movie of the carry (R8.2; tech §7.9, M3.7) | tech | M3 |
 | SNOW CHAINS's effect (`systems.md` §9.2) | systems | M4 |
-| The secret-exit flag on a kill in 1A: until the attribute record's `SECRET_SCR` exists (M5, consistency-21), a stop-gap row for id `$00` read by the hook at `$3F:$F4EB` | tech | M4 |
-| Wherever a system reads the attribute record (GP_BOSSHIT's row, the par), a stop-gap row for id `$00` | tech, systems | M3-M4 |
+| Blizzard's row of the stage record, from its `.lvl` header: `SECRET_SCR` (the secret-exit flag on a kill in 1A, tested by the post-kill hook at `$3F:$F9A0`), `PAR` and `FORT_COL` (GP_BOSSHIT's row). No stage-`$00` stop-gaps (R8.2; tech §4.1, §16.7) | tech | M4 |
 
 **Build order inside M4** (each step leaves a playable build):
 
@@ -310,7 +320,8 @@ save, reload, replay.
 5. The boss rework (16), its WEAK reaction and its pinch.
 6. SNOW CHAINS: the seal ledger and the foreman.
 7. Hooks, debrief predicates and hints, par, VENUE ACT.
-8. The tests below, then the lag report and the ledger re-estimate (R0.1).
+8. The tests below, then the lag report and the ledger re-estimate (R0.1). The boss's flicker check with the Ice Block
+   out decides FLAKES' Ice Block rule (§1.10, R8.6).
 
 **Acceptance tests** (golden movies on NORMAL + EN; one smoke movie per other setting; RULINGS §6 testing policy):
 
@@ -322,7 +333,7 @@ save, reload, replay.
 | G4 | SNOW CHAINS: no seal destroyed (shoves allowed) | the foreman hands over the chip; a second movie destroys one seal: the sad foreman, no chip |
 | G5 | REMATCH with B.ATTACK owned | the Ice Block encases a seal (FROZEN STEP) and a bird, stops the boss's snowball; vegetables appear as tokens; the skip door on 0F opens; pay = improvement only |
 | G6 | save on the bracket, power cycle, reload | resume on the bracket; a second save mid-venue (death autosave) resumes on the bracket too |
-| G7 | lag report on 04-07, 0A, 0D, 10, 11, 17 and the boss, with the Ice Block out | every screen within the 9-slot cap of §0.2, or the screen drops to 3 stage objects |
+| G7 | lag report on 04-07, 0A, 0D, 10, 11, 17 and the boss, with the Ice Block out | every screen within the 9-slot cap of §0.2, or the screen drops to 3 stage objects; the boss passes the flicker simulator, or FLAKES throws one flake fewer while the Ice Block is out (§1.10, R8.6) |
 
 ### 1.1 The pitch
 
@@ -532,7 +543,7 @@ sky. A cloud covers the sun. He sighs. (The vanilla data panel says SOLAR ENERGY
 | Move | Tell | Action | Frames | Counter |
 |---|---|---|---|---|
 | **SLALOM** | crouch, poles planted, 20 f | skis across at 3 px/f (16 px tall), turns at the wall (16 f), skis back | 20 + 75 + 16 + 75 | jump over; contact 4 |
-| **FLAKES** (vanilla move) | arms up, 24 f | throws **3** flakes in a spread (they fall at 1 / 1.75 / 2.5 px/f); **the second to land becomes an ice block** (32×16, solid, slippery top, 240 f): **the Ice Block, shown**. At most one block; while it stands, FLAKES throws 2 | 24 + 60 + 30 recovery | stand on the block; flakes 2 dmg |
+| **FLAKES** (vanilla move) | arms up, 24 f | throws **3** flakes in a spread (they fall at 1 / 1.75 / 2.5 px/f); **the second to land becomes an ice block** (32×16, solid, slippery top, 240 f): **the Ice Block, shown**. At most one block; while it stands, FLAKES throws 2. If the M4 flicker simulator fails the 3-flake case with the player's **Ice Block** out (refights), FLAKES also throws 2 while an Ice Block exists (R8.6) | 24 + 60 + 30 recovery | stand on the block; flakes 2 dmg |
 | **SNOWBALL** (vanilla move) | hunches "Hup!", 12 f | rolls as a 24-px snowball (the boss object itself) at 2.5 px/f, bounces off each wall once, **grows 4 px per crossing** (24 → 32). **An ice block stops it**: the ball shatters the block and bounces back. The player's Ice Block does the same on refights | 12 + ~200 + 20 uncurl | jump it, or hide behind an ice block |
 
 **Pinch (HP ≤ 9): AVALANCHE.** On entering pinch and then every second loop he plants his poles and **yodels** (60 f
@@ -553,14 +564,22 @@ ball jumps to full size. Once per fight; while the snowman stands, FLAKES throws
 plain own-weapon cell.
 
 **Forms** (refights): a charged Power punch on the rolling SNOWBALL cracks it: he tumbles out stunned for 30 f (free
-hits). Jet hovers over the avalanche (one snowball still reaches hover height: 32 px).
+hits). Jet hovers over the avalanche (one snowball still reaches hover height: 32 px). These reactions arrive with the
+forms at M5 (R8.2); the slice's fight has none.
 
 **How it teaches B.ATTACK:** FLAKES is the tap; the ice block it leaves is the alternate, and it *works* (it stops the
 snowball), so the player has used the alternate's idea before owning it.
 
 **Fight loader** (W2): the arena needs no effect init; the pinch threshold comes from the per-fight byte. **Flicker:**
 vanilla's Blizzard fight already shows 9 sprites on a line in 56 % of frames (art_audio §1.6); the 3-flake FLAKES and
-the staggered avalanche keep GP's additions off the snowball's lines, and artcheck verifies it.
+the staggered avalanche keep GP's additions off the snowball's lines, and artcheck verifies it. At M4 the simulator
+also runs FLAKES with the player's Ice Block out (art_audio §3.5); if that case fails, the one-flake-fewer rule in the
+FLAKES row is switched on (R8.6).
+
+**Credits mode** (the v1.0 credits, fortress §6.2; `IFCREDITS`, tech §4.6): with no Rockman he loops SLALOM → FLAKES →
+SLALOM → SNOWBALL in room 16, and any move that would read Rock's position aims at a fixed mark instead (the floor at
+x = 128). FLAKES still leaves its ice block, so the show includes the block stopping his own snowball. Nothing hits him,
+so there is no pinch and no reaction; the commentator bus is already silent. Fallback: his card strip only.
 
 ### 1.11 Secret arena (1A)
 
@@ -723,7 +742,7 @@ their tiles clash with the guards' and the traps').
 | **08** | **The timed gate.** A raise plate on the left opens the right gate for 240 f; it lowers during the last 60 f. While its bottom is still above the slide's height (tuned to the slide hit box, `$059A` id 3) you can **slide under it** (PoP's roll) | spike trap ×1, gate [2] | the gate closes (blocks; no damage) | T3 timed. The plate can be pressed again |
 | **09** | **CHECKPOINT 1.** A palace hall: carpets, columns, a window onto the oil field | none [0] | | |
 | **0A** | **v1.0: the spike hall**: three spike traps in doorways at offset timings. *v1.1 (Should): THE CHOMPER HALL, three chompers, each closed 8 f every 90 f, offset by 30 f; tell: a glint and a "shing" 12 f before they close; 8 dmg* | spike traps ×3 [3] (v1.1: chompers ×3 [3]) | | v1.1: Time Stop freezes the chompers |
-| **0B** | **THE OIL GALLERY** (the oil twist; where FIREPROOF is usually lost, §2.5.3). Two oil pools on the floor, each with a guard standing in it and a **chandelier** on a chain above it. Shoot a chain (one hit): the chandelier falls, **that pool ignites** (its own oil metatile id), and its guard burns (a HAZARD kill, `systems.md` §6.4). The pool is now deadly for the rest of the visit, so you take the **upper balcony** over it instead (harder jumps). Or don't, and fight the guards in slow oil | guards ×2, chandeliers ×2 [4] | the choice, per pool | each pool uses a **distinct oil metatile id** so they ignite separately (vanilla's per-id rule; block-id cost reported by the build). FLM-07 |
+| **0B** | **THE OIL GALLERY** (the oil twist; where FIREPROOF is usually lost, §2.5.3). Two oil pools on the floor, each with a guard standing in it and a **chandelier** on a chain above it. Shoot a chain (one hit): the chandelier falls, **that pool ignites** (its own oil metatile id), and its guard burns (a HAZARD kill, `systems.md` §6.4). The pool is now deadly for the rest of the visit, so you take the **upper balcony** over it instead (harder jumps). Or don't, and fight the guards in slow oil | guards ×2, chandeliers ×2 [4] (a falling chandelier is the same object, and a burned guard's explosion takes his own slot, vanilla type `$17`: 9 slots at most) | the choice, per pool | each pool uses a **distinct oil metatile id** so they ignite separately (vanilla's per-id rule; block-id cost reported by the build). FLM-07 |
 | **0C** | **The balcony.** The Mr. Y gag: v1.0, a sponsor tapestry with a familiar moustache on it; v1.1, a window with **the vizier**: Wily in an obviously fake costume-shop hat and a stick-on beard over his own moustache, waving a sponsor's clipboard. Fire Tellies over a last oil channel | Fire Telly ×2 + drops ≤ 2 [4] | | FLM-08 (Should) |
 | **0D** | **v1.0:** a guard on a ledge over a pit, and a loose tile in front of him. *v1.1 (Should): the skeleton-bot: at 0 HP it collapses into bones for 120 f, then rises with full HP; it is destroyed for good if it falls into the pit (a full charge, systems' FULL flag, knocks it back 16 px), if a loose tile falls on its bones, or if it stands in burning oil* | guard ×1, falling tile ≤ 1 [2] | pit | |
 | **0E** | **THE MIRROR ROOM** (§2.5.1). A tall mirror on the right wall. When you reach the middle of the room, **Shadow Rock** steps out of the glass | Shadow Rock + its mirrored shots ≤ 3 [4] | | FLM-09 (Must: the merge tell). T7 |
@@ -881,6 +900,11 @@ synergy.
 **Fight loader** (W2): the strips are arena data and their timer lives in the arena's script, so the fight runs the
 same when loaded alone; the pinch threshold comes from the per-fight byte.
 
+**Credits mode** (fortress §6.2; `IFCREDITS`, tech §4.6): with no one to duel, DUEL becomes a kata: he advances to the
+room's centre mark, shows the blade glint and THRUSTs at the air twice, then backsteps. PILLARS and LEAP aim at a fixed
+mark on the right oil strip, so the show includes a strip burning out on its own timer. No parry, no pinch, no reaction.
+Fallback: his card strip only.
+
 ### 2.9 Secret arena (1A)
 
 - **v1.0 (Must):** the boss arena again, under a night palette, with the hourglass mural behind the throne (BG). Same
@@ -909,7 +933,7 @@ same when loaded alone; the pinch threshold comes from the per-fight byte.
 | checkpoint | dungeon, palace, vault | CP1 09, CP2 10 | + 07, 0D, 12 | dormant checkpoint objects woken by a CASUAL poke |
 | secret step | the mirror's glow (0E) | 5 s without firing | 3 s | `IFCASUAL` |
 | secret step | the mouse (12) | 10 s standing still | 6 s | `IFCASUAL` |
-| secret step | FIREPROOF | as designed | no extra step: the Telly's doubled hover eases it | - |
+| secret step | FIREPROOF (every oil pool) | any ignition voids it | the first ignition by a Fire Telly's drop is forgiven; a chandelier shot still voids it (the chandelier's own ignite call marks its source) | `IFCASUAL` in the ignition hook on `$3E:$DDFC` |
 
 **HARD** (Should, v1.1):
 
@@ -1237,6 +1261,11 @@ his flank during a GALLOP turn knocks him over for 30 f.
 
 **Fight loader** (W2): the arena's screen script starts the tide itself (`EFFECTS` TIDE with its dwell), and the stage id
 is still 7, so the collision offset holds; the pinch threshold comes from the per-fight byte.
+
+**Credits mode** (fortress §6.2; `IFCREDITS`, tech §4.6): room 17's screen script starts the tide as in a fight (stage
+id 7), and he still picks his moves by the tide. BLINK & BURST reappears 48 px from a fixed mark, and TIME FLASH has no
+one to freeze: its one 4-f flash plays (a fade under REDUCED, at least 4 s apart) and the 3 arrows fly at the mark. No
+slot reel (no pinch), no reaction. Fallback: his card strip only.
 
 ### 3.11 Secret arena (1C)
 
@@ -1589,6 +1618,10 @@ attacks, WEAK! pop, YAM-16), then pulls a new spear from his back.
 **Fight loader** (W2): the wall spears are logged map edits that the arena's script undoes, so the arena resets when
 loaded alone; the pinch threshold comes from the per-fight byte.
 
+**Credits mode** (fortress §6.2; `IFCREDITS`, tech §4.6): RUSH, VAULT & RAIN and WALL SPEARS loop as written, aimed at a
+fixed mark (the floor at x = 128); the wall spears stick and are undone on their 240-f timer as in a fight. No helmet
+(no pinch), no reaction. Fallback: his card strip only.
+
 ### 4.9 Secret arena (1D)
 
 - **v1.0 (Must):** the castle-hall fight on a theatre set: the striped curtain (black, persimmon, green) as the backdrop
@@ -1740,7 +1773,7 @@ Every Must item and the Must engines it rests on. Nothing on this list needs a S
 | Must item | Rests on (all Must) |
 |---|---|
 | Blizzard climb, refills, wrap | T6 variant blocks, the ceiling-probe callback, X-WRAP (tech, M3); ladder stubs (data) |
-| The condor exit, the bonus summit | the attach state (M4), the HUD widget meter, `map_set` (the gate) |
+| The condor exit, the bonus summit | the attach state's core (M3, R8.2), the HUD widget meter, `map_set` (the gate) |
 | The Vegetable Cellar | X-WRAP's per-row opt-out |
 | SNOW CHAINS | the chip framework and its §9.2 effect (systems, Must by R2.5) |
 | The Ice Block prototype | systems' Ice Block (Must by R2.4), the frozen tick and frozen handlers (R2.2) |
@@ -1758,17 +1791,18 @@ Every Must item and the Must engines it rests on. Nothing on this list needs a S
 | Plates E and T | systems' plates as pickups |
 | The four boss reworks | GP_BOSSHIT, WEAK!, SC9 (systems, Must); own-weapon reactions are SC4 (Should) and nothing Must waits on them |
 | W2's refights of these champions | the fight loader and FIGHT_CTX (R1.7) |
+| The four champions' credits mode (v1.0 credits) | the credits room table and `GP_MODE` b0 `CREDITS` (tech §4.6); fallback: card strips only (fortress §6.2) |
 
 ### 5.3 Dependencies on other docs (requests)
 
 | Doc | What this doc needs, or asks it to change |
 |---|---|
-| `systems.md` | (1) The Ice Block ships in the M4 slice (R2.4): its code moves out of the Should alt line. (2) The four venue chips of §9.2 are **Must** (R2.5): systems' revision already tiers SNOW CHAINS v0.1 and the other three v0.5. (3) ABSORB's heal of 1 as a named SC4 exception (consistency-33). (4) VENUE ACTs: CONDOR, FIRST PASS; CLEAN DUEL; NO WRONG DOOR; SPEAR DANCER. (5) Placeholder pars: Blizzard 330 s, Flame 300 s, Centaur 300 s, Yamato 300 s (was 330). (6) The bird-bot has 2 HP, so the Ice Block encases it instead of killing it. (7) The Freeze columns of §1.9, §2.7, §3.9 and §4.10 for the NOFREEZE list. (8) Two boss-room lag rules (§0.2): the WEAK! pop spawns only while fewer than 3 boss-side objects are out, and the CENTURION chip's helper (a player-side utility) costs each boss here one projectile per move while it hovers. (10) Prizes: Blizzard's 4 vegetables are 10/10/15/25 = 60; the Y.SPEAR ledge (v1.1) holds an energy, not bolts. (11) Section moves for its cross-references: SNOW CHAINS is now §1.6.3, FIREPROOF §2.5.3, CENTURION §3.7.3, DARUMA §4.6.3. (9) Proposal (v1.1): an Ice Block in water floats and rides the tide |
+| `systems.md` | (1) The Ice Block ships in the slice (R2.4), built at M3 with the dispatch table and Normal form's taps (R8.2): its code moves out of the Should alt line. (2) The four venue chips of §9.2 are **Must** (R2.5): systems' revision already tiers SNOW CHAINS v0.1 and the other three v0.5. (3) ABSORB's heal of 1 as a named SC4 exception (consistency-33). (4) VENUE ACTs: CONDOR, FIRST PASS; CLEAN DUEL; NO WRONG DOOR; SPEAR DANCER. (5) Placeholder pars: Blizzard 330 s, Flame 300 s, Centaur 300 s, Yamato 300 s (was 330). (6) The bird-bot has 2 HP, so the Ice Block encases it instead of killing it. (7) The Freeze columns of §1.9, §2.7, §3.9 and §4.10 for the NOFREEZE list. (8) Two boss-room lag rules (§0.2): the WEAK! pop spawns only while fewer than 3 boss-side objects are out, and the CENTURION chip's helper (a player-side utility) costs each boss here one projectile per move while it hovers. (10) Prizes: Blizzard's 4 vegetables are 10/10/15/25 = 60; the Y.SPEAR ledge (v1.1) holds an energy, not bolts. (11) Section moves for its cross-references: SNOW CHAINS is now §1.6.3, FIREPROOF §2.5.3, CENTURION §3.7.3, DARUMA §4.6.3. (9) Proposal (v1.1): an Ice Block in water floats and rides the tide |
 | `meta.md` | (1) On-screen name **PERSIAN PALACE** (meta §4.3-§4.4 still print PRINCE OF PERSIA PALACE). (2) Tier B hints for Centaur (§3.14) and Yamato (§4.13); FL0's tier B reworded for the glow (§2.12); **YA0's tier A riddle (the sekisho) must be rewritten** for the draft. (3) PRIZES: 4 bits for Blizzard's vegetables, none for the other three. (4) Mid-boss fight ids for Shadow Rock, GAMARN & GAMADAYU and the Daruma (consistency-44 proposes `$0E`, `$0F`, `$10`). (5) The replay skip door on Blizzard 0F reads the venue's cleared bit. (6) Mini-record (Could): Blizzard's meter time at the condor grab. (7) Tier B hints now sit in §1.14, §2.12, §3.14 and §4.13 |
 | `story.md` | (1) Words for every hook id; new ids **CEN-21** (Must), **CEN-22**, **YAM-21**; retired ids YAM-04, YAM-05, YAM-14, YAM-20, CEN-16 and YAM-15's firework half. (2) FLM-06's trigger is now "first parried shot", and its line should teach spacing. (3) BLZ-04 needs a varied Wily line (R3.9). (4) Death lines: drop BLZ 6 (the Ice Climbers' names) and CEN 6 (Kid Icarus's hero) (R3.3); the recommended four per venue are in §1.13, §2.11, §3.13 and §4.12. (5) Signs and inscriptions: the summit sign, the Atlantis tablet, ZONE 0's inscription, the vault's loan sign, the fortune slip. (6) The NPC row for Yamato: the sekisho guard's line is retired. (7) The Flame Mr. Y gag is a sponsor tapestry in v1.0 and Wily in costume in v1.1 (R3.4) |
-| `tech.md` | (1) **T7 and T8 are Must** (R0.4; its revision agrees). (2) **The attach state at M4**, not M5: the Blizzard slice's secret exit rides the condor, and R1.13 builds each state in the first tranche that needs it. (3) The ship thread's turn event as a registry hook (icicles). (4) A per-room tide base for the tidal shaft, and a check of chain `$14` across vertical exits at the start of M5 (fallback: door-joined rooms). (5) Per-screen door tables read by the screen scripts (Centaur's BG doors). (6) The stage-`$00` stop-gaps for the slice (secret screen, boss row, par) until the attribute record lands. (7) The map-edit uses of §0.4. (8) The set-piece player sheet streamed during the pogo rack's 24-f take animation. (9) The Daruma's stack part reads the hitting shot's Y on its latch. (10) The lag report of test G7 |
-| `art_audio.md` | (1) The change lists of §1.8, §2.6, §3.8 and §4.7 for the R5.3 re-run (cuts, promotions, moves). (2) The mouse squeak as a Must SFX of about 20 B, or a named vanilla fallback. (3) Unchanged cue tiers: G25 BONUS SUMMIT and G26 KABUKI Should, G30 UNDERWATER and G31 PALACE Could. (4) The Blizzard fight's flicker check |
-| `fortress.md` | W2's pair bouts load these four arenas through the fight loader. Each arena initialises its own effects (Centaur's tide) and undoes its own map edits (Yamato's wall spears, Flame's timed oil), and each boss reads its pinch threshold from the per-fight byte. The champions' idle frames are their vanilla stand frames; backdrop strips for the victory lap are Could |
+| `tech.md` | (1) **T7 and T8 are Must** (R0.4; its revision agrees). (2) **The attach state's core at M3**, with the condor as its first user; the vines and the balloon follow at M5 (R8.2; routed as TECH-06). (3) The ship thread's turn event as a registry hook (icicles). (4) A per-room tide base for the tidal shaft, and a check of chain `$14` across vertical exits at the start of M5 (fallback: door-joined rooms). (5) Per-screen door tables read by the screen scripts (Centaur's BG doors). (6) **No stage-`$00` stop-gaps** (R8.2): the slice's GP code reads stage record v0 from M2.1 (`SECRET_SCR`, `PAR`, GP_BOSSHIT's row), and Blizzard's row comes from its `.lvl` header at M4 (routed as TECH-07). (7) The map-edit uses of §0.4. (8) The set-piece player sheet streamed during the pogo rack's 24-f take animation. (9) The Daruma's stack part reads the hitting shot's Y on its latch. (10) The lag report of test G7. (11) The credits room table and the `CREDITS` bit that the four champions' credits mode tests (§1.10, §2.8, §3.10, §4.8; tech §4.6 has them). (12) §15.1's list of set pieces "written at 10-13" can drop Flame 0B: it is 9 occupied slots (§2.3) |
+| `art_audio.md` | (1) The change lists of §1.8, §2.6, §3.8 and §4.7 for the R5.3 re-run (cuts, promotions, moves). (2) The mouse squeak as a Must SFX of about 20 B, or a named vanilla fallback. (3) Unchanged cue tiers: G25 BONUS SUMMIT and G26 KABUKI Should, G30 UNDERWATER and G31 PALACE Could. (4) The Blizzard fight's flicker check: art_audio §3.5 runs FLAKES with an Ice Block out; if it fails, FLAKES throws one flake fewer while the Ice Block exists (R8.6, applied at M4, §1.10) |
+| `fortress.md` | W2's pair bouts load these four arenas through the fight loader. Each arena initialises its own effects (Centaur's tide) and undoes its own map edits (Yamato's wall spears, Flame's timed oil), and each boss reads its pinch threshold from the per-fight byte. The champions' idle frames are their vanilla stand frames; backdrop strips for the victory lap are Could. **The v1.0 credits** (fortress §6.2): each of the four champions runs a credits mode with no Rockman in his own boss room (Blizzard 16, Flame 16, Centaur 17, Yamato 16), given in §1.10, §2.8, §3.10 and §4.8; its cost is in fortress's ending figure (M8); fallback: that champion's card strip only |
 
 ### 5.4 Music and sound
 
@@ -1861,12 +1895,13 @@ slot only on motion); **a slice that is a whole venue** (Blizzard proves every l
    the door-joined fallback costs nothing new.
 5. **Lag and flicker.** Every screen is planned at ≤ 9 occupied slots, but a utility (the Ice Block) or B.ATTACK's
    fourth flake can push a full screen to 10. The slice measures it (G7) before the other venues are built. Vanilla's
-   Blizzard fight already flickers (9 sprites on a line in 56 % of frames).
+   Blizzard fight already flickers (9 sprites on a line in 56 % of frames); if the Ice Block case fails the flicker
+   simulator, FLAKES throws one flake fewer while it is out (R8.6, §1.10).
 6. **Screen budgets** are 28-30 of 32; Centaur and Yamato have two spare screens each.
 7. **Fairness of the behaviour gates.** FIREPROOF can be lost on screen 01 by a first-time player: intended (a replay
-   goal), with a generous lesson (a 120-f hover; 240 f on CASUAL). SNOW CHAINS punishes the full charge, the natural
-   tool, so BLZ-07 fires on the first *hit*, every visit. The mouse's 10-s wait is unusual in a Rockman game; the squeak
-   and the debrief hint carry it.
+   goal), with a generous lesson (a 120-f hover; 240 f on CASUAL, which also forgives one Telly ignition, §2.10). SNOW
+   CHAINS punishes the full charge, the natural tool, so BLZ-07 fires on the first *hit*, every visit. The mouse's 10-s
+   wait is unusual in a Rockman game; the squeak and the debrief hint carry it.
 8. **Tedium.** Seal refills can slow the climb (450 f on CASUAL; a mid-climb checkpoint, plus one more on CASUAL). The
    40-s bonus is skippable on replays (R3.8).
 9. **The Yamato trim** leaves a simple secret exit (five scrolls, one lantern). If playtests find it too easy, HARD's
@@ -1876,7 +1911,7 @@ slot only on motion); **a slice that is a whole venue** (Blizzard proves every l
 11. **Homage and trademarks.** No parody label reaches the screen; plaques describe; DuckTales and the Sakugarne are
     Capcom's; the fortune slip's `大凶` is art (the text engine is kana-only).
 12. **Estimates.** The four venues are 5 sessions above round 1's tight figure, all from rulings that promoted content to
-    Must. The slice re-estimates them (R0.1).
+    Must. The slice re-estimates them (R0.1), and every ⛳ gate re-estimates them again (R8.1).
 
 ---
 
@@ -1894,15 +1929,18 @@ slot only on motion); **a slice that is a whole venue** (Blizzard proves every l
 - CASUAL uses the standard lever list through `CFG_CASUAL` (R2.9).
 - Jump-up exits are Could (tech; the more conservative of the critics' Should and Could); the climbs ship with ladder
   stubs.
+- **No stage-`$00` stop-gaps** (R8.2): the slice's GP code reads the stage record v0 from M2.1 (the secret screen, the
+  boss row, the par); only vanilla's `$51` readers wait for M5.
+- The attach state's core is built at M3 with the condor as its first user (R8.2).
+- The four champions can run a no-player credits mode for the v1.0 credits (fortress §6.2's question): §1.10, §2.8,
+  §3.10, §4.8.
 
 **Still open:**
 
 1. Does the per-room tide base live in each room's screen script or in `EFX_PARAM`? (tech)
-2. Do the slice's stop-gaps for id `$00` (the secret screen, the boss row, the par) stay until M5, or does tech pull the
-   attribute record forward? R1.2 says the slice doesn't need it. (tech)
-3. Should an Ice Block float in water (v1.1)? (systems)
-4. The mouse squeak: a Must SFX, or a vanilla fallback? (art_audio)
-5. The tier A riddle for Yamato's draft. (meta, story)
+2. Should an Ice Block float in water (v1.1)? (systems)
+3. The mouse squeak: a Must SFX, or a vanilla fallback? (art_audio)
+4. The tier A riddle for Yamato's draft. (meta, story)
 
 ---
 
@@ -2002,3 +2040,20 @@ Each change cites the ruling (R…) and the finding ids it resolves.
 *Written by design-venues-b. Measurements: `build/design/design-venues-b/measure.py`, `measure2.py` (shot height, jump
 rise 52 px, slide hitbox id). Map crops: `build/design/design-venues-b/*_0.png`, `*_1.png`. Round-2 scratch:
 `build/revise/venues_b/`.*
+
+---
+
+## Changes in round 3
+
+Requests routed to this doc in [`reconcile.md`](reconcile.md), and the [`RULINGS.md`](RULINGS.md) §8 rulings that touch
+it. No session figure changes: the four venues stay at 53 Must (M4 13.5, M5 39.5).
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| VENUES_B-01 | applied | §1.6.3, §2.5.3, §3.7.3, §4.5.3, §4.6.3; §1.12, §2.10, §3.12, §4.11; §7 risk 7 | Every chip's gate rests on Must set pieces (the seals and the foreman; the oil, the Tellies, the chandeliers and the marshal; the statues; the Daruma), and every venue fills in systems §13.4's lever table. One gap fixed: FIREPROOF had no CASUAL secret step; CASUAL now forgives the first ignition by a Telly's drop (a chandelier shot still voids it) |
+| VENUES_B-02 | already | §0.2, §2.3 (0B), §5.1 | Since round 2 every screen peaks at ≤ 4 stage objects (9 slots; the pogo hall 5 of 7, where Rock can't fire) and every boss room at boss + ≤ 3. 0B's count is now spelled out (a falling chandelier is the same object; a burned guard's explosion takes his own slot); tech is asked to drop 0B from §15.1's "10-13" list |
+| VENUES_B-03 | applied | §1.10 (FLAKES, flicker), §0.2, §1.0 (build step 8, G7), §5.3 art_audio (4), §7 risk 5 | At M4, if the flicker simulator fails FLAKES with the player's Ice Block out, FLAKES throws 2 flakes while an Ice Block exists (R8.6) |
+| VENUES_B-04 | applied | §1.10, §2.8, §3.10, §4.8; §0.4, §5.2, §5.3 fortress, §8 | A credits-mode paragraph per champion (`IFCREDITS`: aimed moves use a fixed mark, no pinch, no reaction; fallback: the card strip only). The cost sits in fortress's ending figure (M8), not here |
+| VENUES_B-05 | applied | v1.0 scope (rungs), §0.2, §0.4, §1.0, §1.10 (forms), §5.2, §5.3 systems and tech, §8 | R8.2: the attach state's core at M3 with the condor; the Ice Block row moves from M4 to M3 with the dispatch table; the stop-gap rows become stage record v0 (M2.1) plus Blizzard's row from its `.lvl` header at M4, tested by the post-kill hook at `$3F:$F9A0` (tech §4.1; was `$F4EB`); no forms in the slice, and Blizzard Man's form reactions arrive at M5. R8.6: the nightingale floor was already Should (§4.1, §4.5.1) |
+| R8.1 | applied | v1.0 scope (session estimates), §7 risk 12 | This doc's per-milestone figures stated for §6's cumulative column (M4 13.5, M5 39.5, unchanged); every ⛳ gate re-estimates them |
+| R8.3, R8.4, R8.5, R8.7 | already | - | Checked: no MMC5 audio, channel drop or POCKET cue; no string-count estimate of its own (story's counts rule); no verbatim quote from another game; no panel string, alias gag, "Blues" line, quick-draw or INPUT LAG figure in this doc |

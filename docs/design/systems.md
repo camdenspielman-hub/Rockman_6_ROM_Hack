@@ -32,8 +32,8 @@ R3.5, +0.5 for the flash-safety rule of R3.5, +0.5 for SC11 and +0.5 for the inp
 Y.SPEAR pierce and PLANT.B's two-contact barrier to Should). Round 2 moved `tight.py`'s total by +3; after every doc's
 round-2 changes the tight Must is **about 450 sessions** (R8.1), and RULINGS §6's cumulative column adds up this table's
 per-rung figures. The full inventory in `tally.py` lists systems at Must 49.5, Should 35.5, Could 12 and Won't 1.5.
-**Round 3 (R8.2)** moves about 5 of these sessions from the slice to Round One (items 2-4: a new file owns no forms, so
-the slice cannot reach them); the total is unchanged.
+**Round 3 (R8.2)** moves about 5 of these sessions from the slice to Round One (items 2 and 4 and item 3's Power and
+Jet rows: a new file owns no forms, so the slice cannot reach them); the total is unchanged.
 
 | # | Item (ids) | What ships | Rung | Sessions |
 |---|---|---|---|---|
@@ -409,7 +409,8 @@ The 4MI precedent: controller 2's A/B cycle weapons.
 - **Mash, reflex and timer rules** (shared by every stage; the CASUAL lever list of §13.4). This doc owns the numbers;
   tech's macros apply them (`tech.md` §5.5: `TIERVAL casual, normal, hard` reads a 3-value table by `LAYOUT_TIER`, 1993
   using NORMAL; `MASH n` is the struggle helper). Reflex windows add INPUT_LAG at run time (a `REFLEX` macro = `TIERVAL`
-  + `INPUT_LAG`, asked of tech):
+  + `INPUT_LAG`, asked of tech), and `REFLEX` reads it from **RULESET's `RS_LAG`** (meta §9.0), never from the system
+  block directly:
 
   | Rule | NORMAL | CASUAL | HARD (v1.0) |
   |---|---|---|---|
@@ -1055,7 +1056,7 @@ them, sets the tier and counts the code:
 
 | Id | Case (owner) | Rule | Tier |
 |---|---|---|---|
-| SC12 | Metal Metslime (venues_a §2.7, KAISHIN's gate; mid-boss fight `$09`) | **Every hit does exactly 1**, whatever the source, with 2-f i-frames: a substitution before the mid-boss default cell. NOFREEZE | Must |
+| SC12 | Metal Metslime (venues_a §2.7, KAISHIN's gate; mid-boss fight `$09`) | **Every hit does exactly 1**, whatever the source, with 2-f i-frames: its damage step substitutes the 1 before any table (the mid-boss default cell or the low nibble). NOFREEZE | Must |
 | SC13 | Kamegoro Maker MK-VI (fortress §4.3, H3's mid-boss) | **Each turtle destroyed also costs the machine 2 HP** (the turtle's death hook calls the machine's HP step) | Must |
 | SC14 | Dark Man MK-VI's **WRONG NOTE** (fortress §4.5) | A FULL-flagged hit while the red note is up sets his HP to min(HP, 14) and plays the exposure (the boss panel's third record, R8.5). With the partner (Should), calling Break Man in phase 1 does the same | Must |
 
@@ -1310,6 +1311,7 @@ Calibration [guess, checked by playtest at M4]:
   | SKY ACE's **LAND** (the run is marked LANDED) | the 2:00 sortie | **7,200 f** |
   | HIGH NOON's **EXPRESS** | the 0:55 train | **3,300 f** |
   | Blizzard's replay skip door on 0F | the 40-s bonus summit | **2,400 f** |
+
 - VARIETY's par is Pv (above). DAMAGE has no par. The SECRETS par is "all".
 
 ### 6.4 Attribution: LATCHSRC (SYS-SC-4) [new-code] M, Must (v0.1)
@@ -1503,10 +1505,10 @@ otoshi (T8) in the Must core, or another Must gate.
 | 6 | **YASHICHI** | Once per stage, the first time HP falls to 4 or less (and Rock survives), it **refills HP to full**. The Yashichi was Capcom's full-restore item. Second-wind family. Feedback: the refill sound, the bar filling and a pop line; a pinwheel sprite is Should | **Venue, Wind**: juggle one POW through 8 hits (venues_a §1.6) | 1 | v0.5 |
 | 7 | **KAISHIN** | Every **12th damaging hit on a boss** in a fight is an **EXCELLENT MOVE**: +2 damage (the cell's damage + 2, at most 6), a chime SFX and the EXCELLENT MOVE style act. Deterministic, so records stay fair; criticals are Won't (R2.4). `EXC_COUNT` resets when a boss bar fills | **Venue, Knight**: kill the Metal Metslime (venues_a §2.7) | 1 | v0.5 |
 | 8 | **SHERIFF STAR** | +20 % on every scorecard payout (replay improvements included) and on prize bolts, rounded down | **Venue, Tomahawk**: reach the Sheriff with no townsfolk hit (venues_a §3.7) | 1 | v0.5 |
-| 9 | **AUTO RECOVER** | After 60 f with no input, +1 HP every 30 f up to max. Off while a boss bar is shown | **Venue, Plant**: the PITFALL PERFECT (venues_a §4.4) | 1 | v0.5 |
-| 10 | **SNOW CHAINS** | Ice floors (types 5/`$15`) grip like normal floor: no momentum. Falling icicles bounce off the helmet harmlessly | **Venue, Blizzard**: never destroy a Toppy (venues_b §1.5.3) | 1 | v0.1 (the slice's venue chip) |
+| 9 | **AUTO RECOVER** | After 60 f with no input, +1 HP every 30 f up to max. Off while a boss bar is shown | **Venue, Plant**: the EXPLORER'S PERFECT, every treasure and no log hit (venues_a §4.4) | 1 | v0.5 |
+| 10 | **SNOW CHAINS** | Ice floors (types 5/`$15`) grip like normal floor: no momentum. Falling icicles bounce off the helmet harmlessly | **Venue, Blizzard**: never destroy a seal (venues_b §1.6.3) | 1 | v0.1 (the slice's venue chip) |
 | 11 | **FIREPROOF** | Burning oil and other fire floors (the ignited collision `$F`) deal 4 with knockback instead of killing. Fire projectiles (a FIRE flag per type) do half, rounded up | **Venue, Flame**: reach the shutter with no oil ignited (venues_b §2.5.3) | 1 | v0.5 |
-| 12 | **CENTURION** | When a boss bar finishes filling, a Centurion-bot hovers beside Rock and absorbs the first 3 projectiles that would hit him. One utility (§3.0), one GP-COMMON tile, and a GP branch in the bullet handler `$38:$9028` | **Venue, Centaur**: free the three statues with full charges (venues_b §3.6.3) | 1 | v0.5 |
+| 12 | **CENTURION** | When a boss bar finishes filling, a Centurion-bot hovers beside Rock and absorbs the first 3 projectiles that would hit him. One utility (§3.0), one GP-COMMON tile, and a GP branch in the bullet handler `$38:$9028`. It is one more occupied slot, so while it hovers each boss throws one projectile fewer per move (the boss docs' AI rule that keeps the 9-slot cap, venues_b §0.2) | **Venue, Centaur**: free the three statues with full charges (venues_b §3.7.3) | 1 | v0.5 |
 | 13 | **DARUMA** | Once per life, a hit that would kill at HP ≥ 2 leaves 1 HP. Pits and spikes excluded (4MI's SKULL AMULET, once per life). Second-wind family. story's proposed hidden function (twice per life after 7 KOs) is **rejected** (consistency decision 33); story's page uses its fallback last line | **Venue, Yamato**: win the daruma otoshi without touching its head (venues_b §4.6.3) | **2** | v0.5 |
 | 14-17 | IRON HELMET, THERMOS, BIRD SEED, Y-TURBO | reserved for the Could bundle (§9.4) | | | |
 
@@ -1571,13 +1573,14 @@ R2.7 asks for a rating that reaches 100 with v1.0 content. This doc supplies the
 - **T5 (venue chips)**: all 8 venue chips, bits 6-13, all Must.
 - **T6 (Eddie's chips)**: the chips with source "shop": **5 in v1.0** (bits 1-5). With the bundle, the garage's 3 chips
   join them (8).
-- **T7 (the TURBO trap)** and **T1 (the partner)** exist only when the bundle and the partner ship; **T3 (Exhibitions)**
-  is removed in v1.0 (scope-3, decision 8).
+- **T1** is meta's **SOLO RIOT** in v1.0 (R8.5): Bass β duel 1 won without Break Man's capsule, RATEFLAGS b4 (the bit
+  fortress called NO-CAPSULE). It becomes PARTNER when the partner ships. **T7 (the TURBO trap)** exists only with the
+  bundle; **T3 (Exhibitions)** is removed in v1.0 (scope-3, decision 8).
 
 A re-derivation that sums to exactly 100 with v1.0 content, offered to meta: CHAMPIONSHIP 40; TEAM 10 = Beat rebuilt 5
-+ a partner-free test 5 (R4.2's example: the Riot won without the help capsule); ROUTE 16 = secret exits 8 + all 8 hidden
-rooms **4** + all 8 venue chips **4**; GEAR 10 = **2 per shop chip** × 5; MEDALS 9; FAIR PLAY 10; BONUS 5. With the bundle,
-meta restores T1, T7's +2 trap and the garage chips in GEAR.
++ T1 SOLO RIOT 5 (R4.2's partner-free test, RATEFLAGS b4, R8.5); ROUTE 16 = secret exits 8 + all 8 hidden
+rooms **4** + all 8 venue chips **4**; GEAR 10 = **2 per shop chip** × 5; MEDALS 9; FAIR PLAY 10; BONUS 5. With the partner,
+meta turns T1 into PARTNER; with the bundle it restores T7's +2 trap and the garage chips in GEAR.
 
 ---
 
@@ -1622,7 +1625,7 @@ W3 and the debrief are `story.md`'s and `fortress.md`'s, drawn as an NPC composi
 | Pickups | life heals him; weapon energy routes as if slot 0 were equipped (§12.2); no tanks (no menu) |
 | Scoring | his HP loss counts in `L`; his kills and boss hits are category BREAK; the TAG TEAM style act |
 | Tag gates | shutters stamped with **his yellow-scarf emblem** open only to Break Man, and lead only to optional content. **Without the partner (v1.0) and on a doped file, every TAG room is a full-charge door** (R4.2, R2.8) |
-| Rating | T1 exists only when the partner ships (§9.5) |
+| Rating | T1 is SOLO RIOT in v1.0 and becomes PARTNER when the partner ships (meta; §9.5) |
 
 Why the retreat costs the rest of the stage and not a life: the call is still meant to be used (a spare body that can
 cost a life gets saved for emergencies and never used; CX's Quick Man is rarely seen), but it must not be a renewable
@@ -1715,8 +1718,8 @@ where each byte lives: the difficulty group is per file (meta §11.2, accepted),
 | RULES | GP / 1993 | everywhere (§13.6) | file, NEW GAME only | Could |
 | ANNOUNCER | ON / DEATHS ONLY / OFF | the commentator bus | global | Must |
 | FLASHES | NORMAL / REDUCED | SYS-FX-1 and every doc's flashes | global | Must |
-| INPUT LAG | 0-6 frames | `REFLEX`, the quick-draw (§1.6) | global | Must |
-| MMC5 AUDIO | ON / OFF | sound driver (`art_audio.md`) | global | art_audio's tier |
+| INPUT LAG | 0-6 frames (R8.7: this range until the user answers the hardware question) | `REFLEX` through RULESET's `RS_LAG`, the quick-draw (§1.6) | global | Must |
+| MMC5 AUDIO | ON / OFF | sound driver (`art_audio.md`) | global | Could, with the MMC5 pulse voices (R8.3: v1.0's SUPER colour has no MMC5 audio) |
 | SELECT SWAP | FULL / WEAPONS / OFF | §1.1 | global | Must |
 | 2P SHIFT | ON / OFF | §1.5 | global | Should |
 | LANGUAGE | JAPANESE / ENGLISH (ENGRISH is Could) | text engine | global | Must |
@@ -1754,8 +1757,10 @@ consistency-15 found that the three docs' HARD tests named three different bits.
 | **b6** | **HARD** (moved from b5, so `BIT DIFF_A` puts it in V) |
 | b7 | RULES = 1993 (N) |
 
-Every doc's code uses **tech's macros, never raw bits**: `IFHARD` = `BIT DIFF_A / BVC skip`; `IF1993` =
-`BIT DIFF_A / BPL skip`; `IFCASUAL` = `LDA DIFF_A / AND #$10 / BEQ skip`.
+Every doc's code uses **tech's macros, never raw bits**: `IFHARD` = `BIT RS_DIFF / BVC skip`; `IF1993` =
+`BIT RS_DIFF / BPL skip`; `IFCASUAL` = `LDA RS_DIFF / AND #$10 / BEQ skip`. `RS_DIFF` is RULESET's copy of DIFF A (meta
+§9.0), so Time Attack, EXTRA CONFIG and fight-loader bouts override it in one place; the file byte is never read in a
+stage.
 
 **The layout tier** `LAYOUT_TIER` is computed by tech once at stage start (consistency-16, `tech.md` §5.5): 3 (1993) if
 RULES; else 2 (HARD) if HARD; else 0 (CASUAL) if CASUAL; else 1 (NORMAL). tech's poke-list header mask (b0 CASUAL, b1
@@ -1769,7 +1774,7 @@ fills in**. The stage docs own the values; this doc owns the levers and the help
 
 | Lever | CASUAL rule | Mechanism |
 |---|---|---|
-| Reflex windows | ×2 (the quick-draw: 40 f, R3.5) | `REFLEX` (tech's `TIERVAL` + INPUT_LAG), the quick-draw table |
+| Reflex windows | ×2, except the quick-draw: 40 f (R3.5, confirmed by R8.6) | `REFLEX` (tech's `TIERVAL` + INPUT_LAG), the quick-draw table |
 | Mash counts | −40 % (⌈0.6 n⌉); **hold-to-struggle allowed** (a held A or B counts once per 6 f) | `MASH n` |
 | Set-piece timers | +50 % | `TIERVAL`, or a CASUAL poke on the object's `arg` |
 | Checkpoints | +1 per section | a dormant checkpoint object woken by a CASUAL poke (`tech.md` §5.5) |
@@ -1851,7 +1856,7 @@ Following rm6 lesson 3, GP state lives in PRG-RAM (WORK). Only hot, per-frame by
 |---|---|---|
 | Free RAM, tech's `SYS_HOT` `$06BD-$06C8` | 12 | `SELHOLD` (SELECT hold timer), `SELFLAGS` (SEL_USED, SWAPMASK), `LASTW`, `SWAPSTATE` (swap frame count, queued form), `WEAK_GATE`, `FLASH_GATE`, `ALT_LOCK` (the 10-f interact lock), `BOSS_ROW`, `EXC_COUNT` (KAISHIN), `MULTI_T` (multi-kill timer), `TSTOP` (Time Stop, v1.1), 1 spare |
 | WORK, per object slot (tech's `$6000-$61FF`, stride 32) | 4 arrays × 23, + 1 | `LASTHIT` (`$6060`), `LATCHSRC` (`$6080`), `REHIT` (`$60A0`), `FREEZE` (`$60C0`; on a boss slot it is the stall count), and **`ENC_CLASS`** (the encased enemy's saved class nibble), which tech places in its WORK ledger. It cannot share a GPV that a GP sub-id's AI uses |
-| WORK, run block (tech's `$6250-$62FF`) | ≈ 32 | T (3), L (2), K, CATS (2), OWNED (2), SECR, STY, TANKS, the kill count, run flags (YASHICHI used; DARUMA, SPIKE GUARD and the partner's call used this life; the call used up for the stage), `BEAT_USED` (4: screen mask), `LASTSAFE` (3: screen, X, Y), `MULTI_CAT`. (`LAYOUT_TIER` is tech's loader byte) |
+| WORK, run block (tech's `$6250-$62FF`) | ≈ 32 | T (3), L (2), K, CATS (2), OWNED (2), SECR, STY, TANKS, the kill count, run flags (YASHICHI used; DARUMA, SPIKE GUARD and the partner's call used this life; the call used up for the stage), `BEAT_USED` (4: screen mask), `LASTSAFE` (3: screen, X, Y), `MULTI_CAT`. (`LAYOUT_TIER` is tech's loader byte.) Cleared at stage start, **not** by a fight-loader warp (§6.1: W2's bouts count in W2's run) |
 | Save (`meta.md` owns the bytes) | | BOLTS (2); CHIPS_OWNED (3) and CHIPS_EQ (3) in §9.2's order; E-TANKS; W-TANKS (Should); FORMS (POWER, JET, SUPER, TAG); FORM_DEBUT; plates (SECRETS b3) and envelopes (SECRETS b4); **PRIZES** (4 B, one bit per placed prize); STAGEREC[24]: best score + preset badge, best PAY, asterisk bit; BASS_ADAPT; WEAKFOUND (Could). Bundle (reserved now): PARTS_GOT, PARTS_USED, TANK RACK, RATEFLAGS.DOPED. **Removed**: METALLS, the DOVE flag; BREAK_JOINED is FORMS.TAG (consistency-11) |
 | Per-file DIFF bytes and the system block (`meta.md`) | | the §13.1 settings; DIFF A as §13.3; INPUT LAG global |
 | ROM tables (`$7F` or a systems bank) | ≈ 1.5 KB | GP_BOSSHIT cells (640 B); the ALT override (10); i-frame class → frames (16); column → category (32); the NOFREEZE override list (tech's `SRCTAB` and derived `FRZ_KIND` tables are tech's); the 8 featured-enemy tables (8 × 16); chip data and source bytes (18 × 4); the 3 frozen handlers (≈ 120); the venue → weapon-slot map (8) |
@@ -1887,7 +1892,8 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   - **Featured enemy:** each venue names one, which dies outright to the champion's weakness weapon: a tell only in v1.0,
     a PART with the Could bundle. No totem; Tomahawk's PART is SPUR (R3.4, design-11).
   - **Scoring data:** each venue gives its VENUE ACT, its secret list and weights (exit 3, hidden room 2, behaviour chip
-    2, plate 1), and its TIME par; a replay skip subtracts the piece's length from the par (§6.3).
+    2, plate 1), and its TIME par; a replay skip adds the piece's fixed length to the run's `T` (§6.3: LAND 7,200 f,
+    EXPRESS 3,300 f, Blizzard's skip door 2,400 f).
   - **Money:** one sponsor envelope per hidden room; prizes ≤ 60 per venue. venues_b replaces its bags and chest with
     envelopes, re-prices the vegetables, and fits Y.SPEAR's ledge bolts in the cap (R2.7, consistency-10).
   - **Placements:** 4 venues hold plates; Tomahawk room 1C holds the ENERGY BALANCER.
@@ -1895,16 +1901,18 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   - **Bosses:** each champion's WEAK reaction (SC9), its G/R thematics (§4.3), its own-weapon reaction (SC4, Should),
     and the NOFREEZE notes for their new enemies (`FRZ_KIND`).
   - **CASUAL:** the lever table of §13.4 per venue. **HARD** content is Should.
-  - **Set pieces** that change Rock's body use `gp_player_sheet` (buster only on vines and the condor). Every UP verb
-    uses `IFINTERACT`.
+  - **Set pieces** that change Rock's body use `gp_player_sheet`; the attach state (vines, balloon, the condor) needs no
+    sheet and fires only the buster (§1.4). Every UP verb uses `IFINTERACT`.
   - **Answers to their questions:** the vanilla weakness cycle is kept; weakness i-frames are 16 f (venues_b's 8 are
     superseded); Y.SPEAR pierces Knight's shield, and vanilla already did (SC1); Y.SPEAR's tap is vanilla's single spear
     (the pierce is Should polish; Yamato Man may throw volleys himself); DARUMA is once per life at 2 slots; Flame's ABSORB
-    heal is a named exception like SC3; objects that react to "a charged shot" test the FULL flag (vanilla AIs keep
-    `$13`/`$14`); the rental Jet is a vehicle, not a form (§2.4); the quick-draw windows are 24/18/40 + INPUT LAG.
+    heal of 1 is a named SC4 exception (§4.6); the Metal Metslime's "every hit does 1" is SC12; objects that react to "a charged shot" test the FULL flag (vanilla AIs keep
+    `$13`/`$14`); the rental Jet is a vehicle, not a form (§2.4); the quick-draw windows are 24/18/40 + INPUT LAG (0-6 f, R8.6,
+    R8.7); the WEAK! pop takes a free slot only (§5) and the CENTURION helper costs each boss one projectile per move
+    (§9.2); an enemy that should be encased by the Ice Block needs at least 2 HP (§3.4).
 - **fortress.md**: the v1.0 rows of §4.5 (they may override them) and the v1.1+ rows; SC5 (Gamma: POWER required with
-  its plaque, plus the no-risk fist-ride practice beat, R2.11), SC6 (Bass copies only the 4 weapons pre-drawn in his set,
-  R3.6), SC10 COUNTER (Should), SC11 CHAMPION BUSTER; the Magnet Beam's 64 px per beam and max 2 (the H1 gap); FORMS.SUPER
+  its plaque, plus the no-risk fist-ride practice beat, R2.11), SC6 (Bass copies only the 4 weapons pre-drawn in his set:
+  B.ATTACK, F.BLAST, KNIGHT.C, SILVER.T, R3.6), SC13 (Kamegoro Maker's turtles) and SC14 (WRONG NOTE), SC10 COUNTER (Should), SC11 CHAMPION BUSTER; the Magnet Beam's 64 px per beam and max 2 (the H1 gap); FORMS.SUPER
   on the H3 screen-12 dock with no YOU GET card; TAG rooms as full-charge doors; envelopes and ≤ 60 prizes per stage; the
   mid-boss and machine defaults; the Riot's auditions on the FULL flag; force beams flagged SPIKE; the RULE column,
   OWNED override and 4 exhibition racing colours (Could, with the Exhibitions); the victory lap's character swap through
@@ -1914,7 +1922,7 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   lines for CASUAL and INPUT LAG; the boot health notice; the partner's lines (Should); the booth's lines and the doped
   headline (Could; "BREAK MAN WILL WALK." is fixed by R2.8); DARUMA's fallback last line; TURBO's WARRANTY VOID (bundle);
   the 1-bolt insurance gag.
-- **meta.md**: the results screen; the Pit Stop (v1.0: 5 chips, E-tank, 1UP; garage and booth with the bundle); 3-byte
+- **meta.md**: the results screen; the run block surviving fight-loader warps (W2's bouts, §6.1); T1 SOLO RIOT (§9.5); the Pit Stop (v1.0: 5 chips, E-tank, 1UP; garage and booth with the bundle); 3-byte
   CHIPS_OWNED/EQ in §9.2's bit order; PRIZES; STAGEREC[24]; FORMS.TAG (not BREAK_JOINED); DIFF A as §13.3; INPUT LAG in
   CONFIG; the health notice screen; the rating inputs (§9.5); Time Attack and GP Rush use drops NONE (no criticals to
   force off); METALLS and DOVE removed; BASS_ADAPT; WEAKFOUND (Could).
@@ -1922,11 +1930,12 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
   slot sets, set-piece sheets and Beat's set, one stream at a time; the M1 spike's 256-B test; the `$9B` audit and the
   `$E130` relocation before H3; family `$FD` for the WEAK! pop and the swap flash; family `$FB` shots with column and
   flags in the sub-id record; `util_spawn` with this doc's caps (§3.0) and the player-contact extension; the
-  pause-close clear keeping utilities when the weapon is unchanged (its open question 4); the frozen-tick patch and
+  pause-close clear at `$38:$9624` keeping utilities when the weapon is unchanged (tech owns the patch, R8.7); the frozen-tick patch and
   `FRZ_KIND` with this doc's NOFREEZE overrides and the boss stall on the boss slot's `FREEZE` (feasibility-6); LATCHSRC
   in §6.4's format, **including b5 FULL**, at the five latch sites (consistency-20); `ENC_CLASS`; `BOSS_ROW` from
   `FORT_COL` or the sub-id record; `SYS_HOT`; the run block; `IFHARD`/`IF1993`/`IFCASUAL`, `TIERVAL`, `MASH n`,
-  `IFINTERACT` and a `REFLEX` macro (`TIERVAL` + INPUT_LAG); `LAYOUT_TIER`-keyed poke lists; `gp_flash_ok()`; the
+  `IFINTERACT` and a `REFLEX` macro (`TIERVAL` + `RS_LAG`), all reading RULESET (meta §9.0); the run block kept across
+  fight-loader warps (§6.1); the attach state's core at M3 with the condor (R8.2), buster only while attached; `LAYOUT_TIER`-keyed poke lists; `gp_flash_ok()`; the
   death-hook audit; Break Man as a slot-0 character variant (family `$FC` dropped); the IRQ-logic bosses testing the
   stall.
 - **art_audio.md**: GP-COMMON tiles (WEAK!: W, K, ! = 3; the swap flash 1; CENTURION 1; 1 spare); the Ice Block's 4
@@ -1959,13 +1968,16 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
 
 ## Risks
 
-1. **Slice schedule.** This doc's slice share is about 33 sessions, against RULINGS §6's 25 for all M3 slice systems.
-   *Mitigation:* pull the scorecard, bolts and chip framework into M2's results and save work; re-estimate at M4 (R0.1).
+1. **Slice schedule.** This doc's slice share is about 28 sessions after R8.2 moved the form swap, the Power and Jet
+   dispatch rows and the adaptors to M5. RULINGS §6 (R8.1) now counts them: M3 is about 44 sessions (79 → ~123) for all
+   slice systems, against round 2's 25. *Mitigation:* the scorecard, bolts and chip framework can still share M2's
+   results and save work; the M4 re-estimate calibrates the rest (R0.1).
 2. **The CHR stream.** 2 KB per form swap is 11-13 stream frames at tech's rates (up to 22 with a column paint every
    frame), inside a fixed 16-frame swap. *Mitigation:* the M1 spike measures the copier; a stream is never cut short; the
    flash hides Rock until it ends; one stream at a time, so a swap may wait behind a pop-up's glyphs.
 3. **Lag** (R1.8: every occupied slot counts, cap 9). A boss room holds the boss, Rock, up to 3 shots, the WEAK! pop
-   and maybe CENTURION and a beam. *Mitigation:* profile on the M4 slice; the pop is optional under load.
+   and maybe CENTURION and a beam. *Mitigation:* profile on the M4 slice; the pop takes a free slot only (§5), and the
+   CENTURION helper costs each boss one projectile per move (§9.2).
 4. **Balance.** A 16-f weakness may be too fast with multi-hit weapons; the stagger may still lock some patterns.
    *Mitigation:* everything is one table byte; playtest at M4, with 20 f as the fallback.
 5. **Attribution holes.** Enemies with custom death code may skip the death hook, and VARIETY would silently
@@ -1990,9 +2002,11 @@ venue docs' chip gates and hidden rooms; fortress's H1, H3 (with its practice be
 1. Does the M1 spike confirm tech's 192 B/frame copier (an 11-frame stream standing still), and is the 256-B blank-band
    mode worth it for the swap?
 2. Do all fortress bosses that keep the `$EF64` path reach it by `JSR` (the boss stall)? Checked at M3.
-3. Which 4 weapons are pre-drawn in Bass β's set? fortress picks, art budgets (R3.6).
+3. **Answered** (fortress §9.2): Bass β's four pre-drawn weapons are B.ATTACK, F.BLAST, KNIGHT.C and SILVER.T (SC6);
+   art budgets them (R3.6).
 4. Will meta adopt §9.5's rating re-derivation, or another one that also reaches 100 with v1.0 content?
-5. Is 0-6 frames of INPUT LAG enough for the user's TV (RULINGS §7 asks about the hardware)?
+5. Is 0-6 frames of INPUT LAG enough for the user's TV (RULINGS §7 asks about the hardware)? R8.7 keeps 0-6 until the
+   user answers.
 6. The Plant Barrier's duration and radius (for Petal Storm, Should): measured at M3.
 
 Round 1's questions, resolved: OQ1 F.BLAST's oil ignition is explicit GP behaviour (consistency decision 35); OQ2 the
@@ -2149,3 +2163,31 @@ Every change from round 1, with the ruling (`R…`, [`RULINGS.md`](RULINGS.md)) 
 55. §15.3 rewritten per owner, with the answers to venues_a's and venues_b's questions and fortress's and story's
     proposals. crossrefs, consistency decisions 17-20, 32-35.
 56. Risks and open questions re-written for the round-2 design; round 1's 12 open questions resolved.
+
+---
+
+## Changes in round 3
+
+Every request routed to this doc in [`reconcile.md`](reconcile.md), then the [`RULINGS.md`](RULINGS.md) §8 rulings
+applied where no request named them.
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| SYSTEMS-01 | already | §4.6 SC1 | Y.SPEAR was already in SC1's pass-through list, piercing without breaking the shield (round 2, consistency-35) |
+| SYSTEMS-02 | already | §2.4 | The vehicle clause (NO TAG, allowed under 1993, no form VARIETY) was there; its examples now name SKY ACE's sortie and the Exhibitions' CANNON |
+| SYSTEMS-03 | applied | §6.3, §15.3 | A replay skip now **adds the piece's fixed length to `T`** (LAND 7,200 f, EXPRESS 3,300 f, Blizzard's skip door 2,400 f) instead of taking it off the par; venues_b's §1.16 wording is asked to follow |
+| SYSTEMS-04 | applied | §4.6 SC8, SC12 | The Metal Metslime's "every hit does 1" (2-f i-frames) is the visible case SC12; SC8 names VA-DRAW (saloon and boss) with INPUT LAG 0-6 f (R8.7) |
+| SYSTEMS-05 | applied | §3.4, §4.6 SC3-SC4, §5, §6.3, §6.5, §9.2, Risk 3, §15.3 | Confirmed: the bird's 2 HP (the block's 1 damage comes first), ABSORB's heal 1 as a named SC4 exception, the four venues_b VENUE ACTs, Yamato's 300-s par, the WEAK! pop on a free slot only, CENTURION's one-projectile cost. Chip citations fixed to venues_b §1.6.3 and §3.7.3; SNOW CHAINS' gate is now "never destroy a seal" |
+| SYSTEMS-06 | applied | §6.1, §15.1, §1.6, §13.1, §13.3 | The run block is not reset by a fight-loader warp (W2's bouts count in W2's scorecard); `REFLEX` reads RULESET's `RS_LAG`, and the `IF…` macros read `RS_DIFF` (meta §9.0) |
+| SYSTEMS-07 | applied | §7, §4.5, §4.6 SC13-SC14, §4.8 | The Opening-lite's envelope (+30) and prizes join the income model (typical ≈ 635 / 1,270 / 1,905; completionist ≈ 1,250 / 2,500 / 3,750); Kamegoro's turtle rule and WRONG NOTE are visible cases SC13-SC14; the H2/H4 rows are Should; an Air Man column (PLANT.B 4/12 W, robot scale) and row 22 for Doc Robot MK-VI (Should) |
+| SYSTEMS-08 | applied | v1.0 scope, §0 decisions 2-3, §1.1, §1.3, §1.4, §2.3, §3.0, Risk 1 | R8.2: the quick form swap, the form cycle, the Power and Jet dispatch rows and the adaptors move to M5 (v0.5); the dispatch table with Normal's taps and the Ice Block, SELECT + Up/Down and the toggle stay in the slice. By rung: slice ≈ 28, Round One ≈ 15.5, v1.0 ≈ 6 (total 49.5 unchanged) |
+| SYSTEMS-09 | applied | §1.1, §1.6, §4.6 SC8, §13.4, §15.3 | The CASUAL quick-draw was already 40 f everywhere (R8.6); §1.1 and §15.3 now say tech owns the `$38:$9624` pause-close patch and this doc owns the rule (R8.7) |
+| R8.1 | applied | v1.0 scope, header | The stale "≈ 439 → ≈ 442" ledger text is replaced by the ~450 baseline and RULINGS §6's summed column; status is round 3 |
+| R8.2 | applied | §1.4, §4.8, §6.3, §15.3 | The attach state's core is at M3 with the condor as first user: no sheet, buster only while attached, SELECT off (vines and the balloon follow at M5); the set-piece player sheet serves the sortie and the pogo (M5). GP_BOSSHIT's row and the par come from stage record v0 (M2.1): no stage-`$00` stop-gaps |
+| R8.3 | applied | §13.1 | MMC5 AUDIO is Could, with the MMC5 pulse voices; v1.0's SUPER colour has no MMC5 audio |
+| R8.5 | applied | §9.5, §11 | Rating T1 in v1.0 is meta's SOLO RIOT (RATEFLAGS b4, fortress's former NO-CAPSULE); it becomes PARTNER when the partner ships |
+| R8.6, R8.7 | applied | §13.4, §13.1, Open question 5 | The quick-draw's 40 f is marked as R3.5's exception to "reflex ×2"; INPUT LAG stays 0-6 f until the user answers the hardware question |
+| fortress answers | applied | §4.5, §4.6 SC6, Open question 3 | Bass β's four pre-drawn weapons (B.ATTACK, F.BLAST, KNIGHT.C, SILVER.T) and Gamma phase 1's hit box (the chin cannon), from fortress §8 and §9.2 |
+| venues_a §4.4 | applied | §9.2 | AUTO RECOVER's gate is named the EXPLORER'S PERFECT (every treasure, no log hit) |
+
+Session figures: the Must total stays **49.5**; about 5 sessions move from the slice (M3) to Round One (M5) under R8.2.

@@ -4,9 +4,9 @@ This doc replaces `docs/PLAN.md` §5-7. Its milestone section (§16) follows [`R
 PLAN §8 and round 1's tech §16 ordering. **[`RULINGS.md`](RULINGS.md) is binding and overrides everything here**, then
 [`BRIEF.md`](BRIEF.md); the research in `docs/research/` wins on facts.
 
-**Tiers** follow RULINGS §0: **Must** = v1.0 (the tight Must, about 450 sessions in all docs, R8.1), **Should** = v1.1+ (re-added
-in the cut-line order of R0.3), **Could**, **Won't (v1)**. A Must depends only on Musts (R0.4). Tags: **[engine-ok]**
-vanilla does it with data only, **[new-code]**, **[new-art]**, **[new-music]**; sizes **S / M / L**; evidence **[code]**,
+**Tiers** follow RULINGS §0: **Must** = v1.0 (the tight Must, about 450 sessions in all docs, R8.1), **Should** =
+v1.1+ (re-added in the cut-line order of R0.3), **Could**, **Won't (v1)**. A Must depends only on Musts (R0.4). Tags:
+**[engine-ok]** vanilla does it with data only, **[new-code]**, **[new-art]**, **[new-music]**; sizes **S / M / L**; evidence **[code]**,
 **[seen]**, **[guess]**. Session counts come from the ledger (`tools/plan/tight.py`, `tools/plan/tally.py`).
 
 **What this doc owns** (the single sources of truth, RULINGS and consistency critic): stage ids (§4.2), all memory (CPU
@@ -413,8 +413,15 @@ floor drift and `$069B`), **1A** (Mr. X 3 tank: borrows 19's drift).
   space the retired handlers free (`$3E:$C163-$C51D`, ≈ 950 B; the four routines need ≈ 300 B), and is called directly.
 - **Parameters:** `irq_logic_tick` reads per-stage parameters from the stage-attribute record (§4.4: `EFFECTS`,
   `EFX_PARAM`) instead of the stage-6 / stage-7 hard-wires. That gives `venues_a.md` the Knight ceiling with HP and a
-  retract flag and `venues_b.md` the tide dwell at its extremes (60 f), and lets Yamato's nightingale floor (R3.2) reuse
-  the ceiling. **No other stage reuses the ceiling** (R3.1: the H4 compactor and escape 0A were swapped out).
+  retract flag and `venues_b.md` the tide dwell at its extremes (60 f), and lets Yamato's nightingale floor reuse the
+  ceiling if it returns (**Should**, R8.6: in v1.0 the pogo and the Daruma carry Yamato). **No other stage reuses the
+  ceiling** (R3.1: the H4 compactor and escape 0A were swapped out).
+- **The tide across rooms** (`venues_b.md` §3.5, the tidal shaft): the water line is a per-room **`TIDE_BASE`** (1 B in
+  the run block) plus the vanilla motion. **Decision: each room's screen script writes `TIDE_BASE`** when it runs the
+  tide init (vanilla script `$5B`'s work), because `EFX_PARAM` is one byte per stage and already holds the dwell, while
+  the base changes per room (+16 px per shaft room). **M5 check** (before the shaft is built, §16.8): the tide logic
+  across a vertical exit (the water line and the type-`$72` objects after the scroll); if it misbehaves, the shaft's
+  rooms join by doors instead (`venues_b.md`'s fallback, no new code).
 
 ### 1.9 The C-window, FAR calls and hooks [new-code] M · Must
 
@@ -555,7 +562,7 @@ in interrupts or every frame by hot vanilla-side hooks live here; everything els
 | `$06BB-$06BC` | `LFSR` | tech | 16-bit Galois LFSR (§7.8) |
 | `$06BD-$06C8` | `SYS_HOT` | systems.md | 12 bytes for its hot values (SELECT hold, SEL_USED, SWAPMASK, LASTW, swap cooldown, CHR stream position, Time Stop, stagger, multi-kill, the 10-frame interact lock of R2.10) |
 | `$06C9-$06D0` | `SND_BANK[8]` | tech | per-stream data bank for the sound reader (§12.2) |
-| `$06D1-$06D8` | `TXT_HOT` | tech | text runner state, typewriter delay, blip id, ExRAM queue head and tail, strip count, flags |
+| `$06D1-$06D8` | `TXT_HOT` | tech | text runner state, typewriter delay, blip id, ExRAM queue head and tail, strip count, flags (incl. `TXT_POS`, the per-screen pop-up position, §11.3) |
 | `$06D9` | `CW_P` | tech | CW epilogue scratch |
 | `$06DA-$06DB` | `NMI_A`, `IRQ_A` | tech | the interrupt stubs' own A (§1.9) |
 | `$06DC` | `MUTE` | tech | the D9 channel mute mask, read by the sound driver inside interrupts (§12.6) |
@@ -598,9 +605,10 @@ MMC5 stores `$00` otherwise), and the CPU cannot read it back. So:
   per-metatile extended-attribute table (≈ 1 KB per tileset, §1.2), `$5104 = $01`, rendering on, and the announcer queue
   is held (no pop-ups, no heckles) until the room is left. Leaving: rendering off, `$5104 = $00`; the window rows are
   rewritten at the next open. No scrolling screen ever uses mode 1.
-- **The "SUPER colour" of W2, W3 and the escape in v1.0** (R1.3) needs nothing from ExRAM: richer per-screen palettes,
-  parallax and palette bands from the raster list (§8), and the music channel drop (the D9 mute mask, §12.6, Must); the
-  MMC5 pulses join it if they ship (Could, §12.5).
+- **The "SUPER colour" of W2, W3 and the escape in v1.0** (R1.3 as clarified by R8.3) needs nothing from ExRAM: richer
+  per-screen palettes, parallax and palette bands from the raster list (§8). **No MMC5 audio and no channel drop**: the
+  2A03 music keeps all its channels there. The channel drop is LIGHTS OUT's alone (§12.6). If the MMC5 pulses ship
+  (Could, §12.5), the castle adds them and the escape drops only them.
 
 Probes [seen, round 1, `probe/exnt2.nes`]: ExRAM writes timed after the NMI (past vblank) landed; with `$5203 = 120` and
 an IRQ that writes `$5105 = $AA`, scanlines 0-119 showed the CIRAM nametable and **scanlines 120+ showed ExRAM**, on
@@ -615,12 +623,12 @@ defines, and the static suite (§14.7) fails on any overlap or on an access outs
 |---|---|---|---|---|
 | `$6000-$61FF` | 512 | per-slot arrays | 32-byte stride, slots 0-22: `$6000` GP_SUBID, `$6020` GP_ARG, `$6040` GP_OFLAGS, `$6060` LASTHIT, `$6080` LATCHSRC, `$60A0` REHIT, `$60C0` FREEZE, `$60E0-$61FF` 9 AI variables (GPV0-GPV8) | tech (format); systems (meaning of LASTHIT, LATCHSRC, REHIT, FREEZE) |
 | `$6200-$622F` | 48 | `SA_CUR` | the current 48-byte stage-attribute record (§4.4) | tech |
-| `$6230-$625F` | 48 | loader | `GRP_ROW` (16), the `VARIANT` row (16), `RAM_ID`, `LIST_N`, `LIST_PTR` (2), section residency, `LAYOUT_TIER` (§5.5), T6 table base (2), spare | tech |
+| `$6230-$625F` | 48 | loader | `GRP_ROW` (16), the `VARIANT` row (16), `RAM_ID`, `LIST_N`, `LIST_PTR` (2), section residency, `LAYOUT_TIER` (§5.5), T6 table base (2), `GP_MODE` (b0 `CREDITS`, §4.6), spare | tech |
 | `$6260-$626F` | 16 | fight | `FIGHT_CTX`, `FIGHT_ID`, `FIGHT_RESULT`, the return-to record (`RET_ID`, `RET_SCREEN/CHR/PAL` = copies of `$0684-$0686`, `RET_SECTION`, `RET_FLAGS`), spare (§4.6) | tech; meta and fortress read `FIGHT_RESULT` |
 | `$6270-$627F` | 16 | `RULESET` | meta's ruleset choke point (`meta.md` §9) | meta |
 | `$6280-$62BF` | 64 | `RET_SNAP` | the return-to snapshot: `$0340-$035F` and `$0650-$066F` of the hub or lobby (§4.6) | tech |
 | `$62C0-$62FF` | 64 | HUD | 8 widget records × 8 B (§7.13) | tech (format); stage docs (records) |
-| `$6300-$63FF` | 256 | run block | systems' run block (≈ 24 B), scorecard counters (≈ 48 B), announcer queue (16 × 2 B), commentator cooldowns (16 B), T3 channels `CHAN[16]`, meta's stage counters for the `$4n` predicates (8 B), key counter, T1-lite director state (16 B); ≈ 72 B spare | systems / meta / tech, sub-ranges in the registry |
+| `$6300-$63FF` | 256 | run block | systems' run block (≈ 24 B), scorecard counters (≈ 48 B), announcer queue (16 × 2 B), commentator cooldowns (16 B), T3 channels `CHAN[16]`, meta's stage counters for the `$4n` predicates (8 B), key counter, T1-lite director state (16 B), `TIDE_BASE` (1 B, §1.8); ≈ 71 B spare | systems / meta / tech, sub-ranges in the registry |
 | `$6400-$65DF` | 480 | raster list | 2 buffers × 24 bands × 10 arrays (§8.1) | tech |
 | `$65E0-$65FF` | 32 | compositor | band-compositor inputs: stage preset, window request, director requests, priorities | tech |
 | `$6600-$6BFF` | 1,536 | object list | the object-list copy, 6 arrays × 256 (§7.3) | tech |
@@ -633,13 +641,14 @@ defines, and the static suite (§14.7) fails on any overlap or on an access outs
 | `$7400-$75FF` | 512 | LIVE FILE | `meta.md` §1.2, at meta's CPU address, in page 1 (§13) | meta |
 | `$7600-$79FF` | 1,024 | LIVE SYS | `meta.md` §1.2 | meta |
 | `$7A00-$7AFF` | 256 | player block | `CHAR` and the stashed HP (Should, §7.9), attach/vehicle state (32 B), pad history ring (64 B, T7), utility bookkeeping for slots 4-7 | tech / systems |
-| `$7B00-$7FFF` | 1,280 | free | handed out by the registry with an owner per range: venue objects' persistent state, the GP Rush runner (Could, ≈ 64 B) | registry |
+| `$7B00-$7B1F` | 32 | `ENC_CLASS` | per-slot array (slots 0-22): the class nibble of an Ice-Blocked enemy, saved at encase and restored at thaw or death (`systems.md` §3.4, §4.8; never shared with a GPV) | tech (place); systems (meaning) |
+| `$7B20-$7FFF` | 1,248 | free | handed out by the registry with an owner per range: venue objects' persistent state, the GP Rush runner (Could, ≈ 64 B) | registry |
 | | **8,192** | | | |
 
 What changed against round 1's over-committed page (feasibility-12): the 1,280-B borrowed-tile buffer is gone (tiles
 are restored from ROM, §11.4); the unrolled copier moved to ROM bank `$46`, leaving a 256-B staging buffer; the map-edit
 log shrank to 256 B; F-GRID is deleted; the raster list's auxiliary arrays, the T7 ring, the return-to snapshot and the
-player-variant state now have ranges. 1,280 B stay free.
+player-variant state now have ranges. 1,248 B stay free (round 3 placed `ENC_CLASS`).
 
 ---
 
@@ -655,6 +664,11 @@ groups `$3E:$DB03` are 16 entries packed against code; several tables are 8 entr
 **When it must be fixed** (R1.2, scope-12): the venues keep ids 0-7, so vanilla's readers already treat them right, and
 the Blizzard slice needs none of this. The 45 readers are rewritten at **M5**, before the first id ≥ `$10` (the
 Opening). What M2 needs is only the record and its init hook (§4.5), read by GP code.
+
+**No stage-`$00` stop-gaps** (R8.2). The 48-byte record v0 exists from **M2.1** for ids 0-15, so the slice's GP code
+reads `SA_CUR` exactly as every later stage does: `SECRET_SCR` (the secret-exit kill in Blizzard's 1A, tested by the
+post-kill hook at `$3F:$F9A0`, §4.6), `PAR` (the scorecard) and `FORT_COL` (GP_BOSSHIT's boss row). Blizzard's row
+takes these GP values from its `.lvl` header when its layout lands (M4, §4.4). Only the 45 vanilla readers wait for M5.
 
 ### 4.2 The id map (binding, R1.2)
 
@@ -726,6 +740,7 @@ into a column of a **variant row** (`SA.VARIANT` selects a row; rows 0-15 reprod
 | `$3B:$957D`, `$3B:$9588` | type `$7F` (`$3B:$9539`) | Wily 4 (`$0F`): keep `$069D` | variant col 9 |
 | `$3E:$CDBD` | respawn | Centaur (7): clear `$0358` (alternate-set bits of metatiles `$C0-$C7`) | variant col 10 (a `$0340` index to clear, `$FF` none) |
 | `$3E:$CDE5` | respawn | Wily 3 (`$0E`): clear the boss bar `$0642`/`$EF` | variant col 11 |
+| `$38:$89DC` (not a `$51` reader) | the underwater bubble spawn (§7.12) | floor type 8 spawns type `$40` while slot 6 is empty | **variant col 12 `NOBUBBLE`**: a non-zero value skips the spawn (H5 01-02's low gravity on floor type 8, `fortress.md`; feasibility-19) [new-code] S · Must, built with the variant row (row 27, M5), first used by H5 (M7); a screen script may write the WORK copy for one room |
 | `$3B:$BA3F` | stage start | ids ≥ 9 skip the weapon refill from progress flags | `SA.FLAGS1.KEEPWE` (systems.md's refill rules) |
 | `$3F:$FA13` | boss shutter | Wily 4 → boss music `$18` | `SA.BOSS_MUSIC` |
 
@@ -861,7 +876,8 @@ vanilla warp into a boss room spawns the boss intro (`$93` → `$95`, measured b
 
 **`FIGHT_CTX`** (WORK `$6260`): b7 active; b6 ONE_LIFE (a death ends the bout as a loss); b5 NO_SAVE (always set by
 the loader); b0-2 return kind: 0 none, 1 hub (W2), 2 lobby (GP Rush, Could), 3 EXTRA CONFIG, 4 mailbox test, 5 the H3
-room (Doc Robot MK-VI, Should). Every path that would end or restart the stage tests it:
+room (Doc Robot MK-VI, Should), 6 the TA list (Time Attack, Should: `meta.md` §9.1 enters with a stage target instead of
+a fight record, ONE_LIFE and NO_SAVE set). Every path that would end or restart the stage tests it:
 
 | Path | Vanilla site | With FIGHT_CTX b7 set |
 |---|---|---|
@@ -870,6 +886,11 @@ room (Doc Robot MK-VI, Should). Every path that would end or restart the stage t
 | player death | the respawn through `$3E:$CE07` | ONE_LIFE: `FIGHT_RESULT = LOSS`, `fight_return()`; else respawn in the arena, as vanilla |
 | game over | `$3C:$805F` | `FIGHT_RESULT = LOSS`, `fight_return()`; the lives policy is RULESET's |
 | autosave points | `meta.md` §1.5 | skipped (NO_SAVE) |
+
+**Outside a fight**, the same `$3F:$F9A0` hook carries meta's **replay test** (`meta.md` §3.2), from the slice on: when
+`STAGE_CLEAR[SA.META]` is already set, the post-kill path skips the YOU GET card (the weapon is owned) and goes to the
+judges' desk; it also tests the kill screen against `SA.SECRET_SCR` (§4.1). Meta's `H_REMATCH` operand hook at
+`$3F:$F952` (§14.2) lets the refight happen at all.
 
 `fight_return()` clears `FIGHT_CTX`, then by return kind: warp back (`RET_FLAGS` b7 = restore pending, `$51 = RET_ID`,
 `$0684-$0686 = RET_*`, `$F0 = 2`; the init hook clears the bits, then restores `RET_SNAP`, and the hub's objects respawn
@@ -884,6 +905,17 @@ the snapshot at 64 B.
 **Users:** W2's pair bouts (Must, M8; `fortress.md` retags its §5.2.1 [new-code] M, feasibility-3/19), EXTRA CONFIG's
 `FIGHT n` and the mailbox's fight command (Must, from M7), Doc Robot MK-VI (Should, R3.6: he copies a Rockman 2 boss and
 is reached only through this loader, never by running champion AI in H3's room), GP Rush and Time Attack (Could/Should).
+
+**The credits show** (`fortress.md` §6.2, M8) [new-code] S · Must. Vanilla's credits load each Robot Master's own boss
+room through the normal stage engine (`$51` = its id, then a screen) and run its AI with no Rockman
+(`rm6/fortress.md` §10). GP keeps that and feeds it **the credits' room table** (8 entries, stage id and screen, with
+fortress's rooms: Blizzard 16, Centaur 17, Flame 16, Knight 17, Plant 17, Tomahawk 17, Wind 13, Yamato 16). M0's census
+locates the vanilla table from `rec.py`'s `$51`/`$57` log; it is patched in place if it is a plain 8-entry table, else
+relocated to `$3E` and its operand patched. While a segment runs, **`GP_MODE` b0 `CREDITS`** (WORK, §3.4) is set: the
+reworked boss AIs test it (macro `IFCREDITS`) for their no-player mode (no quick-draw, no battle log, no grabs; their
+patterns loop at an empty spot, `fortress.md` §6.2). `save_commit` (§13) and the commentator bus (§11.7) return at
+once while `CREDITS` is set, so loading a venue for the show neither autosaves nor heckles. A champion whose AI
+misbehaves skips his room and plays only his card strip (fortress's fallback).
 
 ---
 
@@ -999,23 +1031,26 @@ list:   tier mask (b0 CASUAL, b1 NORMAL, b2 HARD, b3 1993), then entries:
 
 A list applies when `mask & (1 << LAYOUT_TIER)` ≠ 0, so one list can serve CASUAL and NORMAL. **`LAYOUT_TIER`** is
 derived once per stage start (consistency-16), because the file's preset becomes EDIT after any hand change and HARD is
-a per-file override: 3 if RULESET says RULES = 1993; else 2 if the HARD bit is set; else 0 if `CFG_CASUAL` is set
-(R2.9; `meta.md` owns the bit); else 1. Per section the record's `POKE_LIST` (and the section table) points at the
+a per-file override. Its source is **`RS_DIFF`** (RULESET +0, meta's copy of DIFF A, `meta.md` §9.0), never the file
+byte, so Time Attack, GP Rush and fight records override it in one place: 3 if b7 RULES = 1993; else 2 if b6 HARD; else
+0 if b4 CASUAL (`CFG_CASUAL`, R2.9); else 1. Per section the record's `POKE_LIST` (and the section table) points at the
 chain. Object placements are patched the same way (page 1 offsets into the object-list copy).
 
 **Macros** (`src/gp/ai.oph`), generated from `meta.md`'s bit table (`src/gp/bits.inc`) so they cannot drift:
 
 - `IFHARD skip` branches past a block unless HARD is on. Round 1's `BIT DIFF_A / BVC` tested bit 6 (GUARDS) while meta
-  put HARD at b5 (consistency-15). Now: if meta moves HARD to b6 (the critic's fix), the macro assembles to
-  `BIT RULESET_DIFF / BVC skip`; otherwise to `LDA RULESET_DIFF / AND #HARD / BEQ skip`. A unit test asserts that
-  `IFHARD` follows HARD and nothing else.
-- `IFCASUAL skip`, and `TIERVAL casual, normal, hard` (`LDY LAYOUT_TIER / LDA table,Y`, 1993 using the NORMAL value).
+  put HARD at b5 (consistency-15). Meta has since moved HARD to b6 (`meta.md` §1.6), so the macros read `RS_DIFF`:
+  `IFHARD` = `BIT RS_DIFF / BVC skip`, `IF1993` = `BIT RS_DIFF / BPL skip`, `IFCASUAL` = `LDA RS_DIFF / AND #$10 /
+  BEQ skip`. Unit tests assert that each macro follows its bit and nothing else.
+- `TIERVAL casual, normal, hard` (`LDY LAYOUT_TIER / LDA table,Y`, 1993 using the NORMAL value).
+- **`REFLEX casual, normal, hard`** (`systems.md` §1.6): `TIERVAL` plus **`RS_LAG`** (RULESET +13, INPUT LAG 0-6 f,
+  copied from the system block, R8.7), for every reaction window; the quick-draw uses it too (CASUAL 40 f, R8.6).
 
 **The CASUAL lever list** (R2.9, design-7). Every stage fills in the same five levers; this is how each one is built:
 
 | Lever | Mechanism |
 |---|---|
-| reflex windows × 2 | `TIERVAL` on the AI's window constant |
+| reflex windows × 2 | `REFLEX` on the AI's window constant (`TIERVAL` + INPUT LAG) |
 | mash counts −40 % (hold to struggle allowed) | `TIERVAL`; the struggle helper `MASH n` counts a held button as one press per 6 f under CASUAL |
 | set-piece timers +50 % | `TIERVAL`, or a CASUAL poke on the object's `arg` in the list copy |
 | +1 checkpoint per section | the level build places a dormant object (family `$F7`, sub `DORMANT`); a CASUAL poke rewrites its sub-id to `CHECKPOINT`, which writes `$0684-$0686` when Rock passes, as a script checkpoint does (`.lvl`: `casual checkpoint <screen> <x> <y>`) |
@@ -1048,6 +1083,12 @@ on a timer), T3's walls (§7.10), **F-PIECES** (`fortress.md`: the Yellow Devil'
 flies off is a `map_set` to empty plus a sprite, a piece that lands is a `map_set` to a piece block; Must with H1, M7), and
 any grid the Exhibitions need if they return. **F-GRID is deleted.** Vanilla's oil ignition keeps its logic, but its
 repaint joins the queue through the `$3E:$DDFC` hook (`venues_b.md`; `systems.md`'s F.BLAST ignition rule).
+
+**Phase groups** (`fortress.md`: H1 04's appearing blocks in 4 phases; Heat Man's blocks in H2, Should) [new-code] S ·
+Must with H1 (M7, inside row 41's map-edit work). A phase table `[(metatile id, on/off, frames) …]` is stepped by the
+slot-22 screen script (no slot) and calls `alt_flip` once per step; each phase is one metatile id, so each obeys check 8
+(≤ 8 cells per id per screen, §6.3), and a step repaints at most 8 cells over two frames of the CELL budget. VA-TIMED
+is the one-phase case.
 
 ---
 
@@ -1166,13 +1207,15 @@ specifies their inputs and checks; tech builds and runs them.
 |---|---|---|
 | CHR set table v2 (§7.6) | 8-bit source bank and stage-local ids, so CHR in banks above `$3F` is reachable | M2, before any new art |
 | `tools/build/chr.py` | PNG ↔ 2-bpp CHR, de-duplication, the CHR set manifest and packer into the CHR banks (§1.2) | M2 |
-| `tools/build/sprites.py` | the metasprite compiler of §7.5 (PNG + JSON → vanilla frame, layout and animation tables) | M2 |
+| `tools/build/sprites.py` | the metasprite compiler of §7.5 (PNG + JSON → vanilla frame, layout and animation tables), with **overlay composites** (`art_audio.md` §10.4: an overlay JSON adds parts at per-frame offsets to an existing frame list, for Bass β, the NPC Break Man and Roll) | M2 |
 | `tools/build/palettes.py` | palette sets and per-screen palette deltas; the checkpoint self-containment check (§6.3 check 4) | M2 |
-| `tools/build/artcheck.py` | the art gate: sprite-set overlaps, palettes, the free-id map (§6.3), flicker, stream sizes, **weapon-slot sets ≤ 15 tiles** (R2.3; set pieces that change Rock's body use a set-piece player sheet streamed at a locked moment), the worst-case occupied slots per screen (§6.3 check 6) | M2 |
+| `tools/build/artcheck.py` | the art gate: **`art_audio.md` §10.5's checks 1-13**, all built by tech: sprite-set overlaps, palettes, the free-id map (§6.3), flicker, stream sizes, Capcom art untouched, the novelty census and ghost frames, (8) **weapon-slot sets ≤ 15 tiles** (R2.3; set pieces that change Rock's body use a set-piece player sheet streamed at a locked moment), (9) frame caps, (10) the worst-case occupied slots per screen (§6.3 check 6), (11) flash rates, (12) HUD widget limits (§7.13), (13) built counts against the art ledger | M2 |
 | `tools/build/bgboss.py` | BG-boss poses, deltas, hit boxes and streams | M7, before the H wings |
 
-Art acceptance (R5.1): every milestone gate includes screenshots for the user, produced by the golden-movie runner
-(§14.4).
+Art acceptance (R5.1, `art_audio.md` §11.5): every milestone gate includes screenshots for the user, produced by the
+golden-movie runner (§14.4), plus artcheck's ghost frames and built counts. **The gallery is a local HTML page plus the
+PNGs**, written by `check.py`'s full suite into `build/gallery/` and sent to the user at each gate (R8.8); it is
+published only if the user asks. Item 14's 5 sessions cover the overlay composites, checks 8-13 and the gallery page.
 
 ---
 
@@ -1245,7 +1288,8 @@ pointers `$74/$78/$7C/$7E` set by `$3A:$8032` from `$80BF/$80CF/$80DF` [code]. G
 - Ophis macros (`src/gp/ai.oph`): `YIELD`, `WAIT n`, `DIE`, `ANIM id`, `MOVE`, `SPAWN fam,sub,arg`, `TELL id` (queue a
   commentator line), `TALK id` (open a dialogue and wait for it, §11.6), `ONHIT` (read and clear the latch `$056C` through
   the damage routines `systems.md` picks), `DMGSTEP` (the standard damage step; declares `FRZ_KIND` STD, §7.7), the tier
-  macros `IFHARD`, `IFCASUAL`, `TIERVAL` (§5.5), `MASH n` (the struggle helper, §5.5), and **`IFINTERACT`** (R2.10,
+  macros `IFHARD`, `IF1993`, `IFCASUAL`, `TIERVAL`, `REFLEX` (§5.5), `MASH n` (the struggle helper, §5.5: under CASUAL a
+  held A or B counts one press per 6 f), `IFCREDITS` (the credits' no-player mode, §4.6), and **`IFINTERACT`** (R2.10,
   design-21): true on an UP press (`$42` bit) with B not held (`$40`) and the 10-frame post-alt lock in `SYS_HOT` at 0.
   Doors, signs, NPCs, plaques and every UP-to-interact object use it, so no object reads UP on its own.
 - **Frame-waiting code is a coroutine**: anything that waits for frames (TALK, CHOICE, NPC menus, fades) yields with
@@ -1298,8 +1342,10 @@ across 73 vanilla in-stage scenes only 11 sprite tile ids were never shown (`$3B
   feasibility found (`LDA $056C,X / CMP #$14` and kin) keep vanilla behaviour and are not patched.
 - **The latch source** (consistency-20: `systems.md`'s definition is the source of truth). Where the shot-vs-enemy routine
   `$38:$8FDF` copies the attack byte into `$056C`, an inline `$7F` patch also writes `LATCHSRC,X` (WORK `$6080`) in
-  systems' format: bits 0-4 the source column (BUSTER, CHARGE, PUNCH, PUNCH★, FIST, PARRY, the 8 weapons, BREAK,
-  BREAK★, M.BEAM, HAZARD, RULE), b6 alt, b7 synergy. The column is derived at latch time from the shooter: a 256-entry
+  systems' format (`systems.md` §6.4): bits 0-4 the source column (BUSTER, CHARGE, PUNCH, PUNCH★, FIST, PARRY, the 8
+  weapons, BREAK, BREAK★, M.BEAM, HAZARD, RULE), **b5 FULL** (a full-power blow: set by `SRCTAB` for the full charge, type
+  `$0B`, and the full punch, type `$0F`, and by a GP object's sub-id record; new objects that react to "a charged shot"
+  test it, `systems.md` §6.4), b6 alt, b7 synergy. The column is derived at latch time from the shooter: a 256-entry
   `SRCTAB[type]` for vanilla shot types (the buster and punch types pick BUSTER / CHARGE / PUNCH / PUNCH★ by the attack
   byte), and the shot's own `GP_ARG` / `GP_OFLAGS` for family `$FB` objects, which carry their column and the alt and
   synergy flags. `LASTHIT,X` keeps the attack byte. Utilities that deal damage call `$38:$8FDF` themselves (R1.11), so
@@ -1326,6 +1372,11 @@ across 73 vanilla in-stage scenes only 11 sprite tile ids were never shown (`$3B
 - **Death-hook audit** (`systems.md` asks): a static scan for stores of the death types `$17`/`$25` into `$03A0,X` and
   for calls of `$ED42`, cross-checked with shadow6 coverage of every boss kill in the golden suite, lists every custom
   death path (M3).
+- **Boss-stall audit** (`systems.md` §4.8, M3): the boss stall re-points a boss's resume address at its own `JSR` into
+  the damage step, so the same scan checks that **every fortress boss and every GP boss reaches its damage step by
+  `JSR`** (the champions' 81 `JSR $997D` sites already do; fortress bosses through `$EF64`; family `$F8` controllers
+  through GP_BOSSHIT's exit). A boss that gets there by `JMP` is listed **NOSTALL** in the build's boss table and gets
+  only the shake. Bosses that land after M3 (the H wings, W2, W3) are re-checked by the same static test at their gate.
 
 ### 7.8 RNG
 
@@ -1345,7 +1396,7 @@ sheet** streamed at a locked moment (R2.3, feasibility-8), never from the 15-til
 | **GP player states** | GP code takes slot 0 over by writing `$0441` (its bank pair) and `$0413/$042A` (its routine), sets `$94` to a GP value (`$10+`), and hands back by writing the vanilla air or stand resume address. No dispatch hook. The base of every row below | S · Must, M3 |
 | **X-WRAP** (`venues_b.md`) | a post-move hook on slot 0 (and on objects whose `GP_OFLAGS` has WRAP): in a locked room, X < `$08` becomes `$F0` and back, unless the row is flagged as an exit | S · Must, M3 |
 | **X-BONK** (ceiling probe callback, for T6) | a hook where the player's upward collision stops the jump, passing the cell's collision type and position | S · Must, M3 (with T6) |
-| **The attach state** | one record: parent slot, `dx/dy`, input rule (swing / shimmy / ride / none), release (A = jump with the parent's velocity; the parent's death = fall), weapon rule (buster only / none). Serves the vine and T5's pendulum (the pendulum is the vine's parent object, family `$F5`), Plant's balloon, Blizzard's condor, the claw and the arrow ride | M · Must, M5 (Plant first) |
+| **The attach state** | one record: parent slot, `dx/dy`, input rule (swing / shimmy / ride / none), release (A = jump with the parent's velocity; the parent's death = fall), weapon rule (buster only / none). Serves the vine and T5's pendulum (the pendulum is the vine's parent object, family `$F5`), Plant's balloon, Blizzard's condor, the claw and the arrow ride | M · Must: **the core at M3 with the condor** (the slice's secret exit, R8.2), the vines, T5 and the balloon at M5; the claw and the arrow are data on it |
 | **The free-flight vehicle state** | 8-way movement without gravity, a per-vehicle speed table, a **lane flag** (none / lane), the buster mapped to the vehicle's shot, exits off until the ride's END. SKY ACE (Wind's sortie, with T1-lite) uses "none"; CANNON uses "lane" if the Exhibitions return | S · Must, M6 |
 | **X-EXWP** (Yamato's pogo, `venues_b.md`; R3.2 keeps it) | a set-piece weapon: a GP player state with its own physics (bounce on enemies and spikes), taken from a rack object, dropped at the rack's partner | S · Must, M5 |
 | **Pad history** (T7) | a 64-frame ring of `$40` in the player block (WORK `$7A40`), written by a 4-byte hook at the end of the joypad read `$3E:$C711`; the mirror object replays it with LEFT/RIGHT swapped. Flame's Shadow Rock is the one user (H3's Gemini uses its laser fallback, R3.1) | M · Must, M5 |
@@ -1428,8 +1479,13 @@ slot 4 is Beat and Rush (`$38:$9661` spawns there; `$38:$8E6D` and `$903F` clear
   fails cleanly when none is free. At most 4 exist, minus Beat or Rush when out, minus the bubble underwater; **`systems.md`
   caps each weapon to fit** (e.g. M.BEAM max 2). Utilities that deal damage call `$38:$8FDF` (§7.7).
 - Vanilla clears slots 1-7 when the pause menu closes and on death (`$38:$9624`: `LDX #7 / STA $03A0,X / DEX / BNE`,
-  executed in the pause and game-over scenes), so utilities vanish on a pause, as Rush does. The GP per-slot arrays of a
-  cleared slot are reset by the next spawn's init, so nothing dangles.
+  executed in the pause and game-over scenes). **Tech patches the pause-close clear** (R8.7, `systems.md` §1.1)
+  [new-code] S · Must (M2, with the slot plan): when the menu closes **with the weapon unchanged** (`$0699` equal to the
+  value saved when the menu opened), it clears the shots
+  (1-3) and any vanilla object in 4-7 (Beat, Rush, the bubble) but **keeps the GP utilities** (family `$FB` in 4-7), so
+  pausing on a beam over a pit is safe. A weapon change in the menu ends the old weapon's utilities as a SELECT change
+  does. **Deaths and the game-over path still clear slots 1-7**, as vanilla. The GP per-slot arrays of a cleared slot are
+  reset by the next spawn's init, so nothing dangles.
 - Shots that need more than 3 slots at once (Petal Shot's 4, Feather Fan's 3 alongside the buster) are Should alts; when
   they return they borrow utility slots, as vanilla B.ATTACK uses 1-4.
 - **Every occupied slot counts in the lag cap** (§15.1), utilities and the text runner included.
@@ -1492,7 +1548,7 @@ in the C-window (R1.4). A per-line effect is a band routine that keeps the curso
 | `RL_SHIP(...)` | 3 | 1-2-3 | Blizzard ship (`venues_b.md` keeps it). Its effect thread (thread 3 at `$3E:$D4BF`) gets a hook where the roll changes direction that sets `SHIP_TURN` in the run block, so `venues_b.md`'s icicles shake loose on the turn ([new-code] S, with the slice) | Must |
 | `RL_PARALLAX(line, divisor)` | 2 | C-D | Tomahawk, `venues_a.md` T4; W2/W3 parallax | Must |
 | `RL_SHIMMER(line, n)` | **2** | E-F-10 | Tomahawk sunset. Entry 1 resets the scroll at `line`; entry 2 is a self-re-arming routine that alternates the X scroll every 2 lines, `n` times (vanilla n = 20), so the preset never costs 21 bands (R1.9, feasibility-15b) | Must |
-| `RL_CEILING(h)` / `RL_TIDE(h)` | 2 | 11-12 / 14-15 (logic in `irq_logic_tick`, §1.8) | Knight, Centaur; Yamato's nightingale floor (R3.2) | Must |
+| `RL_CEILING(h)` / `RL_TIDE(h)` | 2 | 11-12 / 14-15 (logic in `irq_logic_tick`, §1.8) | Knight, Centaur; Yamato's nightingale floor (Should, R8.6) | Must |
 | `RL_MULTI(...)` | 2 | 16-13 | Mr. X 4 machine, reveal (legacy ids) | Must |
 | `RL_WEAPONGET` | 2 | 17-18 | YOU GET | Must |
 | `RL_MENUSLIDE` | 2 | 4-5 | adaptor change (`systems.md`'s quick swap skips it; the docking cutscene plays once per form per save, R2.3) | Must |
@@ -1552,7 +1608,9 @@ the list's `END` entry, which unlocks the screen (mode 1).
   every 512 px instead of 256; the exit restores it.
 - **The director lives in the slot-22 screen script** (R1.8): the script switches its own bank pair to the director's
   GP bank, as §6.6's waiting routines do, so the director costs no slot. Family `$F5` sub `WAVES` remains only for a
-  room whose script is already busy.
+  room whose script is already busy. **Confirmed for `venues_a.md`**: the wave director, its band control (the script
+  writes its `RL_BANDS` request into the compositor's director inputs, `$65E0`, §8.3), the gallery director and the
+  croc timers all run in the slot-22 script; so does the per-screen pop-up position (§11.3).
 - **Cap**: the player, the script, 3 shots and the director's live children count against the 9-slot cap (§15.1), so a
   ride has **at most 4 enemies or enemy shots alive** until M3's re-measure. Round 1's sortie budget ("5 planes + 2
   bullets + 3 shots = 10", feasibility-4) is re-cut by `venues_a.md` to fit. The player rides in the free-flight vehicle
@@ -1632,20 +1690,37 @@ owns the engine and the compiler.
   `$95/$96` with EN versions added; `story.md` §10.4). Line breaks are command addresses, so EN layouts are re-flowed by
   the encoder (`rm6_ppuscript.py` already encodes `row, col, "text"`).
 - **Boss-panel extension** (`$3C:$81B1`, M5): panel records indexed by fight id (`SA.FIGHT_ROW`, meta's fight table)
-  instead of `$51`, a 10th field (`$0624` starts at 9), and a re-type entry for Dark Man's lying panel (`fortress.md`).
-  The panel stays English in both languages, as vanilla.
+  instead of `$51`, a 10th field (`$0624` starts at 9), and **re-type entries for Dark Man's lying panel**: a fight's
+  panel may chain up to **three records**, each typed over the last on a trigger (`story.md` §5.4: the lie
+  `BREAKMAN` / `DEFINITELY BREAKMAN`; at THE MASK SLIPS the truth `DARKMAN` / `BAD DISGUISES`; when the WRONG NOTE
+  exposes him, the third adds VENUE `EXPOSED BY A WHISTLE`, R8.5). Names keep vanilla's no-space style (R8.5). The
+  panel stays English in both languages, as vanilla.
+- **The CAPCOM TIMES' GP pages** (`story.md` S44, M8; row 44). The vanilla driver (`$3B:$A886-$AB60`) keeps the
+  masthead, the picture, its fades and the last pages `$95/$96` (through the language hook). Its main font
+  (`rm6_main.tbl`) has only 10 + 6 katakana and the screen has 9 free BG tiles, so GP's JP pages (フォルテ, スポンサー,
+  …) cannot be typed by the PPU-script interpreter (`rm6/text.md` §6-§7). **They are typed by the new engine in the
+  driver's text rows**: a registry hook in the driver's page loop sends each GP page to the text runner (a menu-screen
+  wait, §11.6), which renders its glyphs into BG ids **borrowed from the main font's kana slots** (`$34-$3D`,
+  `$3F-$78`: 69 tiles, unreferenced while the text box is cleared), and writes the cells into the driver's own text
+  rows through vanilla's VRAM buffer (a static screen: no window band, no ExRAM). Before `$95` types, the borrowed
+  tiles are **restored from ROM** (§11.4). Two lines a page, blip `$27`, as vanilla. Cost ≈ 0.25 of row 44; the build's
+  free-id measure (§6.3) covers the newspaper screen like a menu screen.
 
 ### 11.3 Windows
 
 - **Nametable**: ExRAM in mode 0 (§3.3). A window's first band (`RL_WINDOW`) sets `$5105 = $AA` (all four slots →
   ExRAM) and points the scroll at the window rows; its second band restores the stage's mapping and scroll. No vanilla
-  nametable byte is touched, so the playfield never needs repainting. The first band also flushes the ExRAM queue.
+  nametable byte is touched (the newspaper's static text rows are the one exception, §11.2), so the playfield never
+  needs repainting. The first band also flushes the ExRAM queue.
 - **Pop-up** (live, the world keeps running): **top of the screen by default** (consistency-26: pits stay visible and the
-  bottom band stays free for palette swaps); at the bottom only where `SA.EFFECTS` b6 says so, i.e. where the top is a
-  raster set piece (Wind 01, Tomahawk 10-11). 4 rows (border, 2 text rows, border), lines 8-39 at the top. Columns 0-1
-  hold the **16×16 face icon** (4 BG tiles, R5.1), columns 2-29 the **28 text cells**, 30-31 the border. Sprites stay on
-  (the life bars). The palette is one of the stage's BG palettes, chosen by the build for contrast (no swap at the top,
-  §8.4).
+  bottom band stays free for palette swaps); at the bottom only where the top is a raster set piece (Wind 01, Tomahawk
+  10-11). **The switch is per screen** (`venues_a.md`): `SA.EFFECTS` b6 gives the stage's default, and a screen script
+  overrides it for its own screen by setting **`TXT_POS`** (a bit of `TXT_HOT`'s flag byte, §3.1), which the runner reads
+  when a window opens. T1-lite's director sets it when its ride locks the screen and clears it at `END`; stage init and
+  respawn reset it to the default. A window already open finishes where it is. 4 rows (border, 2 text rows, border),
+  lines 8-39 at the top. Columns 0-1 hold the **16×16 face icon** (4 BG tiles, R5.1), columns 2-29 the **28 text
+  cells**, 30-31 the border. Sprites stay on (the life bars). The palette is one of the stage's BG palettes, chosen by
+  the build for contrast (no swap at the top, §8.4).
 - **Dialogue, debrief and help pages**: the bottom window, 6 rows (border, 4 × 28 text, border). Its band swaps BG
   palette 3 (rendering off for 1-2 lines at the border, the CX effect-10 trick, `cx/engine.md` §3.2); the NMI restores it
   from the `$0360` buffer while the window is open. The band turns sprites off (PPUMASK).
@@ -1656,8 +1731,10 @@ owns the engine and the compiler.
 
 - **Glyphs**: 1-bpp 8×8 in a text bank, about 240 of them (≈ 2 KB): Latin capitals, digits, `. , ! ? ' " : ; - / & %
   ( ) ★ ♥ ♪ β × ▶ ・ …`, hiragana and katakana with voiced and semi-voiced forms precomposed (one cell each, unlike
-  vanilla's separate `゛`), small kana, `ー 「 」 『 』 、 。 ~` (`story.md` §10.2). **EN is ALL CAPS** (no lowercase set;
-  art's mixed-case set is dropped). **JP is kana only**: no kanji (consistency decision 5).
+  vanilla's separate `゛`), small kana, `ー 「 」 『 』 、 。 ~` (`story.md` §10.2), and **one lowercase `r`** for JP's
+  `Mr.Y`, `Mr.X`, `Mr.Z` and `Dr.` (vanilla's JP writes `Dr.ライト` that way; its main font has an `r.` ligature,
+  `rm6/text.md` §6). **EN is ALL CAPS** (no lowercase set; art's mixed-case set is dropped; EN writes `MR. Y`, `DR.`).
+  **JP is kana only**: no kanji (consistency decision 5).
 - **Cells are fixed**: 8 px, one glyph per cell. The VWF is dropped (R1.4).
 - **Per page**, the compiler emits the list of the page's distinct glyphs. On open the runner renders each into a strip
   tile (1-bpp → 2-bpp in the window's two colours, 16 B a tile) into the staging buffer, streams it (§15.3), then writes
@@ -1712,9 +1789,10 @@ owns the engine and the compiler.
   sets per surface (vanilla-font surfaces: the pause font's D/Q/Z and `ZERO_O`, the bracket's missing punctuation);
   variable widths; every id has EN and JP; **the release build fails on `WIP`, `TODO`, `TBD`, `XXX`** or an empty credit
   field.
-- **Size**: v1.0's ≈ 350 Must strings (R4.5) in two languages, compressed, plus glyphs and dictionaries ≈ 30 KB: text
-  banks T1-T4 (§1.2). The full design (≈ 1,100 strings, 70-90 KB before compression) needs the 9 banks after
-  compression.
+- **Size**: v1.0's **≈ 400 Must strings** (R8.4: R4.5's six kinds, 336, plus the Must mechanics' own text and the
+  system sentences, 64; `story.md`'s counts are the single source) in two languages, compressed, plus glyphs and
+  dictionaries ≈ 30 KB (`story.md` §10.4): text banks T1-T4 (§1.2). The full design (≈ 1,100 strings, 70-90 KB before
+  compression) needs the 9 banks after compression; a tenth would come from music's spare `$79` (R8.7).
 
 ### 11.6 Execution: coroutines, never the C-window (R1.4, feasibility-10)
 
@@ -1741,7 +1819,10 @@ owns the engine and the compiler.
 ### 11.7 The commentator event bus [new-code] M · Must (M3)
 
 Hooks raise events: `EV_DEATH` (with the cause byte, from the player-death hook site), `EV_WEAK_FIRST` (GP_BOSSHIT's
-first weakness hit), `EV_SECRET`, `EV_PLATE`, `EV_RESPAWN_HECKLE` (P1) and stage hooks. The bus picks a line from the
+first weakness hit, argument = fight id), `EV_SECRET`, `EV_PLATE` (raised apart from `EV_SECRET`, `story.md` §6.1),
+`EV_RESPAWN_HECKLE` (P1) and stage hooks. The line ids come from `story.md`'s TSV and are registered in the bus's id
+table by the compiler (§11.5), among them **`WK-WM` and `WK-WC`**, W3's first-weakness lines, keyed by the fight ids of
+WILY MACHINE 6.5 and the Wily Capsule. The bus picks a line from the
 stage's table (`SA.COMM_ID`; `story.md`'s lines, 4 death lines per stage in v1.0, R4.5), rotates it, applies per-event
 cooldowns (run block) and the ANNOUNCER setting (on / deaths only / off), and queues a `TELL`. P1 lines jump the queue
 and show on READY. `story.md` owns every line; the WEAK! pop and stagger are `systems.md`'s.
@@ -1833,9 +1914,9 @@ commands, so they cannot drift. `$5015` is set only when the config is on (BRIEF
 the 5 core channels). With it (D7, `art_audio.md`): 4MI's charge-shot loop on MMC5 pulse 1, so the charge never steals a
 music channel (`r4mi/engine.md` §9.2).
 
-**Reading R1.3 with R5.2.** R1.3 lists "the MMC5 audio" in v1.0's SUPER colour, while R5.2 and BRIEF §9 keep MMC5
-arrangements Could. This doc takes the conservative reading: v1.0's audio part of SUPER colour is the channel drop
-(§12.6, Must), and the MMC5 pulses join it if they ship.
+**R8.3 settles R1.3 with R5.2.** v1.0's SUPER colour in W2, W3 and the escape is palettes, parallax and palette bands
+only (§3.3); **the 2A03 music keeps all its channels there**, and there is no MMC5 audio in v1.0. The MMC5 pulses are
+Could: if they ship, the castle adds them and the escape drops only them (D9 bits b5-6, §12.6).
 
 ### 12.6 The channel mute mask (D9) [new-code] S · Must
 
@@ -1843,9 +1924,18 @@ R1.3 and R5.2 make D9 Must (scope-3: the lights-out ending needs it). `MUTE` (ho
 interrupts) has one bit per **music** channel: b0 pulse 1, b1 pulse 2, b2 triangle, b3 noise, b5-6 the MMC5 pulses (if
 they ship). In the reassembled driver (§14.2) the channel output step writes silence for a masked channel (volume 0 for
 the pulses and noise, `$4008 = $00` for the triangle) while its stream keeps advancing, so unmuting re-enters in time.
-SFX are not masked: an SFX on a muted channel still plays. Users: the ending's LIGHTS OUT (`story.md` S42: the channels go
-out one at a time and **the last sound is pulse 1 alone**, R4.1), and the "music channel drop" of W2, W3 and the escape
-(R1.3). Cost: one `AND` per channel per update.
+SFX are not masked: an SFX on a muted channel still plays. **The channel drop is LIGHTS OUT's alone** (R8.3, Must):
+`story.md` S42 and `art_audio.md` §12.9, where the mask takes G37 LAST MATCH's 2A03 stems away one at a time (noise,
+triangle, pulse 2) until **pulse 1 plays alone** (R4.1). W2, W3 and the escape keep every 2A03 channel; the escape's
+only drop is of the MMC5 voices, if they ship (Could). Cost: one `AND` per channel per update.
+
+**G37's sync** (`art_audio.md` §12.9 left the choice to tech): **a frame table, not the `04` flags command.** `04`
+rewrites the channel's playback flags (`$0730 = $0730 & $97 | p`, `rm6/engine.md` §5.3), so a marker there would need a
+driver change. Instead `mml.py` compiles, beside G37, the frame on which each stem's last phrase ends, by simulating
+the 16-bit tempo accumulator exactly as the driver does. The scene script counts frames from its G37 request on the
+play-time clock in the `$C8C1` wrapper (§12.2), which ticks with the driver every frame, lag frames included, so the
+picture follows the music; at each entry it darkens the next tower and sets that channel's `MUTE` bit. A unit test
+compares the table with a shadow6 run of G37. No driver code, part of row 18.
 
 **DPCM**: none in v1 (consistency decision 36). If a sample is ever added, it lives in `$7F` (R1.14), because the
 C-window switches `$C000` and DPCM fetches from `$C000-$FFFF`.
@@ -1862,6 +1952,9 @@ C-window switches `$C000` and DPCM fetches from `$C000-$FFFF`.
   `$4B = $80`), so an NMI's sound service restores the same page through the shadow; copies the LIVE image into the older
   copy, writes the checksum and commit marker last (meta.md §1.3), and maps `$A000` back. ~10,000 cycles for a file block:
   done at meta.md's commit points (stage clear, bracket, settings), never mid-action.
+- **Refusals** (`meta.md` §1.4): `save_commit` returns at once, committing nothing, when LIVE's magic byte 3 is `'S'`
+  (EXTRA CONFIG's scratch file), when `RS_FLAGS` b0 NO_SAVE is set (every fight-loader bout, §4.6; Time Attack), or
+  while `GP_MODE` b0 `CREDITS` is set (§4.6).
 - **Load**: verify both copies, take the newest valid one, fall back gracefully (meta.md §1.1: never the 4MI black-screen
   loop).
 - **RESET**: maps page 0 at `$A000` briefly to read the test mailbox (§14.5), and clears WORK; it never clears page 0.
@@ -1899,6 +1992,14 @@ executed. Allocator seeds for small data: `$3F:$FAC0-$FF1F` minus `$FFE0-$FFEF` 
 `$3C:$9D16-$9FE1`, `$3D:$BA8D-$BCFF`, `$3D:$BF42-$BFFF`; the empty tileset pages `$2B:$9200`, `$2D:$9200`; sprite-bank
 fill; after M2, `$3E:$C163-$C51D` (retired IRQ handlers). The `$36` tail is **SFX only** (R1.14). Whole banks are placed
 by role (§1.2).
+
+**Hooks other docs own, adopted into the registry** (round 3, `meta.md`'s asks):
+
+| Id | Site | Kind | Owner | What |
+|---|---|---|---|---|
+| `H_REMATCH` | `$3F:$F952` (the operand of `JSR $F527` at `$F951`) | operand | `meta.md` §3.2 | re-pointed at `gp_rematch` in `$7F`: carry clear when `SA.FLAGS1` b2 REMATCH is set, else fall through to `$F527`; `BCS $F9A0` stays |
+| `H_POSTKILL` | `$3F:$F9A0` | cw | tech §4.6 | FIGHT_CTX, meta's replay test (skip YOU GET when the stage is already cleared) and the `SECRET_SCR` test (§4.1) |
+| `H_JOYPAD` | the end of the joypad read `$3E:$C711-$C734` | inline | tech, with `systems.md` §1.1 and `meta.md` §11.1 | one hook, three users in this order: meta's **A/B SWAP** (a conditional `EOR #$C0` on `$40` when exactly one of A and B is held, just before the new-press `AND $44,X / STA $42,X` at `$C732`), systems' SELECT filter, T7's pad-history write (§7.9) |
 
 **The reassemblable source** (M0): Ophis source of the fixed banks `$3E/$3F` (16 KB) and the sound driver
 `$34:$8000-$8A3F`, byte-identical when assembled, with the code/data split taken from shadow6 coverage. The IRQ port, the
@@ -2053,7 +2154,8 @@ START and RIGHT (§14.5).
 ## 16. Milestones M0-M9
 
 RULINGS §6 replaces PLAN §8 and round 1's M0-M3 ordering (scope-4): a minimal engine first, then the **Blizzard
-vertical slice at about 115 sessions**, instead of all foundations followed by Opening + Wind + Knight at about 180.
+vertical slice at about 148 sessions** (R8.1 re-baselined round 1's 115, which under-counted the slice), instead of all
+foundations followed by Opening + Wind + Knight.
 
 ### 16.1 What the research already finished (PLAN's M0, done)
 
@@ -2080,17 +2182,22 @@ counts are tech's share from the ledger; the cumulative column is RULINGS §6's 
 
 | M | Contents (RULINGS §6) | Cumulative, all docs | Tech sessions |
 |---|---|---|---|
-| **M0** | Workbench; **the MMC5 go/no-go spike on Mesen** | [12] | 12.5 |
-| **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [25] | 13 |
-| **M2** | Slice engine (tech's part below; meta's save, file-select-lite, bracket-lite, results, debrief and EXTRA CONFIG UI are theirs) | [70] | 31.5 |
-| **M3** | Slice systems (tech's part below; `systems.md`'s SELECT, form swap, taps, adaptors, GP_BOSSHIT, WEAK!, scorecard, bolts and shop are theirs) | [95] | 11.5 |
-| **M4** ⛳⛳ | **BLIZZARD end to end (v0.1)**; re-estimate the ledger | [~115] | support only |
-| **M5** | Stage-attribute table; Opening-lite; Flame, Plant, Centaur, Yamato | [~205] | 15.5 |
-| **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT (**v0.5 "Round One"**) | [~285] | 8.5 |
-| **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~340] | 8 |
-| **M8** ⛳ | W2, W3, ending | [~380] | 1.5 |
-| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~440] | ledger `overhead` |
-| | | | **102** |
+| **M0** | Workbench; **the MMC5 go/no-go spike on Mesen** | [13] | 12.5 |
+| **M1** | Literal MMC5 port with golden equivalence; PRG-RAM, save skeleton, mailbox | [26] | 13 |
+| **M2** | Slice engine (tech's part below; meta's save, file-select-lite, bracket-lite, results, debrief and EXTRA CONFIG UI are theirs) | [79] | 31.5 |
+| **M3** | Slice systems (tech's part below, with **the attach state's core for the condor**, R8.2; `systems.md`'s SELECT (weapons), the last-weapon toggle, the dispatch table with Normal form's taps and the Ice Block, GP_BOSSHIT, WEAK!, scorecard, bolts and shop are theirs). **No forms in the slice**: a new file owns none (R8.2) | [~123] | 12.5 |
+| **M4** ⛳⛳ | **BLIZZARD end to end (v0.1)**; re-estimate the ledger | [~148] | support only |
+| **M5** | Stage-attribute table; `systems.md`'s quick form swap, forms firing taps and adaptors by win count (R8.2); Opening-lite; Flame, Plant, Centaur, Yamato | [~254] | 14.5 |
+| **M6** ⛳ | Text v1b; T1-lite; Knight, Tomahawk, Wind; HALFTIME RIOT (**v0.5 "Round One"**) | [~342] | 8.5 |
+| **M7** | BG-boss tooling, the fight loader; H1, H3, H5 | [~398] | 8 |
+| **M8** ⛳ | W2, W3, ending | [~433] | 2 |
+| **M9** | Native-JP review, balance, emulator and hardware matrix, BPS release (**v1.0**) | [~450] | ledger `overhead` |
+| | | | **102.5** |
+
+The cumulative column is RULINGS §6's (R8.1), which adds up every doc's own per-milestone figures; round 1's
+12 / 25 / 70 / 95 / ~115 / ~205 / ~285 / ~340 / ~380 / ~440 are withdrawn. Every ⛳ gate re-estimates it from the
+slice's actual cost (R0.1). R8.2's moves (the attach core into M3, the forms into M5) are in RULINGS' figures;
+round 3's +0.5 at M8 (row 44) is not yet, and is reported to the director.
 
 ### 16.3 M0: Workbench and the go/no-go spike (12.5)
 
@@ -2137,7 +2244,8 @@ BPS); vanilla golden suite recorded.
 2. **M2.2 (3)** WRAM-resident layouts (§5.2), the tileset-slot loader (§5.3), poke lists with tiers (§5.5), the map-edit
    service and log (§5.6). Gate: vanilla stages run from RAM, identical in the golden suite.
 3. **M2.3 (3)** Families and sub-ids, object lists v2 in WORK, init and spawn hooks, `gp_spawn`, `util_spawn` and the
-   slot plan (§7.2-7.3, §7.12); one test object per family.
+   slot plan (§7.2-7.3, §7.12), with the pause-close patch at `$38:$9624` (utilities survive a pause with the weapon
+   unchanged, R8.7); one test object per family.
 4. **M2.4 (2)** CHR set table v2 and stage-local ids (§7.6), before any new art (R1.13).
 5. **M2.5 (5)** The minimal art pipeline: `chr.py`, `sprites.py`, `palettes.py`, `artcheck.py` (§6.7).
 6. **M2.6 (3)** The level pipeline (§6): `.lvl` build, checks 1-9, maps. **The free-id scan runs first** (R1.14), as a
@@ -2157,36 +2265,48 @@ BPS); vanilla golden suite recorded.
 pop-up plays inside a vanilla stage and a debrief page on a menu screen, in JP and EN; a new song plays; a sprite made by
 the art pipeline appears in a vanilla stage.
 
-### 16.6 M3: Slice systems (11.5)
+### 16.6 M3: Slice systems (12.5)
 
-1. **M3.1 (1.5)** LATCHSRC in `systems.md`'s format, the frozen tick and frozen handlers with build-derived `FRZ_KIND`,
-   the LFSR, the death-hook audit (§7.7-7.8). Gate: an Ice-Blocked snow robot keeps taking damage and dies frozen.
+1. **M3.1 (1.5)** LATCHSRC in `systems.md`'s format (b5 FULL included) and `ENC_CLASS`, the frozen tick and frozen
+   handlers with build-derived `FRZ_KIND`, the LFSR, the death-hook audit and the **boss-stall audit** (every fortress
+   and GP boss reaches its damage step by `JSR`, or is listed NOSTALL) (§7.7-7.8). Gate: an Ice-Blocked snow robot keeps
+   taking damage and dies frozen.
 2. **M3.2 (2.5)** T6 variant blocks and X-BONK on the map-edit service (§10); a test climb with break and refill.
 3. **M3.3 (1)** GP player-state takeover and X-WRAP (§7.9).
 4. **M3.4 (2)** The HUD widget module (§7.13).
 5. **M3.5 (2.5)** The commentator event bus (§11.7): death and first-weakness lines through pop-ups.
 6. **M3.6 (2)** Lag steps 3-4 (the OAM builder) and the re-measured slot cap, published in §15.1 and artcheck (R1.8).
+7. **M3.7 (1)** The attach state's core (§7.9; R8.2), with Blizzard's condor as its first user: the carry (buster only,
+   A lets go) and its demo movie.
 
-**Exit** (tech side): the slice's mechanics (T6, X-BONK, X-WRAP, frozen damage, HUD, commentary) pass their demo movies;
-the new cap is published.
+**Exit** (tech side): the slice's mechanics (T6, X-BONK, X-WRAP, frozen damage, HUD, commentary, the condor carry) pass
+their demo movies; the new cap is published.
 
 ### 16.7 M4 ⛳⛳: BLIZZARD end to end (v0.1)
 
 No new tech items. Tech's part: Blizzard's layout replaces `$32:$A000` and its vanilla movie retires (§1.2); its slot
-lands in bank `$62`; the full suite and the lag report run on the slice; **the ledger is re-estimated from actual
-session counts** (R0.1), and this section's numbers are revised with it.
+lands in bank `$62`; its stage record row takes `SECRET_SCR`, `PAR` and `FORT_COL` from its `.lvl` header, which the
+slice's GP code already reads (**no stage-`$00` stop-gaps**, §4.1, R8.2); the full suite and the lag report run on the
+slice; **the ledger is re-estimated from actual session counts** (R0.1, R8.1), and this section's numbers are revised
+with it.
 
-### 16.8 M5: the attribute table and the first four venues (15.5)
+### 16.8 M5: the attribute table and the first four venues (14.5)
 
 1. **M5.1 (3)** The stage-attribute table proper (§4.3): the 45 `$51` and 11 `$063D` readers, the relocated tables, ids
    `$10-$21`, the YOU GET operand (§1.2). Gate: every legacy id and every venue built so far plays its movie identically.
 2. **M5.2 (2.5)** T3 switch → target (§7.10).
 3. **M5.3 (2)** T7 pad history (§7.9), for Flame's Shadow Rock.
 4. **M5.4 (2)** T8 multi-part bosses (§7.11), for Yamato's Daruma.
-5. **M5.5 (2)** The attach state (§7.9), for Plant's vines and balloon.
+5. **M5.5 (1)** The attach state's M5 users on the M3 core (§7.9; R8.2): Plant's vines with T5's pendulum, and the
+   balloon.
 6. **M5.6 (1.5)** X-EXWP (§7.9), for Yamato's pogo.
 7. **M5.7 (1.5)** The boss-panel extension (§11.2).
 8. **M5.8 (1)** The pattern-table split for menus (§8.3).
+
+**Check at the start of M5** (no sessions; `venues_b.md` §3.5): the tide logic across a vertical exit with a per-room
+`TIDE_BASE` written by each room's screen script (§1.8); if it misbehaves, the tidal shaft's rooms join by doors.
+`systems.md`'s form work (the quick swap, forms firing taps, adaptors by win count) lands in this milestone too (R8.2);
+tech's part of it, the CHR stream and the `$9B` census, already exists.
 
 ### 16.9 M6 ⛳: the rest of Round One (8.5)
 
@@ -2207,8 +2327,10 @@ session counts** (R0.1), and this section's numbers are revised with it.
 
 ### 16.11 M8 ⛳ and M9
 
-- **M8 (1.5)**: `RL_FLOOR8` (§8.3) for W3. W2 runs on the fight loader (M7); the ending uses the D9 mask (M2) and the
-  vanilla staff-roll engine through the language hook.
+- **M8 (2)**: `RL_FLOOR8` (§8.3) for W3 (1.5). The ending's engine pieces (0.5, row 44): the CAPCOM TIMES' GP pages
+  through the new engine (§11.2) and the credits' room table and `CREDITS` bit (§4.6). W2 runs on the fight loader
+  (M7); LIGHTS OUT uses the D9 mask (M2) with G37's frame table (§12.6); the staff roll is the vanilla engine through
+  the language hook.
 - **M9** (ledger `overhead`): the BPS release, tested with the tool itself and with Rom Patcher JS / Floating IPS
   (§14.3); the emulator and hardware matrix (FCEUmm, Mesen, the user's cart, RULINGS §7 question 1); the final ledgers.
 
@@ -2269,8 +2391,9 @@ W1 (item 5), TS_ARCADE with the Exhibitions (item 6), the MMC5 pulse driver, X-U
    clear inside a W2 bout. Mitigation: the death-hook audit's site list plus coverage of every boss kill in fight mode.
 11. **CW costs ≈ 110 cycles** now that it is re-entrant. Mitigation: hot paths stay inline in `$7F`; the profiler counts
    CW calls per frame.
-12. **Cartridge space**: the full design fills the bank ledger exactly (§1.2); v1.0 uses about 41 of 64 new banks. Growth
-   after v1.0 must displace something; the ledger is re-totalled at every gate.
+12. **Cartridge space**: the full design fills the bank ledger but for music's `$79` and the third sprite pair (§1.2), and
+   its CHR leans on the vanilla gap reserve; v1.0 uses about 42 of 64 new banks. Growth after v1.0 must displace
+   something; the ledger is re-totalled at every gate.
 13. **Sound driver reassembly** (M0.4) is delicate, and the mute mask now depends on it (Must).
 14. **Vanilla savestates cannot load into MMC5 builds**: all tests boot and warp (mailbox, scripted pokes).
 
@@ -2280,15 +2403,16 @@ W1 (item 5), TS_ARCADE with the Exhibitions (item 6), the MMC5 pulse driver, X-U
    strict the spike is.
 2. Can a headless Mesen run in this environment, for CI and the spike? If not, the user runs the six probe ROMs and
    reports a screenshot each.
-3. **`meta.md`**: will HARD move to DIFF A b6 (consistency-15)? `IFHARD` works either way (§5.5); BIT/BVC is cheaper.
-   Where does `CFG_CASUAL` (R2.9) live in the file?
-4. **`systems.md`**: the per-weapon utility caps that fit the slot plan (§7.12), and whether utilities should survive a
-   pause (vanilla's `$38:$9624` clears slots 1-7).
+3. *Closed (round 3)*: meta moved HARD to DIFF A b6 and put `CFG_CASUAL` at b4; the macros and `LAYOUT_TIER` read
+   RULESET's `RS_DIFF` (§5.5).
+4. *Closed (round 3)*: `systems.md` §3.0 caps each weapon's utilities; R8.7 keeps utilities through a pause with the
+   weapon unchanged, through tech's patch of `$38:$9624` (§7.12).
 5. **`venues_a.md`, `venues_b.md`, `fortress.md`**: the set-piece caps re-cut to 9 occupied slots (§15.1).
-6. **`art_audio.md`**: confirm 14 CHR banks, 3 sprite pairs and the 26-slot table (§1.2, §5.3) after its R5.3 re-run.
+6. *Closed (round 3)*: art's re-run gives CHR ≈ 9 of 14 banks in v1.0 (≈ 15.5 with the vanilla gap reserve in the full
+   design), 2 sprite pairs and the 26-slot table (§1.2, §5.3; R8.7).
 7. **`story.md`**: the compressed size of the v1.0 strings, measured at M2, before the text banks freeze.
-8. **Director**: R1.3 lists "the MMC5 audio" in v1.0's SUPER colour while R5.2 keeps MMC5 arrangements Could. This doc
-   reads it conservatively (§12.5): the channel drop is Must, the MMC5 pulses are Could.
+8. *Closed (round 3)*: R8.3 rules that v1.0's SUPER colour has no MMC5 audio and no channel drop; the drop is LIGHTS
+   OUT's (§3.3, §12.5-12.6).
 
 Round 1's questions are closed: the id map (R1.2), the LIVE images in page 1, the pop-up position (top), sections (no
 stage over 32 screens), T1-full (not needed), kanji (kana only), and legacy ids' rules (vanilla unless RULESET says
@@ -2298,13 +2422,13 @@ otherwise) (consistency decisions 1, 5, 28, 37).
 
 | Doc | Must agree with |
 |---|---|
-| `meta.md` (save bytes, bracket, events, debrief, RULESET, the fight table) | the PRG-RAM page 0 map unchanged, LIVE images in page 1 at meta's CPU addresses (§13); the mailbox at page 0 `$1A00`, its fight command through the fight loader (§4.6, §14.5); EXTRA CONFIG's UI on tech's warp, DEV flags, ring buffer and the pad-2 DEV combos (§14.5); `SA.META` = the meta index, fight records pointing at the engine ids of §4.2 (fight `$27` → legacy `$0F`, room 06, RULESET 1993); RULESET at WORK `$6270` (§3.4); the DIFF bits behind `IFHARD` and `LAYOUT_TIER`, and `CFG_CASUAL` (§5.5); the language hook at `$3C:$8636` (§11.2); the stage counters of the `$4n` predicates in the run block (§7.13) |
-| `systems.md` (combat, economy, chip numbers) | hot bytes `$06BD-$06C8`, per-slot arrays at `$6000+` (§3.1, §3.4); LATCHSRC in systems' format, written at `$38:$8FDF`; no punch re-class (§7.7, R2.1); frozen handlers, `FRZ_KIND`, its NOFREEZE list overriding the derived kinds (§7.7, R2.2); the slot plan, `util_spawn`, per-weapon caps (§7.12, R1.11); the stream budget 192 / 96 / 32 B and the 16-20-frame form swap (§15.3, R2.3); controller 2 (§15.4); the poke-list format and `TIERVAL` for the CASUAL levers (§5.5, R2.9); the `$9B` audit before SUPER (§7.9); Break Man as a slot-0 variant (Should, §7.9); stage fields `FORT_COL`, `SCORE_ID`, `PAR`, `NO_TAG` (a mask), `KEEPWE`, `YOUGET` → its weapon-order table (§4.4) |
-| `venues_a.md` (staging, mechanics) | T1-lite with the director in the script slot and ≤ 4 enemies alive (§9.1); T4 through `RL_BANDS` ≤ 6 + the window (§8.3); text v1b before Knight; the battle log in the pop-up window with the commentators muted (§11.3); T3, the attach state (the T5 vines), the VA-* objects on families `$F4/$F5`; VA-TIMED = `alt_flip` (§5.6); the Knight ceiling out of the IRQ with parameters (§1.8); its slots (§5.3); caps re-cut to 9; no BG tile ids are freed by MMC5 (8 KB CHR-RAM, no banking, ExGrafix only in W1's rooms: D6, R1.3), so Plant keeps its canopy redraw |
-| `venues_b.md` (staging, mechanics) | T6 = variant blocks only (§10); X-BONK; X-GPOBJ = families; ship, tide and ceiling as `EFFECTS` bits with `EFX_PARAM` (tide dwell); X-UPEXIT and X-FLOOR Could; the pogo = X-EXWP, the Daruma = T8, Shadow Rock = T7 (all Must); sponsor envelopes as family `$F6` pickups; one slot per venue (§5.3); the ignition hook on `$3E:$DDFC` repaints through the queue; the ship thread's `SHIP_TURN` event (§8.3) |
-| `fortress.md` (staging, mechanics) | the ids of §4.2 (R1.2); TS_STADIUM for the Opening, the Riot and the lap, and the slots of §5.3; BG bosses on `RL_FLOOR`; F-PIECES on the map-edit service; W3 on `RL_FLOOR8` + 2 window bands; W2 through the fight loader with its hub state in `$0340/$0650` (§4.6; its §5.2.1 retagged [new-code] M); no ExGrafix in v1.0 (§3.3: Could, W1 and METALL 16 rooms only); SUPER colour = palettes, bands and the channel drop; the NPC Break Man = family `$F7`; F-GRID deleted; `NO_TAG` mask, `ERA`, `OWNED` (§4.4); Pi-kun at one size (F-SIZES Should) |
-| `story.md` (every word, the ending) | the engine of §11: glyph cache, EN ALL CAPS, JP kana; POP 2 × 28 cells with ≤ 24 glyph ids + a face icon; dialogue, debrief and help pages 4 × 28; full-screen pages 9 × 28 with ≤ 128 glyph ids; the control codes (§11.5); the TSV source; dictionary compression; ≈ 350 Must strings in text banks T1-T4 (§1.2); the hook at `$8636`; the mute mask for S42 (§12.6); 7 face icons |
-| `art_audio.md` (tile, byte and track budgets) | 8 KB CHR-RAM and no extra page (D6, R1.3); the tileset-slot table is tech's (§5.3), art's is regenerated from it; CHR set table v2 (§7.6); the minimal pipeline (§6.7); weapon-slot sets ≤ 15 tiles and set-piece player sheets (R2.3); the 1-bpp glyph set without lowercase; 16×16 face icons (portraits Should); 5 music banks and SFX in the `$36` tail (§12.4); the stream budget (§15.3); the ledger rows for CHR (14), sprites (3 pairs), tilesets (13) and music (5) |
+| `meta.md` (save bytes, bracket, events, debrief, RULESET, the fight table) | the PRG-RAM page 0 map unchanged, LIVE images in page 1 at meta's CPU addresses (§13); the mailbox at page 0 `$1A00`, its fight command through the fight loader (§4.6, §14.5); EXTRA CONFIG's UI on tech's warp, DEV flags, ring buffer and the pad-2 DEV combos (§14.5); `SA.META` = the meta index, fight records pointing at the engine ids of §4.2 (fight `$27` → legacy `$0F`, room 06, RULESET 1993); RULESET at WORK `$6270` (§3.4); `RS_DIFF` as the source of `IFHARD`/`IF1993`/`IFCASUAL` and `LAYOUT_TIER`, `RS_LAG` for `REFLEX` (§5.5); the language hook at `$3C:$8636` (§11.2); the stage counters of the `$4n` predicates in the run block (§7.13); `H_REMATCH`, the `$F9A0` replay test and A/B SWAP in the joypad hook (§14.2); return kind 6 (§4.6); `save_commit`'s refusals (§13) |
+| `systems.md` (combat, economy, chip numbers) | hot bytes `$06BD-$06C8`, per-slot arrays at `$6000+` (§3.1, §3.4); LATCHSRC in systems' format with b5 FULL, written at `$38:$8FDF`, and `ENC_CLASS` at `$7B00` (§3.4); no punch re-class (§7.7, R2.1); frozen handlers, `FRZ_KIND`, its NOFREEZE list overriding the derived kinds (§7.7, R2.2); the slot plan, `util_spawn`, per-weapon caps (§7.12, R1.11); the stream budget 192 / 96 / 32 B and the 16-20-frame form swap (§15.3, R2.3); controller 2 (§15.4); the poke-list format, `TIERVAL`, `REFLEX` and `MASH n` (6 f per held press) for the CASUAL levers (§5.5, R2.9); the pause-close patch (§7.12, R8.7); the boss-stall audit (§7.7); the `$9B` audit before SUPER (§7.9); Break Man as a slot-0 variant (Should, §7.9); stage fields `FORT_COL`, `SCORE_ID`, `PAR`, `NO_TAG` (a mask), `KEEPWE`, `YOUGET` → its weapon-order table (§4.4) |
+| `venues_a.md` (staging, mechanics) | T1-lite with the director in the script slot and ≤ 4 enemies alive (§9.1); T4 through `RL_BANDS` ≤ 6 + the window (§8.3); text v1b before Knight; the battle log in the pop-up window with the commentators muted (§11.3); the per-screen pop-up position `TXT_POS` set by the screen script (§11.3); directors and band control in the slot-22 script (§9.1); T3, the attach state (the T5 vines), the VA-* objects on families `$F4/$F5`; VA-TIMED = `alt_flip` (§5.6); the Knight ceiling out of the IRQ with parameters (§1.8); its slots (§5.3); caps re-cut to 9; no BG tile ids are freed by MMC5 (8 KB CHR-RAM, no banking, ExGrafix only in W1's rooms: D6, R1.3), so Plant keeps its canopy redraw |
+| `venues_b.md` (staging, mechanics) | the attach state's core at M3 for the condor (§7.9, R8.2); the slice reads the stage record v0, no stage-`$00` stop-gaps (§4.1); `TIDE_BASE` per room from the screen script and the M5 tide check (§1.8); T6 = variant blocks only (§10); X-BONK; X-GPOBJ = families; ship, tide and ceiling as `EFFECTS` bits with `EFX_PARAM` (tide dwell); X-UPEXIT and X-FLOOR Could; the pogo = X-EXWP, the Daruma = T8, Shadow Rock = T7 (all Must); sponsor envelopes as family `$F6` pickups; one slot per venue (§5.3); the ignition hook on `$3E:$DDFC` repaints through the queue; the ship thread's `SHIP_TURN` event (§8.3) |
+| `fortress.md` (staging, mechanics) | the ids of §4.2 (R1.2); TS_STADIUM for the Opening, the Riot and the lap, and the slots of §5.3; BG bosses on `RL_FLOOR`; F-PIECES on the map-edit service; W3 on `RL_FLOOR8` + 2 window bands; W2 through the fight loader with its hub state in `$0340/$0650` (§4.6; its §5.2.1 retagged [new-code] M); no ExGrafix in v1.0 (§3.3: Could, W1 and METALL 16 rooms only); SUPER colour = palettes and bands, all 2A03 channels kept, the channel drop LIGHTS OUT's alone (R8.3); variant col 12 `NOBUBBLE` (§4.3); the credits' room table and `CREDITS` bit (§4.6); `alt_flip` phase groups (§5.6); the NPC Break Man = family `$F7`; F-GRID deleted; `NO_TAG` mask, `ERA`, `OWNED` (§4.4); Pi-kun at one size (F-SIZES Should) |
+| `story.md` (every word, the ending) | the engine of §11: glyph cache, EN ALL CAPS, JP kana; POP 2 × 28 cells with ≤ 24 glyph ids + a face icon; dialogue, debrief and help pages 4 × 28; full-screen pages 9 × 28 with ≤ 128 glyph ids; the control codes (§11.5); the TSV source; dictionary compression; ≈ 400 Must strings in text banks T1-T4 (§1.2, R8.4); one lowercase `r` (§11.4); the CAPCOM TIMES' GP pages (§11.2); the panel's three records (§11.2); `WK-WM`/`WK-WC` and `EV_PLATE` apart from `EV_SECRET` (§11.7); the hook at `$8636`; the mute mask for S42 (§12.6); 7 face icons |
+| `art_audio.md` (tile, byte and track budgets) | 8 KB CHR-RAM and no extra page (D6, R1.3); the tileset-slot table is tech's (§5.3), art's is regenerated from it; CHR set table v2 (§7.6); the minimal pipeline (§6.7); weapon-slot sets ≤ 15 tiles and set-piece player sheets (R2.3); the 1-bpp glyph set without lowercase but for one `r` (§11.4); 16×16 face icons (portraits Should); 5 music banks, `$79` spare, and the 21 Must SFX in 392 of the `$36` tail's 449 B (§12.4); G37's frame table (§12.6); overlay composites, artcheck checks 1-13 and the local gallery page (§6.7, R8.8); the stream budget (§15.3); the ledger rows for CHR (14; v1.0 ≈ 9, the full design with the vanilla gap reserve), sprites (2 pairs used), tilesets (13) and music (5) |
 
 ## Changes in round 2
 
@@ -2360,3 +2484,31 @@ Every change, with the ruling or finding that caused it. Finding ids refer to `r
 | 45 | Risks, open questions and the cross-doc table rewritten; round 1's ten open questions closed | consistency decisions 1, 5, 28, 37; R1.2 |
 | 46 | `[engine-ok]` tags that need code retagged (the YOU GET operand; W2's loader in `fortress.md`) | R1.14; feasibility-19 |
 | 47 | `fight_return` sets a restore-pending flag (`RET_FLAGS` b7) so the init hook restores the hub's snapshot after the `$CE44` clear; world freeze is one more test in the frozen tick's inline patch; the NMI's mapping of the copier bank is justified by the scheduler's own remap (`$C588-$C593`) | R1.7, R1.4, R1.6 (implementation detail) |
+
+## Changes in round 3
+
+Each request routed to this doc in [`reconcile.md`](reconcile.md), then the RULINGS §8 rulings applied where no request
+named them. Session changes: tech 102 → **102.5** (+0.5 at M8, row 44); 1 session moved from M5 to M3 (rows 31a/31b).
+
+| Id | Outcome | Section | Note |
+|---|---|---|---|
+| TECH-01 | applied | §7.7, §3.4, §5.5, §7.4 | LATCHSRC gains b5 FULL (set by `SRCTAB` for the full charge and full punch, or by a GP sub-id); `ENC_CLASS` placed at WORK `$7B00-$7B1F`; `REFLEX` = `TIERVAL` + `RS_LAG`; hold-to-struggle at 6 f was already in `MASH n` |
+| TECH-02 | applied | §7.12, §16.5 (M2.3) | tech patches the pause-close clear at `$38:$9624`: with the weapon unchanged, GP utilities in 4-7 survive; shots, Beat, Rush and the bubble still clear; deaths clear 1-7 (R8.7) |
+| TECH-03 | applied | §7.7, §16.6 (M3.1) | boss-stall audit: every fortress and GP boss reaches its damage step by `JSR` or is listed NOSTALL; re-checked at later gates |
+| TECH-04 | applied | §14.2, §4.6, §5.5, §13 | `H_REMATCH` at `$3F:$F952`, the `$F9A0` hook's replay test, A/B SWAP in one joypad hook, return kind 6 (Should), `RS_DIFF` as the macros' and `LAYOUT_TIER`'s source, `save_commit` refusing the scratch magic, NO_SAVE and CREDITS |
+| TECH-05 | applied | §11.3, §9.1, §3.1 | per-screen pop-up position `TXT_POS` set by the screen script (T1-lite's director sets it for its ride); the wave director, band control, gallery director and croc timers confirmed in the slot-22 script |
+| TECH-06 | applied | v1.0 scope (rows 31a/31b), §7.9, §16.2, §16.6 (M3.7), §16.8 (M5.5) | the attach state's core with the condor at M3 (1), vines/T5 and the balloon at M5 (1); per-milestone M3 11.5 → 12.5, M5 15.5 → 14.5 (R8.2) |
+| TECH-07 | applied | §4.1, D8, §16.7 | no stage-`$00` stop-gaps: the slice's GP code reads record v0 from M2.1 (`SECRET_SCR` through the `$F9A0` hook, `PAR`, `FORT_COL` for GP_BOSSHIT); Blizzard's row comes from its `.lvl` header (R8.2) |
+| TECH-08 | applied | §1.8, §3.4, §16.8 | decision: a per-room `TIDE_BASE` written by each room's screen script (`EFX_PARAM` keeps the stage's dwell); an M5 check of the tide across a vertical exit, fallback door-joined rooms |
+| TECH-09 | applied | §4.3 (variant col 12), §4.6, §3.4, §5.6, §16.11 | `NOBUBBLE` variant column for H5's low gravity; the credits' room table and `GP_MODE` b0 `CREDITS` (macro `IFCREDITS`; no autosave, no heckles); `alt_flip` phase groups stepped by the screen script |
+| TECH-10 | applied | §1.2, §12.4, open question 6 | CHR row confirmed: v1.0 ≈ 9 of 14 banks, the full design ≈ 15.5 with the vanilla gap reserve; 2 sprite pairs (3rd spare); a 10th text bank comes from music's spare `$79`, not CHR (R8.7); v1.0 ≈ 42 of 64 new banks |
+| TECH-11 | applied | §12.6, §6.7, §12.4 | G37's sync is a frame table from `mml.py` read on the play-time clock (not the `04` command, which rewrites playback flags); `sprites.py` overlay composites; artcheck checks 1-13; the gallery is a local HTML page plus PNGs (R8.8); the 21 Must SFX fit the `$36` tail (392 of 449 B) |
+| TECH-12 | applied | §11.4, §11.2, v1.0 scope row 44 | one lowercase `r` glyph for JP `Mr.`/`Dr.`; the CAPCOM TIMES' GP pages are typed by the new engine in the driver's text rows, with glyphs borrowed from the main font's kana slots and restored from ROM before `$95` (+0.5 with the credits pieces at M8) |
+| TECH-13 | applied | §11.2, §11.7 | a panel chains up to three records (the WRONG NOTE's VENUE `EXPOSED BY A WHISTLE`); names without a space (R8.5); `WK-WM`/`WK-WC` registered by fight id; `EV_PLATE` raised apart from `EV_SECRET` |
+| TECH-14 | applied | header, v1.0 scope, §3.3, §1.8, §8.3, §12.5-12.6, §16.2, open question 8, cross-doc table | R8.3: no MMC5 audio and no channel drop in v1.0's SUPER colour, the D9 drop is LIGHTS OUT's; R8.6: the nightingale floor is Should; R8.1: about 450 sessions and RULINGS §6's cumulative column (13 / 26 / 79 / ~123 / ~148 / ~254 / ~342 / ~398 / ~433 / ~450) |
+| R8.2 (extra) | applied | §16.2 (M3, M5 rows), §16.8 | the quick form swap, forms firing taps and adaptors by win count listed at M5, not in the slice; a new file owns no forms |
+| R8.4 (extra) | applied | §11.5, cross-doc (story) | ≈ 400 Must strings (story's counts are the single source); still ≈ 30 KB in T1-T4 |
+| R8.6 (extra) | applied | §5.5 | the quick-draw goes through `REFLEX` with CASUAL's 40 f |
+| R8.7 (extra) | applied | §5.5 | INPUT LAG 0-6 f through `RS_LAG` |
+| Open questions (extra) | applied | Open questions 3, 4, 6, 8 | closed by meta's DIFF A, systems' caps with R8.7, art's re-run with R8.7, and R8.3 |
+| Risk 12 (extra) | applied | Risks | the bank ledger's spares (`$79`, the 3rd sprite pair) and v1.0 ≈ 42 banks |

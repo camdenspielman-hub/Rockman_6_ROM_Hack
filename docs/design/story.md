@@ -213,15 +213,15 @@ The game speaks in four registers. Every line belongs to one; a scene may mix th
    the debrief are not commentary and always play; START skips a scene after its first viewing (R3.8).
 8. **ENGRISH (Could) never touches story text, hints or help pages** (`meta.md` §12): it is a menu joke (§9), with one
    deliberate exception, Break Man's perfect-score line, a nod to 4MI's (S47).
-11. **Quoted lines from other games are paraphrased, never verbatim, in both languages** (R8.4, R3.3's spirit). A joke
-    on a famous line keeps its rhythm in new words (HERO'S QUEST's King, Princess and Knightlord; ENGRISH's classics).
-    The genre's formulas with GP's own nouns ("A METSLIME DRAWS NEAR!", the command menu) are conventions, not quotes.
-    Vanilla Rockman 6's own text is this game's, and is kept verbatim where §5.2, S44 and S45 say so.
 9. **The Wily gag plays once per act, in new words each time** (R4.4, R3.9; §1.3). Nobody repeats "It's definitely
    Wily."
 10. **Break Man's disguise is respected** (R4.2; §1.3's mirror gag). Only Rock says "Blues?", twice; Light says the name
     once, at the very end. **The plaques are the one exception** (R3.9, design-23): a museum labels its exhibits by
     their real names, so the Rockman 3-5 plaques say BLUES.
+11. **Quoted lines from other games are paraphrased, never verbatim, in both languages** (R8.4, R3.3's spirit). A joke
+    on a famous line keeps its rhythm in new words (HERO'S QUEST's King, Princess and Knightlord; ENGRISH's classics).
+    The genre's formulas with GP's own nouns ("A METSLIME DRAWS NEAR!", the command menu) are conventions, not quotes.
+    Vanilla Rockman 6's own text is this game's, and is kept verbatim where §5.2, S44 and S45 say so.
 
 ### 1.3 The running gag: Mr. Y is Wily, once per act
 
@@ -1152,8 +1152,8 @@ H3.LBL4 labels the Doc Robot skulls in the workshop (b1): Rockman 3's Doc Robot 
 | H5.LBL1 | M | stage | LBL | door | ROCKMAN 6 (1993): WING / UNDER CONSTRUCTION. KNOCK. | |
 
 PLQ.H5.19 is the hidden room's plaque (b1: the 1993 wing, where Mr. X's card lies) and the setup for S43, when the wing
-opens. The eight letter plates (b0) need no plaque: the letters are the game's own (A-5.3: `ROCKMAN5` in the
-Japanese release, `MEGAMANV` abroad; fortress chooses which set to draw, §12).
+opens. The eight letter plates (b0) need no plaque: the letters are the game's own, and they spell **`ROCKMAN5`**, the
+Japanese release's word, in both languages (R8.5; A-5.3).
 
 **H2 ROCKMAN 2 and H4 ROCKMAN 4** (Should, with H2 and H4; R0.3 item 5) and the two thanks plaques
 
@@ -1422,7 +1422,7 @@ off without a word, and Rock does not ask.
 Scene 4: two Committee guards (recoloured vanilla robots) lead Wily away, under vanilla's Wily-behind-bars art. **The
 one Mr. Y gag of the ending** (R4.1 step 4), and Act V's: R8.5 makes it the ending's only alias gag. Scene 5: the GP
 Stadium by day; Rock on the top step holding the GP Cup he recovered in W3; the champions applaud below **in pairs**
-(R8.6: 0 new tiles; the all-eight BG row is Should), so S41's lines name no champion; Bass β beams in at the pitch's edge for his vow (PLAN's
+(R8.6: 0 new tiles; the all-eight BG row is Should); Bass β beams in at the pitch's edge for his vow (PLAN's
 Rockman 7 nod, A-7.1) and leaves in a multicoloured beam. If the escape's mercy fired, Cossack confesses (4MI's "who
 lowered the output?" in tournament clothes). STORY_BEAT → `$0C`.
 
@@ -1442,7 +1442,8 @@ lowered the output?" in tournament clothes). STORY_BEAT → `$0C`.
 Scene 6: vanilla's newspaper driver (`$3B:$A886`), its masthead `CAPCOM TIMES ●▲.●▲.20XX` kept, the headline picture
 redrawn, two lines a page. The last two pages are **vanilla's own `$95/$96`, word for word in JP** (the 1993 game's
 sincere last sentence); EN translates them. **`$94` is not reprinted** (R4.1): S02 quoted it, and page 2 answers it.
-Page 4 is **Act VI's Wily gag** (the alphabet runs out); the arrest used the Mr. Y gag, so neither gag repeats.
+**R8.5: the alias gag plays once in the whole ending, at the arrest**, so page 4 is the fallback S44.4F (no Mr. Z) and
+Act VI's Wily gag is page 1's "WE KNEW.", the press's answer to S33's "WE KNOW.".
 
 | Id | Tier | Kind | Surf | Who | EN | JP |
 |---|---|---|---|---|---|---|
@@ -1450,15 +1451,14 @@ Page 4 is **Act VI's Wily gag** (the alphabet runs out); the arrest used the Mr.
 | S44.1 | M | scene | NEWS | — | ROCKMAN WINS THE GRAND PRIX! / MR. Y WAS DR. WILY. WE KNEW. | ロックマン グランプリ ゆうしょう! / Mr.Yの しょうたいは ワイリー。 |
 | S44.2 | M | scene | NEWS | — | WILY IS BACK IN JAIL. GUARDS / CHECK DAILY: NOT CARDBOARD. | ワイリーは ふたたび ろうやへ。 / だんボールで ないか まいにち かくにん。 |
 | S44.3 | M | scene | NEWS | — | THE ROBOT BASS IS STILL AT / LARGE. HE SAID: NEXT TIME. | ナゾの ロボット フォルテは / ゆくえふめい。「つぎは」と いっていた。 |
-| S44.4 | M | scene | NEWS | — | NEXT SPONSOR: MR. Z. COSSACK / ASKS FOR A LONGER ALPHABET. | らいねんの スポンサーは Mr.Z。 / コサックは ながい アルファベットを ようきゅう。 |
-| S44.4F | C | scene | NEWS | — | NEXT YEAR'S SPONSOR: NOT YET / ANNOUNCED. COSSACK RELAXES. | らいねんの スポンサーは みてい。 / コサックは ほっと している。 |
+| S44.4F | M | scene | NEWS | — | NEXT YEAR'S SPONSOR: NOT YET / ANNOUNCED. COSSACK RELAXES. | らいねんの スポンサーは みてい。 / コサックは ほっと している。 |
+| S44.4 | W | scene | NEWS | — | NEXT SPONSOR: MR. Z. COSSACK / ASKS FOR A LONGER ALPHABET. | らいねんの スポンサーは Mr.Z。 / コサックは ながい アルファベットを ようきゅう。 |
 | S44.5 | M | scene | NEWS | — | A HEART FOR PEACE, AND A / STRENGTH NO EVIL CAN BEAT... | しかし へいわを あいする こころと / あくに まけない ちからを もった |
 | S44.6 | M | scene | NEWS | — | AS LONG AS ROCKMAN IS HERE, / PEACE WILL SURELY LAST!! | さいきょうのロボット ロックマンが / いるかぎり このへいわは つづくだろう!! |
 | S44.7 | C | stage | LBL | headline | CHAMPION'S CHIP UNDER REVIEW | |
 | S44.8 | C | scene | NEWS | — | JUDGES REVIEW A CHIP STAMPED / Y. THE WIN GETS AN ASTERISK. | しんさいんは 「Y」の チップを / ちょうさちゅう。けっかは ほしじるしつき。 |
 
-S44.4F replaces S44.4 only if R4.1's "one use of the Mr. Y / Mr. Z gag" is read as one for the whole ending (Open
-question 2). S44.5-S44.6's JP is vanilla's text verbatim; the EN is GP's translation (the vanilla game had no EN for them). S44.7-S44.8
+S44.4F is page 4 (R8.5); S44.4's Mr. Z page is kept as a Won't record (round 2 had it Must). S44.5-S44.6's JP is vanilla's text verbatim; the EN is GP's translation (the vanilla game had no EN for them). S44.7-S44.8
 are the doped file's headline and page 1 (Could, with the bundle); the wording `UNDER REVIEW` is story's (consistency
 decision 10), and systems §9.4 and fortress cite it.
 
@@ -1520,7 +1520,7 @@ help capsule, R4.2); the partner's entries return with the partner.
 |---|---|---|---|---|---|---|
 | S47.0 | M | scene | WIN | BM | ...YOU WON. NOT BAD, ROCK. | ・・・かったか。わるくない、ロック。 |
 | S47.T0 | M | scene | WIN | BM | THAT BIRD'S STILL IN PIECES. / B. E. A. T. SPELL IT. | あの とりは まだ バラバラだ。 / B、E、A、T。ぜんぶ あつめろ。 |
-| S47.T1 | M | scene | WIN | BM | AGAINST BASS YOU NEEDED MY / HELP. NEXT TIME, STAY ABOVE / SIX. | フォルテには おれの たすけが / いったな。つぎは 6より うえで / ねばれ。 |
+| S47.T1 | M | scene | WIN | BM | IN THE RIOT YOU NEEDED MY / HELP AGAINST BASS. NEXT / TIME, STAY ABOVE SIX. | ライオットの フォルテせんでは / おれの たすけが いったな。 / つぎは 6より うえで ねばれ。 |
 | S47.T2 | M | scene | WIN | BM | THE JUDGES COUNTED %N% SECRET / EXITS. THERE ARE 8. ONE PER / VENUE. | ひみつの でぐちは %N%こ。 / ぜんぶで 8こ。かいじょうに 1こずつ。 |
 | S47.T4 | M | scene | WIN | BM | EVERY VENUE HIDES ONE ROOM, / ONE SCREEN BIG. LISTEN TO / THE JUDGES. | どの かいじょうにも かくしべやが / ひとつ。しんさいんの ヒントを きけ。 |
 | S47.T5 | M | scene | WIN | BM | SOME PRIZES AREN'T WON BY / WINNING. THEY'RE WON BY / ACTING STRANGE. | かって もらえない しょうひんも / ある。かわった ことを して / もらうんだ。 |
@@ -1538,21 +1538,26 @@ help capsule, R4.2); the partner's entries return with the partner.
 | S47.T1S | S | scene | WIN | BM | YOU BARELY CALLED ME. PAUSE, / CALL, A. I'D HAVE COME. | ほとんど よばなかったな。 / ポーズして CALL、A。よべば いった。 |
 | S47.T1D | C | scene | WIN | BM | YOU TOOK Y'S CHIP. I DON'T / TAG WITH CHEATS. | Mr.Yの チップを つかったな。 / ずるを する やつとは くまない。 |
 | S47.T3 | C | scene | WIN | BM | FOUR BADGES ON THAT BRACKET. / TWO SECRET EXITS LIGHT EACH. | ひょうに バッジが 4つ。 / ひみつの でぐち 2つで 1つ ひかる。 |
-| S47.PE | C | scene | WIN | BM | I HAVE NO ADVICE. / YOU ARE REAL CHAMPION! | (EN) |
+| S47.PE | C | scene | WIN | BM | ADVICE? I HAVE NONE. / YOU ARE REAL CHAMPION! | (EN) |
 
 S47.T11's "three hours" follows meta's T11 threshold (3:00:00, tuned at M9): if meta changes it, the line changes with
 it. S47.P points at Rockman 7, which opens with Wily breaking out of jail (A-7.2). S47.T1S points at the pause menu's
-CALL row confirmed with A (R2.10; `meta.md` §6.2), not at SELECT. S47.PE is the ENGRISH perfect line (Could), 4MI's own
-(`r4mi/text.md` §4): the one ENGRISH line in story text, on purpose; its JP is the normal S47.P.
+CALL row confirmed with A (R2.10; `meta.md` §6.2), not at SELECT. **S47.T1 is v1.0's T1, SOLO RIOT** (meta RATEFLAGS
+b4: Bass β duel 1 won without the capsule Break Man throws below 6 HP); it names the Riot, never a call or SELECT.
+S47.PE is the ENGRISH perfect line (Could), a nod to 4MI's "I HAVE NO ADVICE. YOU ARE REAL HERO." (`r4mi/text.md` §4) in
+new words (R8.4): the one ENGRISH line in story text, on purpose; its JP is the normal S47.P.
 
 #### S42 LIGHTS OUT · Must
 
 Scene 9 (fortress §6.1): night, the empty stadium. Rock and Dr. Light sit in the stands, with Roll, Rush, and Beat if
 B-E-A-T is complete. The GP theme plays in **the lights-out arrangement** (G37 LAST MATCH, 2A03 stems; art_audio adds
 it, consistency-13). The floodlight towers switch off one by one, and **each takes a music channel with it** through
-tech's D9 mute mask: **the MMC5 voices first** (if they ship and are on), **then noise, triangle and pulse 2; pulse 1
-plays the melody alone**, and the last tower goes dark on its last note (consistency decision 25: round 1's DPCM cue is
-deleted, and the MMC5 pulses are no longer "silenced when the castle fell"). Each switch-off is a palette step, never a
+tech's D9 mute mask, in `art_audio.md` §12.9's order: **the MMC5 voices first** (G37x, Could, only if they ship and
+are on), **then noise, triangle and pulse 2; pulse 1 plays the melody alone**, and the last tower goes dark on its last
+note (consistency decision 25: round 1's DPCM cue is deleted). **This is the game's only channel drop, and it is Must**
+(R8.3): W2, W3 and the escape keep every 2A03 channel (their SUPER colour is palettes, parallax and palette bands), and
+the escape's drop, if the MMC5 voices ship, takes only those voices: they are the only sound "already silenced when the
+castle fell" (G37x, if it ships, voices them again for cue 0 below). Each switch-off is a palette step, never a
 flash. **Light says "Blues" here, once** (R4.2).
 
 | Id | Tier | Kind | Surf | Who | EN | JP |
@@ -1565,10 +1570,18 @@ flash. **Light says "Blues" here, once** (R4.2).
 | S42.6 | M | scene | WIN | L | AND ROCK... TELL BLUES HE / CAN COME HOME TOO. WHENEVER / HE'S READY. | それと ロック・・・ ブルースにも / いつでも かえって おいでと。 / じゅんびが できたらな。 |
 | S42.7 | M | scene | WIN | R | LET'S GO HOME. | かえろう。 |
 
-The cues: S42.1 opens with the 2A03's four channels playing (the MMC5 towers, if any, have already gone dark); **noise
-stops** as S42.3 opens, **triangle** as S42.4 opens, **pulse 2** as S42.6 opens; after S42.7 **pulse 1 plays four bars
-alone**, the last tower goes dark on its last note, and 60 frames of silence follow. Without MMC5 audio the scene starts
-with four towers lit.
+The cues, in §12.9's order (no DPCM cue; G37's sync marker switches each tower, so the picture follows the music):
+
+| Cue | Tower and channel that go dark | Where |
+|---|---|---|
+| 0 | the two MMC5 towers (only with G37x and the MMC5 voices on; Could) | before S42.1 opens |
+| 1 | **noise** | as S42.3 opens |
+| 2 | **triangle** | as S42.4 opens |
+| 3 | **pulse 2** | as S42.6 opens |
+| 4 | **pulse 1** plays four bars alone after S42.7; the last tower goes dark on its last note; 60 frames of silence follow | the end |
+
+S42.1 opens with the 2A03's four channels playing. Without MMC5 audio cue 0 does not exist and the scene starts with
+four towers lit.
 
 #### S43 The sixth wing · Must
 
@@ -1732,7 +1745,8 @@ Notes:
   (b2), the third record adds the "one extra line" fortress asks for, VENUE `EXPOSED BY A WHISTLE`. LOCATION is true
   in every version: in Rockman 5 Dark Man waited in what was believed to be Blues' castle (Appendix A, A-5.2), so the
   disguise's own card gives him away to anyone who reads it. fortress wrote `BREAK MAN` / `DARK MAN` with a space;
-  this doc owns the words and keeps vanilla's no-space style (§12).
+  this doc owns the words and keeps vanilla's no-space style, as R8.5 rules (§12); tech's panel re-type types all
+  three records.
 - **GAMMA MK-VI** is fortress's name (§4.3.6). Gamma was built by Light and Wily together as a peacekeeping robot in
   Rockman 3 (1990), hence ENERGY and SPECIALTY. **DOC ROBOT** (Should with his room, R3.6) fought in Rockman 3's four
   revisited stages (1990), two per stage, copying the eight Rockman 2 bosses; his AIR MAN copy waited in Needle Man's
@@ -1771,7 +1785,7 @@ first weaknesses, secret, plate and tell lines and the heckles are Must; flavour
 | `EV_OWN_WEAPON` | SC4, once per fight | fight id | §6.3 | P2 | Should (SC4 is Should) |
 | `EV_PINCH` | boss enters pinch | fight id | §6.3 | P3 | Should |
 | `EV_NODMG_BOSS` | boss killed with BOSS NO-HIT set (`systems.md` §6.5) | — | §6.2 | P2 | Should |
-| `EV_EXCELLENT` | KAISHIN's EXCELLENT MOVE, first per stage visit (criticals are Won't, R2.4) | — | §6.2 | P4 | Should |
+| `EV_EXCELLENT` | KAISHIN's strengthened hit (G.EX's "A SPLENDID STRIKE!"), first per stage visit (criticals are Won't, R2.4) | — | §6.2 | P4 | Should |
 | `EV_CLOSE_CALL` | HP ≤ 3 and alive 300 f later, once per stage visit | — | §6.2 | P4 | Should |
 | `EV_FORM_FIRST` | first use of POWER / JET / SUPER, once per save | form | §6.2 | P3 | Should |
 | `EV_TIMESTOP_FIRST` | first C.FLASH Time Stop, once per save | — | §6.2 | P3 | Should |
@@ -1868,7 +1882,7 @@ G.RS3 teaches the i-frame read (4MI's "read the weakness from the flashing", BRI
 | G.ND2 | S | flavour | POP | C | THE JUDGES ARE STANDING. TWO / OF THEM. ONE IS CARDBOARD. | しんさいんが たった。ふたり。 / ひとりは だんボール。 |
 | G.ND2b | S | flavour | POP | C | THE JUDGES ARE STANDING. / ALL OF THEM. | しんさいんが たった。 / ぜんいんだ。 |
 | G.ND3 | S | flavour | POP | C | FLAWLESS. WRITE THAT DOWN, / KALINKA. | かんぺきだ。 / メモして くれ カリンカ。 |
-| G.EX | S | flavour | POP | K | AN EXCELLENT MOVE! | かいしんの いちげき! |
+| G.EX | S | flavour | POP | K | A SPLENDID STRIKE! | みごとな いちげきが きまった! |
 | G.CC1 | S | flavour | POP | K | HANGING ON BY ONE BOLT! | ボルト いっぽんで / ふみとどまってる! |
 | G.CC2 | S | flavour | POP | C | LOW ON ENERGY. HIGH ON / SPIRIT. | エネルギーは ひくい。 / きあいは たかい。 |
 | G.F1 | S | flavour | POP | K | RUSH POWER! LOOK AT THOSE / FISTS! | ラッシュパワー! / すごい こぶし! |
@@ -1946,7 +1960,8 @@ AYACO is 1943's own boss, a Capcom name. WND.D6: 1942 (Capcom, 1984) gave the pl
 | KNT.D6 | S | death | POP | K | THOU ART... OUT OF HP. | HPが・・・ つきた。 |
 
 KNT.D1 is the King's (venues_a §2.11: "the King, 1 + his death line"), in the icon-less pop-up. It nods to the genre's
-famous scolding in new words, in both languages (R3.3, R8.4: round 2's JP kept the original's 「なさけない」; it is gone). KNT.D4's Killer Chest is a Must enemy (venues_a SET-KN2); KNT.D5 waits for
+famous scolding in new words, in both languages (R3.3, R8.4: round 2's JP kept the original's 「なさけない」; it is
+gone). KNT.D4's Killer Chest is a Must enemy (venues_a SET-KN2); KNT.D5 waits for
 the Inn (Should).
 
 #### Tomahawk: HIGH NOON FRONTIER (`venues_a.md` §3.11)
@@ -2201,8 +2216,8 @@ Should**: in v1.0 §6.2's generic G.SR and G.SI play for them (R4.5's budget; fo
 | H5-10 | S | secret | POP | C | THE 1993 WING. SOMEONE HAS / BEEN BUILDING THIS. | 1993ねんの ウイング。 / だれかが つくって いたな。 |
 | H5-11 | S | secret | POP | K | WRONG NOTE! THE JUDGES HEARD / IT TOO! | おんちだ! しんさいんにも / きこえてたよ! |
 
-H5-09 does not spell the letters: Rockman 5's plates spell `ROCKMAN5` in the Japanese release and `MEGAMANV` abroad
-(Appendix A, A-5.3), and fortress's b0 name follows the English one (§12 asks fortress to choose).
+H5-09 does not spell the letters; the plates themselves spell `ROCKMAN5` in both languages (R8.5; Appendix A, A-5.3),
+so the line stays true whatever a player calls the game.
 
 **W2 THE BRACKET OF DOOM** (fortress §5.2). W2-01 is S36.1; W2-02 the shouts (S36, Should); W2-03 and W2-05/06 are in
 S36-S37.
@@ -2602,16 +2617,18 @@ v1.0 key for the partner's doors (R4.2).
 ### 7.3 Generic debrief lines (meta §4.5's ids)
 
 Requirement hints play when only tool-gated secrets remain; scorecard hints (G) when every secret is found but a
-medal is not, chosen by the weakest row; perfect lines when nothing is left. v1.0's predicate table uses only R2
-(the E and T plates); meta keeps R1, R3 and R5 Must for its table's generality (§12).
+medal is not, chosen by the weakest row; perfect lines when nothing is left. **v1.0's predicate table uses only R2**
+(the E and T plates: `meta.md` §4.3, where no venue exit, room or item needs an adaptor and the fortress stages'
+`require` values are none), so **R1, R3 and R5 are Should** (round 3; meta §4.5 follows), written now for the stages
+that will need them (H4's SUPER-gated prize and kin).
 
 | Id | Tier | When |
 |---|---|---|
-| R1 | M | POWER missing |
+| R1 | S | POWER missing (no v1.0 predicate) |
 | R2 | M | JET missing (Yamato E, Centaur T) |
-| R3 | M | SUPER missing |
+| R3 | S | SUPER missing (H4's prize, Should) |
 | R4 | S | the partner missing (Should) |
-| R5 | M | a weapon missing |
+| R5 | S | a weapon missing (no v1.0 predicate) |
 | G-TIME | M | weakest row TIME |
 | G-DAMAGE | M | weakest row DAMAGE |
 | G-VARIETY | M | weakest row VARIETY |
@@ -2624,11 +2641,11 @@ medal is not, chosen by the weakest row; perfect lines when nothing is left. v1.
 
 | Id | Tier | Kind | Surf | Who | EN | JP |
 |---|---|---|---|---|---|---|
-| DB.R1 | M | hint | WIN | K | THIS STAGE NEEDS MORE PUNCH. / COME BACK AFTER YOUR 2ND / WIN! | ここは パンチりょくが たりない。 2しょうめの あとに / また きてね! |
+| DB.R1 | S | hint | WIN | K | THIS STAGE NEEDS MORE PUNCH. / COME BACK AFTER YOUR 2ND / WIN! | ここは パンチりょくが たりない。 2しょうめの あとに / また きてね! |
 | DB.R2 | M | hint | WIN | K | THERE'S A ROUTE HERE FOR / ENTRANTS WHO FLY. COME BACK / AFTER YOUR 4TH WIN. | ここには とぶ せんしゅ むけの みちが ある。 / 4しょうめの あとに また きてね。 |
-| DB.R3 | M | hint | WIN | K | A NEW ADAPTOR IS HIDDEN IN / THE HALL OF FAME. SOMETHING / HERE IS WAITING FOR IT. | ホール・オブ・フェイムに あたらしい アダプターが / かくれてる。 ここで なにかが それを まってる。 |
+| DB.R3 | S | hint | WIN | K | A NEW ADAPTOR IS HIDDEN IN / THE HALL OF FAME. SOMETHING / HERE IS WAITING FOR IT. | ホール・オブ・フェイムに あたらしい アダプターが / かくれてる。 ここで なにかが それを まってる。 |
 | DB.R4 | S | hint | WIN | K | SOME PLACES NEED TWO. YOU'LL / HAVE A TAG PARTNER SOON. A / MASKED ONE. | ふたりなら いける ばしょが ある。 もうすぐ / タッグパートナーが できるよ。 かめんの ひとが。 |
-| DB.R5 | M | hint | WIN | K | THE JUDGES THINK ANOTHER / CHAMPION'S WEAPON IS THE KEY / HERE. %WEAPON%, MAYBE? | しんさいんの みたてでは べつの チャンピオンの ぶきが / かぎ。 %WEAPON% かも? |
+| DB.R5 | S | hint | WIN | K | THE JUDGES THINK ANOTHER / CHAMPION'S WEAPON IS THE KEY / HERE. %WEAPON%, MAYBE? | しんさいんの みたてでは べつの チャンピオンの ぶきが / かぎ。 %WEAPON% かも? |
 | DB.G-TIME | M | hint | WIN | K | TOO SLOW FOR THE JUDGES! PAR / HERE IS %PAR%. YOU TOOK / %TIME%. | しんさいんには おそすぎ! ここの パーは / %PAR%。 きみは %TIME%。 |
 | DB.G-DAMAGE | M | hint | WIN | K | THE JUDGES COUNT EVERY HIT / YOU TAKE. FEWER HITS, BIGGER / PRIZE. | しんさいんは ダメージを ぜんぶ かぞえてる。 へらせば / しょうきん アップ。 |
 | DB.G-VARIETY | M | hint | WIN | K | THE JUDGES LOVE VARIETY! WIN / WITH LOTS OF WEAPONS AND / FORMS FOR THE BIGGEST PRIZE. | しんさいんは バラエティが だいすき! いろんな ぶきと / フォームで たおすと いちばん もうかる。 |
@@ -2691,7 +2708,7 @@ come back with it; the three cut chips' pages are kept as Won't notes.
 | HLP.EXCHANGER | M | help | WIN | E | LIFE YOU CAN'T USE BECOMES / ENERGY YOU CAN. TWO FOR ONE. / EDDIE'S MATH. | つかえない ライフを つかえる エネルギーに。 / 2たい1。 エディけいさん。 |
 | HLP.ENERGY_SAVER | M | help | WIN | E | EVERY WEAPON SIPS INSTEAD OF / GULPING. TAKES TWO SLOTS. / WORTH IT? DISCUSS. | どの ぶきも ちびちび のむ。 スロットを 2つ / つかう。 その かちは? ぎろん しよう。 |
 | HLP.YASHICHI | M | help | WIN | E | IT SPINS WHEN YOU NEED IT / MOST. ONCE. THEN IT RESTS / UNTIL THE NEXT STAGE. NOT / WITH DARUMA. | いちばん ひつような ときに まわる。 1どだけ。 / つぎの ステージまで やすむ。 ダルマとは いっしょに / つけられない。 |
-| HLP.KAISHIN | M | help | WIN | E | AN EXCELLENT MOVE! EVERY / 12TH HIT ON A CHAMPION LANDS / HARDER. COUNT ALONG AT HOME. | かいしんの いちげき! ボスへの 12はつめごとに / いちげきが おもくなる。 いっしょに かぞえよう。 |
+| HLP.KAISHIN | M | help | WIN | E | A SPLENDID STRIKE! EVERY / 12TH HIT ON A CHAMPION LANDS / HARDER. COUNT ALONG AT HOME. | みごとな いちげき! ボスへの 12はつめごとに / いちげきが おもくなる。 いっしょに かぞえよう。 |
 | HLP.SHERIFF_STAR | M | help | WIN | E | DEPUTIES GET PAID BETTER: / 20% MORE PRIZE MONEY. THAT / IS THE WHOLE POINT OF BEING / A DEPUTY. | ほあんかんは きゅうりょうが いい。 しょうきん 20% / アップ。 ほあんかんに なる りゆうは それだけ。 |
 | HLP.AUTO_RECOVER | M | help | WIN | E | STAND STILL AND LISTEN. / SOMETHING IS GROWING BACK. / THE JUNGLE IS PATIENT. / CHAMPIONS ARE NOT. | じっと して みみを すませて。 なにかが はえて / くる。 ジャングルは きが ながい。 チャンピオンは / みじかい。 |
 | HLP.SNOW_CHAINS | M | help | WIN | E | ICE HOLDS STILL UNDER YOUR / BOOTS. ICICLES BOUNCE OFF. / THE SEALS TAUGHT YOU THIS. | こおりでも すべらない。 つららも はねかえす。 / アザラシたちに おそわった。 |
@@ -2716,7 +2733,8 @@ HELMET (systems §9.4).
 
 `meta.md` §12 owns the mechanism (a sparse override table, EN fallback, the letter O for zero in numbers); this is the
 final list. **Rules:** menus only (never story, hints or help pages; the one exception is meta's ENGRISH perfect line, a
-deliberate 4MI tribute); affectionate, never mocking; the classics quoted correctly; every string legal in its
+deliberate 4MI tribute); affectionate, never mocking; the classics nodded to in new words, never quoted verbatim
+(R8.4); every string legal in its
 surface's font (§10.1: the pause font has no D, O, Q or Z, so ENGRISH there spells around them too). All rows are
 labels (LBL, EN only by definition) and **Could**.
 
@@ -2741,15 +2759,16 @@ labels (LBL, EN only by definition) and **Could**.
 | Shop | WELCOME! | ALL YOUR BOLTS ARE BELONG TO EDDIE | a 1989 shooter's famous line, as Europe saw it in 1991 |
 | Pit stop | SAVE & QUIT | SAVE AND GOODBYE | |
 | Game over | GAME OVER / CONTINUE | GAME IS OVER / CONTINUE? YOU CAN | |
-| GP Rush (Could) | ELIMINATED / CHAMPION | YOU ARE ELIMINATE / A WINNER IS YOU | a 1986 wrestling game's victory screen |
+| GP Rush (Could) | ELIMINATED / CHAMPION | YOU ARE ELIMINATE / A CHAMPION IS YOU | a 1986 wrestling game's victory screen, in new words |
 | Records | KNOCKOUTS / TOTAL | TIWNS / TOTALLY | 4MI's heading (meta §9.4) |
-| Rating, header | CHAMPIONSHIP RATING | CONGLATURATION !!! | a 1988 ghost-catching game's ending screen |
+| Rating, header | CHAMPIONSHIP RATING | CONGLATULATE !!! | a 1988 ghost-catching game's ending screen, in new words |
 | Rating | GRAND CHAMPION / PARTICIPANT | GRAND CHAMPIOM / THANK YOU FOR PARTICIPATE | |
 | Credits | TRANSLATION: (name) | TRANSLATION: (RESERVED) | 4MI's credit |
 
-The quoted classics are accurate to their originals' spelling: "ALL YOUR BASE ARE BELONG TO US", "A WINNER IS YOU",
-"CONGLATURATION !!!" (Appendix A, A-8.14). The notes describe the games (R3.3); the strings are quotations of famous
-mistranslations, not names. Round 1's SEMIFINAL row became HALFTIME RIOT (R4.3); the 1993 difficulty row is gone with
+The classics are nodded to, never quoted (R8.4): the originals ("ALL YOUR BASE ARE BELONG TO US", "A WINNER IS YOU",
+"CONGLATURATION !!!", Appendix A, A-8.14) keep their rhythm in new words: ALL YOUR BOLTS…, A CHAMPION IS YOU,
+CONGLATULATE !!!. The notes describe the games (R3.3); no string names one. Round 1's SEMIFINAL row became HALFTIME
+RIOT (R4.3); the 1993 difficulty row is gone with
 1993 RULES (Could, meta). Digits print with O for zero (`1OO`), the mirror of vanilla's pause font, which writes O
 with a zero.
 
@@ -2810,7 +2829,7 @@ A pop-up whose screen has fewer than 24 free ids waits in the announcer queue (t
 
 - Latin capitals, digits, `. , ! ? ' " : ; - / & % ( ) ★ ♥ ♪ β × ▶ ・ …` (EN is ALL CAPS, R1.4: no lowercase set);
 - hiragana and katakana with voiced and semi-voiced forms precomposed, small kana, `ー 「 」 『 』 、 。 ~`;
-- **one lowercase `r`**, for JP's `Mr.Y`, `Mr.X`, `Mr.Z` and `Dr.` (vanilla's JP writes `Dr.ライト` with a lowercase r;
+- **one lowercase `r`**, for JP's `Mr.Y`, `Mr.X` and `Dr.` (vanilla's JP writes `Dr.ライト` with a lowercase r;
   EN writes `MR. Y` and `DR.` in capitals). This is the one glyph this doc asks tech to add (§12);
 - no kanji (vanilla's JP text has none; the only kanji in RM6 are the logo's).
 
@@ -2860,35 +2879,56 @@ and up to 4 items (tech's CHOICE); in JP `▶はい いいえ`.
 
 | Kind | Must | Should | Could | Won't | What it is |
 |---|---|---|---|---|---|
-| `scene` | 158 | 8 | 33 | 1 | Must scenes (R4.5) |
+| `scene` | 158 | 8 | 32 | 2 | Must scenes (R4.5) |
 | `plaque` | 7 | 7 | 6 | 0 | plaques (Must scenes, R4.5) |
 | `death` | 40 | 37 | 7 | 0 | death tables, 4 per stage (R4.5) |
 | `heckle` | 12 | 28 | 4 | 0 | heckles (death lines in H1-W3, R4.5) |
 | `weak` | 14 | 0 | 1 | 0 | first-weakness lines (R4.5) |
 | `secret` | 37 | 12 | 0 | 0 | secret, plate and tell lines (R4.5) |
-| `hint` | 54 | 33 | 0 | 0 | debrief hints, tier B (R4.5) |
+| `hint` | 51 | 36 | 0 | 0 | debrief hints, tier B (R4.5); R1, R3, R5 Should (§7.3) |
 | `help` | 14 | 0 | 4 | 3 | chip help pages (R4.5) |
 | `stage` | 56 | 0 | 0 | 0 | a Must mechanic's own text (R0.4) |
 | `sys` | 8 | 0 | 0 | 0 | boot, health notice, CONFIG (R3.5, R0.4) |
 | `flavour` | 0 | 234 | 36 | 0 | flavour (Should by R4.5) |
-| **translated strings** | **400** | **359** | **91** | **4** | EN + JP |
+| **translated strings** | **397** | **362** | **90** | **5** | EN + JP |
 | labels (`LBL`) | 28 | 3 | 5 | 0 | English in both |
 | boss-panel records (§5) | 18 | 3 | 4 | 2 | English in both |
 
 **Against R4.5's ≈ 350.** R4.5 lists six Must kinds: death tables (4 per stage), first-weakness lines, secret and
-plate lines, Must scenes, tier B hints and the 14 help pages. Those kinds total **336** here (`death`, `heckle`,
+plate lines, Must scenes, tier B hints and the 14 help pages. Those kinds total **333** here (`death`, `heckle`,
 `weak`, `secret`, `scene`, `plaque`, `hint`, `help`), inside the ruling. On top sit **64** strings R4.5's list
 does not name but R0.4 makes Must, because a Must mechanic cannot run without them: Knight's command windows, Sage,
 King, Knightlord and battle log (≈ 33), Tomahawk's posters, conductor and Sheriff (≈ 15), the other venues' and
 stages' tells written as signs (`stage`), and the boot and CONFIG sentences, among them R3.5's health notice (`sys`).
-**Total v1.0: 400 translated strings**, plus 28 labels and 18 panel records in English only.
+**Total v1.0: 397 translated strings**, plus 28 labels and 18 panel records in English only. **R8.4 accepts this
+reading** ("about 400 Must strings").
 
-**Size.** 400 strings × 2 languages ≈ 34 KB raw (about 42 B a string-language), ≈ 22 KB after dictionary
+**By area** (R8.4: these counts are the single source; the venue and fortress docs cite them instead of their own
+estimates). Must rows only, from the same `fit.py` pass, grouped by Id (a venue's row includes its S11 bar fill, S15
+words, §6.3 hooks and deaths and §7.1 hints; a fortress stage's includes its scenes, §6.4 lines and §7.2 hints):
+
+| Area (owner) | Strings | Labels | Area (owner) | Strings | Labels |
+|---|---|---|---|---|---|
+| Boot and menus (meta) | 8 | 1 | HALFTIME RIOT (fortress) | 30 | 0 |
+| Opening-lite (fortress) | 33 | 3 | Hall of Fame scenes S25-S33, Mr. Y's heckles (fortress) | 43 | 2 |
+| Bracket, pit stop, debrief generic lines, help pages, generic secret lines (meta, systems) | 48 | 0 | H1 (fortress) | 10 | 3 |
+| Blizzard (venues_b) | 13 | 0 | H3 (fortress) | 10 | 5 |
+| Wind (venues_a) | 10 | 2 | H5 (fortress) | 8 | 1 |
+| Plant (venues_a) | 11 | 1 | W2, W3, Wily's heckles (fortress) | 28 | 1 |
+| Flame (venues_b) | 11 | 0 | The ending S40-S48 (fortress) | 39 | 8 |
+| Yamato (venues_b) | 12 | 0 | **venues_a** (Wind, Knight, Tomahawk, Plant) | **90** | **4** |
+| Tomahawk (venues_a) | 25 | 1 | **venues_b** (Blizzard, Flame, Yamato, Centaur) | **50** | **0** |
+| Knight (venues_a) | 44 | 0 | **fortress** (Opening to the ending) | **201** | **23** |
+| Centaur (venues_b) | 14 | 0 | **Total** | **397** | **28** |
+
+**Size.** 397 strings × 2 languages ≈ 34 KB raw (about 42 B a string-language), ≈ 22 KB after dictionary
 compression, plus ≈ 2 KB of glyphs and ≈ 6 KB of dictionaries: inside tech's text banks T1-T4 (tech §11.5, which
 budgeted ≈ 30 KB for ≈ 350). The full design (850 strings with Should and Could) is ≈ 60-70 KB before compression,
-under round 1's 1,100-string estimate, and fits the 9 banks tech reserves.
+under round 1's 1,100-string estimate, and fits the 9 banks tech reserves; if text ever needs a 10th, it is music's
+spare bank `$79`, never a CHR bank (R8.7).
 
-**If the director holds v1.0 to 350 in total**, the trim list, in order (each keeps every Must mechanic playable):
+**The reserve trim list** (R8.4: held in reserve, not planned; used only if the M4 re-estimate or a later gate needs
+it), in order (each keeps every Must mechanic playable):
 
 1. Knight's battle log to the 5 lines that carry a tell (KNT.L03, L04, L06, L08, L09): −5.
 2. The Knightlord's refusal (KNT.K04) and the second key line (KNT.S18) folded into one: −2.
@@ -2897,17 +2937,18 @@ under round 1's 1,100-string estimate, and fits the 9 banks tech reserves.
 5. The venue tells that a sign or a plaque already gives (FLM-02, CEN-07, BLZ-07): −3.
 6. The heckles to Mr. Y 4 and Wily 3 (HY.02, HY.05, HW.04 to Should): −3.
 7. S33's green-castle pages (S33.14-S33.15), S33.6's evidence line and S41.8's injury-time confession: −4.
-8. The generic requirement hints no v1.0 predicate uses (R1, R3, R5; §7.3): −3.
+8. *(Applied in round 3: the requirement hints no v1.0 predicate uses, R1, R3 and R5, are Should, §7.3; −3 taken.)*
 9. The game-over lines to one (S16): −2.
 10. The scoreboard pages folded into the lane judges' cards (S07.6-S07.9): −4.
 
-That is −33, to ≈ 367; the rest would have to come from venue mechanics themselves (a Must-list change, not a text
-change). This doc recommends keeping the 400: the overage is the mechanics' own text, and the session estimate
-below already carries it.
+The reserve is −30 (items 1-7, 9-10), to ≈ 367; the rest would have to come from venue mechanics themselves (a
+Must-list change, not a text change). R8.4 keeps the 397: the overage is the mechanics' own text, and the session
+estimate below already carries it.
 
 **Sessions** (the v1.0 scope's table): **12** for v1.0 (≈ 40 strings a session written, fitted and compiled in both
-languages, plus the M2 setup and the M9 review fixes); Should ≈ 7 (359 strings, mostly one-line pop-ups already
-drafted, at ≈ 50 a session); Could ≈ 3 (91); Won't ≈ 0.5. `tools/plan/tight.py` (text 12) and `tools/plan/tally.py`
+languages, plus the M2 setup and the M9 review fixes); Should ≈ 7 (362 strings, mostly one-line pop-ups already
+drafted, at ≈ 50 a session); Could ≈ 3 (90); Won't ≈ 0.5. Round 3's moves (three hints to Should, one page swapped)
+change no session figure. `tools/plan/tight.py` (text 12) and `tools/plan/tally.py`
 carry these figures.
 
 ### 10.5 Labels and what the vanilla constraints mean for the script
@@ -2954,7 +2995,7 @@ The staging docs list their own; these are the story's. v1.0 unless marked.
 3. The GP mascot, pumped with Mr. Y-brand helium, turns into PI-KUN 16-BIT EDITION; a masked voice after your first
    fall: "HOLD B. LET GO WHEN YOU GLOW." (S08)
 4. Bass β is registered as **entrant β**, because Mr. Y ran out of numbers (S14).
-5. The judges' desk always has a cardboard Mr. Y on the sponsor's chair, holding up a 1 (meta §4.0).
+5. *(Should)* The judges' desk always has a cardboard Mr. Y on the sponsor's chair, holding up a 1 (meta §4.0).
 6. At halftime the rejected contest entries riot, the lights go out, and a masked stranger holds the crowd back.
    Rock: "...BLUES?" "BREAK MAN." (S17-S20)
 7. The trophy is stolen in front of everyone by a claw on Mr. Y's pod (S25).
@@ -2971,7 +3012,8 @@ The staging docs list their own; these are the story's. v1.0 unless marked.
 16. The ending turns the music off one sound channel at a time while Light explains why that isn't sad; the last sound
     is pulse 1 alone (S42).
 17. The Hall of Fame opens a sixth wing for the game you are playing, and its plaque is true (S43).
-18. The CAPCOM TIMES announces next year's sponsor, Mr. Z, and ends on vanilla's own last sentence (S44).
+18. The CAPCOM TIMES reports "MR. Y WAS DR. WILY. WE KNEW.", finds no sponsor for next year (Cossack relaxes), and
+    ends on vanilla's own last sentence (S44).
 19. The credits keep the 1993 fan designers' cards exactly as Capcom printed them (S45).
 20. *(Could)* A booth sells a chip "legal in at least one country"; take it and Break Man walks off the bracket (S21).
 
@@ -2981,13 +3023,13 @@ The staging docs list their own; these are the story's. v1.0 unless marked.
 
 | Doc | This doc needs (asks) | This doc gives |
 |---|---|---|
-| `meta.md` | STORY_BEAT at FILE `$013` with §0's values; EVENTS b0-b4/b6/b7 and EVENTS2 b4 (Must), b5 and EVENTS2 b0-3/b5 (Should, Could); COMMFLAGS at FILE `$04A` (b4-b5 Must, §6.1); the sponsor chair's `BACK SOON` from STORY_BEAT `$03` and `RESERVED` from `$09`; **W3 has no desk, so its three hints are Should** (§7.2); v1.0's predicate table uses only R2, so meta may demote R1, R3 and R5 (§7.3) | every word meta asked for: the hints (tier B Must, tier A Should), the generic debrief lines, Break Man's debrief (S47), the post-game intro, the bracket lines, the health notice and CONFIG descriptions, the labels' decisions (§10.5), ENGRISH (Could) |
+| `meta.md` | STORY_BEAT at FILE `$013` with §0's values; EVENTS b0-b4/b6/b7 and EVENTS2 b4 (Must), b5 and EVENTS2 b0-3/b5 (Should, Could); COMMFLAGS at FILE `$04A` (b4-b5 Must, §6.1); the sponsor chair's `BACK SOON` from STORY_BEAT `$03` and `RESERVED` from `$09` (the chair and its signs are Should); **W3 has no desk, so its three hints are Should** (§7.2); v1.0's predicate table uses only R2, so **R1, R3 and R5 are Should here** (§7.3) and meta §4.5 should read the same (META-04) | every word meta asked for: the hints (tier B Must, tier A Should), the generic debrief lines, Break Man's debrief (S47), the post-game intro, the bracket lines, the health notice and CONFIG descriptions, the labels' decisions (§10.5), ENGRISH (Could) |
 | `systems.md` | The v1.0 weakness rows (§5) for the first-weakness lines; SC5, SC6, SC11 for S28, S19/S37, S39; the 1-bolt insurance (−1, never below 0) for HY.04; the 14 chips' exact effects for §8 | the 14 help pages (YASHICHI and DARUMA both say they exclude each other; DARUMA's page uses the fallback line, its hidden function rejected); `UNDER REVIEW`; the Could bundle's four pages; the Y-TURBO warranty proposal stays with the bundle |
-| `venues_a.md` | — (its hooks, tiers and triggers are taken as written) | final EN/JP of `WND-`, `KNT-`, `TMH-`, `PLT-`; the new sixth Tomahawk death line (TMH.D6); PLT-06 and PLT-08 without "Harry" and "Game Boy"; TO1 without a game's name; Tomahawk Man's showman voice (§2.10); the secret arenas' v1.0 VENUE names (§5.2); KNT.D1 as the King's line |
-| `venues_b.md` | — | final EN/JP of `BLZ-`, `FLM-`, `CEN-`, `YAM-`; the replacement sixth death lines (BLZ.D6, CEN.D6); FLM-06 for the spacing parry; BLZ-04 and YAM-02 without a Wily gag; YA0's new tier A; the secret arenas' v1.0 VENUE names |
-| `fortress.md` | (1) **§0.5 and §2.6**: Rock's first "Blues?" is at the Riot's 0E reveal (S20.3), not S06 (R4.2: S06 speaks no name), the second at S40; fortress §0.5 says "S06 and S40". (2) **Panel names** in vanilla's no-space style: `BREAKMAN` / `DEFINITELY BREAKMAN` → `DARKMAN` / `BAD DISGUISES`, and the WRONG NOTE's extra line is the VENUE field `EXPOSED BY A WHISTLE` (§5.4). (3) The **b1 and b2 secret lines are Should** in v1.0 (§6.4: the generic lines play); b0 and the tells are Must. (4) **H5's b0 letters**: `ROCKMAN5` (the Japanese release) or `MEGAMANV` (abroad), fortress chooses; this doc's lines spell neither. (5) New hook ids **WK-WM, WK-WC** (W3's first-weakness lines). (6) The dogeza (S39) has no Mr. Y line: the arrest (S41) carries the ending's one Mr. Y gag; S44's Mr. Z is Act VI's own gag. (7) W3's VENUE on the panel is `FINAL ROUND` | every line in its stages (S03-S08, S17-S20, S25-S48, §6.4's OPN-/RIO-/H1-/H3-/H5-/W2-/W3- lines, the 4 death lines of the Opening and the Riot, the heckle tables with its wing-tagged drafts as Should variants); the plaques; the panel records; the tier B hints fitted |
-| `art_audio.md` | Face icons for the POP speakers (Cossack, Kalinka, Mr. Y/Wily, Roll, Break Man, Light as a radio frame, Eddie; Bass β and the champions); **4 blips**; the whistle jingle (Must) at Break Man's pages and the WRONG NOTE; G37 LAST MATCH with **one stem per 2A03 channel**, dropped in the order MMC5 (if on), noise, triangle, pulse 2, pulse 1, **no DPCM cue**; the panel's bold `- ? ! ' β` and VENUE strip; one CAPCOM TIMES headline; no mixed-case EN set | the glyph list (§10.2); the per-window glyph budgets; which speakers need icons |
-| `tech.md` | The glyph cache with **one added glyph, lowercase `r`** (JP's `Mr.`/`Dr.`); the CAPCOM TIMES' GP pages typed by the new engine in the vanilla driver's text rows (§10.1); the panel's re-type entry able to type a third record (§5.4); `EV_PLATE` and `EV_SECRET` as in §6.1; ≈ 30 KB of text in T1-T4 for v1.0's 400 strings (§10.4) | the string inventory and sizes (§10.4); the TSV ids (every row's Id) |
+| `venues_a.md` | Its hooks, tiers and triggers are taken as written. Cite §10.4's counts by area instead of its own ≈ 86 (R8.4); HERO'S QUEST's quoted lines are now paraphrased here (R8.4: KNT.S11, S16, S23, K01-K04, D1's JP), so its drafts should follow | final EN/JP of `WND-`, `KNT-`, `TMH-`, `PLT-`; the new sixth Tomahawk death line (TMH.D6); PLT-06 and PLT-08 without "Harry" and "Game Boy"; TO1 without a game's name; Tomahawk Man's showman voice (§2.10); the secret arenas' v1.0 VENUE names (§5.2); KNT.D1 as the King's line |
+| `venues_b.md` | Cite §10.4's counts by area (R8.4) | final EN/JP of `BLZ-`, `FLM-`, `CEN-`, `YAM-`; the replacement sixth death lines (BLZ.D6, CEN.D6); FLM-06 for the spacing parry; BLZ-04 and YAM-02 without a Wily gag; YA0's new tier A; the secret arenas' v1.0 VENUE names |
+| `fortress.md` | (1) **§0.5 and §2.6** follow R8.5: Rock's first "Blues?" is at the Riot's 0E reveal (S20.2), not S06 (S06 speaks no name), the second at S40; fortress §0.5 said "S06 and S40". (2) **Panel names** in vanilla's no-space style (R8.5): `BREAKMAN` / `DEFINITELY BREAKMAN` → `DARKMAN` / `BAD DISGUISES`, and the WRONG NOTE's extra line is the VENUE field `EXPOSED BY A WHISTLE` (§5.4). (3) The **b1 and b2 secret lines are Should** in v1.0 (§6.4: the generic lines play); b0 and the tells are Must (R8.6). (4) **H5's b0 letters spell `ROCKMAN5`** in both languages (R8.5); this doc's lines spell no letters. (5) New hook ids **WK-WM, WK-WC** (W3's first-weakness lines). (6) The dogeza (S39) has no Mr. Y line: the arrest (S41) carries the ending's one Mr. Y gag and its only alias gag; S44 uses S44.4F, no Mr. Z (R8.5). (7) W3's VENUE on the panel is `FINAL ROUND`. (8) Cite §10.4's string counts by area, not fortress's own ≈ 230 (R8.4) | every line in its stages (S03-S08, S17-S20, S25-S48, §6.4's OPN-/RIO-/H1-/H3-/H5-/W2-/W3- lines, the 4 death lines of the Opening and the Riot, the heckle tables with its wing-tagged drafts as Should variants); the plaques; the panel records; the tier B hints fitted |
+| `art_audio.md` | Face icons for the POP speakers (Cossack, Kalinka, Mr. Y/Wily, Roll, Break Man, Light as a radio frame, Eddie; Bass β and the champions); **4 blips**; the whistle jingle (Must) at Break Man's pages and the WRONG NOTE; G37 LAST MATCH with **one stem per 2A03 channel**, dropped in §12.9's order MMC5 (if on), noise, triangle, pulse 2, pulse 1, **no DPCM cue**: the game's only channel drop (R8.3; W2, W3 and the escape keep every 2A03 channel); the panel's bold `- ? ! ' β` and VENUE strip; one CAPCOM TIMES headline (the doped one Could); no mixed-case EN set; the S40 carry art Should; the crawl's pictures Could | the glyph list (§10.2); the per-window glyph budgets; which speakers need icons |
+| `tech.md` | The glyph cache with **one added glyph, lowercase `r`** (JP's `Mr.`/`Dr.`); the CAPCOM TIMES' GP pages typed by the new engine in the vanilla driver's text rows (§10.1); the panel's re-type entry able to type a third record (§5.4); `EV_PLATE` and `EV_SECRET` as in §6.1; ≈ 30 KB of text in T1-T4 for v1.0's 397 strings (§10.4); a 10th text bank, if ever needed, from music's spare `$79` (R8.7) | the string inventory and sizes (§10.4); the TSV ids (every row's Id) |
 
 ## Lessons applied
 
@@ -3009,9 +3051,9 @@ The staging docs list their own; these are the story's. v1.0 unless marked.
 
 ## Risks
 
-1. **Text volume.** v1.0 has 400 translated strings against R4.5's ≈ 350; R4.5's own kinds are 336, and the
-   rest is Must mechanics' text. *Mitigation:* §10.4's trim list (−33) if the director holds 350; the session estimate
-   already carries the full count.
+1. **Text volume.** v1.0 has 397 translated strings against R4.5's ≈ 350; R4.5's own kinds are 333, and the
+   rest is Must mechanics' text. R8.4 accepts about 400. *Mitigation:* §10.4's reserve trim list (−30) if the M4
+   re-estimate needs it; the session estimate already carries the full count.
 2. **JP quality.** The JP drafts are a non-native pass. Register is the main risk (Mr. Y's わたくし, the hero's-quest
    archaic forms, Yamato's ござる). *Mitigation:* the native review gates release (R4.5), booked at M9; its date is the
    user's to set.
@@ -3031,16 +3073,14 @@ The staging docs list their own; these are the story's. v1.0 unless marked.
 
 ## Open questions
 
-1. **R4.5's 350**: total, or R4.5's six kinds? This doc reads it as the six kinds (336) and adds the Must
-   mechanics' text (§10.4). If it is the total, apply the trim list.
-2. **"One use of the Mr. Y / Mr. Z gag"** (R4.1 step 4): this doc gives the arrest the one Mr. Y gag and keeps S44's Mr. Z
-   page as Act VI's own gag. If the ruling means one for the whole ending, S44.4 gives way to S44.4F, "NEXT YEAR'S SPONSOR: NOT
-   YET ANNOUNCED. COSSACK RELAXES." (§4, S44).
-3. **Light's "ALBERT"** (S33.7): the full name Albert W. Wily is from English-language material; JP uses アルバート.
-   Keep, or have Light say ワイリー in JP?
+1. *Resolved (R8.4):* about 400 Must strings are accepted (the six kinds plus the Must mechanics' text); §10.4's
+   trim list is the reserve.
+2. *Resolved (R8.5):* the alias gag plays once in the whole ending, at the arrest (S41); S44 uses S44.4F.
+3. *Resolved (R8.4):* JP says アルバート for Light's one use of Wily's first name. Story places that use in S33.7, not
+   S42, so S42 has no first name and S33.7's JP already reads アルバート.
 4. **The thanks plaques' author names** in kana for JP (H2/H4, Should): kept in Latin letters until the authors' own
    preference is known.
-5. **H5's letters**: `ROCKMAN5` or `MEGAMANV` (fortress's call, §12).
+5. *Resolved (R8.5):* H5's letters spell `ROCKMAN5` in both languages.
 6. **The victory lap's ALL ENTRANTS roll** (Could): generated from the object lists at build time, or written by hand?
 
 ---
@@ -3082,7 +3122,7 @@ screen (R3.3) while staying here, in the design notes, where R3.3 allows them.
 | A-4.6 | Rockman CX is by Himajin Jichiku (ver 1.1, 2017); its Light is the villain | S45.2, the H2 thanks plaque | high: `cx/SUMMARY.md` |
 | A-5.1 | Rockman 5: Blues no Wana!?, 1992 | PLQ.H5, §5.4 | high (year; the day is not printed) |
 | A-5.2 | A Blues look-alike kidnapped Light; it was Dark Man, built by Wily; the real Blues appeared and the disguise fell | PLQ.H5, S30, §5.4 | high: Mega Man wiki |
-| A-5.3 | The Beat plates spell `ROCKMAN5` in Japan and `MEGAMANV` abroad | H5-09 and H5's b0 (neither spelled) | high (round 1: TCRF, regional differences) |
+| A-5.3 | The Beat plates spell `ROCKMAN5` in Japan and `MEGAMANV` abroad | H5's b0 plates spell `ROCKMAN5` in both languages (R8.5); H5-09 spells no letters | high (round 1: TCRF, regional differences) |
 | A-5.4 | Dr. Cossack built Beat in Rockman 5 | PLQ.H5, G.SP1 | high |
 | A-5.6 | Rockman 5's first fortress is Blues' castle, where Dark Man waits | §5.4 (Dark Man's LOCATION) | medium-high (canon; stage names vary by region) |
 | A-6.1 | Rockman 6 was released on 5 November 1993, the last Rockman on the Famicom | S43, PLQ.H5.19 | high |
@@ -3098,7 +3138,7 @@ screen (R3.3) while staying here, in the design notes, where R3.3 allows them.
 | A-7.3 | Tango debuts in Rockman World 5 (the handheld, 1994) | PLT-08 | high |
 | A-7.4 | The Sakugarne is Quint's pogo in Rockman World 2 (1991) | YAM-13 | high |
 | A-7.5 | "Block Man" is a Rockman 11 Robot Master (2018) | §5.3 (Could) | high |
-| A-8.1 | Dragon Quest (1986): the hidden stairs behind the last lord's empty throne; the hero's ancestor's tablet; the King's scolding at a death; the Princess's "But thou must!"; "an excellent move"; "half the world" | KN0-KN2, KNT.D1, KNT.S23, KNT.K01 | high; the text nods, it does not quote the King (R3.3) |
+| A-8.1 | Dragon Quest (1986): the hidden stairs behind the last lord's empty throne; the hero's ancestor's tablet; the King's scolding at a death; the Princess's "But thou must!"; "an excellent move"; "half the world" | KN0-KN2, KNT.D1, KNT.S11, KNT.S16, KNT.S23, KNT.K01-K04, HLP.KAISHIN, G.EX | high; the text paraphrases these lines in new words, never quotes them (R3.3, R8.4) |
 | A-8.2 | *1943*: shooting a POW cycles its item, the Yashichi among them; the Yashichi first appeared in *Vulgus* (1984), Capcom's first arcade game; *1942* gives three loops; AYAKO is a *1943* boss | WI0, WI2, WND.D6, WND-05 | high: Sega Retro, Giant Bomb |
 | A-8.3 | *Pitfall!* (1982) has a 20-minute clock and logs cost points; in *Pitfall II* (1984) the explorer seeks his niece, a pet (cat or mountain lion, by source) and a diamond | PLT-01, PL0, PL2 | high |
 | A-8.4 | *Prince of Persia* (1989): the mouse opens a gate; the prince merges with his shadow; 60 minutes | FL0, FL1, FLM-03, FLM.D6 | high |
@@ -3109,7 +3149,7 @@ screen (R3.3) while staying here, in the design notes, where R3.3 allows them.
 | A-8.10 | The falling-block puzzle was born in Moscow in 1984 | E1 plaque (Could) | high |
 | A-8.11 | Block breakers: the 1976 original and its 1986 descendant with a named paddle | E2 plaque (Could) | high |
 | A-8.12 | The 1978 fixed shooter's invaders speed up as fewer are drawn; **"they say"** it caused a 100-yen coin shortage (disputed folklore) | E3 plaques, §5.3 (Could) | high (speed-up); folklore, worded so (R3.9) |
-| A-8.14 | The ENGRISH classics: "ALL YOUR BASE ARE BELONG TO US" (a 1989 shooter, Europe 1991), "A WINNER IS YOU" (a 1986 wrestling game), "CONGLATURATION !!!" (a 1988 ghost-catching game) | §9 (Could) | high |
+| A-8.14 | The ENGRISH classics: "ALL YOUR BASE ARE BELONG TO US" (a 1989 shooter, Europe 1991), "A WINNER IS YOU" (a 1986 wrestling game), "CONGLATURATION !!!" (a 1988 ghost-catching game) | §9 (Could; nodded to in new words, R8.4) | high |
 | A-8.15 | Fireworks call "Tamaya!"; the daruma's eyes; 七転び八起き; the nightingale floor; kabuki shouts of the actor's house name; ninja houses' turning panels (donden-gaeshi) | YAM lines, YA0, HLP.DARUMA | high (cultural) |
 | A-8.16 | *DuckTales* (Capcom, 1989): the cane works as a pogo and finds hidden treasure | YA1, G.SY1 | high |
 | A-8.18 | Rockman's death sound is called "tiun tiun" by Japanese players; 4MI's TIWNS | G.D07, §9 | high: `r4mi/text.md` §0 |
@@ -3148,3 +3188,28 @@ passes, cut with the sekisho, R3.2), A-8.13 (Maze Man, Won't), A-8.17 (the "ORA 
 | 22 | **Lag and CASUAL**: no story element occupies an object slot (pop-ups, plaques and windows are BG); story owns no stage, so it has no CASUAL lever list | R1.8, R2.9 |
 | 23 | **Ledger**: text v1.0 stays 12 sessions (`tools/plan/tight.py`); `tools/plan/tally.py`'s text line now reads Must 400 strings ≈ 12, Should ≈ 7, Could ≈ 3, with the native-JP review as a dated external gate | R0.1, R4.5 |
 | 24 | **Asks to other docs** recorded in §12: fortress §0.5's "S06 and S40", the no-space panel names, the H5 letters, the new WK-WM / WK-WC ids; tech's lowercase `r` and the newspaper's GP pages; meta's W3 hints and R1/R3/R5 | consistency decision 8; R4.1 |
+
+---
+
+## Changes in round 3
+
+RULINGS §8 (R8.1-R8.8) and the "## story.md" table of `reconcile.md`. `fit.py` re-run: 0 problems; Must 397, Should
+362, Could 90, Won't 5 translated strings; 28 labels and 18 panel records unchanged. Text stays **12 sessions** (no
+milestone figure changes). The "Changes in round 2" table above is history: where it says S44's Mr. Z is Act VI's gag
+or the trim list is −33, this round supersedes it.
+
+| Request | Outcome | Section | Note |
+|---|---|---|---|
+| STORY-01 | applied | §4 S47; §1.3; §11 | S47.T1 now names the Riot, and the note says T1 is SOLO RIOT (RATEFLAGS b4), never a call or SELECT. Already there: YA0.A (§7.1), SYS.HARD = ×1.5 damage, fewer drops, no refill; SYS.HEALTH, SYS.LAG, SYS.CASUAL and SYS.CASUALBIT (Boot and menus); the sponsor's chair Should (§1.3, now also marked in §11 item 5) |
+| STORY-02 | already | §6.3 Tomahawk, Plant; §2.10; S15 | TMH.D6 replaces Boot Hill; PLT-06/PLT-08 name no Harry or Game Boy; the rodeo showman; WND.S02 (LAND, LANDED), TMH.S07/S09 (the count, EXPRESS), KNT.S17/S18 (the stairs check), KNT.S02 (the Sage's after-death tell), TMH.S15 (the RODEO RING) |
+| STORY-03 | already | §6.3 Blizzard, Flame, Centaur, Yamato | BLZ.D6 and CEN.D6 replaced; BLZ-04 is no Wily gag at all (one per act, R4.4); FLM-06 teaches the 48-px spacing; CEN-21, CEN-22, YAM-21 exist; sekisho and hanabi lines retired |
+| STORY-04 | applied | §4 S42; §12 art_audio row | S42's cues are a table in art_audio §12.9's order (MMC5 if on, noise, triangle, pulse 2, pulse 1), no DPCM; "already silenced when the castle fell" applies only to the MMC5 voices (R8.3). Already there: one Must headline (S44.7 Could), 4 blips (§10.2), the S40 carry art Should, the crawl Could |
+| STORY-05 | already | §4 Acts 0, II, IV, V; §6.4; S30; §5.4; Appendix A | fortress §9.4's new lines exist (lane judges, the `?` card S07.5, the breaker RIO-05, NO DATA RIO-08, the turtles H3-03, FISTS ONLY, TAG! W2-03, the gap sign's second line H1.LBL2, the jammed pod W3-07); the orange scarf (S30.2); no-space panels; facts A-3.4, A-3.8, A-8.12, A-6.9 |
+| STORY-06 | applied | §7.3; v1.0 scope; §10.4 | v1.0's predicate table uses only R2 (meta §4.3), so R1, R3 and R5 (and DB.R1, DB.R3, DB.R5) are Should: Must −3 (400 → 397), Should +3; the trim list's item 8 is taken |
+| STORY-07 | applied | §1.2 rule 11; S15; §6.3 Knight; §6.2 G.EX; §8 HLP.KAISHIN; §9; S47; §1.3; S41; S44; S27; §6.4 H5; Open questions | R8.4: 397 Must strings accepted, the trim list is the reserve; quoted lines paraphrased in both languages (KNT.S11, S16, S23, K01-K04, KNT.D1's JP, G.EX, HLP.KAISHIN, ENGRISH's A CHAMPION IS YOU and CONGLATULATE !!!, S47.PE); Light's one first-name use is S33.7, whose JP already says アルバート. R8.5: the alias gag only at the arrest (S41), S44.4F is Must and S44.4 Won't; the H5 plates spell ROCKMAN5 in both languages |
+| R8.3 (extra) | applied | §4 S35 | S35.7 ("MORE CHANNELS") plays only if the MMC5 voices ship; W2, W3 and the escape keep every 2A03 channel (S42 prose) |
+| R8.4 (extra) | applied | §10.4; §12 | A by-area table of Must strings, the single source the venue and fortress docs cite (venues_a 90 + 4 labels, venues_b 50, fortress 201 + 23 labels); the reserve trim list is −30 |
+| R8.5 (extra) | applied | §5.4; §12 fortress row; §4.0; §11 item 18 | no-space panel names and the third record cited to R8.5; the press's "WE KNEW." is Act VI's Wily gag; no Mr. Z anywhere in v1.0 |
+| R8.6 (extra) | applied | §4 S41 | the champions applaud in pairs (0 new tiles; the all-eight row Should). Already: fortress b1/b2 lines Should, the nightingale floor Should (YAM-06, -07, YAM.D2-D3) |
+| R8.7 (extra) | applied | §10.4; §12 tech row | a 10th text bank, if ever needed, is music's spare `$79`, never CHR |
+| R8.1, R8.2, R8.8 | already | v1.0 scope | no stale ledger total or cumulative figure, slice form, attach-state or stage-`$00` text in this doc; story's milestone table (12 sessions) is one of R8.1's inputs, unchanged |
