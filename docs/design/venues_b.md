@@ -1,132 +1,265 @@
 # Heritage Venues B: Blizzard, Flame, Centaur, Yamato (design-venues-b)
 
-Status: **v1, complete for all four venues.** Owner: design-venues-b. Scratch: `build/design/design-venues-b/`.
+Status: **v2 (design round 2), revised against [`RULINGS.md`](RULINGS.md).** Owner: design-venues-b. Scratch:
+`build/revise/venues_b/` (round 1: `build/design/design-venues-b/`).
 
 This doc designs four of the eight Heritage Venues of Rockman 6 GP:
 
-| Venue | Stage id | Homage | Vanilla set piece kept (with one twist) |
+| Venue (on-screen name, R3.3) | Stage id (R1.2) | Homage (design notes only; never on screen) | Vanilla set piece kept, with one twist |
 |---|---|---|---|
-| **Blizzard Man: SUMMIT CLIMBER** | 0 | *Ice Climber* (1985) | the rocking icebreaker (now it shakes icicles loose) and slippery ice |
-| **Flame Man: PRINCE OF PERSIA PALACE** | 3 | *Prince of Persia* (1989, FC 1992) | igniting oil (now a choice you make, and it stays made) |
-| **Centaur Man: ATLANTIS RUINS** | 7 | *Atlantis no Nazo* (1986), *Kid Icarus* (1986) | the tide (now a tool: high tide lifts you, low tide opens a door) |
-| **Yamato Man: EDO NINJA ROW** | 4 | *Ninja Jajamaru-kun* (1985), *Ganbare Goemon!* (1986), *DuckTales* (1989) | the dark mid-boss room, the E-plate Jet ledge, the charged-punch bypass; Knight's falling ceiling, re-homed |
+| **Blizzard Man: SUMMIT CLIMBER** | `$00` | *Ice Climber* (1985) | the rocking icebreaker (now it shakes icicles loose) and slippery ice |
+| **Flame Man: PERSIAN PALACE** | `$03` | *Prince of Persia* (1989, FC 1992) | igniting oil (now a choice you make, and it stays made) |
+| **Centaur Man: ATLANTIS RUINS** | `$07` | *Atlantis no Nazo* (1986), *Kid Icarus* (1986) | the tide (now the venue's spine: a lift, a lock and a flooding shaft) |
+| **Yamato Man: EDO NINJA ROW** | `$04` | *Ninja Jajamaru-kun* (1985), *DuckTales* (1989, Capcom) | the charged-punch bypass and its dark mid-boss room, the E-plate Jet ledge |
 
-It follows `docs/design/BRIEF.md` (binding), starts from `docs/PLAN.md` §3.2 and corrects it against the research
-(`docs/research/rm6/`, `cx/`, `r4mi/`). Weapon specs, chips, dialogue, the scorecard and the engine belong to
-`systems.md`, `meta.md`, `story.md` and `tech.md`: where this doc needs something from them, it is a **proposal**
-and is listed in §5.3 (dependencies).
+**What binds this doc.** [`RULINGS.md`](RULINGS.md) first, then [`BRIEF.md`](BRIEF.md). The single sources of truth
+are: `systems.md` for combat, the economy and chips; `meta.md` for save bytes, the bracket, events and the debrief;
+`tech.md` for ids, memory, raster and CHR; `story.md` for **every word** and the ending; `art_audio.md` for the tile,
+byte and track budgets. **This doc owns the staging of its four venues:** screens, set pieces, secret gates, objects
+and their placements, boss patterns and reactions, and the CASUAL and HARD levers. Where it quotes a number another doc
+owns, that doc wins; where it needs something from another doc, it says so in §5.3.
 
 Every vanilla map was read from `docs/research/rm6/img/maps/` (`00_blizzard`, `03_flame`, `04_yamato`, `07_centaur`).
 Vanilla screen numbers are written **v0E**; GP screen numbers are plain **0E**.
 
 ---
 
+## v1.0 scope
+
+v1.0 is the **tight Must** (R0.2). Each venue ships its **core**: the homage mechanic, the secret exit, the hidden
+room, the behaviour chip and the boss rework. Each venue's **second set piece and its secret-arena twist are Should**
+(v1.1+, cut-line item 4 of R0.3). **A Must depends only on Musts** (R0.4), so every Should below names what v1.0 ships
+in its place. Blizzard is the **v0.1 vertical slice** (R0.2, RULINGS §6 M4) and is specified first and completely (§1.0).
+
+### What ships in v1.0 (Must), per venue
+
+| Venue | Core (Must, v1.0) | Second set piece and arena twist (Should, v1.1+) | Could | Won't (v1) |
+|---|---|---|---|---|
+| **Blizzard** (M4, v0.1) | Harbour and the rocking ship with falling icicles; the Ice Climber climb (head-bonk breaks ice cells, seals refill them, screens wrap, ladder stubs up); the 40-s bonus summit with vegetables and the **condor** (secret exit); the no-wrap floor to the Vegetable Cellar (hidden room); **SNOW CHAINS**; the boss rework (SLALOM, FLAKES with the ice block, SNOWBALL, AVALANCHE, MELT); secret arena = the boss room re-paletted; the **Ice Block** alt as the alt-dispatch prototype (R2.4); the bonus skip on replays (R3.8) | the ski run (v1.0: plain downhill steps); jump-up exits (X-UPEXIT; v1.0: ladder stubs); the CLOUD SUMMIT arena twist; the SNOWMAN own-weapon reaction (SC4); the bonus jingle | Shirokuma | - |
+| **Flame** (M5) | The oil field and the ignition lesson; the PoP dungeon (plates, portcullises, the timed gate you slide under, loose tiles, spike traps, palace guards with the **spacing parry**); the oil gallery's chandeliers; the mirror merge with **Shadow Rock** (secret exit); the **mouse** room (hidden room, R2.5); **FIREPROOF**; the fire vault's hourglass gate and loose bridge; the boss rework (the spacing DUEL, PILLARS, LEAP, THE PALACE BURNS, BLOWOUT); secret arena re-paletted | the chomper hall (v1.0: a spike hall); the skeleton (v1.0: a guard); the throne-room Shadow Flame Man; the vizier (Wily in costume); ABSORB (SC4) | Roll's cameo; the palace music | - |
+| **Centaur** (M5) | ZONE cards; honest, lying and fake doors; the black zone and **ZONE 0** (hidden room); the tide with its dwell, used as a lift (0D) and a lock (**ZONE 100**, secret exit); the **tidal shaft** that floods as you climb (R3.1, replacing the wrap tower); the **Centurion statues** and **CENTURION**; the Pegasus gap and plate T; the boss rework (tide-picked moves, TIME FLASH, the ABILITY UNKNOWN slot reel, STUMBLE); secret arena re-paletted | the Kid Icarus cast (Grim Reap-bot, Nasubi Mage, hot spring); the Centurions' help in the boss fight; the SUNKEN THRONE twist; ZONE 100's currents; SAY CHEESE (SC4) | the eggplant curse; the underwater music | - |
+| **Yamato** (M5), **trimmed** (R3.2) | The rooftop **bonk-stun** (kept); spinning scrolls; the **Daruma** (two-part) and **DARUMA**; the **spear pogo** over caltrops (homage mechanic) and the crest trapdoor to the vault (hidden room); **the draft** in the hall of scrolls (secret exit, R3.1: "the scroll gate alone"); vanilla's charged-punch bypass and dark room; plate E; the boss rework (RUSH, VAULT, WALL SPEARS, HELMET OFF, SNAP); secret arena re-paletted | the nightingale floor with Knight's ceiling (v1.0: a plain gold hall); the kabuki revolving stage; the bells; the ashigaru helpers in the boss fight; PARRY (SC4) | kuroko stagehands | the **sekisho**, its three passes and the runner ninja (R3.2, designer's choice); the **kite run** (R3.2); the **hanabi** lights-on-a-timer (R3.1) |
+
+All four behaviour chips, all four hidden rooms (Flame's mouse room included) and all four secret exits are Must (R2.5,
+scope-3). The per-venue HARD poke lists and boss AI branches are Should (R2.9, cut-line item 3); v1.0 HARD is the
+global ×1.5 damage, drops LESS, no refill (`systems.md`). Every venue fills in the CASUAL standard lever list (R2.9;
+§1.12, §2.10, §3.12, §4.11). Weapon alts and synergies are Should (R2.4) except **B.ATTACK's Ice Block**, which ships
+in the Blizzard slice.
+
+### Session estimates (venue code, data and tests; shared engine work is counted under tech and systems)
+
+| Venue | Must (v1.0) | Should (v1.1+) | Could | Won't | Note |
+|---|---|---|---|---|---|
+| Blizzard | **13.5** | 2.75 | 0.5 | - | +1.5 on round 1's tight figure: SNOW CHAINS is Must (R2.5), the bonus skip (R3.8) and the Ice Block venue tests (R2.4) |
+| Flame | **13** | 3 | - | - | +1: the mouse room and FIREPROOF are Must; the chompers drop to Should |
+| Centaur | **13.5** | 4 | 1 | - | +1.5: CENTURION is Must; the tidal shaft replaces the wrap tower at about the same cost |
+| Yamato | **13** | 3.75 | - | 2 | +1: the Daruma and DARUMA are Must; the sekisho, passes and runner leave |
+| Tag-partner shortcuts (4 venues) | - | - | 1 | - | with the partner bundle (R2.5, R4.2) |
+| **Total** | **53** | **13.5** | **2.5** | **2** | `tools/plan/tally.py` and `tight.py` carry these figures |
+
+The four Must figures are 5 sessions above round 1's tight estimate (48), all from rulings that promoted content to
+Must. They are re-estimated from actual counts after the slice (R0.1): the Blizzard number becomes the calibration for
+the other three.
+
+### Release rungs
+
+- **v0.1 "Blizzard slice" (M4):** §1, complete: new game → bracket → SUMMIT CLIMBER (exit, room, chip, Ice Block,
+  boss) → judges → save, reload, replay. It needs no stage-attribute table (stage id `$00` keeps the ship's hard-wire),
+  no T3, no text v1b and no other venue (§1.0).
+- **v0.5 "Round One" (M5-M6):** Flame, Centaur and Yamato after the stage-attribute table (M5): the tide's dwell is an
+  `EFX_PARAM`, and T3, T7 and T8 arrive with them.
+- **v1.0 "Championship":** unchanged venues, refought in W2 through the fight loader (§5.3).
+- **v1.1+:** the Should rows above, in R0.3's order: alts and synergies (item 1), then the tag partner's shortcuts
+  (item 2, as Could), HARD lists (item 3), then each venue's second set piece and arena twist (item 4).
+
+---
+
 ## 0. Rules shared by the four venues
 
-### 0.1 Tags
+### 0.1 Tags and tiers
 
-Each item carries the BRIEF §8 marks: **[engine-ok]** (vanilla does it, data only), **[new-code]**, **[new-art]**,
-**[new-music]**, a size **S/M/L** and a tier **Must/Should/Could**. A line like `[new-code M · Should]` means new code,
-medium size, Should tier.
+- Each item carries the BRIEF §8 marks: **[engine-ok]** (vanilla does it with data only; anything that needs code is
+  **[new-code]**, R1.14), **[new-art]**, **[new-music]**, a size **S/M/L** and a tier. `[new-code M · Should]` means
+  new code, medium size, Should tier.
+- **Must** = ships in v1.0. **Should** = v1.1+, re-added in R0.3's cut-line order. **Could** = later, if ever.
+  **Won't (v1)** = cut by a ruling; the idea is recorded so it can come back in a later version.
+- **A Must depends only on Musts** (R0.4). Every Should item names its v1.0 stand-in ("v1.0:").
 
 ### 0.2 Ids, screens and budgets
 
-- **Stage ids stay vanilla** (Blizzard 0, Flame 3, Yamato 4, Centaur 7). The ship's and the tide's collision offsets
-  (`$3E:$DA1C-$DA6A`) are hard-wired to stage ids 0 and 7, so keeping the ids keeps both set pieces working before the
-  stage-attribute table (BRIEF §7.2) lands. Yamato borrows Knight's ceiling (stage-6 only) and therefore **needs**
-  that table (§4.5.1).
-- **One 32-screen layout per venue** (8 rows x 256 blocks; screens `$00-$1F`). Convention: the main route counts up
-  from 00; branches, secret arenas and the hidden room live in the high screens, entered by exits with explicit
-  targets (vanilla practice, `levels.md` §9). Every venue below fits in 32 screens with 2-4 spare for HARD-only rooms.
-  If `tech.md` adopts WRAM-resident sections (BRIEF §7.2), nothing here breaks; the spare screens just get bigger.
-- **One new tileset slot per venue** (BRIEF §4). I ask for **a whole 8 KB tileset bank per venue** (its own 9-page
-  set plus its *own* alternate set at `$9B-$9F`), because two of these venues swap layouts through the alternate set
-  (Blizzard's ice cells, Yamato's kabuki stage) and a shared alternate set would couple them to bank-mates
-  (`stages_a.md` lessons).
-- **Lag**: about 10 live objects fill a frame (`engine.md` §8). The screen tables give each screen's peak count in
-  brackets, the player included and shots excluded; the target is **8 or fewer**, so the player's shots still fit.
-- **Checkpoints**: two mid-stage checkpoints plus the boss shutter (vanilla has one plus the shutter). CASUAL adds the
-  ones marked *(CASUAL)*. A checkpoint is the `LDA #s / JMP $8416` routine; every checkpoint screen gets a palette
-  program that sets everything it needs (`levels.md` §19: palettes are cumulative deltas).
+- **Stage ids** (R1.2, tech §4.2): venues are `$00-$07`; these four keep vanilla's: Blizzard `$00`, Flame `$03`,
+  Yamato `$04`, Centaur `$07`. The ship's and the tide's collision offsets (`$3E:$DA1C-$DA6A`) are hard-wired to ids 0
+  and 7, so both set pieces work before the stage-attribute table (M2.1, needed by M5) exists. That is why Blizzard can
+  be the slice. The tide's GP dwell is `EFX_PARAM` in the attribute record (tech §4.4), so Centaur waits for M5.
+  Yamato's re-homed ceiling (Should) also needs the table.
+- **Layouts:** one 32-screen layout per venue (8 rows × 256 blocks, screens `$00-$1F`). The main route counts up from
+  00; branches, the secret route and arena, and the hidden room live in the high screens, entered by exits with
+  explicit targets (vanilla practice, `levels.md` §9). The new layouts may overwrite vanilla layout banks `$32/$33`
+  once vanilla ids 0-7 have their regression movies (R1.5).
+- **Tilesets:** tech owns one slot table (R1.10): the RAM-image model, 2 slots per bank, an **independent alternate set
+  per slot**. Round 1's request for a whole 8 KB bank per venue is withdrawn (consistency-9). What these venues need
+  from the slot is listed per venue: T6 variant blocks (Blizzard's ice cells, Flame's loose tiles, Yamato's crest),
+  distinct oil metatile ids (Flame's gallery), and, in v1.1, the kabuki set swap.
+- **Lag (R1.8): every occupied slot counts, cap 9.** On a venue screen: the player (1) + the screen script in slot 22
+  (1, always counted) + the player's shots (3, the buster's maximum) leave **at most 4 stage objects**. A stage object
+  is anything in an enemy slot: enemies, their bullets, set-piece sprites, NPCs, pickups that are objects, and
+  transient effects (T6 debris, explosions). The screen tables give each screen's peak in brackets: **[4]** means 4
+  stage objects, 9 slots in all.
+  - Where Rock cannot fire (the pogo hall, Yamato 12-13), the cap allows 7 stage objects; the tables say so.
+  - **Boss rooms:** the boss (1) + **boss-side objects ≤ 3** (projectiles, helpers, props and the WEAK! pop) = 9.
+  - A player utility in slots 4-7 (the Ice Block, R1.11) or B.ATTACK's fourth flake can lift a 4-object screen to 10
+    for its lifetime. The slice measures exactly this (§1.0, test G7) on Blizzard 0A, 0D, 10 and the boss; if a
+    screen lags past the 9-slot band, its object count drops to 3.
+  - The design trick that keeps these numbers: **BG until it moves.** Hanging icicles, loose tiles, zone doors and
+    plaques, the crest and Yamato Man's wall spears are BG cells or map edits; only the moment they move costs a slot.
+- **Checkpoints:** two mid-stage checkpoints plus the boss shutter (vanilla has one plus the shutter). A checkpoint is
+  the `LDA #s / JMP $8416` routine; every checkpoint screen gets a palette program that sets everything it needs
+  (`levels.md` §19: palettes are cumulative deltas). CASUAL adds one per section through its poke list (§0.7).
+- **Pop-ups** sit at the top by default (tech `EFFECTS` b6 clear; consistency-26). None of these venues needs the
+  bottom position: the ship's and the tide's bands are below the window band.
 
 ### 0.3 The gate matrix
 
-Each venue has one secret exit, one one-screen hidden room and one behaviour-gated chip (BRIEF §5.4). They use
-**four different kinds of gate**, so the four venues don't feel alike, and **none of the four secret exits needs an
-adaptor**. Only the plates (Jet, as in vanilla) and Yamato's lower bypass (Power, as in vanilla) are adaptor-gated.
+Each venue has one secret exit, one one-screen hidden room and one behaviour-gated chip (BRIEF §5.4), **all Must**.
+They use different kinds of gate so the four venues don't feel alike, and **nothing here needs an adaptor, an alt, a
+synergy, a form or Break Man** (`systems.md` §2.4). Only the plates (Jet, as in vanilla) and Yamato's bypass (Power, as
+in vanilla) are adaptor-gated, and neither is on the main route.
 
-| Venue | Secret exit (gate kind) | Hidden room (tell) | Behaviour-gated chip | Plate | Adaptor routes |
+| Venue | Secret exit (kind) | Hidden room (tell) | Behaviour chip | Plate | Adaptor extras |
 |---|---|---|---|---|---|
-| Blizzard | **Catch the condor** in the summit bonus before the timer ends (timing) | A floor of one climb screen does not wrap: the seals walk off it and don't come back | **SNOW CHAINS**: never destroy a Toppy seal-bot | none | F.BLAST ice pockets (revisit) |
-| Flame | **Don't fight your shadow**: walk into it without shooting (behaviour) | A sealed gate with a mousehole: wait, and the mouse steps on the plate | **FIREPROOF**: reach the boss with no oil ignited | none | Power-block 1-up (revisit) |
-| Centaur | **ZONE 100**: a sunken door that opens only at low tide (observation + timing) | **ZONE 0**: in the black zone, one door glows only in the dark | **CENTURION**: free the three petrified Centurion-bots with a charged shot | **T** across the Pegasus gap (Jet) | Jet sky route |
-| Yamato | **The sekisho back road**: carry 3 travel passes to the checkpoint gate (collection) | Pogo on the gold crest in the caltrop hall: a trapdoor opens (DuckTales) | **DARUMA**: win the daruma otoshi without touching its head | **E** on the castle roof (Jet) | charged-punch bypass + dark mid-boss room (Power) |
+| Blizzard | **Catch the condor** in the 40-s bonus round (timing) | One climb floor doesn't wrap: a seal walks off it and doesn't come back | **SNOW CHAINS**: never destroy a seal | none | a Power-block crate on the ship (07) |
+| Flame | **Don't fight your shadow**: hold fire until the mirror glows, then walk into it (behaviour) | A shut gate with a mousehole: stand still, and the mouse presses the plate (patience) | **FIREPROOF**: reach the shutter with no oil ignited | none | a Power-block 1-up (02) |
+| Centaur | **ZONE 100**: a sunken door that opens only at the lowest tide (timing) | **ZONE 0**: in the black zone, one door glows only in the dark (light) | **CENTURION**: free the three stone soldiers with full charges | **T** across the Pegasus gap (Jet) | the Jet sky route |
+| Yamato | **The draft**: in a hall of five still scrolls, a lantern flame leans toward the one that turns (observation) | Pogo on the gold crest in the caltrop hall: a trapdoor opens (tool) | **DARUMA**: win the daruma otoshi without touching its head | **E** on the castle roof (Jet) | the charged-punch bypass (Power) |
 
-**Route choices.** In Centaur and Yamato the plate route and the secret exit branch off at different points, so one
-visit takes one or the other (Yamato's Jet route skips the keep, and with it the third pass); a replay takes the other
-(§8, question 3). Flame's secret route skips the fire vault, mouse room included; Blizzard's skips only the ski run.
+- **Collect-N secrets** (R3.1): at most one per stage. CENTURION's three statues are the only one in these venues, and
+  it uses meta's stage-counter predicate (R1.10).
+- **Route choices.** In Centaur and Yamato the plate route and the secret exit branch off at different points, so one
+  visit takes one or the other; a replay takes the other (replays for the other exit are allowed: meta removes
+  vanilla's beam-out, consistency decision 38). Flame's secret route skips the fire vault, mouse room included;
+  Blizzard's skips only the descent.
+- **Exhibitions.** meta pairs E3 = Blizzard + Flame and E4 = Centaur + Yamato. The Exhibitions are Could (v1.1) and E4's
+  Maze is Won't (v1) (R3.7), so in v1.0 these secret exits pay SECRETS (weight 3) and the rating's route test only.
 
-Exhibition pairs (PLAN §3.3): **E3 = Blizzard + Flame**, **E4 = Centaur + Yamato**. Both can open before the first
-adaptor, which spreads the Exhibitions across the game instead of piling them at the end.
+### 0.4 Shared mechanics: tech's single engines (R1.10)
 
-### 0.4 Shared mechanics these venues depend on
+Round 1's working labels (X-…) map onto tech's single engines. The engines are tech's; the uses are this doc's.
 
-Built once, owned by `tech.md`. My working labels (prefix **X-** so they don't collide with PLAN's T1-T8):
+| Engine (owner, tier) | Round-1 label | Uses here (tier of the use) |
+|---|---|---|
+| **Map-edit service**: `map_set` + a per-id alternate flip, one repaint queue (tech §5.6, Must) | T6, part of X-BONK | ice cells, loose tiles, the crest trapdoor (via T6); hanging icicles; the summit gate and the replay skip door (Blizzard, no T3 needed in the slice); Flame's timed arena oil; Yamato Man's wall spears (all Must); the kabuki set swap (Should) |
+| **T6 variant blocks** (tech §10, Must) | T6 bitmap | Blizzard's ice cells and their refill; Flame's loose tiles; Yamato's crest. The bitmap is tech's fallback only |
+| **Ceiling-probe callback** (tech §7.9, Must) | X-BONK | Blizzard: break the cell above (`t6_break`). Yamato: stun the enemy standing on the bonked floor cell |
+| **X-WRAP** (tech §7.9, Must) | X-WRAP | Blizzard's climb only (Centaur's wrap tower is gone, R3.1) |
+| **Exit type 7** (tech §7.9, Should) | X-UPEXIT | Blizzard's climb (Should). v1.0: a 2-rung ladder stub at each climb screen's top |
+| **Attach state** (R1.10, Must; first built for this slice, R1.13) | condor carry | Blizzard's condor (Must) |
+| **GP player states** (tech §7.9, Must) + the **set-piece player sheet** (R2.3) | X-EXWP | Yamato's pogo (Must): the sheet streams at the rack, a locked moment |
+| **HUD widget module** (R1.10, Must) | X-METER, X-LABEL | the bonus meter (Blizzard), ZONE cards (Centaur) (both Must) |
+| **Families and sub-ids** (tech §7.2, Must) | X-GPOBJ | every new object kind here (about 37 after the cuts, §5.1) |
+| **T3 switch → target** (tech §7.10, Must) | T3 | Flame's plates, gates and timed gates; Centaur's door warps; Yamato's scroll spins (all Must, M5) |
+| **T7 input mirror + pad history** (tech §7.9) | T7 | Shadow Rock (Must: Flame's secret exit, so T7 is Must by R0.4); Shadow Flame Man (Should) |
+| **T8 multi-part boss** (tech §7.11) | T8 | the Daruma (Must: DARUMA is Must, so T8 is Must by R0.4), two parts |
+| **New collision groups via `GRP_ROW`** (tech §4.5, Should) | X-FLOOR | ski snow, the hot spring, the nightingale boards (all Should) |
+| **`EFFECTS` / `EFX_PARAM`** (tech §4.4, Must) | stage-attribute table | `SHIP` (Blizzard; hard-wired by id 0 until M5), `TIDE` + dwell (Centaur, Must), `CEILING` (Yamato, Should) |
+| **Raster presets** (tech §8, Must) | chains 1, `$14`, `$11` | `RL_SHIP`, `RL_TIDE` (Must); `RL_CEILING` (Should) |
+| **Hook registry** (tech, Must) | ignition hook | FIREPROOF's clean bit on `$3E:$DDFC`; the ship thread's turn event (icicles) |
+| **Fight loader + FIGHT_CTX** (R1.7, Must) | - | W2 refights all four champions in their own arenas (§5.3) |
+| **Commentator bus** (tech/story, Must) | - | every hook in this doc |
 
-| Label | What | Used by | Mark |
-|---|---|---|---|
-| T3 | Generic switch → target pair (plates, gates, doors, warps, timed gates, the sekisho) | Flame, Centaur, Yamato | `[new-code M · Must]` (shared) |
-| T6 | Per-position destructible tiles: a WRAM bit per 16x16 cell, checked by the painters (`$3E:$D1FF`/`$D322`) and the collision read (`$3E:$DA6C`); a "refill" call clears the bit and repaints | Blizzard climb + secret arena | `[new-code M · Must]` |
-| T7 | Input mirror: an object that replays the player's pad with LEFT/RIGHT swapped | Flame (Shadow Rock, Shadow Flame Man) | `[new-code M · Should]` |
-| T8 | Multi-segment boss framework | Yamato (Daruma) | `[new-code M · Should]` (shared) |
-| **X-BONK** | A callback when the player's head hits a ceiling, by collision type. Blizzard: break the ice cell (T6). Yamato: stun every enemy standing on that floor tile | Blizzard, Yamato | `[new-code S · Must]` |
-| **X-WRAP** | Horizontal wrap in a locked one-screen room: player X < `$08` → `$F0` and back; enemies flagged "wrap" do the same; per-row opt-out so one floor can lead somewhere else | Blizzard climb, Centaur tower | `[new-code S · Must]` |
-| **X-UPEXIT** | Jump-up exit: rising, Y < `$0B`, the cells above open → transition up with a small upward boost. BRIEF §4 lists it as a Could "designed only if a venue needs it"; **Ice Climber needs it** | Blizzard climb, Centaur tower | `[new-code M · Should]`, fallback: a 2-rung ladder stub at each screen top `[engine-ok · Must]` |
-| **X-METER** | A stage meter drawn in the boss-bar slot (4MI's TEMP gauge trick, `stages_b.md` lessons) | Blizzard bonus timer | `[new-code S · Must]` |
-| **X-LABEL** | A 4-8 letter room label drawn with sprites under the life bar (4MI Pharaoh's curse words) | Centaur ZONE cards, Yamato PASS n/3 | `[new-code S · Should]` |
-| **X-EXWP** | A set-piece weapon that replaces the buster for a stretch and is dropped at a stand (4MI EXWP: Quint's pogo) | Yamato pogo | `[new-code M · Must]` |
-| **X-FLOOR** | New floor types through the group remap (`$3E:$DB03/$DB13`): *ski snow* (forced slide), *hot spring* (slow heal), *nightingale* (chirps) | Blizzard, Centaur, Yamato | `[new-code S each · Should]` |
-| **X-GPOBJ** | One generic "GP object" type with a sub-id and a per-sub-id code bank (4MI's `$5E` pattern). Only 30-32 type ids are free in the whole ROM; these four venues alone add about 46 object kinds | all four | `[new-code M · Must]` |
-| Stage-attribute table | BRIEF §7.2; lets the ship (chain 1), tide (chain `$14`) and spike ceiling (chain `$11`) run in any stage | Yamato ceiling; tide in Centaur's boss rooms | `[new-code M · Must]` (tech.md) |
-| Commentator pop-up | T2 text window, 1-2 lines, toggleable (BRIEF §5.5) | all hooks in this doc | owned by meta/tech |
+### 0.5 Weapons: superseded by systems.md
 
-### 0.5 Weapon proposals for systems.md
+Round 1's weapon proposals (§0.5) and every "proposed row" of boss damage are **superseded by `systems.md` §3 (weapons)
+and §4 (Tables 1-2, SC1-SC9)** (consistency-33). Weakness i-frames are 16 f, not 8. This doc keeps three things:
 
-The four bosses here award B.ATTACK, F.BLAST, C.FLASH and Y.SPEAR. BRIEF §5.1 gives each weapon a tap, an alternate
-(UP+B or hold) and one form synergy. Each boss fight below **shows the player its weapon's alternate and synergy
-before they own it** (a boss move that *is* the alternate). These are proposals; `systems.md` decides.
+1. **Boss previews.** Each boss performs its weapon's alt or synergy as a boss move before the player owns it. That
+   is AI, not player code, so it stays in v1.0 although the player's alts are Should (R2.4).
+2. **Reactions.** Each champion's WEAK reaction (SC9, Must) and own-weapon reaction (SC4, Should: systems tiers the
+   hook Should) are defined in the boss sections.
+3. **Venue jobs** for the weapons:
 
-| Weapon | Tap | Alternate (UP+B) | Form synergy | Cross-venue jobs proposed here |
-|---|---|---|---|---|
-| **B.ATTACK** | 4 flakes in a spread (vanilla) | an **ice block** (32x16, solid, slippery top, 240 f) | **Jet**: flakes drop straight down as bombs | freezes burning oil into a 300-f ice floor (Flame revisit) |
-| **F.BLAST** | fireball that leaves a short pillar | an **upward fire column** | **Power: Burning Knuckle** (flaming lunge punch) | melts `$D` ice (vanilla), **ignites oil** (Flame revisit), burns paper shoji (`$D`) in Yamato |
-| **C.FLASH** | screen flash (vanilla, 4 to every class 1/3/F object) | **time stop** 2 s (Flash Man nod) | **Power**: x3 punch damage during a time stop | lights dark rooms for 4 s (Yamato's dark room, Centaur's black zone) |
-| **Y.SPEAR** | 3-spear volley | a spear that **sticks in walls** as a one-way platform (240 f) | **Power: the DuckTales pogo** (hold DOWN in the air: bounce on enemies and spikes) | wall spears reach Centaur's high zone ledges and a ledge on Blizzard's ship |
+| Weapon | v1.0 jobs (taps, Must) | v1.1 jobs (alts and synergies, Should) |
+|---|---|---|
+| **B.ATTACK** | the vanilla thematic one-shots on fire robots (Flame's Tellies and jugglers) | **Ice Block: Must, the slice's prototype (R2.4).** Encases seals and birds (Blizzard: platforms), stops Blizzard Man's snowball, freezes burning oil into a 300-f floor (Flame 13). Snow Bomb (Jet) is Should |
+| **F.BLAST** | melts `$D` ice (Blizzard 0C and 18 pockets); burns shoji (Yamato 08); ignites oil through `$3E:$DDFC` (systems OQ1) | Flare melts the ice cell above you (a faster climb); Burning Knuckle |
+| **C.FLASH** | lights a dark room for 240 f (Centaur's black zone, Yamato's dark room) | Time Stop freezes the hourglass gate, the chompers and the tide; Time Fist |
+| **Y.SPEAR** | single spear + one pierce (systems) | Wall Spear reaches Blizzard 05's, Flame 0E's and Centaur 0D's high ledges; the Pogo synergy crosses Yamato's caltrop hall without the rack |
+| **KNIGHT.C, SILVER.T** | their arcs hit diving birds (Blizzard) and a patrolling Reap-bot from behind (Should) | - |
 
-Proposed boss rows (damage / boss i-frames) follow the BRIEF §5.1 shape (weakness 4 dmg and very short i-frames,
-most weapons 2 and mid i-frames, buster 1 and ≈ 60 f). Each boss section lists its row and its **self-weapon
-reaction** (4MI's Toad/Bright lesson: a boss hit by its own weapon does something special; here it is a joke
-instead of damage, once per fight, worth a STYLE point if `meta.md` agrees).
+**Featured enemies** (`systems.md` §9.3): the PART drop is cut (R2.5), but the one-shot stays as an in-stage tell for
+the champion's weakness: Blizzard's snow robot `$4D` to F.BLAST (vanilla), Flame's Fire Telly `$2C` to W.STORM,
+Centaur's seahorse `$C4` to KNIGHT.C, Yamato's samurai `$A2` to SILVER.T.
 
-### 0.6 Fiction shared by the four venues
+**Frozen objects** (R2.2): every object table below has a **Freeze** column. **H** = a frozen handler (the enemy's
+damage step is `$E9D7`/`$EA20`/`$EA6E`, so it keeps taking damage while frozen); **NF** = NOFREEZE (it ignores Time
+Stop and the Ice Block but still takes hits); **boss** = a boss-side frozen state. Vanilla types follow tech's audit of
+their damage step.
 
-- Every venue opens with a **match card**: `MATCH: ROCKMAN vs BLIZZARD MAN / VENUE: SUMMIT CLIMBER`. The vanilla
-  boss-intro panel stays (its stats are English in both languages), and the commentators read from it: Blizzard Man
-  runs on SOLAR ENERGY, Centaur Man's specialty is ABILITY UNKNOWN, Yamato Man has MOBILE 31.
-- **The Mr. Y gag in every venue** (BRIEF §1), always as cheap BG art or one sprite:
-  the icebreaker is the *MR. Y MARU*; a vizier with a familiar moustache watches from the palace balcony; an Atlantean
-  mural of a bald man with a moustache labelled "THE Y-MAN SHALL COME"; an Edo **WANTED** poster: `MR. Y - 1,000,000 RYO`.
+### 0.6 Fiction, names and words
+
+- **On-screen names** (R3.3): SUMMIT CLIMBER, PERSIAN PALACE, ATLANTIS RUINS, EDO NINJA ROW (meta's ≤ 20-character
+  list). Homage games are named only in this doc's design notes, never on screen; plaques describe, they don't name
+  (R3.3). The parody labels (TOPPY, NITPICKY, Jaja-nin, Nasubi Mage, Grim Reap-bot) are design labels; in-game text
+  says "seals", "birds" and "ninjas". Capcom's own names (DuckTales, the Sakugarne) may be nodded to.
+- **Words:** `story.md` owns every word (R4.1). This doc gives each hook a stable id and a trigger; the text lives in
+  story §6.3, and the debrief hints in meta §4.4. Text tiers follow R4.5: the first-weakness line, the hooks that are
+  the tell of a Must secret, the secret and plate lines, the tier B hints and **4 death lines per venue** are Must;
+  flavour hooks are Should.
+- **Signs** (the summit sign, the Atlantis tablet, notice boards) are BG art with a symbol; their words appear in the
+  2 × 28 pop-up (ALL CAPS, R1.4) when Rock presses UP at them.
+- **The Mr. Y gag in every venue** (story §1.2 rule 4), always as cheap BG art (≤ 12 tiles, Must): the icebreaker's
+  *MR. Y MARU* banner; Flame's sponsor tapestry with a familiar moustache on it (the vizier, Wily in an obviously fake
+  costume, is Should: R3.4); the Atlantean mural of a bald man with a moustache, "THE Y-MAN SHALL COME"; the Edo
+  WANTED poster, "MR. Y - 1,000,000 RYO". The Wily line is varied at every step (R3.9).
+- **The match card** is meta's (vanilla's typed boss-intro panel); the commentators read its stats: SOLAR ENERGY,
+  ABILITY UNKNOWN, MOBILE 31.
 - The champions are good-natured rivals (BRIEF §2): they trash-talk, they don't hate you.
 
-### 0.7 What changed from PLAN §3.2
+### 0.7 CASUAL and HARD
+
+- **CASUAL** (R2.9): a `CFG_CASUAL` bit and CASUAL poke lists in tech's poke-list format (§5.5). Every venue section
+  ends with the **standard lever list**: reflex windows ×2; mash counts −40 % (hold-to-struggle allowed); set-piece
+  timers +50 %; +1 checkpoint per section; skill-gated secrets relaxed by one step. All of it is Must (data).
+- **HARD** in v1.0 is the global ×1.5 damage, drops LESS, no refill (`systems.md`). The per-venue HARD poke lists and
+  boss AI branches in this doc are **Should** (v1.1, cut-line item 3), written for tech's format.
+
+### 0.8 Flashes and input
+
+- **Flashes** (R3.5): in the default mode no effect flashes a large area more than 3 times per second, and REDUCED
+  turns every flash into a fade.
+
+  | Venue | Flash-like effects | Rule check |
+  |---|---|---|
+  | Blizzard | none; the AVALANCHE yodel is a 2-px shake (the SHAKE option) | pass |
+  | Flame | the merge (one flash per merge); the pinch's red tint (held 40 f, not a flash); the vanilla oil palette cycle | the cycle's rate is measured at M5 and slowed if it changes a large area more than 3 times a second |
+  | Centaur | TIME FLASH (one 4-f flash per move, at least 4 s apart, pinch included); C.FLASH's tap (systems) | pass |
+  | Yamato | none (the hanabi are cut, R3.1) | pass |
+
+- **Input** (R2.10): every UP interaction here (zone doors, the ZONE 100 door, scrolls, signs, the tablet) fires on an
+  UP press with B not held, and not within 10 f of an alt. In-stage, SELECT means only the quick swap and the
+  last-weapon toggle.
+
+### 0.9 Prizes and envelopes (R2.7)
+
+- **Each hidden room holds one sponsor envelope** (30 bolts, once per save; `systems.md` §7). The round-1 bolt bags and
+  the 100-bolt chest are gone (consistency-10).
+- **Venue prize bolts:** at most 60 per venue, once per save, shown as tokens on replays (`systems.md` §7, §6.7). Only
+  Blizzard has them: four bonus vegetables worth 60 in all. That is **4 prize bits** for Blizzard and none for the other
+  three, so the venue prizes fit a 4-byte PRIZES field (meta owns the bytes; consistency-11).
+- Each hidden room also holds one tank or 1-up and one large energy, never both a tank and a 1-up (safety nets don't
+  stack, R2.6).
+- **Secret weights** (exit 3, room 2, item 2, plate 1) and the **debrief order** are `systems.md` §6.2's and meta
+  §4.3's. Each venue gives one **VENUE ACT** style act (systems §6.5) and a placeholder **par** (systems §6.3; measured
+  from the golden movies).
+
+### 0.10 What changed from PLAN §3.2 (round 1, still true)
 
 | Venue | Kept from PLAN | Changed, and why |
 |---|---|---|
-| Blizzard | the vertical ascent; Topi-bots pushing ice into holes; the condor secret exit; the skiing boss who makes snowballs | ice ceilings break to a **head-bonk**, not "shoot or Power-punch upward" (Ice Climber's verb, no adaptor, and the BRIEF says destructible ceilings are new tech, so they get one clear rule); the **downhill autoscroll** becomes a forced-slide floor (no T1 needed); the rocking ship, which PLAN dropped, is back (BRIEF §6 keeps it) |
-| Flame | plates and timed gates; loose floors; chompers; igniting oil; the mirror room's Shadow Rock; "don't fight your shadow" | the merge rule is **"don't fire for 5 s, then touch it"**, not "walk in with the buster unequipped": unequipping is not a PoP verb, and because the shadow copies you, holding fire is self-teaching; the oil gets a **player choice** (chandeliers) instead of being only a boss pattern |
-| Centaur | numbered zones linked by doors, warp and fake doors; the tide; the galloping boss; C.FLASH's time stop | the secret exit is **ZONE 100 at low tide**, not a "ZONE 1 → ZONE 9" door (a door you can only open by reading the tide uses the vanilla set piece); "walls that crack under a Power punch" are dropped (no secret here needs an adaptor); the tide is **confirmed vanilla** (chain `$14`) and gets a dwell |
-| Yamato | rooftop ninjas; sliding-door secret passages; falling-ceiling traps; the Daruma Otoshi mini-boss; the helmet that flies off at half HP; the DuckTales pogo as Y.SPEAR's Power synergy | "press UP at one hanging scroll" had no tell, so scrolls became a **mechanic with a tell** (they flutter) and the secret exit became **Goemon's three passes**; the pogo is also an **in-stage set piece** (EXWP) so the venue itself is DuckTales, not only the weapon you win |
-| All | homage set pieces | PLAN reused each vanilla tileset; BRIEF §4 gives **every venue a new tileset slot**, vanilla CHR kept and extended |
+| Blizzard | the vertical ascent; seal-bots pushing ice into holes; the condor secret exit; the skiing boss who makes snowballs | ice ceilings break to a **head-bonk** (Ice Climber's verb, no adaptor); the downhill autoscroll became a forced-slide floor and is now Should; the rocking ship, which PLAN dropped, is back (BRIEF §6) |
+| Flame | plates and timed gates; loose floors; igniting oil; the mirror room's Shadow Rock; "don't fight your shadow" | the merge rule is "hold fire until the mirror glows, then touch it", not "walk in unequipped"; the oil gets a **player choice** (chandeliers); the duel is about **spacing**, not a shield (R3.1) |
+| Centaur | numbered zones linked by doors, warps and fake doors; the tide; the galloping boss; C.FLASH's time stop | the secret exit is **ZONE 100 at low tide**; walls that crack under a Power punch are dropped; the tide gets a dwell and becomes the venue's spine, flooding shaft included (R3.1) |
+| Yamato | rooftop ninjas; sliding-door secret passages; the Daruma Otoshi mini-boss; the helmet that flies off at half HP; the DuckTales pogo | the scrolls became a mechanic with a tell, and the secret exit is now a scroll (R3.1, R3.2); the pogo is an **in-stage set piece**; Knight's falling ceiling is Should |
+| All | homage set pieces | PLAN reused each vanilla tileset; every venue now gets its own slot in tech's table, vanilla CHR kept and extended |
 
 ---
 
