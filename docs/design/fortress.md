@@ -1,7 +1,6 @@
 # Rockman 6 GP: the non-venue stages (fortress.md)
 
-Owner: design-fortress. Status: **v1, being written** (the container can restart, so this file is rewritten as it
-grows; sections still marked TODO are not done). Scratch: `build/design/design-fortress/`.
+Owner: design-fortress. Status: **v1, complete for its scope**. Scratch: `build/design/design-fortress/`.
 
 Scope: every stage that is not one of the 8 Heritage Venues.
 
@@ -41,23 +40,23 @@ data stays where it is, untouched, so Mr. X Returns can still load vanilla Mr. X
 | Stage | Proposed id | Base layout (vanilla, copied and remixed) | Screens used / 32 | Tileset slot (new) | Vanilla art kept | Music |
 |---|---|---|---|---|---|---|
 | Opening Ceremony | 16 | new | 13 (+1 hidden) | **TS_STADIUM** | Mr. X 1's night-city skyline and moon (set `$9D`, v00-v02); the intro pictures `$53-$5A` | new: GP FANFARE (cutscene), GP STADIUM (stage), `$10` boss intro kept |
-| Semifinal Riot | 17 | new, on the Opening's blocks | 14 (+1) | TS_STADIUM, night/riot palettes | as above; Mr. X 1's skyline behind the roof arena | new: RIOT (a minor-key remix of GP STADIUM); new: BASS β |
-| E1-E4 | 18-21 | new | 6-7 each | **TS_ARCADE** (shared; one CHR third per exhibition) | none (simple new tiles: the cheap-art rule of PLAN §3.3) | new: one 30-s loop per guest |
-| H1 ROCKMAN | 8 | **Wily 2** (19 screens) | 17 (+1) | TS_H1 = copy of `$2A:$89` + MUSEUM third + MM1 third | Wily 2's pink machine blocks and circuit walls, its disappearing-block objects `$8F`, its F.BLAST twin plug | new: HALL OF FAME (shared theme, 5 arrangements) |
-| H2 ROCKMAN 2 | 9 | **Wily 1** (24 screens) | 21 (+1) | TS_H2 = copy of `$2A:$80` + MUSEUM + MM2 | the castle exterior, the long fall, the updraft blowers `$36/$41`, the Power pocket, the dinosaur art set `$8B` (re-skinned) | HALL OF FAME (MM2 arrangement) |
-| H3 ROCKMAN 3 | 10 | **Mr. X 3** (18 screens) | 18 (+1) | TS_H3 = copy of `$2F:$92` + MUSEUM + MM3 | the red gear machinery, the pistons, the warning light thread | HALL OF FAME (MM3) |
+| Semifinal Riot | 17 | new, on the Opening's blocks | 15 (+1) | TS_STADIUM, night/riot palettes | as above; Mr. X 1's skyline behind the roof arena | new: RIOT (a minor-key remix of GP STADIUM); new: BASS β |
+| E1-E4 | 18-21 | new | 6 (+1) each | **TS_ARCADE** (shared; one CHR third per exhibition) | none (simple new tiles: the cheap-art rule of PLAN §3.3) | new: one 30-s loop per guest |
+| H1 ROCKMAN | 8 | **Wily 2** (19 screens) | 19 (+1) | TS_H1 = copy of `$2A:$89` + MUSEUM third + MM1 third | Wily 2's pink machine blocks and circuit walls, its disappearing-block objects `$8F`, its F.BLAST twin plug | new: HALL OF FAME (shared theme, 5 arrangements) |
+| H2 ROCKMAN 2 | 9 | **Wily 1** (24 screens) | 24 (+1) | TS_H2 = copy of `$2A:$80` + MUSEUM + MM2 | the castle exterior, the long fall, the updraft blowers `$36/$41`, the Power pocket, the dinosaur art set `$8B` (re-skinned) | HALL OF FAME (MM2 arrangement) |
+| H3 ROCKMAN 3 | 10 | **Mr. X 3** (18 screens) | 19 (+1) | TS_H3 = copy of `$2F:$92` + MUSEUM + MM3 | the red gear machinery, the pistons, the warning light thread | HALL OF FAME (MM3) |
 | H4 ROCKMAN 4 | 11 | **Mr. X 2** (18 screens) | 18 (+1) | TS_H4 = copy of `$2F:$89` (about 100 free tiles) + MUSEUM + snow | the machine panels, the falling bell row, the pod-column BG technique | HALL OF FAME (MM4) |
-| H5 ROCKMAN 5 | 12 | **Mr. X 4** (25 screens) | 24 (+1) | TS_H5 = copy of `$2B:$80` (159 of 256 blocks used) + MUSEUM + MM5 | the grey stone castle, the crates and drones, the open pit branch | HALL OF FAME (MM5) |
-| W1 Upgrade Lab | 13 | new | 20 (+1) | **TS_LAB** (from Wily 3's base set `$A2`, 91 free tiles) + ExGrafix data | Wily 2/3's machinery | new: UPGRADE LAB in three arrangements (pocket / 2A03 / 2A03 + MMC5) |
+| H5 ROCKMAN 5 | 12 | **Mr. X 4** (25 screens) | 25 (+1) | TS_H5 = copy of `$2B:$80` (159 of 256 blocks used) + MUSEUM + MM5 | the grey stone castle, the crates and drones, the open pit branch | HALL OF FAME (MM5) |
+| W1 Upgrade Lab | 13 | new | 19 (+1) | **TS_LAB** (from Wily 3's base set `$A2`, 91 free tiles) + ExGrafix data | Wily 2/3's machinery | new: UPGRADE LAB in three arrangements (pocket / 2A03 / 2A03 + MMC5) |
 | W2 Bracket of Doom | 14 | **Wily 3** (17 screens) | 19 (+1) | TS_W2 = copy of `$2A:$92` + bracket board | the moat, the teleporter, **the hub and its rush tables** | `$0B` Wily theme kept; refights `$0C`; new BASS β (final) |
-| W3 MODE-7 Machine | 15 | **Wily 4** (7 screens) + escape | 13 | TS_W3 = copy of `$2B:$89` + TS_LAB's blocks for the escape | the capsule arrival, the dispenser routine, the Wily Machine slot and floor split | `$0B`, `$18` Wily Machine kept; new: FINAL LAP (escape) |
+| W3 MODE-7 Machine | 15 | **Wily 4** (7 screens) + escape | 13 (+1) | TS_W3 = copy of `$2B:$89` + TS_LAB's blocks for the escape | the capsule arrival, the dispenser routine, the Wily Machine slot and floor split | `$0B`, `$18` Wily Machine kept; new: FINAL LAP (escape) |
 | Victory lap | 23 | new, on TS_STADIUM | 8 (loops) | TS_STADIUM | the credit cards `$71-$80`, the roll `$81-$88` | new: VICTORY LAP |
 | Mr. X Returns | 22 | **vanilla Mr. X 1, untouched** | 22 | vanilla `$2C:$92` | everything | `$09` |
 
 Notes:
 
-- The four empty or spare tileset pages (`$2B:$92`, `$2D:$92`, and the pages freed by moving the eight fortress
-  layouts) are enough for TS_STADIUM, TS_ARCADE and TS_LAB; the H/W slots are **copies** of vanilla pages in new
+- The two empty tileset pages (`$2B:$92`, `$2D:$92`) and the pages freed by moving the eight fortress layouts are
+  enough for TS_STADIUM, TS_ARCADE and TS_LAB; the H/W slots are **copies** of vanilla pages in new
   banks, so a remix never touches a vanilla table.
 - **The MUSEUM CHR third** (about 96 tiles, swapped into `$0A00-$0FFF` by screen exits exactly as vanilla's `$91/$95/$98`
   sets are) is shared by all five wings: marble floor trim, velvet ropes and posts, plaque frames, glass display
@@ -76,7 +75,7 @@ rule, because by then the player's kit is known:
   teaches it), the **Magnet Beam from H1's display case on**, and nothing else. Every punch, form, alt, synergy, weapon
   and Break Man gate is on optional content.
 - Every required tool is **handed over on the main path right before it is needed, with a sign** (CX lesson 6).
-  There is exactly one such gate in the whole fortress: H1 07, the Magnet Beam gap, which is also the homage
+  There is exactly one such gate in the whole fortress: H1 0B, the Magnet Beam gap, which is also the homage
   (Rockman 1 could not be finished without the Magnet Beam).
 - Exhibitions lend their vehicles ("COMMITTEE LOANER JET", the `venues_a.md` §1.2 precedent), because they can be
   unlocked before the 4th win.
@@ -92,8 +91,8 @@ rule, because by then the player's kit is known:
   `REPLAY` (any cleared H/W stage) / `BACK TO BRACKET`. [new-code] S, [new-art] M, Must.
 - **RETIRE** is allowed everywhere except the Opening (`meta.md` §3.7).
 - **Break Man** (once he has joined, §2.6) can be called everywhere except during a boss bar fill and in stages or
-  screens flagged NO TAG: the Opening (he has not joined), the exhibitions' vehicle screens, the W1 GB section (he
-  "isn't compatible"), the escape.
+  screens flagged NO TAG: the Opening (he has not joined), the exhibitions' vehicle screens, the W1 POCKET rooms (he
+  "isn't compatible"), W2's Championship Ring, the escape.
 
 ### 0.4 Secrets in non-venue stages
 
@@ -114,6 +113,8 @@ doc uses one layout everywhere, so the debrief and the scorecard can treat these
   that is +240 bolts over a full game, inside its completionist model's slack.
 - Showpiece and prize bolts (30 per b0) are **venue-prize-style** money: paid once per save, tokens on replays
   (`systems.md` §6.7).
+- **No secret exits here.** BRIEF §5.4 gives secret exits to the venues only (they light the Exhibitions); in these
+  stages the b0 showpiece takes the exit's weight (3) in SECRETS and in the debrief order.
 
 ### 0.5 Voice: commentators and Mr. Y's heckles
 
@@ -123,7 +124,7 @@ doc uses one layout everywhere, so the debrief and the scorecard can treat these
   line from the stage's 6-line table, then a shared 12-line table. One line in the shared table is a **YES/NO** (the
   CX s12 homage, made harmless): *"Tired? Sign with MR. Y PERFORMANCE PARTNERS! YES / NO"*. YES plays a 3-s fake
   commercial ("MR. Y: FOR ALL YOUR WORLD-CONQUEST NEEDS") and Kalinka: *"Don't sign anything!"*. No mechanical effect;
-  TURBO is only at the booth (`systems.md` §9.4). After the unmasking (§4.7) the heckler is "DR. WI- I MEAN MR. Y"
+  TURBO is only at the booth (`systems.md` §9.4). After the unmasking (§4.6) the heckler is "DR. WI- I MEAN MR. Y"
   until W3.
 - Shared heckle drafts: *"My museum thanks you for the donation of one life."* / *"In 1987 you had infinite
   continues. I've fixed that."* / *"The judges are taking notes. I bribed them to."* / *"Did you know respawning is
@@ -134,17 +135,22 @@ doc uses one layout everywhere, so the debrief and the scorecard can treat these
 | Vanilla tech (`rm6/fortress.md`) | Where it was | GP stage | The twist |
 |---|---|---|---|
 | BG boss in NT1, **vertical** scroll, floor strip from NT0 (chain 7) | Mr. X 2 pod column | Opening: **Grand Pi-kun** (§1.6) | The BG **inflates and deflates**: three pre-drawn sizes streamed into CHR-RAM (the CX giant-Light technique) |
-| BG boss in NT1, horizontal scroll, floor strip (chain 7) | Wily 2 walker | H1: **Yellow Devil MK-VI** (§4.2) | The body **comes apart**: its 12 pieces are erased from NT1, fly across as sprites, and are painted back on the far side; pieces you knock down become floor blocks |
-| BG boss in NT0, floating, multi-split (chain `$16`) | Mr. X 4 X Crusher | H2: **Mecha Dragon MK-VI** (§4.3) | The floor is **Heat Man's appearing blocks** (sprite platforms on a rhythm), and in pinch the dragon dives into the pit and comes up through a block |
-| Static BG boss, one head hit box, body reflects | Wily 1 Mechazaurus | H3: **Gamma MK-VI** (§4.4) | Its **rocket fists** are sprite platforms that rise back to its head: you ride Gamma's own fist up and punch it in the face |
-| BG boss in NT1 with vertical-scroll technique (chain 7) | Mr. X 2 | H4: **Cossack Catcher MK-VI** (§4.5) | The pod column becomes a **crane cabin on a rail** (X and Y scroll) with a sprite claw that **grabs Rock** (mash to escape) |
-| Robot Master framework: intro `$93`, room controller `$94`, the typed boss panel `$3C:$81B1` | the 8 RMs | H5: **Dark Man MK-VI** (§4.6) | **The boss panel lies**: it types "BREAK MAN", then re-types "DARK MAN MK-VI" when the disguise falls |
-| BG tank + sprite pilot, floor strip (chain `$1A`) | Mr. X 3 Metonger Z | W1: **METALL 16** (§5.1) | The BG body **upgrades between bars**: GB palette, NES palette, then ExGrafix colours and MMC5 audio |
+| BG boss in NT1, horizontal scroll, floor strip (chain 7) | Wily 2 walker | H1: **Yellow Devil MK-VI** (§4.1.2) | The body **comes apart**: its 12 pieces are erased from NT1, fly across as sprites, and are painted back on the far side; pieces you knock down become floor blocks |
+| BG boss in NT0, floating, multi-split (chain `$16`) | Mr. X 4 X Crusher | H2: **Mecha Dragon MK-VI** (§4.2.3) | The floor is **Heat Man's appearing blocks** (sprite platforms on a rhythm), and in pinch the dragon dives into the pit and comes up through a block |
+| Static BG boss, one head hit box, body reflects | Wily 1 Mechazaurus | H3: **Gamma MK-VI** (§4.3.4) | Its **rocket fists** are sprite platforms that rise back to its head: you ride Gamma's own fist up and punch it in the face |
+| BG boss in NT1 with vertical-scroll technique (chain 7) | Mr. X 2 | H4: **Cossack Catcher MK-VI** (§4.4.1) | The pod column becomes a **crane cabin on a rail** (X and Y scroll) with a sprite claw that **grabs Rock** (mash to escape) |
+| Robot Master framework: intro `$93`, room controller `$94`, the typed boss panel `$3C:$81B1` | the 8 RMs | H5: **Dark Man MK-VI** (§4.5.2) | **The boss panel lies**: it types "BREAK MAN", then re-types "DARK MAN MK-VI" when the disguise falls |
+| BG tank + sprite pilot, floor strip (chain `$1A`) | Mr. X 3 Metonger Z | W1: **METALL 16** (§5.1.4) | The BG body **upgrades between bars**: GB palette, NES palette, then ExGrafix colours and MMC5 audio |
 | Data-driven rush: hub, alcoves, tables `$39:$8EC8/$8ED2/$8EDC`, rooms `$09+id`, palette `$9A+id`, ninth teleporter | Wily 3 | W2: **Bracket of Doom** (§5.2) | **Pair bouts**: an alcove starts a two-champion bout; the first one's life capsule is replaced by a "TAG!" warp into the partner's room |
-| Wily Machine: BG in NT1, floor split with a scrolled strip (chain `$19`), three bars in one room | Wily 4 | W3: **MODE-7 Machine** (§5.3) | The floor strip becomes a **16-band perspective floor** (per-band X and Y scroll), and the machine drives toward the camera in three streamed sizes |
-| Sprite capsule with palette-fade teleports | Wily 4 | W3: **Wily Capsule SUPER** (§5.3) | It teleports with **afterimage decoys**, and it is where **Break Man's gift** (4MI's Wily Buster pattern) happens |
-| Mr. X reveal: pod, typed speech, flight path (`$39:$8DE9/$8E04`) | after Mr. X 4 | after H5: **Mr. Y's unmasking** (§4.7) | Two masks: Y comes off to show X, X comes off to show Wily |
+| Wily Machine: BG in NT1, floor split with a scrolled strip (chain `$19`), three bars in one room | Wily 4 | W3: **MODE-7 Machine** (§5.3.2) | The floor strip becomes a **16-band perspective floor** (per-band X and Y scroll), and the machine drives toward the camera in three streamed sizes |
+| Sprite capsule with palette-fade teleports | Wily 4 | W3: **Wily Capsule SUPER** (§5.3.3) | It teleports with **afterimage decoys**, and it is where **Break Man's gift** (4MI's Wily Buster pattern) happens |
+| Mr. X reveal: pod, typed speech, flight path (`$39:$8DE9/$8E04`) | after Mr. X 4 | after H5: **Mr. Y's unmasking** (§4.6) | Two masks: Y comes off to show X, X comes off to show Wily |
 | Credits: each RM plays its real AI in its own room, then its card | the ending | the **victory lap** (§6.3) | You run past them on a playable lap, and touching each plays its card plus your WINS / LOSSES (4MI) |
+
+`rm6/SUMMARY.md` §4 listed the re-skin fits (Section 3, CONFIRMED as fits, [guess] as AI): the Yellow Devil after the
+Wily Machine's "NT1 + floor split" (GP uses that technique in the room H1 inherits, Wily 2's walker room) rather than
+the X Crusher; Gamma after Mechazaurus; the Cossack Catcher after Power Piston (with Metonger Z's sprite part as the
+claw); Dark Man after the Robot Master framework. The X Crusher's floating technique goes to the Mecha Dragon instead.
 
 Kept vanilla quirks (BRIEF §6, rm6 lesson 8): Wily 2's twin F.BLAST plug (one blast opens both) in H1; the falling
 bell row in H4; the Mr. X 1 skyline; the scripted capsule arrival of Wily 4 in W3; the CAPCOM TIMES jailbreak line;
@@ -159,10 +165,10 @@ type ids are free). Labels are prefixed **F-**.
 |---|---|---|---|
 | **F-PLAQUE** | A museum plaque: stand in front, press UP, the T2 text window types 2-4 lines (JP/EN). Touching it also stamps it in the Museum's plaque gallery (`meta.md` §9.5) | H1-H5, W2 hub, Opening | [new-code] S, Must (T2 is shared) |
 | **F-CASE** | A glass display case that holds a pickup; breaks open on touch (a glass-shatter SFX), plays the weapon-get screen (chain `$17`) when it holds a weapon | H1 (M.BEAM), museum gags | [new-code] S, [new-art] S, Must |
-| **F-PIECES** | The "BG body that comes apart" engine: an object owns a w×h grid of 16×16 BG pieces in NT0/NT1; it can erase a piece (4 tiles through the VRAM buffer), turn it into a flying sprite, and paint it back elsewhere. ≤ 3 pieces in flight | Yellow Devil, Picopico-kun, the Opening's scoreboard gag | [new-code] M, Must |
-| **F-SIZES** | Streams one of 2-4 pre-drawn size frames of a BG boss into CHR-RAM over 2-4 frames (CX's giant Light) | Grand Pi-kun, METALL 16, MODE-7 Machine | [new-code] M, Must |
+| **F-PIECES** | The "BG body that comes apart" engine: an object owns a w×h grid of 16×16 BG pieces in NT0/NT1; it can erase a piece (4 tiles through the VRAM buffer), turn it into a flying sprite, and paint it back elsewhere. ≤ 3 pieces in flight | Yellow Devil, Picopico-kun | [new-code] M, Must |
+| **F-SIZES** | Streams one of 2-4 pre-drawn size frames of a BG boss into CHR-RAM (CX's giant Light): 8-20 frames per change depending on the size, always in a locked room and behind motion, a puff or a flash | Grand Pi-kun, METALL 16, MODE-7 Machine | [new-code] M, Must |
 | **F-GRID** | A WRAM cell grid (up to 16×14) mapped to BG tiles and collision, with a paint queue (≤ 8 cells per frame) and row operations (clear, shift) | E1 well, E2 bricks, E3 formation and bunkers, E4 dots | [new-code] M, Should (with the exhibitions) |
-| **F-CLOCK** | A countdown in seconds and tenths drawn with sprites above the life bar (4MI `$7689-$768B`), with a time-out handler | the escape, E-stage bonus timers | [new-code] S, Must |
+| **F-CLOCK** | A countdown in seconds and tenths drawn with sprites above the life bar (4MI `$7689-$768B`), with a time-out handler | the escape; the Opening's limbo timer | [new-code] S, Must |
 | **F-ERA** | The W1/escape "era" switch: palette tier, ExGrafix on/off, audio tier, letterbox on/off, firmware flags (slide/charge/forms) | W1, W3 escape, ending | [new-code] M, Should |
 | Text window, director, push zones, timed blocks, input mirror | as defined by `venues_a.md` (T2, T1-lite, VA-GUST, VA-TIMED) and `venues_b.md` (T6, T7, X-WRAP, X-LABEL, X-METER) | many | shared |
 
@@ -197,7 +203,7 @@ START skips after the first line.
 | 2 | vanilla's tournament pictures `$57-$5A` | *A year ago, the 1st World Robot Championship ended in disaster: its sponsor, "Mr. X", was Dr. Wily in a moustache.* |
 | 3 | the GP stadium (new, 1 picture) | *This year the Committee tries again: the GRAND PRIX! Eight venues, each a tribute to a legend of the games.* |
 | 4 | vanilla's four pictures `$53-$56` (2 robots each), unchanged | *The eight champions return, rebuilt by the fans who designed them.* |
-| 5 | vanilla's Mr. X picture, **with the X repainted as a Y** (a handful of tiles; the rest is the 1993 art) | *And at the last minute, a ninth sponsor registered an entrant...* `MR. Y` |
+| 5 | vanilla's Mr. X picture, **with the X repainted as a Y** (a handful of tiles; the rest is the 1993 art) | *And at the last minute, a new sponsor registered a ninth entrant...* `MR. Y` |
 | 6 | Light's lab (new, small) | Rock: *"...That's Dr. Wily."* Light: *"That's definitely Dr. Wily."* Rock: *"Let's go, Rush!"* (vanilla's `$4A` line, kept) |
 
 The repainted Y is the running gag's first screenshot. [new-art] S (the Y, the stadium, the lab).
@@ -270,7 +276,7 @@ which is exactly what lane 3 taught.
 **How it is built.** The Mr. X 2 pod-column technique: Pi-kun is BG art in NT1, positioned by the frame's X and Y
 scroll above the IRQ split, and the pitch below the split comes from NT0 row 24 (chain 7, handler `$3E:$C23A`)
 [engine-ok]. The twist is size: three pre-drawn sizes (S 48 px, M 80 px, L 128 px) are streamed into CHR-RAM by
-F-SIZES, 2-3 frames per change behind a puff of air sprites. The valve is a sprite plus the hit-box object, which
+F-SIZES, at most 8 frames per change, behind a puff of air sprites. The valve is a sprite plus the hit-box object, which
 follows the scroll (as vanilla's `$D1/$D2` do). [new-code] M (F-SIZES), [new-art] M (three sizes ≈ 150 tiles), Must.
 
 **Stats.** HP **14** (half a bar, `systems.md` §4.5). Contact 3; shockwave 2; confetti 1. Only the valve is a hit
@@ -457,7 +463,7 @@ no damage taken from the bar fill to the overdrive.
 |---|---|---|---|---|---|---|
 | b0 | **FLOODLIGHTS** | flip all 6 fuse-box levers (02, 08, 08, 0A, 0B, 0C) in one run. Any shot flips a lever; each lit screen stays lit. Six on: the crowd returns (crowd tiles animate), K: *"The lights are back! The show goes on!"* | red levers with a lightning sticker; the first one at eye level, with C's hint | - | `A STADIUM WITHOUT LIGHTS / IS JUST A BIG DARK BOWL. / SIX SWITCHES. FLIP 'EM.` | `THERE ARE SIX FUSE BOXES BETWEEN THE CONCOURSE AND THE ROOF. SHOOT EVERY LEVER.` |
 | b1 | **THE LOCKER ROOM** (1D) | the emblem door at 06 opens only to Break Man (`systems.md` §11 tag gate) | the door shows his scarf emblem during the help beat itself, and K: *"That door has his emblem on it..."* | TAG (`meta.md` R4) | `ENTRANT TEN'S LOCKER / ONLY OPENS FOR ENTRANT / TEN. ASK HIM NICELY.` | `CALL BREAK MAN AT THE RUBBLE WALL. HIS EMBLEM DOOR LEADS TO THE LOCKERS.` |
-| b2 | **TALENT SCOUT** | all 9 placed rejects ACCEPTED (killed by a full-power blow) | the first ACCEPTED stamp, and C: *"A full-power audition. Rules are rules."* | - | `EVERY REJECT DESERVES A / SECOND AUDITION. MAKE IT / A FULLY CHARGED ONE.` | `DEFEAT EVERY REJECTED ENTRANT WITH A FULL CHARGE (OR A FULL PUNCH) AND THEY WALK AWAY HAPPY.` |
+| b2 | **TALENT SCOUT** | **12** of the 21 placed rejects ACCEPTED (killed by a full-power blow) in one run; a counter `AUDITIONS 7/12` appears after the first | the first ACCEPTED stamp and the counter, and C: *"A full-power audition. Rules are rules."* | - | `EVERY REJECT DESERVES A / SECOND AUDITION. MAKE IT / A FULLY CHARGED ONE.` | `DEFEAT 12 REJECTED ENTRANTS WITH A FULL CHARGE (OR A FULL PUNCH) AND THEY WALK AWAY HAPPY.` |
 
 **1D, the locker room**: eleven lockers with name plates. Rock's, marked `CHALLENGER` (a spare helmet), the eight champions' (gags: Wind
 Man's is full of leaves, Knight Man's has a "polish" can), #9 Bass's (dented, `KEEP OUT`), and **#10 `??????`**: a
@@ -537,8 +543,8 @@ chase a different target. Each is short: a lobby, three lesson screens, a high-s
   Museum + the guest unlocked in GP Rush (fights `$18-$1B`). **No chip**: PLAN's Line Clear, Multiball, Barrier and
   Power Pellet live on **inside the stages as rule power-ups**, which keeps `systems.md`'s 21 chips intact (its open
   question 9, answered).
-- **Secrets (the same three in every exhibition)**: b0 = the game's famous mastery act (a TETRIS, a long rally, a
-  perfect UFO shot, all four ghosts on one pellet); b1 = **the BACKROOM** behind the lobby's `OUT OF ORDER` cabinet
+- **Secrets (the same three in every exhibition)**: b0 = the game's famous mastery act (four lines at once, a long
+  rally, a perfect UFO shot, all four ghosts on one pellet); b1 = **the BACKROOM** behind the lobby's `OUT OF ORDER` cabinet
   (one rule for all four, so the tell is learned once: the cabinet wobbles when shot; three full charges, or one
   full punch, topple it; behind it a door to 1E); b2 = a clean-play act.
 - **The BACKROOM** (1E, one per exhibition): a dusty storeroom with a prototype cabinet and a gag plaque (each listed
@@ -568,7 +574,7 @@ Screens:
 | **00** | The arcade lobby: the `FALLING BLOCKS` cabinet; Block Man's intro card. The `OUT OF ORDER` cabinet (b1) | intro | Should |
 | **01** | **MOVE**: the exit is a door 3 rows up the right wall. Only O and I pieces fall. Push them right with taps to build a staircase | taps push | Should |
 | **02** | **ROTATE**: a 64-px spike pit across the floor. An upright I falls; rotate it flat with a full charge so it bridges the pit | charge rotates | Should |
-| **03** | **CLEAR**: a stack with a 1-wide gap in each of its 4 bottom rows; the exit door is buried under it. An I falls: rotate it upright and drop it into the gap: **4 rows clear at once** and the door is uncovered (the b0 TETRIS is possible on purpose right here) | lines clear | Should |
+| **03** | **CLEAR**: a stack with a 1-wide gap in each of its 4 bottom rows; the exit door is buried under it. An I falls: rotate it upright and drop it into the gap: **4 rows clear at once** and the door is uncovered (b0, FOUR LINES, is possible on purpose right here) | lines clear | Should |
 | **04** | The high-score corridor (`1ST BMN 999999 ... 5TH ROCK %SCORE%`); checkpoint; shutter | - | Should |
 | **05** | **Arena: BLOCK MAN** | | Should |
 | **1E** | BACKROOM: a `FALLING BLOCKS (PROTOTYPE)` cabinet whose screen shows only one piece shape, the long one, falling forever. Plaque: `THE LONG ONE NEVER COMES WHEN YOU NEED IT. WE PUT IT IN STORAGE.` | | Should |
@@ -621,8 +627,8 @@ Lose the ball and you lose your footing, not a life.
 | Mechanic | Numbers | Tags |
 |---|---|---|
 | Ball | 8×8, 2.0 px/f at serve, +0.25 per 8 brick hits, cap 3.5; reflects off walls, bricks and the ceiling | [new-code] M, Should |
-| Shot deflect | a shot touching the ball sets vy = −|v|, and vx from the hit offset (5 zones: ±60°, ±40°, ±20° off vertical, like the classic paddle's zones) | [new-code] S |
-| Header | the ball landing on Rock's helmet: vy = −|v|, vx from Rock's x offset (same 5 zones); a `boink` | [new-code] S |
+| Shot deflect | a shot touching the ball makes it fly upward at its current speed, and vx comes from the hit offset (5 zones: ±60°, ±40°, ±20° off vertical, like the classic paddle's zones) | [new-code] S |
+| Header | the ball landing on Rock's helmet flies upward at its current speed, vx from Rock's x offset (same 5 zones); a `boink` | [new-code] S |
 | SMASH | a full charge (or PUNCH★) on the ball: it turns red and pierces up to 3 bricks for 120 f, speed 4.0 | [new-code] S |
 | Bricks | F-GRID cells, 16×8; 1 hit each (silver: 2 hits; gold: unbreakable) | F-GRID |
 | Floor bricks | the arena and lesson floors are bricks: 1 ball hit = cracked, 2 = hole | F-GRID |
@@ -686,7 +692,7 @@ crosses the top. Invaders reaching the lane is an invasion.
 | Mechanic | Numbers | Tags |
 |---|---|---|
 | CANNON mode | Rock on the (loaner) Jet at y `$C0`, 1.25 px/f left/right, B fires the buster straight up at 4 px/f, **one shot on screen**. OWNED = {BUSTER} (§3.0). The cabinet card says `ARCADE RULES: ONE SHOT` | [new-code] S, Should |
-| Formation | 5 rows × 8 columns of 16×8 invaders, **drawn as BG in NT1** and moved by the scroll above a split (the Mr. X 4 floating-BG technique, chain `$16`); the bottom band (bunkers, lane) is NT0, unscrolled | [engine-ok] tech + F-GRID |
+| Formation | 5 rows × 8 columns of 16×8 invaders, **drawn as BG** and moved by the scroll above a split (the Mr. X 4 floating-BG technique, chain `$16`: the X Crusher was nametable art moved by scrolling over a multi-split); the bottom band (bunkers, lane) comes from an unscrolled nametable row | [engine-ok] tech + F-GRID |
 | Step rule | the formation moves 2 px per step; **one step every N frames, N = invaders alive** (40 alive: every 40 f; 1 alive: every frame). At a wall: down 8 px and reverse | [new-code] S |
 | Hits | the shot tests the formation's 40-bit WRAM map offset by the scroll; a hit erases 2 tiles and spawns an explosion sprite | F-GRID |
 | Bombs | at most 3 on screen: a zigzag, a straight one, and one aimed at Rock (the original's three shot types). 2 damage | [new-code] S |
@@ -706,7 +712,7 @@ Screens:
 | **05** | **Arena: INVADER MAN** | | Should |
 | **1E** | BACKROOM: an upright cabinet tipped on its side, its monitor showing `INSERT 100 YEN`. Plaque: `IN 1978 THIS GAME CAUSED A COIN SHORTAGE. THE BUSTER IS FREE.` (a well-known anecdote, worded as folklore) | | Should |
 
-**Boss: INVADER MAN.** A big crab-shaped commander (32×24, BG in NT1, part of the formation's top row) leading a full
+**Boss: INVADER MAN.** A big crab-shaped commander (32×24, BG, part of the formation's top row) leading a full
 formation. He can only be hit through a **clear column** (shots stop at invaders), so you must cut a lane through his
 troops, and he keeps closing it.
 
@@ -814,9 +820,9 @@ off to an island museum, the **HALL OF FAME**: *"The greatest robots in history!
 personally lost to! Rebuilt, MK-VI!"* (Mr. Y). It is a museum of Rockman 1-5, and each wing is one game.
 
 **The floor plan** (the fortress map, §0.3): a rotunda and five wing doors marked 1987, 1988, 1990, 1991, 1992, plus a
-sixth door, `1993 - UNDER CONSTRUCTION`, greyed out (§4.6). The wings are played **in order** (a museum tour; it also
+sixth door, `1993 - UNDER CONSTRUCTION`, greyed out (§4.5.3). The wings are played **in order** (a museum tour; it also
 fixes when M.BEAM and Super arrive). If a Should wing (H2, H4) is cut, its door reads `CLOSED FOR RENOVATION` and the
-tour skips it; nothing later depends on H2 or H4 except H4's optional friend (§4.5).
+tour skips it; nothing later depends on H2 or H4 except H4's optional friend (§4.4.2).
 
 **Every wing has:**
 
@@ -855,13 +861,13 @@ IT NEVER DID ANYTHING. THE JUDGES DISAGREE.`), except for b0. [new-code] S, Must
 |---|---|---|---|---|---|
 | **00** | v00 | Entrance hall: marble, velvet ropes; plaque `ROCKMAN (1987): THE FIRST. A BLUE ROBOT, SIX BOSSES AND A SCORE THAT COUNTED NOTHING.` READY | none | Vanilla's Power-block E-tank pocket (charged punch) kept | [engine-ok], Must |
 | **01-02** | v01-v02 | Right through the "1987 gallery" | totem walkers `$12`, capped walkers `$1E` (each drops a score ball) | Score balls placed in awkward spots (b0) | [engine-ok], Must |
-| **03** | v03 | **The Magnet Beam case** (F-CASE): `MAGNET BEAM (1987). HANDLE WITH CARE.` Touch: the case shatters, **YOU GET MAGNET BEAM** (weapon-get, chain `$17`; `systems.md` §3.10 sets WEAPONS b8). **Checkpoint 1** | none | Plaque: `IN 1987, PLAYERS WHO MISSED THIS BEAM COULD NOT FINISH THE GAME. WE PUT IT ON THE MAIN PATH. YOU'RE WELCOME.` | [new-code] S, Must |
+| **03** | v03 | **The Magnet Beam case** (F-CASE): `MAGNET BEAM (1987). HANDLE WITH CARE.` Touch: the case shatters, **YOU GET MAGNET BEAM** (weapon-get, chain `$17`; `systems.md` §3.10; `meta.md` WEAPONS `$031` b0). **Checkpoint 1** | none | Plaque: `IN 1987, PLAYERS WHO MISSED THIS BEAM COULD NOT FINISH THE GAME. WE PUT IT ON THE MAIN PATH. YOU'RE WELCOME.` | [new-code] S, Must |
 | **04** | v04 | Up through the **appearing-block hall**: vanilla's 11 `$8F` blocks over the spike floor, retimed to a 1987 rhythm (each block: appear, 90 f, vanish; a "pyoo" SFX) | none | The vanilla **F.BLAST plug** at the upper right leads to the branch 10-12 (and one blast opens both plugs: the vanilla quirk, kept) | [engine-ok], Must |
 | **05-06** | v05-v06 | **Guts Man's lifts** over a pit: lifts ride a rail; on the dashed rail sections the lift **tips** for 30 f (Rock slides off if he stays on), then rights itself | vanilla riders `$C6` throwing balls (1 per screen) | OBJ_GUTSLIFT: vanilla lift contact (`$A0`) + a rail path table + a tip state | [new-code] M, Must |
 | **07** | v07 | **Elec Man's beams**: three horizontal beams across a ladder shaft, each 60 f on / 90 f off, offset; the emitters spark 20 f before firing | 1 rider | 3 damage per beam touch | [new-code] S, Must |
 | **08-09** | v08-v09 | Right, then down at 09 | 1 rider; the E-tank at 09 (vanilla) | **Tag pocket**: an emblem shutter at 08 → a closet with 6 score balls and a large weapon energy | [engine-ok], Should |
 | **0A** | v0A | **Checkpoint 2** (vanilla's). The branch rejoins here | none | | Must |
-| **0B** | v0B | **The Magnet Beam gap**: a 96-px gap over a pit, with an anti-Jet field over it (floor type E blocks thrust, `systems.md` §2.1) and a sign `NO RUSH JET: AUTHENTIC 1987 EXPERIENCE`. Build a beam, walk across | none | **The fortress's only required tool** (§0.2), handed over 6 screens earlier on the same route, and on both routes | [engine-ok] + M.BEAM, Must |
+| **0B** | v0B | **The Magnet Beam gap**: a 96-px gap over a pit, with an anti-Jet field over it (floor type E blocks thrust, `systems.md` §2.1) and a sign `NO RUSH JET: AUTHENTIC 1987 EXPERIENCE`. Build a beam, walk across | none | **The fortress's only required tool** (§0.2), handed over at 03, which both routes pass | [engine-ok] + M.BEAM, Must |
 | **0C** | v0C | **Fire Man's pillars**: floor vents glow 20 f, then a 16×64 flame column rises (30 f), holds (40 f), drops | 1 rider | | [new-code] S, Must |
 | **0D** | v0D | **Mid-boss: BIG EYE MK-VI** (room locked by shutters) | | | Must |
 | **0E** | v0E | Shutter corridor; plaque `THE YELLOW DEVIL'S PIECES NEVER FLY HIGHER THAN 64 PIXELS. A MAGNET BEAM AT 72 IS A FINE PLACE TO WATCH FROM.` | | The tell for the boss's beam shelf | Must |
@@ -870,9 +876,9 @@ IT NEVER DID ANYTHING. THE JUDGES DISAGREE.`), except for b0. [new-code] S, Must
 | **13** | new | **Hidden room: THE BOX ART STOREROOM** | | | Must |
 
 Checkpoints: 03, 0A, the shutter (0E). The M.BEAM case (03) is before the branch point (04), so **every route takes
-the beam before the gap (0B)**. A death after 03 keeps the beam (WEAPONS b8 is set on pickup and autosaved).
+the beam before the gap (0B)**. A death after 03 keeps the beam (its WEAPONS bit is set on pickup and autosaved).
 
-#### 4.1.1 Mid-boss: BIG EYE MK-VI (fight `$08`)
+#### 4.1.1 Mid-boss: BIG EYE MK-VI (fight `$13`)
 
 Rockman 1's hopping cyclops. A 32×48 sprite (new art), HP 20 (`systems.md` mid-boss default row), contact 4.
 
@@ -994,7 +1000,7 @@ beams per screen; the safe line weaves, so Rock must steer while falling (vanill
 Rockman 2 homage, and **the fans** are rests where Rock can hover and read the next screen. Lag: ≤ 3 beams + 2
 enemies.
 
-#### 4.2.2 Mid-boss: PICOPICO-KUN MK-VI (fight `$09`)
+#### 4.2.2 Mid-boss: PICOPICO-KUN MK-VI (fight `$14`)
 
 Rockman 2's wall blocks that come alive. Built on **F-PIECES** (the Yellow Devil's engine, reused at no extra code):
 the room's right wall is 10 BG blocks (16×16). In pairs, blocks **detach from the wall** (erased from the BG), fly at
@@ -1112,7 +1118,7 @@ celebrated; the gap presses have a yellow stripe). The vanilla red pistons are t
 - **Fallback** if T7 slips: Gemini Man's bouncing laser (a beam that reflects off walls at 45°) through a crystal
   room, Must.
 
-#### 4.3.3 Mid-boss: DOC ROBOT MK-VI (fight `$0A`)
+#### 4.3.3 Mid-boss: DOC ROBOT MK-VI (fight `$15`)
 
 Rockman 3's Doc Robot copied Rockman 2's bosses. **Doc Robot MK-VI copies one of your champions: the one whose venue
 you scored worst in** (from STAGEREC best scores; ties go to the most recent). It runs that champion's own GP AI with
@@ -1221,9 +1227,9 @@ New: MUSEUM third, snow cover, the Balloon, compactor plates, Flip-Top Jr.'s cag
 | **01-02** | v01-v02 | `1991: ROCKMAN LEARNED TO CHARGE. METALLS LEARNED TO HIDE.` Snow Metalls (vanilla `$18`, the punch-only rule, `systems.md` §4.7) | Metalls, drill tanks `$6E` (Drill Man's year) | b1's tell on 02 | [engine-ok], Must |
 | **03-05** | v03-v05 | **Bright Man's dark rooms**: the lights go out 3 s in every 6 (the Semifinal's BLACKOUT thread); **flash bulbs** on the walls (shoot one: the room is lit for 10 s); C.FLASH lights it 240 f | Metalls | | [engine-ok] reuse, Must |
 | **06** | v06 | **The chapel bells**: vanilla's falling bell row, kept, re-skinned as onion-dome chapel bells. **Each bell rings a note as it drops**, so a clean run plays a scale (b0) | none | | [engine-ok] + SFX, Must |
-| **07** | v07 | **WIRE & BALLOON (1991)**: a case with both inventions (plaque `DR. COSSACK'S INVENTIONS. THE WIRE IS ON LOAN. THE BALLOON IS RIGHT THERE.`). The Balloon: a rideable platform that rises 0.5 px/f when stood on and drifts with LEFT/RIGHT; it pops after 8 s and respawns at its post. It carries Rock up a tall gap to 08 | none | A set-piece platform, not a weapon | [new-code] S, Must |
+| **07** | v07 | **WIRE & BALLOON (1991)**: a case with both inventions (plaque `DR. COSSACK'S INVENTIONS. THE WIRE IS ON LOAN. THE BALLOON IS RIGHT THERE.`). The Balloon: a rideable platform that floats at 0.5 px/f in the D-pad's direction (it sinks slowly when idle); it pops after 8 s and respawns at its post. It carries Rock over a 160-px pit to 08 | none | A set-piece platform, not a weapon | [new-code] S, Must |
 | **08** | v08 | **Checkpoint 1** (vanilla's) | | | Must |
-| **09-0D** | v09-v0D | **DUST MAN'S COMPACTOR**: a spiked ceiling descends at 0.25 px/f while you run right (Knight's chain `$11` logic, run here through the stage-attribute table, as `venues_b.md` does for Yamato); junk-block pockets (Power) hold items; **Flip-Top Jr.'s cage at 0B** (b2) | skull drones `$66`, skull walkers `$67` | The ceiling resets at 0E | [new-code] S (attribute hook), Must |
+| **09-0D** | v09-v0D | **DUST MAN'S COMPACTOR**: a spiked ceiling cycles over the run (Knight's chain `$11` logic, run here through the stage-attribute table, as `venues_b.md` does for Yamato): it lowers to 32 px above the floor at 0.5 px/f, holds 60 f, rises at 1 px/f. Dips in the floor (16 px deep, hazard-striped) are safe at its lowest point. Junk-block pockets (Power) hold items; **Flip-Top Jr.'s cage at 0B** (b2) | skull drones `$66`, skull walkers `$67` | The ceiling resets at 0E | [new-code] S (attribute hook), Must |
 | **0E-0F** | v0E-v0F | **TOAD MAN'S RAIN**: rain sprites (6 at most, cosmetic), and the floor is wet: ice momentum (floor type 5) | Metalls | **Tag pocket** at 0F: an emblem shutter → a large life and a large weapon energy | [engine-ok], Must |
 | **10** | v10 | Shutter corridor; **checkpoint 2**. Plaque `COSSACK CATCHER (1991): A CLAW MACHINE WITH A SCIENTIST IN IT.` K: *"That machine took me a lot of places."* | | | Must |
 | **11** | v11 | **Boss: COSSACK CATCHER MK-VI** (§4.4.1) | | | Must |
@@ -1269,7 +1275,7 @@ cabin slides off its rail into the prize chute.
 |---|---|---|---|---|---|---|
 | b0 | **BELL CHOIR** | cross 06's bell row in one go, so all eight bells drop in order (a rising scale, then a chord) | the first bell's note; a plaque with a stave of eight notes | - | `EIGHT BELLS, ONE TUNE. / STOP HALFWAY AND THE / CHOIR LOSES ITS PLACE.` | `RUN ACROSS THE CHAPEL BELLS WITHOUT STOPPING OR TURNING BACK.` |
 | b1 | **KALINKA'S ROOM** (12) | at 02, a cracked Cossack crest (the "C" emblem) in the ceiling corner is a Power block: a charged punch opens it, and a ladder goes up | the crack in the crest | - | `THE FAMILY CREST IS / CRACKED. A FATHER WOULD / FIX IT. PUNCH IT OPEN.` | `BREAK THE CRACKED COSSACK CREST NEAR THE START WITH A CHARGED POWER PUNCH.` |
-| b2 | **FLIP-TOP JR.** | at 0B, a cage on the back wall holds `EDDIE PROTOTYPE (1991)`. Its lock faces the wall: only the **Super Adaptor's rocket fist on its homing return** can strike it (it flies past the cage and curves back). The compactor gives you about 10 s | the lock glints toward the wall; a plaque `THE KEY IS ALWAYS BEHIND YOU.` | SUPER (`meta.md` require 3) | `HE'S LOCKED FROM THE / BACK. YOUR NEW FIST KNOWS / HOW TO COME BACK AROUND.` | `THROW THE SUPER FIST PAST THE CAGE IN THE COMPACTOR. ON ITS WAY BACK IT HITS THE LOCK.` |
+| b2 | **FLIP-TOP JR.** | at 0B, a cage on the back wall holds `EDDIE PROTOTYPE (1991)`. Its lock faces the wall: only the **Super Adaptor's rocket fist on its homing return** can strike it (it flies past the cage and curves back). You have until the ceiling's second pass (about 10 s); then the museum's safety system lowers the cage into a floor safe, and only a replay of H4 brings it back | the lock glints toward the wall; a plaque `THE KEY IS ALWAYS BEHIND YOU.` | SUPER (`meta.md` require 3) | `HE'S LOCKED FROM THE / BACK. YOUR NEW FIST KNOWS / HOW TO COME BACK AROUND.` | `THROW THE SUPER FIST PAST THE CAGE IN THE COMPACTOR. ON ITS WAY BACK IT HITS THE LOCK.` |
 
 **12, Kalinka's room**: a bed, a radio, a stack of drawings (one of Rock), and an empty bird cage with a sign `BEAT
 WAS HERE (ROCKMAN 4 MINUS INFINITY)`; a plaque thanking 4MI (PLAN): `THANK YOU, ROCKMAN 4 MINUS INFINITY, FOR
@@ -1444,4 +1450,695 @@ at the top of the screen in the `$6C/$6D` style, the flight path `$39:$8E04` and
 
 After the unmasking, the heckler in W1-W3 is labelled `DR. WI- I MEAN MR. Y` (§0.5).
 
-(TODO: §5 Castle, §6 ending, §7-§10 are being written.)
+---
+
+## 5. SUPER WILY CASTLE W1-W3 (meta 19-21, ids 13-15)
+
+**The idea.** Project SUPER is Wily's "16-bit upgrade" (BRIEF §1). The Castle **shows the upgrade happening**: W1
+starts in a Game Boy screen and upgrades to NES, then to "16-bit" (MMC5 ExGrafix colour and MMC5 audio); W2 and W3
+stay 16-bit; and the escape **downgrades** back to a green handheld screen as Project SUPER collapses, which is also
+how the ending's lights go out. Every tier changes the rules, not only the colours.
+
+### 5.0 The three eras (F-ERA) [new-code] M, Should
+
+| | **POCKET** (the 1991 handheld era) | **NES** (1987-1993) | **SUPER** (Project SUPER) |
+|---|---|---|---|
+| View | a **160×144 window** (the handheld's screen) in the middle of the TV; the border is opaque black BG | full screen | full screen |
+| Palette | four greens for BG and sprites (`$09/$19/$2A/$39`, tune) | normal | **ExGrafix**: MMC5 ExRAM mode 1 gives each 8×8 tile its own palette and 4 KB CHR page: gradients and many more colours per area, on the BG only (Rock's sprites stay 8-bit: that is the point) |
+| Audio | the stage theme's **POCKET** arrangement: 2 pulses (50 % duty) + noise | the 2A03 arrangement | 2A03 **+ the two MMC5 pulses** (BRIEF §7.5); CONFIG "MMC5 AUDIO OFF" falls back to the 2A03 arrangement |
+| Rock's firmware | **FW 1.0**: no slide, no charge, no forms (the first handheld Rockman had neither a slide nor a charge shot); a `FW 1.0` label under the life bar (`venues_b.md` X-LABEL) | FW 6.0: everything | FW 6.0, but `NOT COMPATIBLE`: upgraded enemies take **half damage** (rounded down, minimum 1 every other hit) from Rock unless he is in 16-BIT MODE |
+| Camera | **flip-screen rooms**: each room is a fixed 256×240 screen whose playable window is the 160×144 centre; exits at the window's edges teleport to the next room (vanilla's `$39:$89F5` teleport) behind a 16-f fade. Enemies spawn behind the border with sprite priority "behind BG" and **emerge from the black**: the cramped view, faithfully | scrolling | scrolling, plus up to 3 parallax bands (`venues_a.md` T4) and **foreground pillars** (BG tiles in front of sprites: Rock and enemies pass behind them) |
+
+How cheap each tier is: POCKET is palette data, BG borders and the teleport (no raster trick needed, because the
+rooms do not scroll); NES is vanilla; SUPER is ExGrafix data per screen (1 KB of ExRAM per screen, streamed by column
+with the nametable column; on a horizontal scroll each ExRAM column index is visible once, so it works with vanilla's
+column painter: `tech.md` confirms) plus the MMC5 pulse channels in the sound driver.
+
+### 5.1 W1 UPGRADE LAB (id 13)
+
+**Pitch.** The Castle's entrance lab scans Rock, declares him obsolete, and downgrades him to a pocket screen to make
+him "compatible". You fight your way back up: an upgrade gate to NES, then a second one to 16-bit, where the castle is
+gorgeous and you are not, until Roll's smuggled patches let you catch up. The boss is a giant Metall that upgrades
+itself between bars.
+
+**Tileset.** **TS_LAB** (new slot) built from Wily 3's base set `$A2` (pink machinery and gold castle, 91 free tiles):
+lab floors, scanner gates, the colour blocks, the capsules, foreground pillars; plus the ExGrafix attribute data and
+one extra 4 KB CHR page of "16-bit" detail tiles for the SUPER screens. The escape (§5.4) reuses these blocks. [new-art]
+L, Should.
+
+| GP | Era | The player does | Enemies | Hazards and set pieces | Tags |
+|---|---|---|---|---|---|
+| **00** | NES | READY in the entrance hall. Walks into the **FORMAT CHECK** scanner gate: `ERROR: OBSOLETE FORMAT (8-BIT). DOWNGRADING FOR COMPATIBILITY...` The picture shrinks to the 160×144 window (a 30-f iris), the palette goes green, the music thins, `FW 1.0` appears | none | The heckler: *"Welcome to Project SUPER! Please remove your 8 bits at the door."* | [new-code] S, Should |
+| **01** | POCKET | Room 1: a ledge climb. Rock tries to slide: nothing happens; K: *"He can't slide!"* | green Metalls | Enemies emerge from the black border | Should |
+| **02** | POCKET | Room 2: a spike corridor with low ceilings and gaps above: without the slide you must jump up through the gaps | green drones | | Should |
+| **03** | POCKET | Room 3: a drop through the window's bottom edge into 04 | | | Should |
+| **04** | POCKET | Room 4: **the blind jump**: the next ledge is outside the window; an arrow sign points at it (the tell); bullets come from beyond the border | green Sniper-style shooters on ledges | | Should |
+| **05** | POCKET | **Mid-boss: ENKER MK-VI** (§5.1.1), in the pocket view | | | Should |
+| **06** | NES | **UPGRADE GATE 1**: `UPGRADING TO 8-BIT... COMPLETE.` The window opens to full screen (30 f), colour floods in, the triangle and the full arrangement come back, `FW 6.0`. **Checkpoint 1**. K: *"Colour! I can see colour again!"* | none | | Should |
+| **07-0B** | NES | **The palette blocks** (§5.1.2): red and blue blocks, solid only in their colour's phase | Metalls `$18`, bombers `$1B` | **Tag pocket** at 0A (emblem shutter → a W-tank) | [new-code] S, Should |
+| **0C** | SUPER | **UPGRADE GATE 2**: `UPGRADING TO 16-BIT... PROJECT SUPER: ACTIVE.` ExGrafix blooms across the screen, the MMC5 pulses join, parallax bands start, then: `WARNING: ROCKMAN NOT COMPATIBLE.` Rock stays dull 8-bit against the gorgeous background. **Checkpoint 2**. Roll on the radio: *"Rock! Dr. Light sent upgrade patches! Look for the capsules!"* A broken third gate stands beside it (b1) | none | | Should |
+| **0D-10** | SUPER | **The 16-bit section** (§5.1.3): upgraded enemies, Roll's SUPER PATCH capsules (3), parallax, foreground pillars, a translucent-water band | SUPER Metalls, SUPER drones | | Should |
+| **11** | SUPER | Shutter corridor: the UPGRADE CHAMBER | | | Should |
+| **12** | all three | **Boss: METALL 16** (§5.1.4) | | | Should |
+| **13** | - | **Hidden room: THE 32-BIT ROOM** | | | Should |
+
+#### 5.1.1 Mid-boss: ENKER MK-VI (fight `$16`)
+
+The handheld game's first "Mega Man Killer", in the pocket view. HP 20, contact 4. **His spear absorbs shots** (the
+Mirror Buster): while it is raised (a 10-f raise is the tell), Rock's shots hitting the spear are absorbed and counted;
+at 3 absorbed he flashes and releases them as one big shot (4 damage, 3 px/f). Shoot him while the spear is down.
+
+| Id | Pattern | Timeline |
+|---|---|---|
+| A | **GUARD** | spear up 60 f (absorbs) |
+| B | **CHARGE** | a dash across the window at 2 px/f (contact 4), spear down: the opening |
+| C | **RELEASE** | if he holds ≥ 3 absorbed shots: the big shot |
+| | Cycle | A, B, (C), A: ≈ 200 f |
+
+It teaches patience in a room where you cannot charge, slide or see far. Damage: mid-boss default row.
+
+#### 5.1.2 The palette blocks (07-0B)
+
+Two block sets, RED and BLUE. The stage palette cycles every 120 f; **only the blocks of the current colour are solid**
+(the other set is drawn dim and is air). 30 f before a swap, the next colour pulses (the tell). It is NES palette
+cycling (RM6's own oil uses it) made into a platforming rule. Built with `venues_a.md`'s VA-TIMED toggling floor (the
+`$0340` alternate-metatile bits flipped on a timer and repainted). Rooms: 07 one swap over a pit; 08 a climb on
+alternating colours; 09 a long run where you must stand on the right colour at the right moment; 0B a shaft.
+
+#### 5.1.3 The 16-bit section (0D-10)
+
+- **SUPER enemies**: Metalls and drones with richer palettes (an extra highlight, a two-tone helmet). Against an
+  incompatible Rock they take half damage (§5.0).
+- **Roll's SUPER PATCH capsules** (a friend mechanic, and the X-style capsule that CX's Dr. Light offered, s16,
+  credited): step in, a 40-f "installing" animation, and Rock is in **16-BIT MODE** for 20 s: his palette gains a
+  second highlight colour, **every buster shot fires as a full charge at once** (the charge counter is forced to full),
+  and SUPER enemies take normal damage. A timer bar (`venues_b.md` X-METER). Three capsules: 0D, 0F, 10. [new-code] S.
+- 0E: **parallax and foreground**: three bands (machinery 0.25×, girders 0.5×, the play layer 1×) and foreground
+  pillars that Rock and enemies pass behind. SUPER drones wait behind pillars and ambush.
+- 0F: **translucent water**: the bottom band is tinted by a mid-frame PPUMASK emphasis switch (4MI Cossack 3's water,
+  credited) over a floor-type-8 pool: "16-bit transparency".
+- 10: the gauntlet before the chamber.
+
+#### 5.1.4 Boss: METALL 16 (fight `$22`)
+
+**What it is.** Project SUPER's flagship prototype: a giant Metall. **It upgrades itself between bars**: POCKET, then
+NES, then SUPER. And it obeys the RM6 Metall rule at boss scale: **helmet down, only full-power blows hurt** (vanilla
+`$3F:$EA99`: Metalls take only the full punch; GP's list: PUNCH★, Burning Knuckle, Morning Star, Time Fist, BREAK★,
+and here the Super fist).
+
+**How it is built.** The **Mr. X 3 Metonger Z technique**: the helmet body is BG in NT1 with its own floor copy,
+moved by the horizontal scroll above the line-`$C1` split (chain `$1A`, handler `$3E:$C4F2`, whose strip scroll every
+4th frame becomes its little tread feet), and the face under the brim is a sprite (the vanilla pilot's role)
+[engine-ok]. **The twist**: between bars its BG art is re-streamed by F-SIZES in a new era: POCKET 64×48 in greens
+with the arena letterboxed to 144 lines (two raster bands, no flip-screen here), NES 96×64, SUPER 128×80 with ExGrafix
+colour and the MMC5 pulses joining the boss theme. [new-code] M, [new-art] M (three eras ≈ 160 tiles), Should.
+
+**HP: three bars of 14** (shown as half bars; 42 in all). Between bars: `UPGRADING...` (60 f, invulnerable, the
+arena changes era with it).
+
+| Bar | Id | Pattern | Timeline (frames) |
+|---|---|---|---|
+| POCKET | A | **HIDE** | helmet down 90 f (immune except full blows; shots ping off with a dink) |
+| | B | **PEEK** | helmet up 40 f, one aimed bullet (2 damage) |
+| | C | **HOP** | a 64-px hop toward Rock whose peak is hidden above the letterbox; **its shadow on the floor** is the tell (crush 4) |
+| | | Cycle | A, B, A, C (≈ 300 f) |
+| NES | B' | **PEEK 3-WAY** | the classic Metall spread: straight and ±30° |
+| | D | **MET CALL** | 2 small Metalls (vanilla `$18`, max 2) |
+| | | Cycle | A, B', D, A, C |
+| SUPER | E | **SPIN** | the helmet spins (4 rotation frames streamed: "Mode 7!") and rolls across the floor at 3 px/f (immune except full blows; jump it) |
+| | F | **PEEK SPREAD** | 5-way |
+| | G | **PARATROOPERS** | 4 small Metalls parachute down (max 4) |
+| | | Cycle | E, F, A, G, F |
+| Pinch (bar 3 ≤ 6) | H | **DX HOP** | two big hops with floor shockwaves (3 damage) |
+
+**The weakness is a flip.** W.STORM **4/12 W** and, as its WEAK reaction (`systems.md` SC9), a tornado that hits the
+helmet **while it is down flips the Metall onto its back** for 60 f (legs kicking): everything hurts. SILVER.T 3/16 G
+(it arcs under the brim), F.BLAST 1/32 R; buster 1/32 and charge 3/32 only while the helmet is up; PUNCH★ 4/24 always.
+
+**Defeat.** The helmet cracks open; inside, a normal-size Metall waves a tiny white flag and hops away.
+
+#### 5.1.5 Secrets
+
+| Bit | Secret | How | Tell | Tier A | Tier B |
+|---|---|---|---|---|---|
+| b0 | **BACKWARD COMPATIBLE** | the POCKET section (01-05, Enker included) with no damage | `FW 1.0` under the life bar makes the handicap explicit | `NO SLIDE, NO CHARGE, NO / SCRATCH. THE POCKET ERA / RESPECTS A CLEAN RUN.` | `GET THROUGH THE GREEN HANDHELD ROOMS, ENKER INCLUDED, WITHOUT TAKING A HIT.` |
+| b1 | **THE 32-BIT ROOM** (13) | at 0C, a third gate stands broken beside the others, labelled `32-BIT (NOT READY)`, flickering. A full charge or full punch on its panel: `UPGRADING TO 32-BIT... ERROR`, and a door opens | the flickering broken gate | `TWO GATES WORK. THE / THIRD ONE NEEDS A GOOD / THUMP. THE FUTURE IS RUDE.` | `HIT THE BROKEN 32-BIT GATE BESIDE THE SECOND UPGRADE GATE WITH A FULL CHARGE.` |
+| b2 | **8-BIT PRIDE** | the SUPER section (0D-11) without touching a SUPER PATCH | the capsules are optional and obvious | `DR. LIGHT SENT PATCHES. / A PROUD 8-BIT ROBOT / DOESN'T NEED THEM.` | `CROSS THE 16-BIT SECTION WITHOUT USING ANY OF ROLL'S UPGRADE CAPSULES.` |
+
+**13, the 32-bit room**: everything drawn in flat diagonal "polygon" tiles; a plaque `ROCKMAN 8 (1996): ON LOAN FROM
+THE FUTURE. THE FUTURE IS NOT READY.`; the envelope and a 1-UP. b0: 30 bolts; b2: 30 bolts and a W-tank.
+
+Hooks: the downgrade K *"They shrank him!"* C *"Handheld mode. Mind your eyes."*; Upgrade Gate 1 K *"Colour!"*; NOT
+COMPATIBLE C *"He's too retro for this castle."*; 16-BIT MODE K *"Shiny Rock!"*; METALL 16 C *"It's just a Metall.
+A very, VERY expensive Metall."*; the flip K *"It's on its back! Get it!"*. Heckles: *"Your firmware is older than my
+moustache."* / *"Sixteen bits! Twice as many as you!"*. Deaths: *"Downgraded."* / *"Wrong colour, Rock."* / *"It came
+out of the black!"* / *"Incompatible."* / *"Patch notes: Rock died."* / *"He should've hidden under a helmet too."*
+
+HARD: POCKET rooms with one more emerging enemy each; palette swaps every 90 f; 2 SUPER PATCHES instead of 3 and 15 s
+each; METALL 16 HIDE 120 f and PEEK 30 f.
+
+Homage moments: the scanner shrinking Rock into a green handheld window; a Metall emerging from the black border;
+the gate where colour floods back; a dull 8-bit Rock against a 16-bit castle; a W.STORM tornado flipping a giant
+Metall onto its back.
+
+### 5.2 W2 BRACKET OF DOOM (id 14): base vanilla Wily 3
+
+**Pitch.** Vanilla Wily 3's boss rush (a hub, eight teleporters, a ninth after the eighth win), turned into a
+tournament bracket: eight Project SUPER copies of the champions in four **pair bouts**, then **the final against Bass
+β**.
+
+**Tileset.** TS_W2 = a copy of Wily 3's (`$2A:$92`; base set `$A2` + `$A8` + `$A9`). Kept: the water castle, the
+teleporter, the hub and its alcoves, the hub lights thread `$13`. New: the bracket board on the hub's back wall
+(portraits in BG, lines lit by palette), ExGrafix data for the moat, the Championship Ring. [new-art] M, Must.
+
+| GP | From | The player does | Enemies | Hazards and set pieces | Tags |
+|---|---|---|---|---|---|
+| **00-05** | v00-v05 | **The moat**: vanilla's underwater castle (floor type 8 throughout), now in SUPER colour | piranhas `$C1`, clam capsules `$CA` | spike pits; items as vanilla (big WE 01, E-tank 02, big WE 03/04, big HP 05) | [engine-ok], Must |
+| **06-07** | v06-v07 | Up past wheel cannons to the teleporter pad (07: collision D → `$1F`, vanilla) | `$C0/$C9` | **Checkpoint 1** at 06 | [engine-ok], Must |
+| **08** | v08 | **The bracket hub** (§5.2.1). Checkpoint (vanilla: the hub is checkpoint 08) | none | the bracket board; plaque `THE BRACKET OF DOOM: EIGHT SUPER COPIES. FOUR BOUTS. ONE FINAL.` | Must |
+| (arenas) | venues | **Pair bouts**: each alcove warps into a champion's own venue arena (§5.2.2) | | | Must |
+| **11** | new | **The Championship Ring**: Bass β, duel 2 (§5.2.3) | | | Must |
+| **12** | new | Walk-out; stage clear | | | Must |
+| **13** | new | **Hidden room: THE LOSERS' BRACKET** (tag-gated) | | | Must |
+
+Vanilla's eight generic refight rooms (v09-v10) stay in the layout unused by W2; `meta.md`'s GP Rush **1993 CUP** can
+use them (its "vanilla Wily 3 hub order").
+
+#### 5.2.1 The hub as a bracket [engine-ok] data + [new-code] S
+
+- Vanilla's machinery is kept: the per-frame routine `$39:$8E3B` reads the touched alcove metatile and looks up
+  `$8ED2` (boss), `$8EC8` (X) and `$8EDC` (alcove metatiles); each win closes that alcove through the `$0340` bits;
+  after all eight, byte `$0C` opens the ninth teleporter at the top centre.
+- **The tables are re-ordered so pairs sit side by side**: the Exhibition pairs, which the player already knows from
+  the bracket screen: left top and left middle = **Wind + Knight**; left bottom and centre left = **Tomahawk + Plant**;
+  right top and right middle = **Blizzard + Flame**; right bottom and centre right = **Yamato + Centaur**.
+- **The back wall is a bracket board**: 8 portraits in 4 pairs, a line from each pair to a quarterfinal node, two
+  semifinal nodes, and the FINAL at the top centre over the ninth teleporter. Lines light (a palette entry each) as
+  bouts are won; a small icon beside each portrait shows the weapon that finished that copy (b0).
+- **The twist on the vanilla rush: instead of "redraw screen `$09 + id`", an alcove calls the GP Rush fight loader**
+  (`meta.md` §9.2.1: write `$51`, `$0684-$0686`, then `$F0` = 2) and the fight happens **in the champion's own venue
+  arena**. This matters: the venue reworks (Wind's gusts, Centaur's tide, Tomahawk's high noon, Knight's ENCOUNTER
+  card) live in their arenas, and a generic room would break them.
+
+#### 5.2.2 Pair bouts
+
+- Step on either alcove of a pair: the bout starts with that champion. When he falls, he drops a **large life
+  capsule**; 90 f later a `TAG!` card slams in and **his partner jumps in**: the warp goes straight into the partner's
+  arena (no hub return). When the partner falls, his capsule returns Rock to the hub (vanilla's 60-f return), both
+  alcoves close, the pair's line lights.
+- **SUPER copies**: each champion is a Project SUPER copy (the real champions are in the stands, says the
+  commentary): his GP AI and Table 1/2 row with own-weapon cells (`systems.md` §4.5), a brighter SUPER palette, his
+  boss panel tagged `(SUPER COPY)`, and **pinch at HP 14 instead of 9** (one data byte per fight).
+- A death in a bout returns Rock to the hub with the bout reset (both copies at full HP); finished pairs stay
+  finished. HP carries from the first copy to the second, so the life capsule matters.
+- Commentators: `TAG!` K *"Tag! Knight Man is in!"*; a finished pair C *"Quarterfinal decided!"*.
+
+#### 5.2.3 Boss: BASS β, duel 2: "THE FINAL" (fight `$23`)
+
+**The arena: the Championship Ring.** A boxing-ring stage under spotlights in SUPER colour, ropes on both sides.
+**The ropes rebound**: touching one throws Rock (or Bass) back toward the centre at 3 px/f for 12 f. NO TAG in the
+ring (a one-on-one final; K: *"No tag-outs in the final!"*).
+
+**What is new since the Semifinal.** He copies **all eight** weapons now; SC6's armour **starts adapted** to the
+column you used most in duel 1 (`BASS_ADAPT`; C: *"He remembers your F.BLAST!"*); and his COPY is now a
+**counter-copy**: he uses **the last weapon that hit him**. The COUNTER rule (§2.4) still applies, so reading him is
+rewarded twice.
+
+| Id | Pattern | Timeline (frames) |
+|---|---|---|
+| A | **SCOUT** | duel 1's, with 5 shots |
+| B | **DOUBLE-JUMP VOLLEY** | duel 1's |
+| C | **COUNTER-COPY** | the ANALYZING pose (30 f, the icon tell) with **the last weapon that hit him**, fired twice |
+| D | **ROPE RUN** | runs into a rope, rebounds across the ring at 4 px/f (contact 4), twice |
+| E | **WALL KICK** | duel 1's D, off the ring posts |
+| | Cycle | A, D, B, C, E (≈ 450 f) |
+| Pinch (HP ≤ 9) | **SUPER β** | a 16-bit afterimage trail (3 ghost sprites); dash-cancels into the double jump into a downward volley; every recovery −25 % |
+
+HP 28, robot scale (`systems.md` row) + SC6 + COUNTER. No help, no overdrive: this is the fair final the rivalry was
+building to. At 0 HP he drops to one knee: *"Grr... This isn't the last round, Rockman."* He teleports. (His vow is
+saved for the ending, §6.1.)
+
+#### 5.2.4 Secrets
+
+| Bit | Secret | How | Tell | Require | Tier A | Tier B |
+|---|---|---|---|---|---|---|
+| b0 | **PERFECT BRACKET** | the eight copies finished by **eight different** scoring classes (`systems.md` §6.4: BUSTER, PUNCH, the 8 weapons, BREAK) | the finisher icons on the board | - | `THE JUDGES LIKE VARIETY. / EIGHT KNOCKOUTS, EIGHT / DIFFERENT FINISHERS.` | `FINISH EACH OF THE EIGHT COPIES WITH A DIFFERENT WEAPON. THE BOARD SHOWS WHICH YOU USED.` |
+| b1 | **THE LOSERS' BRACKET** (13) | the board has a ninth portrait slot, `??`, over a sealed alcove with Break Man's emblem: only he opens it | the emblem; the `??` slot | TAG | `EVERY BRACKET HAS A / LOSERS' SIDE. THE MASKED / ENTRANT KNOWS THE WAY.` | `CALL BREAK MAN IN THE HUB. THE SEALED ALCOVE WITH HIS EMBLEM OPENS FOR HIM.` |
+| b2 | **UNDEFEATED** | the eight copies and Bass with no death | a `W` streak counter on the board | - | `A CHAMPION DOESN'T LOSE / A ROUND. NOT ONE. NOT EVEN / TO THE FLOOR.` | `CLEAR ALL FOUR BOUTS AND THE FINAL WITHOUT DYING.` |
+
+**13, the losers' bracket**: a lounge with benches where the rejected entrants of the Semifinal sit (the ones you
+ACCEPTED, or all of them with TALENT SCOUT), a Vending Man who dispenses an E-tank once (*"For the champ."*), and a
+plaque `THE LOSERS' BRACKET: EVERYONE GETS A SECOND CHANCE. (EXCEPT MR. Y.)`. Rewards: b0 30 bolts and the filled
+bracket in the Museum; b2 30 bolts and an E-tank.
+
+HARD: SUPER copies with their HARD branches (the venue docs' lists); no life capsule between a pair; Bass pre-adapted
+to your two most-used columns.
+
+Hooks and deaths: *"Knocked out in the quarterfinals."* / *"The bracket wins again."* / *"TAG! ...You're it."* / *"He
+went to the ropes. Bass didn't."* / *"Eliminated."* / *"There's always the losers' bracket."*
+
+Homage moments: the vanilla hub with a tournament bracket on its wall; `TAG!` and a champion leaping into his own
+venue arena; Bass throwing your own favourite weapon back; a rope rebound in the ring.
+
+### 5.3 W3 MODE-7 MACHINE (id 15): base vanilla Wily 4
+
+**Pitch.** The final round. Wily's machine sits on a **pseudo-3D floor**, drives toward the camera to fight you,
+spins the floor under your feet, then the Capsule, where **Break Man's gift** can happen, then the escape.
+
+**Tileset.** TS_W3 = a copy of Wily 4's (`$2B:$89`; 177 blocks). Kept: the teal castle, the capsule arrival, the
+dome-dispenser routine, the Wily Machine's 202-tile slot (`$BE` at `$0360`) for the new machine. New: the checker
+floor texture (NT0 rows 24-29), the machine in three sizes, the capsule's SUPER badge; the escape uses TS_LAB's
+blocks. [new-art] L, Must.
+
+| GP | From | The player does | Enemies | Hazards and set pieces | Tags |
+|---|---|---|---|---|---|
+| **00** | v00 | Arrival in the teleporter capsule (vanilla script 73 at `$8F95`: waits for Rock's Y = `$77`, places him at X `$30`, Y `$53`). Wily's PA: `WELCOME TO THE FINAL ROUND! ADMISSION: ONE ROCKMAN.` | eye cannon `$54` | | [engine-ok], Must |
+| **01** | v01 | Down the 16-bit hall (vanilla big WE) | `$54` | b1's tell at the window | Must |
+| **02-03** | v02-v03 | **Mid-boss: THE TROPHY DISPENSER** (§5.3.1): vanilla's dome dispenser `$4F` re-skinned | | | [engine-ok] reuse, Must |
+| **04** | v04 | Red skull spearman `$70` and the E-tank (vanilla). **Checkpoint 1** (vanilla Wily 4 had none) | `$70` | | Must |
+| **05** | v05 | Shutter corridor; loads the machine art into the `$BE` slot (vanilla init `$8FCF`). Wily's PA: `BEHOLD THE MODE-7 MACHINE! IT ROTATES! IT SCALES! IT WAS VERY EXPENSIVE!` | | | Must |
+| **06** | v06 | **Boss: the MODE-7 MACHINE**, then the **WILY CAPSULE SUPER** (§5.3.2-§5.3.3) | | Phase checkpoints | Must |
+| **07-0C** | new | **The escape: THE FINAL LAP** (§5.4) | | | Must |
+| **0D** | new | **Hidden room: WILY'S TROPHY ROOM** | | | Must |
+
+#### 5.3.1 Mid-boss: THE TROPHY DISPENSER (fight `$17`)
+
+Vanilla Wily 4's screen 03 reuses Tomahawk's dome mid-boss routine (`$39:$8FBC` → `$861B`, a dispenser that drops
+hard-hat walkers and rocks, HP 14). GP keeps the routine and re-skins it: **the stolen GP CUP** bolted onto a
+dispenser, dropping mini-Metalls. The twist is the payoff: when it breaks, **the GP CUP falls intact**, and Rock picks
+it up (`THE GP CUP: RECOVERED`). He carries it to the podium in the ending. [engine-ok] + [new-art] S, Must.
+
+#### 5.3.2 Boss: THE MODE-7 MACHINE (fight `$24`)
+
+**How it is built.** Vanilla's Wily Machine: BG in NT1, moved by the scroll above the floor split, whose strip is
+scrolled by `$0678/$0679` (chain `$19`, handler `$3E:$C4B2`), three bars in one room [engine-ok]. **The twist: the
+floor strip becomes a 16-band perspective floor.** The bottom 64 lines (176-239) are split into 16 bands of 4 lines
+by the MMC5 scanline IRQ through the generic raster list (BRIEF §7.1); band k (0 = far, 15 = near) gets X scroll
+`camX × s[k] + rot × k` and a Y scroll that picks a row of a checkerboard texture in NT0 rows 24-29, advanced by
+`v × s[k]` per frame, so the rows rush toward the viewer when the machine drives. `s[k]` runs from 0.25 (far) to 2.0
+(near). Fallback: 8 bands of 8 lines. The machine's **depth** is shown by three pre-drawn sizes streamed with F-SIZES
+(S 64 px, M 112 px, L 160 px wide; only the current size is resident in the `$BE` slot). Rock's collision floor is a
+flat line at y 192; the bands above and below it are the floor receding and approaching (visual). [new-code] L,
+[new-art] L, Must.
+
+**Phase 1, THE APPROACH** (bar 1, 28):
+
+| Id | Pattern | Timeline (frames) |
+|---|---|---|
+| A | **FAR CRUISE** | ≈ 300 f: small (S) on the horizon, driving left and right (X scroll), the floor bands scrolling. **Out of range**: shots pass under it (an `OUT OF RANGE` pop on the first try). Every 90 f it lobs a **mortar** at Rock's x: the shell's **shadow grows on the floor for 60 f** (the depth used as a tell), then a 24-px blast (3 damage) |
+| B | **CHARGE** | a horn blast (30 f), a headlight glow on the floor where it will arrive (30 f), then it drives at the camera: S → M → L over 60 f while the checker rows rush past, arriving in Rock's plane, L size, filling half the arena |
+| C | **CLOSE QUARTERS** | 180 f, hittable (the cockpit hit box): hops toward Rock (64 px, crush 6: the Wily Machine's hop) and fires vanilla's ring shots (`$F0`, 3 per volley) |
+| D | **REVERSE** | backs off to the horizon, L → S, 60 f |
+| | Cycle | A, B, C, D (≈ 600 f) |
+
+**Phase 2, SPIN-OUT** (bar 2, refilled to 28; vanilla's face plate bursts and Wily is visible). It stays near (L) and
+**rotates the floor**: the bands **shear** (each band's X offset grows with depth), and the floor **drags Rock
+sideways** at 0.75 px/f in the spin's direction (`venues_a.md` VA-GUST applied while grounded). The checkers start to
+shear 30 f before (the tell); the direction alternates.
+
+| Id | Pattern | Timeline (frames) |
+|---|---|---|
+| A | **SPIN** | 180 f of rotation; one sweeping cockpit laser at standing height (30-f charge tell; jump it) |
+| B | **SUPER HOP** | two hops toward Rock, each landing sending shockwaves both ways |
+| C | **RING STORM** | 3 volleys of 3 rings |
+| | Cycle | A, B, A, C |
+| Pinch (HP ≤ 9) | **DRIFT** | spins every 200 f and **reverses mid-spin** once; rings split |
+
+**Damage** (`systems.md` row, vanilla homage): SILVER.T **4/12 W**, KNIGHT.C 3/16 G, Y.SPEAR 1/32 R, PUNCH★ 4/24,
+buster 1/32. **Phase checkpoints**: on CASUAL and NORMAL, a death in phase 2 restarts in phase 2, and a death in the
+Capsule restarts at the Capsule (HARD: from phase 1). [new-code] S, Must.
+
+#### 5.3.3 Boss: THE WILY CAPSULE SUPER (fight `$25`), and Break Man's gift
+
+The machine explodes (vanilla's sequence) and the Capsule rises (bar 3, 28). **How it is built**: vanilla's sprite
+Capsule (`$F2`: palette-fade teleports, rings that split) [engine-ok]. **The twist: afterimages**: from HP 14 each
+teleport leaves 2 decoys in faded, dithered palettes; only the real one's `SUPER` badge blinks (the tell); decoys fire
+half the shots and vanish when hit once.
+
+| Id | Pattern | Timeline (frames) |
+|---|---|---|
+| A | **FADE** | every 180 f: fade out 20, in 20, at one of 6 positions |
+| B | **SPLIT RING** | a ring that splits into 4 after 40 f (3 damage), vanilla |
+| C | **AFTERIMAGE** (HP ≤ 14) | 2 decoys per teleport |
+| D | **16-BIT BLAST** (HP ≤ 7) | a row of the screen flashes 40 f, then a screen-wide beam fires at that height: low (jump) or high (stand or slide); 4 damage |
+
+**Damage**: KNIGHT.C **4/12 W**, SILVER.T 3/16 G, C.FLASH 1/32 R (vanilla's Capsule ignored C.FLASH: kept as a
+resist), PUNCH★ 4/24.
+
+**BREAK MAN'S GIFT** (4MI's Proto Man and the Wily Buster, credited; `r4mi/wily.md` §4.5) [new-code] S, [new-art] S,
+Must (with the tag partner; the Roll fallback otherwise):
+
+- **Trigger**: in the Capsule phase, Rock's HP < 6, and the gift not yet given in this W3 run. Checked every 8 f.
+- **Scene** (≈ 4 s): the screen blacks out with yellow sparkles; the whistle; Break Man beams in: *"A gift from Dr.
+  Light. And Dr. Cossack. They insisted on both names. Take it."* He throws an orb; a white flash.
+- **Effect**: HP refilled to full, and Rock holds the **CHAMPION BUSTER** for the rest of the fight (an EXWP-style
+  weapon that replaces the buster and the weapon menu; the HUD reads `WPN: CB`): **4 damage, 8 i-frames** on the
+  Capsule, 3 shots on screen, and while it is held **any hit of 2 or more on Rock becomes 1**. A death after the gift
+  keeps it on respawn (4MI's re-give).
+- **The purist path**: never drop below 6 HP in the Capsule phase and the gift never comes (W3 b2, PURIST). C: *"He
+  didn't need any help."*
+- **If Break Man walked** (the doping trade-off, `systems.md` §9.4) or the tag partner is cut: **Roll** brings the
+  orb: *"Break Man asked me to bring this. He said he 'wasn't welcome'."* The cost of doping is shown, and the fight
+  stays fair.
+
+**Defeat.** The Capsule cracks; **Wily falls out and kneels, begging** (vanilla's ending art, kept). Then he springs
+up: *"...PSYCH!"* The PA (4MI's announcement, credited): `ANNOUNCE: PROJECT SUPER WILL SELF-DESTRUCT. THIS SEQUENCE
+MAY NOT BE ABORTED. MR. Y, PLEASE PROCEED TO THE EMERGENCY POD. DR. WILY ALSO.` He jumps into a pod and is gone. Red
+alarm; the escape.
+
+### 5.4 The escape: THE FINAL LAP (W3 07-0C)
+
+**The clock.** F-CLOCK shows `1:00.0` over the life bar, a referee's whistle sounds, and it runs. At zero: a red
+flash, a white flash, and Rock dies (`TIME!`). A death restarts at 07 with a fresh clock (never at the machine).
+
+**The mercy (4MI's escape, credited).** Attempts 1-3 get 60.0 s. **From the 4th attempt the clock reads 90.0 s, with
+a small yellow `+30 INJURY TIME` beside it.** The game never explains it; in the ending the head judge confesses
+(§6.1). 4MI's in-fiction excuse was a lowered self-destruct output; GP's is the referee's stoppage time.
+[new-code] S, Must.
+
+**The downgrade.** As Project SUPER collapses, the escape runs F-ERA in reverse: 07-08 SUPER, 09-0A NES (at 09 the
+ExGrafix flickers off and one MMC5 pulse drops out of the music; at 0A the other), 0B POCKET (green, letterboxed to
+144 lines by two raster bands since this room scrolls, **FW 1.0: no slide, no charge**).
+
+| GP | Era | The player does | Hazards | Friends |
+|---|---|---|---|---|
+| **07** | SUPER | Runs right through the collapsing hall | crumbling floors (the Mr. X group's falling-bell collision `$1D`, reused), explosions (white orb clusters, 3-f tells, 2 damage) | |
+| **08** | SUPER | Drops down a shaft | falling debris (shadows on ledges are the tells) | Beat's pit rescue (`systems.md` §10) works here, as everywhere |
+| **09** | NES | Across a crumbling bridge | crumbling floors | **Flip-Top Jr.** (if freed in H4) pops out of a vent and throws a large life and a large weapon energy: *"Thanks for the rescue!"* |
+| **0A** | NES | Up ladders while a ceiling descends behind (Knight's chain `$11` logic again) | the ceiling | |
+| **0B** | POCKET | The whole floor gives way (scripted): **Rush Jet swoops in and catches Rock** (4MI Cossack 1's catch, credited), and Rock rides the Jet for the rest of the screen (a short T1-lite ride, steering through falling debris) | debris | **Rush** |
+| **0C** | POCKET | The exit door: **Break Man holds it open**: *"Go! I'll be right behind you."* (He is not: he is on the stadium roof in the ending.) If he walked, Roll holds it | | **Break Man** / Roll |
+
+A white flash as Rock bursts out, and the ending begins.
+
+#### 5.4.1 W3 secrets
+
+| Bit | Secret | How | Tell | Tier A | Tier B |
+|---|---|---|---|---|---|
+| b0 | **NO INJURY TIME** | escape within the first three attempts | (none needed: the clock) | `THE REFEREE ADDS TIME / FOR THE STRUGGLING. A / CHAMPION NEVER NEEDS IT.` | `ESCAPE THE CASTLE IN YOUR FIRST THREE ATTEMPTS.` |
+| b1 | **WILY'S TROPHY ROOM** (0D) | at 01, a window shows a trophy shelf behind the wall, under a skull-shaped keyhole; a charged punch or a full charge on the keyhole opens it | the window and the keyhole | `WILY KEEPS HIS TROPHIES / BEHIND A SKULL. KNOCK IT / OFF ITS HINGES.` | `HIT THE SKULL KEYHOLE NEAR THE START WITH A FULL CHARGE OR A FULL PUNCH.` |
+| b2 | **PURIST** | beat the Capsule without Break Man's gift | the gift's trigger is HP < 6, which the gift scene states | `A GIFT IS KIND. WINNING / WITHOUT ONE IS KINDER TO / YOUR PRIDE. STAY ABOVE 5.` | `BEAT THE WILY CAPSULE WITHOUT FALLING BELOW 6 HP, SO BREAK MAN NEVER STEPS IN.` |
+
+**0D, Wily's trophy room**: a cabinet of participation ribbons from every contest Wily ever lost (`1987: 2ND PLACE
+(OF 2)`, `1988: 2ND PLACE (OF 2)`, ... `1993: DISQUALIFIED`), a plaque `DR. WILY: PERSONAL BESTS`, an E-tank and a
+1-UP. b0: 30 bolts; b2: 30 bolts.
+
+Hooks: arrival K *"This is it, Papa. The final."*; FAR CRUISE C *"Out of range! Watch the shadows!"*; the floor spins
+K *"The floor is turning!"* C *"Mode 7! I always wanted to say that."*; afterimages K *"Which one is real?!"*;
+the gift K *"Is that... Blues?"* C *"OBVIOUSLY Blues."*; the clock C *"Sixty seconds! Run!"*; Rush catch K *"RUSH!"*.
+Heckles (W3, as `DR. WI- I MEAN MR. Y`): *"You can't hit what you can't scale!"* / *"My capsule has afterimages. Does
+yours?"*. Deaths: *"Flattened in perspective."* / *"The floor took him for a spin."* / *"Wrong capsule."* / *"TIME!"*
+/ *"So close to the door."* / *"The castle is downgrading. So is Rock."*
+
+HARD: mortar shadows 45 f; CHARGE every 240 f; spins alternate every 150 f; afterimages from HP 20; the 16-bit blast's
+flash 30 f; escape clock 50 s (90 s after 3 tries, unchanged); no phase checkpoints.
+
+Homage moments: the machine driving out of the horizon over a rushing checkerboard; the floor shearing into a spin
+under Rock's feet; Break Man's gift in the dark, yellow sparkles and all; the castle downgrading around Rock as he
+runs, the music losing channels; Rush catching Rock as the floor falls away; `+30 INJURY TIME`.
+
+---
+
+## 6. The championship ending and the victory lap
+
+### 6.1 The ending (≈ 3 min, START skips each scene after its first viewing) [new-code] M, [new-art] M, Must
+
+| # | Scene | What happens | Built from |
+|---|---|---|---|
+| 1 | **The castle falls** | Outside, the castle collapses into a skull-shaped cloud (4MI's, credited) that **pixelates**: a SUPER-colour cloud, then chunky 8-bit blocks, then four greens, then one green pixel, then nothing | 3 BG pictures + F-ERA palettes |
+| 2 | **Caught** | Wily's pod sputters across the bay and crash-lands on the GP Stadium's pitch. Rock lands beside it. **Vanilla's big-sprite "Rockman holds Wily by the collar"** (kept). Wily: *"It was all Mr. Y's idea!"* Everyone: *"YOU are Mr. Y."* Wily: *"...Prove it."* Kalinka holds up the Y mask | vanilla ending art |
+| 3 | **The booth** | If the escape mercy fired: C: *"For the record... I may have added a little injury time back there. A judge's discretion."* Otherwise: K: *"Under a minute! Papa, did you SEE that?"* (4MI's "who lowered the output?", in tournament clothes) | text window |
+| 4 | **The vow** | On the stadium roof, against vanilla's moon (Mr. X 1's art), Bass β: *"Enjoy your little trophy, Rockman. Next time... it won't be 8-bit."* He leaves in a wide, multicoloured "16-bit" beam (PLAN: the Rockman 7 nod) | sprites |
+| 5 | **The podium** | Rock on the top step with the **GP CUP** he recovered in W3; the eight champions applauding; the guests in the stands; **Break Man on the roof**, a whistle, and gone (the Proto Man tradition). If he walked (doping): an empty roof | sprites over the stadium BG |
+| 6 | **The CAPCOM TIMES** | Vanilla's newspaper screen and masthead, kept; the headline art redrawn: `ROCKMAN WINS GRAND PRIX!!`. Typed below, vanilla-style: *"Rockman of Dr. Light's laboratory has won the Grand Prix."* / *"Mr. Y, who was Dr. Wily, has been arrested."* / **vanilla's `$94`, verbatim: "But he may be building a jailbreak robot inside his cell."** / vanilla's `$95-$96`: *"...as long as the strongest robot, Rockman, is here, this peace will surely last!!"* Doped: the headline `CHAMPION'S CHIP UNDER INVESTIGATION` (`systems.md` §9.4; `story.md` words it) | vanilla `$92-$96` slots |
+| 7 | **The lights go out, one channel at a time** | Night, the empty stadium; Rock and Dr. Light in the stands. The GP theme in its full MMC5 arrangement. One by one the six floodlight towers switch off, and **each one takes an audio channel with it**: MMC5 pulse 2, MMC5 pulse 1, noise, triangle, pulse 2, until pulse 1 plays the melody alone; the last tower goes dark and it stops. Light: *"That was the last one, Rock."* Rock: *"The last what?"* Light: *"...The last match of the season."* (MMC5 AUDIO OFF: the drop starts at the 2A03 channels.) The farewell of the last NES Rockman, said with the sound chip | stadium BG at night + 2 sprites; [new-music] M |
+| 8 | **VICTORY LAP** | The scoreboard flickers back on: `VICTORY LAP`. The lap (§6.3) | |
+| 9 | **The rating** | `meta.md` §6: the CHAMPIONSHIP RATING (its background is the lap's PHOTO FINISH), Break Man's debrief, then vanilla's **`TO BE CONTINUED`** (`$88`, kept), START → title | meta |
+
+### 6.2 The escape-to-ending handoff
+
+- The escape's last frame and scene 1 share the white flash, so there is no load seam.
+- The ending is skippable scene by scene after the first viewing (a cleared file can replay W3, `meta.md` §6.1).
+
+### 6.3 The VICTORY LAP: the playable credits (meta 23) [new-code] M, [new-art] M, Should
+
+CX's staff roll was a level you walked as Quick Man with 99 lives (credited). GP's is **a victory lap around the
+stadium track**.
+
+| Element | Rule |
+|---|---|
+| Layout | 8 screens of the running track on TS_STADIUM (the track, the stands above, the infield below); the last screen loops back to the first (a teleport, like X-WRAP), so the lap repeats until the credits are done (about 3 laps, ≈ 4 min). The credits are tied to **places on the lap**, not to time, so a fast runner sees them faster |
+| Player | Rock with **99 lives and 99 E-tanks** (CX), all weapons and forms. **Break Man runs beside him** as a follower (24 px behind, jumps when Rock jumps) if he is your partner; **SELECT swaps who you control** (CX let you play the partner) |
+| The credits | written **into the stadium**: on the scoreboard (BG text painted through the VRAM buffer), on banners along the track, mowed into the infield grass, and **as card stunts**: the crowd in the stands holds up coloured cards that form each name as you pass (a crowd-card BG pattern swapped in per credit) |
+| Credit content | the GP team; `ORIGINAL ROCKMAN 6 STAFF` (vanilla's `$84-$86`, kept as text); `THE CONTEST DESIGNERS` (vanilla's `$81-$83` roll, kept); `SPECIAL THANKS: ROCKMAN CX (HIMAJIN JICHIKU) / ROCKMAN 4 MINUS INFINITY (PURESABE, NEO BOROKUZU KOUBOU)`; `ORIGINAL GAME (C) CAPCOM 1993`, with vanilla's `PRESENTED BY CAPCOM` (`$87`) as the last banner |
+| **The champions' cards** | the eight champions stand along the track in vanilla's credit order (alphabetical, as the cards are), each in front of a backdrop strip of his venue, doing his idle animation. **Touch one** (a high five): his **card** types in a banner over the track: vanilla's `DWNB-41..48` + `DESIGNER` cards (`$71-$80`, verbatim) + 4MI's tribute line **`WINS n / LOSSES n`** (wins: his venue clears and his W2 copy's defeat; losses: Rock's deaths in his boss rooms, from the save) + a GP job title (`story.md`; e.g. `BLIZZARD MAN: SNOW SPORTS ROBOT`). Vanilla's credits showed each master in his own room; here they are all at the track, and you choose whom you visit |
+| Cameos | CROWD FAVOURITE (Opening b2) earned: each champion calls Rock's name as he passes. TALENT SCOUT (Semifinal b2): the accepted rejects sit in the front row under a `WE GOT IN!` banner. The guests and the MK-VI bosses ride **museum floats** around the infield. Flip-Top Jr. (H4 b2) rides Eddie's cart |
+| **Wily** | in a cage on a float pulled by Eddie (4MI's captive Wily on the credits train, credited): *"This is UNDIGNIFIED!"* On the last lap he breaks out and runs for the podium to steal the GP CUP; touching him makes **Rush and Beat pin him** (a 2-s gag) |
+| The end | at the podium: a camera flash, **`PHOTO FINISH`**: a still of Rock with the cup, the champions, Break Man on the roof and Wily pinned in the corner pulling a face. It becomes the rating screen's background |
+| Records | `LAP TIME` (the first lap) for Time Attack (`meta.md` meta 23). No scorecard |
+
+---
+
+## 7. Mr. X Returns (meta 22, id 22) [Could]
+
+`meta.md` §9.8: unlocked by U1.5; the premise is that the original Mr. X was a real person after all, furious that
+Wily borrowed his name twice.
+
+- **Entrance**: the back door of H5's 1993 wing diorama (§4.5.3), which opens after U1.5: walking into the diorama of
+  vanilla Mr. X 1's screen v00 walks into the real thing.
+- **The stage**: **vanilla Mr. X Fortress 1, untouched**: its layout, tileset `$2C:$92`, music `$09`, enemies and
+  Rounder II (the rail riders). The museum of the 1993 game, played as it was. Under GP rules otherwise (scorecard,
+  chips), so the riders' row comes from vanilla `$EFE4` (the open question about their charged-buster damage applies,
+  `systems.md` open question 10).
+- **The new fight** (fight `$28`): **MR. X (THE REAL ONE)** in his flying office chair, a sprite boss built on the
+  Capsule's framework. HP 28; every weapon neutral 2/30, buster 1/60.
+
+| Id | Pattern | Timeline (frames) |
+|---|---|---|
+| A | **SWIVEL** | the chair spins on the spot, firing 8 shots in a ring (2 damage), 60 f |
+| B | **BUSINESS CARDS** | throws 3 cards that stick in the walls for 300 f as 16×4 platforms (and hurt in flight, 2 damage) |
+| C | **HOVER CHARGE** | rolls across the room on its castors at floor level (contact 4); jump it |
+| Pinch (HP ≤ 9) | **LAWSUIT** | *"I'm suing Dr. Wily for identity theft!"* A stack of papers rains down (8 sheets falling in a sine, 1 damage each) |
+
+- Reward: achievement THE X-FILES (`meta.md` §10) and the TRUE GP finale slot `$28`. One screen of dialogue after
+  (`story.md`): Mr. X shakes Rock's hand and hands him another business card.
+
+---
+
+## 8. Boss index, and the damage rows this doc sets
+
+Every boss and mid-boss in this doc, with its `meta.md` fight id, its technique and its row. Damage cells are
+"damage / i-frames" in `systems.md` §4's format (W weak, G good, R resisted). Unlisted columns take `systems.md`
+§4.5's defaults for that family (**machines**: buster 1/32, charge 3/32, punch 2/32, PUNCH★ 4/24, other weapons
+2/24; **robots**: the champion scale: buster 1/60, charge 3/60, weapons 2/30, PUNCH★ 3/30).
+
+| Fight | Boss | Stage | HP | Family | W | G | R | Special rules (visible code) |
+|---|---|---|---|---|---|---|---|---|
+| `$26` | Grand Pi-kun | Opening | 14 | machine (`systems.md` row) | - | - | - | only the valve is a hit box; buster 1/30, charge 3/30 |
+| `$21` | Bass β, duel 1 | Semifinal | 28 | robot | - | - | - | buster 1/40, charge 3/40, weapons 2/24, PUNCH★ 3/30 (`systems.md`); SC6; COUNTER 3/16 |
+| `$18` | Block Man | E1 | 28 | rule | **line clear 4/12** (×rows) | - | - | weapons 1/32 |
+| `$19` | Paddle Man | E2 | 28 | rule | **ball 4/12** | - | - | weapons 1/32 (break bricks) |
+| `$1A` | Invader Man | E3 | 28 | rule | **cannon 4/12** | - | - | cannon mode is buster-only |
+| `$1B` | Maze Man | E4 | 28 | rule | **chomp 4/12** | - | - | maze mode has no weapons |
+| `$13` | Big Eye MK-VI | H1 | 20 | mid-boss default | - | - | - | |
+| `$1C` | Yellow Devil MK-VI | H1 | 28 | machine | C.FLASH 4/12 | Y.SPEAR 3/16 | PLANT.B 1/32 | eye only; full blows knock pieces down; SC7 (Could) |
+| `$14` | Picopico-kun MK-VI | H2 | 10 blocks | mid-boss default | - | - | - | the bar counts blocks |
+| `$1D` | Mecha Dragon MK-VI | H2 | 28 | machine | KNIGHT.C 4/12 | SILVER.T 3/16 | F.BLAST 1/32 | head only |
+| `$15` | Doc Robot MK-VI | H3 | 20 | the copied champion's row | (his) | (his) | (his) | SC4 own-weapon joke on the first own hit |
+| `$1E` | Gamma MK-VI, phase 1 | H3 | 28 | machine | W.STORM 4/12 | B.ATTACK 3/16 | C.FLASH 1/32 | chest core only |
+| `$1E` | Gamma MK-VI, phase 2 | H3 | 28 | machine | - | - | - | **SC5**: fists only (tap 2/30, PUNCH★ and Time Fist 4/12, Morning Star 3/20, Super fist 3/20); all else dinks |
+| `$1F` | Cossack Catcher MK-VI | H4 | 28 | machine | Y.SPEAR 4/12 | W.STORM 3/16 | KNIGHT.C 1/32 | dome only; C.HOPPER claw 8 HP |
+| `$20` | Dark Man MK-VI | H5 | 28 | robot | F.BLAST 4/16 | PLANT.B 3/20 | SILVER.T 1/45 | a hit from the real Break Man in phase 1 sets HP to min(HP, 14) |
+| `$16` | Enker MK-VI | W1 | 20 | mid-boss default | - | - | - | the raised spear absorbs shots |
+| `$22` | METALL 16 | W1 | 3 × 14 | machine | W.STORM 4/12 + FLIP | SILVER.T 3/16 | F.BLAST 1/32 | helmet down: full blows only; buster and charge only with the helmet up |
+| `$00-$07` | the 8 SUPER copies | W2 | 28 | champions | Tables 1/2 | | | pinch at 14 |
+| `$23` | Bass β, duel 2 | W2 | 28 | robot | - | - | - | SC6 pre-adapted; COUNTER; counter-copy |
+| `$17` | Trophy Dispenser | W3 | 14 | mid-boss default | - | - | - | vanilla routine |
+| `$24` | MODE-7 Machine | W3 | 2 × 28 | machine | SILVER.T 4/12 | KNIGHT.C 3/16 | Y.SPEAR 1/32 | out of range while far |
+| `$25` | Wily Capsule SUPER | W3 | 28 | machine | KNIGHT.C 4/12 | SILVER.T 3/16 | C.FLASH 1/32 | decoys die to 1 hit; CHAMPION BUSTER 4/8 |
+| `$27` | `???` = **WILY CAPSULE 1993** | (TRUE GP only) | 3 × 28 | vanilla | vanilla `$EFE4` | | | see below |
+| `$28` | Mr. X (the real one) | Mr. X Returns | 28 | robot | - | - | - | all weapons 2/30 |
+
+**`$27`, the `???` fight** (`meta.md` §9.2.1 asked for "the Castle's final form, renamed"): it is **vanilla Wily 4's
+whole final fight, untouched**: the 1993 Wily Machine 6, its second phase and the 1993 Wily Capsule, three 27-HP bars
+in vanilla room 06 with vanilla music `$18`, the 1993 art, and **vanilla's rules** (32-f i-frames, SILVER.T 4,
+KNIGHT.C 2, C.FLASH 0, the charged punch 4). After all the 16-bit glitz, TRUE GP's secret last fight is the original.
+Until U1.4 the lobby names it `MR. Y'S ???`; after, `DR. WILY (OBVIOUSLY)`. It costs a fight record and a rules flag
+(the 1993 row set `systems.md` §13.3 already generates).
+
+**Overrides of `systems.md` §4.5**: none of its W/G/R cells are changed. Additions: the exhibition rule events as
+4/12 cells booked as class 4 (§3.0); METALL 16's and the mid-bosses' rows; the COUNTER cell (3/16) for Bass; the
+CHAMPION BUSTER (4/8, a new column used only in W3); the Dark Man phase-1 exposure rule.
+
+---
+
+## 9. Cross-doc dependencies
+
+### 9.1 `tech.md`
+
+- **Ids** (§0.1): H1-H5 = 8-12 and W1-W3 = 13-15 (keeping the fortress tests); Opening 16, Semifinal 17, E1-E4 18-21,
+  Mr. X Returns 22, victory lap 23. The vanilla Mr. X 1 layout and tileset kept intact for 22.
+- **Tileset slots**: TS_STADIUM, TS_ARCADE, TS_LAB new; TS_H1-H5 and TS_W2/W3 as copies of vanilla pages; the shared
+  MUSEUM CHR third.
+- **Raster**: the generic raster list must carry W3's 16-band floor (MMC5 scanline IRQ every 4 lines, X and Y per
+  band; fallback 8 bands), the POCKET letterbox bands, the W1 PPUMASK water band, and vanilla chains 7, `$16`, `$19`,
+  `$1A` as presets.
+- **ExGrafix**: ExRAM mode 1 per SUPER screen, streamed by column with the nametable columns; and the fall-back when
+  the player turns it off (there is no "off" in CONFIG today: proposed as part of FLASHES/visual options, or always
+  on).
+- **F-SIZES** VBlank budget: 8-20 frames per size change (≤ 150 tiles at `systems.md`'s 128 B per frame assumption
+  ≈ 19 frames for the largest: hidden behind motion or a flash).
+- **Objects**: about 40 new object kinds in this doc (rejects, lifts, beams, presses, the exhibition pieces, the
+  bosses); all through the generic GP object id + sub-id.
+- **The stage-attribute table** fields this doc uses: class, collision group (H1 needs group 0's F.BLAST plug; the
+  Semifinal and W3 escape need group 3's crumbling `$1D`), the Knight-ceiling logic for H4 and the escape, NO TAG per
+  screen, OWNED override (exhibitions), the era (F-ERA), the stage's par.
+- **Teleport flip-screen exits** for POCKET rooms (vanilla `$39:$89F5`).
+- **The boss panel re-type** (Dark Man) and new panel records for every new boss (`$3C:$81B1`, tables
+  `$3C:$85EE-$8615`).
+
+### 9.2 `systems.md`
+
+- **Answers** to its questions: the Exhibition rewards are **fixed prizes** (100 bolts + an exclusive RACING COLOUR +
+  a Museum trophy), **not chips** (its open question 9); the fortress adds **8 envelopes** (+240 bolts) and **30-bolt
+  showpiece and prize payouts** (paid once, venue-prize style); the Super Adaptor comes out of Gamma at the end of H3
+  (its §2.3); M.BEAM is taken from a display case at H1 03, on the main path, before H1's only required gap.
+- **Proposals**: the exhibitions' rule damage booked as class 4 (HAZARD) and a per-stage OWNED override, so VARIETY's
+  par fits a one-tool stage (§3.0); 4 more RACING COLOURS (exhibition-only); the force beams counting as spikes for
+  SPIKE GUARD; the CHAMPION BUSTER column (4/8) and its "hits of 2+ become 1" rule; Bass's COUNTER cell; METALL 16's
+  W.STORM FLIP as an SC9 reaction; the Super fist counting as a "full-power blow" for punch-only enemies and the
+  audition rule.
+- **Its special cases used here**: SC4 (Doc Robot), SC5 (Gamma), SC6 (Bass, both duels), SC7 (Yellow Devil, Could),
+  SC9 (METALL 16's flip).
+- **Break Man**: joins at the Semifinal (its §11 said "e.g. after the Semifinal"); the fortress uses his tag gates only
+  for optional pockets and two hidden rooms (Semifinal b1, W2 b1) and one prize (H5 b2). If he walks (doping), the W3
+  gift comes from Roll.
+
+### 9.3 `meta.md`
+
+- **SECRETS** for meta 0 and 9-21 as defined per stage here (b0 showpiece 3, b1 room 2, b2 prize 2, b3 the Mr. X card
+  1), with every hint in both tiers. `require` values used: TAG (Semifinal b1, H5 b2, W2 b1) and SUPER (H4 b2).
+- **Mr. X's card**: H5's hidden room (19), RATEFLAGS b1.
+- **Fight ids**: `$13-$17` for this doc's five mid-bosses (Big Eye, Picopico-kun, Doc Robot, Enker, the Trophy
+  Dispenser), leaving `$08-$12` to the venues; `$18-$28` as in §8; `$27` = the 1993 Wily Capsule; `$28` Mr. X.
+- **The GP Rush lobby** is the Opening's screen 06 (the players' tunnel).
+- **The fortress maps** with `NEXT WING / REPLAY / BACK TO BRACKET`; per-stage saves.
+- **EVENTS**: b4 the trophy theft (the crane, §4.0); b5 Break Man joins (the Semifinal's end); b6 the unmasking (H5's
+  end); EVENTS2 b4 the Super Adaptor (H3's end).
+- **The rating**: the PHOTO FINISH as the RATING screen's background; T14's card location.
+- **The `???` fight** is defined (§8).
+
+### 9.4 `story.md`
+
+Every quoted line here is a draft. The beats it must keep: the intro's X→Y picture and *"That's definitely Dr.
+Wily"*; the Semifinal help, block and reveal (*"Entrant number ten."* / *"That's OBVIOUSLY Blues."*); the Hall of Fame
+theft by a claw crane; the unmasking's two masks and *"WE KNOW."*; Dark Man's lying boss panel; the W3 gift line (with
+the Roll variant); the escape PA; the booth's injury-time confession; Bass's vow; the CAPCOM TIMES with vanilla's
+jailbreak line kept; Light's *"the last match of the season"*; the champions' job titles for the lap cards; Mr. Y's
+heckle tables; every plaque (facts checked, folklore worded as folklore); the commentators' running "can't say the
+trademark" gag in the exhibitions.
+
+### 9.5 `venues_a.md` / `venues_b.md`
+
+- Their **T1-lite, T2, T3, T4, VA-GUST, VA-TIMED** (venues_a) and **T6, T7, X-WRAP, X-LABEL, X-METER, X-GPOBJ**
+  (venues_b) are reused here, so they must stay generic: T7's input mirror for Gemini Rock (H3), X-WRAP for the maze
+  tunnel (E4), VA-GUST for magnets, the ring ropes and the spinning floor, VA-TIMED for W1's palette blocks.
+- The **SUPER copies** in W2 load each champion's own arena and GP AI: every venue boss must run correctly when
+  entered through the fight loader (the GP Rush requirement, `meta.md` §9.2), with a per-fight pinch byte.
+- The **victory lap** needs each champion's idle animation and a venue backdrop strip (one band of each venue's
+  tileset).
+- The **parade** (Opening) needs each champion's idle frame and one line.
+
+### 9.6 `art_audio.md`
+
+Art: TS_STADIUM (L), TS_ARCADE (M + 4 × S), TS_LAB (L) and its ExGrafix page, the MUSEUM third (M), the wing thirds
+(5 × M), Bass β (L), the rejects (3 × S), Grand Pi-kun (3 sizes), the Yellow Devil, the Mecha Dragon (`$8B` budget),
+Gamma (≈ 160 tiles), the Cossack Catcher, Dark Man, METALL 16 (3 eras), the MODE-7 Machine (3 sizes), the exhibition
+guests (4), the mid-bosses (5), the ending pictures, the crowd card stunts. Music: GP FANFARE, GP STADIUM, RIOT, BASS
+β (two arrangements), 4 exhibition loops, HALL OF FAME (5 arrangements), UPGRADE LAB (POCKET / 2A03 / MMC5), FINAL
+LAP, VICTORY LAP, the lights-out channel arrangement, Break Man's whistle jingle. SFX: knocks, bells (a scale),
+the referee's whistle, the claw's ding-ding, HIGH FIVE.
+
+---
+
+## Lessons applied
+
+| Source | Lesson | Where |
+|---|---|---|
+| CX 1 | One premise everywhere: the tournament reaches the opening (a ceremony and warm-up lanes), the riot (rejected entrants, auditions), the museum (plaques, a sixth wing for the game you are playing), the rush (a bracket of pair bouts), the escape (a match clock with injury time), the ending (a podium, a newspaper, card stunts) | all |
+| CX 2 | A guest or homage is a mechanic: rows that clear, a ball that erodes the floor, a formation that speeds up as it shrinks, four ghost targets, appearing blocks, force beams frozen by Time Stop, needle presses with slide gaps, a mirror twin, a claw that grabs, gravity arrows, a lying boss panel | §3, §4 |
+| CX 3 | The villain talks between lives: Mr. Y's heckle tables and a harmless YES/NO | §0.5 |
+| CX 4 | The partner as a second body: Break Man's tag gates, the two-Break-Men exposure, the lap partner | §2.6, §4.5, §6.3 |
+| CX 5 | Reuse engine set pieces with one twist each: every vanilla fortress technique gets exactly one (the table in §0.6) | §0.6 |
+| CX 6 | Telegraph tools: the one required tool (M.BEAM) is handed over on the main path with a sign; every gate has a visible tell; the "SELECT trick", the slide gaps, the shadows of hidden hops and mortars, the wrong-note whistle | §0.2, all secrets tables |
+| CX (staff roll, Light 6) | The credits are a level; a boss can be a story beat (Gamma's uppercut, Dark Man's panel) | §6.3, §4.3, §4.5 |
+| CX (giant Light) | BG bosses that change size by streaming pre-drawn frames into CHR-RAM: Pi-kun, METALL 16, the MODE-7 Machine | §0.7 F-SIZES |
+| 4MI 1 | Weakness in the i-frames, flat damage: every row here is in `systems.md`'s format | §8 |
+| 4MI 4 | Friends are mechanics: Break Man's help, block and gift; Roll's patches and the gift fallback; Flip-Top Jr.'s items in the escape; Rush's catch; Beat's rescue; the accepted rejects; Kalinka's room | §2, §4.4, §5 |
+| 4MI 4 (escape) | Hidden mercy with an in-fiction excuse, revealed later: 60 → 90 s after three failures, confessed by the head judge | §5.4, §6.1 |
+| 4MI 5 | Behaviour-gated prizes and a hint per missed secret, never WIP text: every non-venue stage has b0/b1/b2 with tier A and B hints | all secrets tables |
+| 4MI (Wily 4 final) | An unwinnable-feeling moment with a fair, concrete trigger and a purist path: the gift at HP < 6, the PURIST secret | §5.3.3 |
+| 4MI (ending) | Spend the ending on a punchline: Wily caged on a float, pinned by Rush and Beat in the photo; WINS / LOSSES on the cards | §6.3 |
+| 4MI 7 | Make the theme mechanics: the handheld era is a smaller screen and missing moves; the 16-bit era is "incompatible" armour | §5.0 |
+| 4MI 9 | A boss rush on one fight table: W2 calls the GP Rush loader, so the bracket and GP Rush share one table | §5.2 |
+| RM6 7, 8 | Keep vanilla quirks: Wily 2's twin plug, the falling bells, the Mr. X 1 skyline, Wily 4's capsule arrival, the jailbreak line, the C.FLASH resist on the Capsule, TO BE CONTINUED | §0.6 |
+| RM6 1 | Keep the fortress ids below 16 and let the vanilla fortress tests keep working | §0.1 |
+| RM6 (fortress lessons) | Vanilla used adaptors as keys to shortcuts and rewards, never hard gates: the same here; every BG boss sits over a flat floor at the split line | §0.2, §0.6 |
+
+## Risks
+
+1. **Scope.** This doc holds 14 stages, 22 bosses and mid-bosses and about 40 new objects. *Mitigation*: the tiers
+   (BRIEF §9). The Must spine is the Opening, the Semifinal, H1, H3, H5, W2, W3, the ending; W1, H2, H4, the
+   exhibitions, the lap and Mr. X Returns degrade cleanly (closed doors, a plain credits roll, a skipped W1). Within a
+   stage, the Should pieces (Gemini Rock, gravity flips, the SUPER section's patches) have Must fallbacks listed.
+2. **The 16-band floor** (W3) needs 16 IRQs per frame plus Y-scroll writes mid-frame; it may not fit next to the music
+   and the sprite work. *Mitigation*: the 8-band fallback; the floor is decoration (collision is a flat line), so even
+   a 4-band version keeps the fight intact.
+3. **ExGrafix and horizontal scroll**: ExRAM must be streamed with the nametable columns. *Mitigation*: SUPER screens
+   are few (W1 0C-12, W2, W3, two escape screens); a fallback is the NES palette with richer palettes per screen.
+   Emulator support for ExGrafix is good (Mesen, FCEUX), but test on hardware early (4MI lesson 12).
+4. **Sprite-per-line limits** in the busiest scenes: Gamma's two fists beside Rock, Block Man's falling pieces,
+   METALL 16's paratroopers. *Mitigation*: sizes chosen for ≤ 8 per line (the fists are 24 px wide); flicker
+   priority favours Rock and projectiles.
+5. **F-SIZES VBlank cost** while the camera scrolls. *Mitigation*: every size change happens in a locked room, behind
+   motion or a flash.
+6. **The POCKET section could feel bad on purpose.** No slide, no charge, a small view. *Mitigation*: it is 5 short
+   rooms, a mid-boss and one secret; the gate back to full colour is the payoff; CASUAL keeps the slide.
+7. **Break Man is a Should.** If he is cut: the Semifinal's help and reveal still play (he leaves instead of joining),
+   the tag gates become ordinary doors opened by a full charge, H5 b2 and the two TAG hidden rooms re-gate, and Roll
+   brings the W3 gift. The rating's T1 arithmetic is `meta.md`'s (§6.3).
+8. **Dark Man in Break Man's sprite** depends on Break Man's sprite set existing (`systems.md` art, L). *Mitigation*:
+   if it is cut, Dark Man's disguise uses a palette swap of Rock's sprite with a scarf overlay ("BREAK MAN?").
+9. **Gameplay facts about other games** in plaques and homages (dates, who copied whom, the UFO shot count, the coin
+   shortage) could be wrong. *Mitigation*: plaques give years only where sure; folklore is worded as folklore; the M10
+   text pass checks each one.
+10. **Trademarks**: the exhibitions imitate famous games. *Mitigation*: parody names, no logos, guests designed as RM
+    robots (Maze Man's visor mouth, not a yellow disc); the commentators' running gag is that they cannot say the
+    names.
+11. **Pair bouts in W2 load two venue arenas back to back** with different tilesets and music: a long load mid-bout.
+    *Mitigation*: the 90-f `TAG!` card hides the warp; the loader is the GP Rush one, tested there first.
+12. **The required M.BEAM gap** is the only hard gate in the fortress. *Mitigation*: the case is on both routes before
+    it, the beam is saved on pickup, the gap has a sign, and CASUAL adds a narrow ledge midway.
+
+## Open questions
+
+1. **Ids 8-15 for the H/W stages**: does `tech.md` agree to keep the eight new fortress stages in the vanilla fortress
+   slots (the cheapest way to keep the `AND #$08` tests), or does it move everything to the attribute table anyway?
+2. **Is Break Man the right ending-scene partner on the lap?** CX let you play its partner in the credits; GP's lap
+   lets you swap. Should a doped file get Roll as the lap partner instead of no one?
+3. **W1's tier.** It is the Castle's showpiece for the "16-bit upgrade" premise, but BRIEF ranks it Should. If it is
+   cut, should its POCKET/NES/SUPER idea move into the escape alone (already there in reverse)?
+4. **The Super Adaptor's timing.** `systems.md` and `meta.md` put it after H3, which this doc follows (it drops from
+   Gamma). Should H3's phase 2 instead lend it (the 4MI "tool when the level needs it" pattern), so the uppercut finale
+   uses the new adaptor on the first run?
+5. **Should the Hall of Fame be linear?** A museum tour is chronological, and it fixes when M.BEAM and Super arrive.
+   A free order (like the venues) would be more replayable but would need H2-H5 to work without M.BEAM or Super.
+6. **Exhibition RACING COLOURS**: does `systems.md` accept 4 exhibition-only palettes beside its 4 shop ones?
+7. **The `???` fight under 1993 rules** inside TRUE GP: is a rules switch for a single fight acceptable to `meta.md`
+   (records, chips) or should it run under GP rules with the 1993 art only?
+8. **Block Man's name** collides with a later official Robot Master of the same name (Rockman 11, 2018). Keep it (PLAN
+   and BRIEF use it) or rename (TETRO MAN)?
+9. **Doc Robot MK-VI's copy choice** (your worst venue): is reading STAGEREC at H3 fine with `meta.md`, or should it be
+   the champion you lost to most (KOs in his room)?
+10. **The 32-bit room's plaque** names a 1996 game (Rockman 8). Is a joke about a future game fine in a 1993 setting
+    (the museum's "on loan from the future" running gag), or does it break the farewell tone?
