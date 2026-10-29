@@ -259,5 +259,7 @@ music = {'Must': (7, 3700, 21, 9.0), 'Should': (18, 13180, 35, 26.4), 'Could': (
 for k, (n, b, sfx, ses) in music.items():
     print(f"music {k:6}: {n} tracks, {b} B, {sfx} new SFX -> ~{ses:.1f} sessions")
 print("music Must = G00-G04, G27 WHISTLE (2 s), G37 LAST MATCH (2A03 stems) + 21 new SFX in the $36 tail (392 of 449 B)")
-# text: story.md §10.4 ~1,100 strings x 2 languages; Must ~600
-print("text: ~1,100 strings EN+JP at ~90 strings/session (write+fit+compile checks) = ~24 sessions; Must ~600 = ~13 (+ external native JP review)")
+# text: story.md §10.4 (round 2, counted by build/revise/story/fit.py): translated strings (EN+JP) Must 400
+# (R4.5's kinds 336 + Must mechanics' text 64), Should 359, Could 91, Won't 4; plus 28 Must labels and 18 panel records.
+print("text: Must 400 strings EN+JP at ~40/session + M2 setup + M9 review fixes = ~12 sessions (tight.py); "
+      "Should 359 (short pop-ups, drafted) = ~7; Could 91 = ~3; Won't ~0.5 (+ external native-JP review, gates release)")

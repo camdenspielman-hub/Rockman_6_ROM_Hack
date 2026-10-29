@@ -78,6 +78,6 @@ print(f'{"CODE":9} {total:6.1f}')
 # +5 % for the fixes the art-acceptance gates ask for. Round 1's formula on R5.1's ~3,900 tiles / 350 frames gave ~50.
 # Music (music_r2.py): G00-G04, G27 WHISTLE and G37 LAST MATCH, 21 new SFX and the fallback wiring = 9 (was ~10).
 art_tiles, art_frames = 4535, 354
-art, music, text = 51.6, 9, 12
+art, music, text = 51.6, 9, 12  # text: story.md §10.4, 400 Must strings EN+JP (round 2)
 print(f'art ~{art:.1f}  music ~{music}  text ~{text}')
 print(f'TIGHT MUST TOTAL ~{total+art+music+text:.0f} sessions')
