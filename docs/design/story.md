@@ -2985,7 +2985,7 @@ docs' working labels as written, with these decisions:
 | The stage-select font has no punctuation | Kalinka's bracket lines live in the WIN window; nodes are champion names |
 | The panel is English in JP; 12 cells for a name | Cards in English (§5); W2 copies named `BLIZZARD.EXE` (12) |
 | The YOU GET font draws R like A | `C.FLRSH` kept: it reads "C.FLASH" on screen and is a joke in CEN-20 |
-| No kanji anywhere but the logo | JP is kana-only, spaced (§10.3); GP's subtitle 史上最大のグランプリ!! is logo art like vanilla's |
+| No kanji anywhere but the logo | JP is kana-only, spaced (§10.3); GP's subtitle 史上最大の再会!! is logo art like vanilla's |
 | The main font has 16 katakana | All GP JP goes through the glyph cache |
 | Typing speed and blip are per-call variables | Per-speaker blips (§10.2) |
 | Text timing is fixed waits after typing | Scenes advance on a button; pop-ups on a length-based timer (§6.1) |

@@ -1106,9 +1106,9 @@ meta owns what each menu screen shows and does; story owns every word on it; thi
 
 - **Logo**: vanilla's ROCKMAN 6 logo (142 tiles) is kept, with a **"GP" badge as sprites** on top: two 16×24 letters in
   red and gold with a 2-frame glint (16 sprite tiles, D). The title's sprite table has 251 tiles free.
-- **Subtitle**: 史上最大の戦い!! → **史上最大のグランプリ!!**. 史上最大の and !! are vanilla logo art and stay. 戦い (≈ 8
-  tiles) is replaced by グランプリ drawn in the same brush style (≈ 20 tiles, D). The extra tiles come from the
-  pattern-table split (§2.8): the menu text moves to the sprite table, which frees its 16 tiles. The logo's kanji are art,
+- **Subtitle**: 史上最大の戦い!! → **史上最大の再会!!** (*Saikai*, "The Greatest Reunion"; the user's choice). 史上最大の
+  and !! are vanilla logo art and stay. 戦い (≈ 8 tiles) is replaced by 再会 drawn in the same brush style, two glyphs in
+  the same footprint (≈ 8 tiles, D), so no extra tiles are needed. The logo's kanji are art,
   so the text engine stays kana-only (consistency decision 5).
 - **Menu**: GAME START / SPECIAL EVENTS / CONFIG and the © lines, in meta's order and story's words, drawn from a caps
   font in the sprite table under the split at line 112 (16 tiles re-sourced from vanilla's font). The split is tech's
