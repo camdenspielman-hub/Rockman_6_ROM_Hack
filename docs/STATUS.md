@@ -10,7 +10,7 @@ Update this at the end of every session: what was done, what's next, and anythin
 - **Scope:** v1.0 = the tight Must, ≈ 451 sessions (`python3 tools/plan/tight.py`). Release ladder (RULINGS R8.1): v0.1 Blizzard slice
   (M4, ~150), v0.5 Round One (M6, ~342), v1.0 Championship (M9, ~451).
 - **User answers** are in `docs/PLAN.md` §9: emulator-only is fine; art and JP review undecided (show a sample sprite
-  early); title ROCKMAN 6 GP, subtitle pun to pick; pace 2-4 sessions a week.
+  early); title ROCKMAN 6 GP: 史上最大の再会!! (Saikai); pace 2-4 sessions a week.
 
 ## Session log
 

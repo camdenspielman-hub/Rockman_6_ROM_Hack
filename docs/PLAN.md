@@ -1,6 +1,6 @@
 # ROCKMAN 6 GP: the plan (v2)
 
-> **ロックマン6 GP 史上最大のグランプリ!!** / *Mega Man 6 GP: The Greatest Grand Prix in History*
+> **ロックマン6 GP 史上最大の再会!!** (*Shijō Saidai no Saikai*) / *Mega Man 6 GP: The Greatest Reunion in History*
 > Codename **`r6gp`**. The title is a working title (question 4 in §9).
 
 This is the front door to the project. It says what the game is, what v1.0 contains, how it gets built, and how the
@@ -378,10 +378,8 @@ Each design doc has its own risk list; tech's (14 items) is the longest.
 2. **Art:** no artist yet. Commissioning depends on how Claude's sprites look, so a sample sprite or two comes early
    (an M2 art-pipeline deliverable, shown at the first art gate).
 3. **Japanese review:** same answer as art; decide later. JP text stays draft until then.
-4. **Title:** *ROCKMAN 6 GP* is the main title. The subtitle should be a pun on the original 史上最大の戦い
-   (*Shijō Saidai no Tatakai*). Candidates: 史上最大の**大会** (*Taikai*, "the greatest tournament in history",
-   one sound away from *Tatakai*), 史上最大の**再会** (*Saikai*, "the greatest reunion": the returning champions and the
-   returning villain), 史上最大の**祭典** (*Saiten*, "the greatest festival"). Pick one later.
+4. **Title:** **ROCKMAN 6 GP: 史上最大の再会!!** (*Shijō Saidai no Saikai*, "The Greatest Reunion in History"), a
+   pun on the original 史上最大の戦い (*Tatakai*): the returning champions, and the returning villain. Chosen by the user.
 5. **Pace:** about 2 sessions a week if sessions are as heavy as the planning one, 3-4 if lighter; build sessions should
    be lighter. At 3 a week the slice (~150) is about a year and v1.0 (~451) about three, before any gain from better or
    cheaper models.

@@ -15,7 +15,7 @@ Read first:
 
 ## 1. Identity
 
-**Rockman 6 GP: Shijō Saidai no Grand Prix!!** (codename `r6gp`)
+**Rockman 6 GP: Shijō Saidai no Saikai!!** (史上最大の再会, "The Greatest Reunion in History"; codename `r6gp`)
 
 **One premise, followed through every layer** (CX lesson 1): *the World Robot Tournament is real this time*.
 
