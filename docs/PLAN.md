@@ -271,7 +271,7 @@ Details: [`design/fortress.md`](design/fortress.md).
 |---|---|
 | **Controls** | SELECT is a modifier: held with Up or Down it cycles weapons, held with Left or Right it cycles forms, and tapped it returns to the last weapon. Doors and characters respond to UP |
 | **Forms** | A form change takes 16-20 frames, with no cutscene. Every form fires every weapon. Rush Power comes with the second win and Rush Jet with the fourth; the Super Adaptor (a rocket fist that returns, and a short jet hop) arrives in H3 |
-| **Weapons** | Each weapon has a standard shot in every form. Blizzard Attack's alternate fire, the Ice Block, freezes an enemy into a platform. Slot 9 holds the Magnet Beam. Whether the other alternate fires and form combinations join v1.0 is an open question (§9) |
+| **Weapons** | Each weapon has a standard shot in every form, and one combination with a Rush form: Power or Jet changes how that weapon behaves (for example, a pogo, or a punch that carries the weapon's element). Weapons have no alternate fire modes. Slot 9 holds the Magnet Beam |
 | **Combat** | Two tables per boss and weapon, after Minus Infinity: damage, and invulnerability after a hit. A weakness deals 4 and leaves the boss open again after 16 frames; the buster deals 1 and leaves 60. The first weakness hit shows WEAK!, staggers the boss and prompts the commentators |
 | **Scorecard** | 100 points: time 20, damage 20, variety 25, secrets 20, style 15. The variety target grows with the arsenal, so a buster-only clear is possible but pays less |
 | **Economy** | Bolts come only from scorecards (the best score, paid once), one sponsor envelope per hidden room, and capped prizes. There is nothing to farm |
@@ -280,7 +280,7 @@ Details: [`design/fortress.md`](design/fortress.md).
 | **Accessibility** | By default no large flash repeats more than three times a second; a REDUCED setting turns flashes into fades. An input-lag setting widens reaction windows. A health notice appears at boot |
 
 **The venue chips.** Each is earned by playing a venue a particular way, and each must be worth equipping for the rest of
-the game. Four meet that standard as designed. The other four are being redesigned, and the replacements below await
+the game. Four meet that standard as designed. Three replacements are approved, and the fourth, for LOST JUNGLE, awaits
 approval.
 
 | Venue | Earned by | Chip | Effect |
@@ -289,10 +289,10 @@ approval.
 | HERO'S QUEST | defeating the Metal Metslime | KAISHIN | every 12th hit on a boss is a SPLENDID STRIKE, worth 2 extra damage |
 | HIGH NOON FRONTIER | reaching the sheriff without hitting a townsperson | SHERIFF STAR | +20 % on every payout |
 | EDO NINJA ROW | winning the daruma otoshi without touching the head | DARUMA | once per life, a hit that would kill leaves 1 health instead |
-| SUMMIT CLIMBER | sparing every seal | **CLIMBER'S GRIP** (proposed) | ladders are climbed half again as fast, and a hit never knocks Rock off a ladder; ice floors grip like normal floors |
-| PERSIAN PALACE | reaching the end without igniting the oil | **COOL HEAD** (proposed) | taking damage does not cancel a buster or Power charge |
-| ATLANTIS RUINS | freeing the three statues with full charges | **ZONE MAP** (proposed) | the pause screen shows which of each stage's secrets are still unfound, and breakable walls and secret doors shimmer faintly |
-| LOST JUNGLE | the EXPLORER'S PERFECT: every treasure, no points lost | **FORAGER** (proposed) | every 5th enemy defeated in a row without taking damage drops a small energy capsule, every 10th a large one |
+| SUMMIT CLIMBER | sparing every seal | **CLIMBER'S GRIP** | ladders are climbed half again as fast, and a hit never knocks Rock off a ladder; ice floors grip like normal floors |
+| PERSIAN PALACE | reaching the end without igniting the oil | **COOL HEAD** | taking damage does not cancel a buster or Power charge |
+| ATLANTIS RUINS | freeing the three statues with full charges | **ZONE MAP** | the pause screen shows which of each stage's secrets are still unfound, and breakable walls and secret doors shimmer faintly |
+| LOST JUNGLE | the EXPLORER'S PERFECT: every treasure, no points lost | **THORN GUARD** (proposed) | after Rock takes a hit, a ring of thorny petals circles him for as long as he is invulnerable, damaging any enemy it touches |
 
 Details: [`design/systems.md`](design/systems.md).
 
@@ -321,8 +321,9 @@ v1.0 contains everything in §3, with new music throughout. The following are de
 | HARD per-stage changes and boss AI branches | v1.1 |
 | PARTs, the garage, Mr. Y's booth and the TURBO trap | v1.1 |
 | GP Rush (boss rush with courses) | v1.1 |
-| Weapon alternate fires (except the Ice Block) and the eight form combinations | open (§9) |
-| 1993 RULES, a preset that plays by Rockman 6's original rules | open (§9) |
+| The eight form combinations (one per weapon, with Rush Power or Rush Jet) | v1.0 |
+| Weapon alternate fires | not planned |
+| 1993 RULES, a preset that plays by Rockman 6's original rules | v1.1 |
 | Time Attack | not planned for now |
 | Playable victory-lap credits; achievements; ENGRISH; the attract-mode crawl | cut |
 | Bass Mode; Mr. X Returns; the Museum gallery; KNOCKOUT; Exhibition rule variants; critical hits | not planned |
@@ -332,10 +333,10 @@ v1.0 contains everything in §3, with new music throughout. The following are de
 The session ledger (`tools/plan/tight.py`, `tools/plan/tally.py`) prices every item in focused work sessions. Before
 the user's review it held about 451 sessions for a smaller v1.0. The content added since (H2, H4, W1 and the castle's
 presentation work, every second set piece, the Exhibitions, and new music for every stage) brings the estimate to
-**about 670 sessions**, or about 690 if the alternate fires and form combinations are included. The ledger is
+**about 680 sessions**, including the eight form combinations. The ledger is
 re-itemised in the next revision round and re-estimated from real progress after the vertical slice.
 
-At three sessions a week, 670 sessions is a little over four years; at four a week, a little over three.
+At three sessions a week, 680 sessions is a little over four years; at four a week, a little over three.
 
 ### 4.3 Releases
 
@@ -437,13 +438,18 @@ Details: [`design/art_audio.md`](design/art_audio.md).
 6. **Scope.** v1.0 is the complete game. All Hall of Fame and castle stages, every second set piece, the Exhibitions and
    new music are in, and the releases are the slice, the venues, the Hall of Fame and the castle (RULINGS §9).
 
+7. **Weapons.** The eight form combinations are in v1.0; weapon alternate fires are not planned.
+8. **1993 RULES** is v1.1.
+9. **Chips.** CLIMBER'S GRIP, COOL HEAD and ZONE MAP replace SNOW CHAINS, FIREPROOF and CENTURION.
+10. **Exhibitions.** Girder Man is the fourth Exhibition for now; the Exhibition concept as a whole is to be revisited.
+
 **Waiting on the user:**
 
-1. **Weapon alternate fires and form combinations** (about 20 sessions). Each weapon would gain a second fire mode and
-   one combination with a Rush form. Are they part of v1.0, or v1.1?
-2. **1993 RULES** (about 3 sessions). A preset that plays with Rockman 6's original rules. v1.0, v1.1, or cut?
-3. **The four chip replacements** in §3.5.
-4. **Girder Man** as the fourth Exhibition (§3.3).
+1. **The Ice Block.** Blizzard Attack's Ice Block (freeze an enemy, stand on it) is the one alternate fire already in
+   the design, and the Blizzard slice uses it. Keep it as an exception, turn it into Blizzard Attack's form combination,
+   or drop it?
+2. **LOST JUNGLE's chip.** THORN GUARD is proposed in §3.5; alternatives are listed in STATUS.md.
+3. **The Exhibitions**, when the user is ready to revisit them.
 
 ---
 
