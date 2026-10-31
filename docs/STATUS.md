@@ -10,15 +10,8 @@ Update this at the end of every session: what was done, what's next, and anythin
 - **Scope:** v1.0 is the complete game (RULINGS §9): all Hall of Fame and castle stages, every second set piece, the
   Exhibitions and new music; about 670 sessions, to be re-itemised in the next revision round. Releases: v0.1 the slice
   (~155), v0.5 the venues (~435), v0.8 the Hall of Fame (~535), v1.0 the castle (~670).
-- **Waiting on the user:**
-  - the Ice Block: keep it as the one alternate fire, make it Blizzard Attack's form combination, or drop it;
-  - LOST JUNGLE's chip. Candidates: **THORN GUARD** (recommended: after a hit, a ring of thorny petals circles Rock for
-    as long as he is invulnerable and damages any enemy it touches, after Plant Barrier); **LIFELINE** (once per stage,
-    a fall into a pit ends with a vine swinging Rock back to the last ledge, at a cost of 4 health; it does not stack
-    with Beat's rescue); **RUNNING START** (after a second of running without stopping, Rock jumps a quarter farther;
-    it opens shortcuts but is never required);
-  - the Exhibition concept, when the user is ready;
-  - the user's detailed review of the design docs, which feeds the next revision round.
+- **Waiting on the user:** the Exhibition concept, when the user is ready; the user's detailed review of the design
+  docs, which feeds the next revision round.
 
 ## Session log
 
@@ -28,8 +21,9 @@ Update this at the end of every session: what was done, what's next, and anythin
   Fame, castle); the castle is the climax of the 16-bit spectacle and gets its own presentation study; music is in
   v1.0; venues must be competent Mega Man stages first; venue chips must matter after their venue; lag rules come from
   measuring CX and 4MI; plain, formal prose with links to every homage's source game.
-- PLAN.md rewritten accordingly. Follow-up answers: the eight form combinations are in v1.0 and weapon alternate fires
-  are not planned; 1993 RULES is v1.1; CLIMBER'S GRIP, COOL HEAD and ZONE MAP are approved; Girder Man is E4 for now.
+- PLAN.md rewritten accordingly. Follow-up answers: the eight form combinations and the Ice Block are in v1.0, and the other
+  alternate fires in v1.1; 1993 RULES is v1.1; CLIMBER'S GRIP, COOL HEAD, ZONE MAP and THORN GUARD are approved; Girder
+  Man is E4 for now.
 - The design docs are not yet revised to match; RULINGS §9 overrides them meanwhile.
 
 ### 2026-10-29 (later): Design round 3, reconciliation and verification

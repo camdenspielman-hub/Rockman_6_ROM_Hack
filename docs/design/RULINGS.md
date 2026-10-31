@@ -553,7 +553,7 @@ adds an ExGrafix test so the options are known early. The MMC5 pulse voices are 
 
 | R0.3 item | Decision |
 |---|---|
-| 1. Weapon alts and form synergies | the 8 form synergies are **Must**; weapon alts are not planned (the Ice Block is pending, PLAN §9) |
+| 1. Weapon alts and form synergies | the 8 form synergies and the Ice Block are **Must**; the other weapon alts are v1.1 |
 | 2. Break Man as the tag partner | v1.1 |
 | 3. HARD per-stage lists and boss branches | v1.1 |
 | 4. Each venue's second set piece and secret-arena twist | **Must** |
@@ -585,5 +585,5 @@ their own revision history outside the "Changes in round N" tables. Every homage
 its Wikipedia article.
 
 **U11 (2026-10-31) — Chips and Exhibitions.** CLIMBER'S GRIP (SUMMIT CLIMBER), COOL HEAD (PERSIAN PALACE) and ZONE MAP
-(ATLANTIS RUINS) are approved as defined in PLAN §3.5. LOST JUNGLE's chip is still open. Girder Man is the fourth
+(ATLANTIS RUINS) and THORN GUARD (LOST JUNGLE) are approved as defined in PLAN §3.5. Girder Man is the fourth
 Exhibition for now; the Exhibition concept is to be revisited with the user.
