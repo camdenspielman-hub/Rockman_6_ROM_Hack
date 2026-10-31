@@ -7,12 +7,22 @@ Update this at the end of every session: what was done, what's next, and anythin
 - **Phase:** design complete (round 3: reconciled and verified). **Next task: M0.0, the MMC5 go/no-go spike** (`docs/PLAN.md` §7 and §10;
   `docs/design/tech.md` §1.10 and §16.3).
 - **Build:** none yet. Analysis tools live in `tools/analysis/` (see its README); the session ledger in `tools/plan/`.
-- **Scope:** v1.0 = the tight Must, ≈ 451 sessions (`python3 tools/plan/tight.py`). Release ladder (RULINGS R8.1): v0.1 Blizzard slice
-  (M4, ~150), v0.5 Round One (M6, ~342), v1.0 Championship (M9, ~451).
-- **User answers** are in `docs/PLAN.md` §9: emulator-only is fine; art and JP review undecided (show a sample sprite
-  early); title ROCKMAN 6 GP: 史上最大の再会!! (Saikai); pace 2-4 sessions a week.
+- **Scope:** v1.0 is the complete game (RULINGS §9): all Hall of Fame and castle stages, every second set piece, the
+  Exhibitions and new music; about 670 sessions, to be re-itemised in the next revision round. Releases: v0.1 the slice
+  (~155), v0.5 the venues (~435), v0.8 the Hall of Fame (~535), v1.0 the castle (~670).
+- **Waiting on the user:** weapon alternate fires and form combinations, 1993 RULES, the four chip replacements, Girder
+  Man (`docs/PLAN.md` §9); the user's detailed review of the design docs, which will feed the next revision round.
 
 ## Session log
+
+### 2026-10-31: The user's review of PLAN.md
+
+- The user's directions are recorded as RULINGS §9: v1.0 is the complete game; four releases (slice, venues, Hall of
+  Fame, castle); the castle is the climax of the 16-bit spectacle and gets its own presentation study; music is in
+  v1.0; venues must be competent Mega Man stages first; venue chips must matter after their venue; lag rules come from
+  measuring CX and 4MI; plain, formal prose with links to every homage's source game.
+- PLAN.md rewritten accordingly, with proposed chip replacements and a fourth Exhibition (Girder Man).
+- The design docs are not yet revised to match; RULINGS §9 overrides them meanwhile.
 
 ### 2026-10-29 (later): Design round 3, reconciliation and verification
 

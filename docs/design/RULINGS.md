@@ -518,3 +518,68 @@ like the rest of this file.
 - The art-acceptance gallery is a local HTML page plus PNGs sent to the user at each gate. It is published only if the
   user asks.
 - EXTRA CONFIG and RECORDS keep meta's unlock points.
+
+---
+
+## 9. The user's directions (2026-10-31)
+
+These come from the user's review of PLAN.md. They override every earlier section of this file and every design doc.
+The design docs are brought in line with them in the next revision round, after the user's detailed review of the
+docs; until then, where a doc disagrees with this section, this section wins.
+
+**U1 — v1.0 is the complete game.** Scope follows the design, and the schedule follows scope. Cutting content to meet a
+session target is not a tool; the release ladder exists to deliver playable builds along the way, not to trim.
+
+**U2 — Every fortress and castle stage is Must:** H1-H5 and W1-W3, with the escape. This includes W1 (the Upgrade Lab
+with its 16-bit section), each stage's second set piece, Doc Robot MK-VI, Grand Pi-kun's sizes, W3's approach and the
+escape's eras. The H2 and H4 "closed for renovation" doors are withdrawn.
+
+**U3 — The release ladder has four rungs:**
+
+| Release | Contents |
+|---|---|
+| v0.1 | the vertical slice (SUMMIT CLIMBER end to end) |
+| v0.5 | the Opening, all 8 venues, the Exhibitions, the HALFTIME RIOT |
+| v0.8 | the Hall of Fame, H1-H5 |
+| v1.0 | Super Wily Castle W1-W3, the escape and the ending |
+
+**U4 — Super Wily Castle is the apex of the game's spectacle.** The "16-bit upgrade" story depends on how convincingly
+the castle delivers it. R1.3's limit on ExGrafix (text-free locked rooms only) is reopened for the castle: tech runs a
+dedicated study of the castle's presentation (ExGrafix colour, the MMC5 pulse channels, raster effects, how text is
+shown while ExRAM is in use for graphics) and proposes the most ambitious version the hardware supports. The M0 spike
+adds an ExGrafix test so the options are known early. The MMC5 pulse voices are Must for the castle.
+
+**U5 — The cut line is re-sorted:**
+
+| R0.3 item | Decision |
+|---|---|
+| 1. Weapon alts and form synergies | open: the user decides |
+| 2. Break Man as the tag partner | v1.1 |
+| 3. HARD per-stage lists and boss branches | v1.1 |
+| 4. Each venue's second set piece and secret-arena twist | **Must** |
+| 5. H2, H4, W1 | **Must** (U2) |
+| 6. The Exhibitions | **Must**; E4 Maze is replaced by a new Exhibition that fits the single-arena format |
+| 7. Time Attack | cut for now |
+| 8. The victory-lap credits | cut |
+| 9. The PARTs bundle | v1.1 |
+| 10. 1993 RULES | open: the user decides |
+| 11. GP Rush | v1.1 |
+| 12. Achievements, ENGRISH, the attract crawl | cut |
+
+**U6 — Music is Must for v1.0.** Every stage gets its own new music, so each level feels new. The search for a composer
+starts now; until one is found, Claude sequences the tracks.
+
+**U7 — A venue is a competent Mega Man stage first.** Running, jumping, sliding and shooting stay the core verbs on
+every screen; the homage mechanic changes the play without replacing it. Each venue is re-reviewed against this rule
+when the user reviews the venue docs.
+
+**U8 — Behaviour chips must matter after their venue.** A venue chip may not be useful only in its own stage, and no chip
+may reward standing still. SNOW CHAINS, FIREPROOF, CENTURION and AUTO RECOVER are redesigned; PLAN §3.4 lists the
+proposed replacements, pending the user's approval.
+
+**U9 — Lag is designed out using what CX and 4MI did.** Set-piece budgets are derived from measurements of how the
+reference hacks keep their busiest scenes inside the frame, not from a slot cap alone (PLAN §8, risk 4).
+
+**U10 — Writing.** Design prose is plain and formal. Documents describe the design as it stands; they do not narrate
+their own revision history outside the "Changes in round N" tables. Every homage names its source game with a link to
+its Wikipedia article.
